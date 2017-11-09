@@ -1,5 +1,6 @@
-function [Components, h] = Set_PCM_components(print, PCM_dir, FigDim)
-%% Set the different pattern components
+function [Components, h] = Set_PCM_components_RDM(print, FigDim)
+
+%% Set the different pattern components using RDMs
 
 fprintf('Preparing pattern components\n')
 
@@ -9,18 +10,14 @@ CondNames = {...
     'T contra','T ipsi'...
     };
 
-ID_Matrix = 1-eye(numel(CondNames));
+ID_Matrix = eye(numel(CondNames));
 BaseMatrix = 1-eye(numel(CondNames)); %ones(numel(CondNames));
-
-Null = 1-eye(numel(CondNames));
-Components(1).mat = Null;
-Components(1).name = [num2str(numel(Components)) '-Null'];
 
 SensMod = BaseMatrix;
 SensMod(1:2,1:2)=0;
 SensMod(3:4,3:4)=0;
 SensMod(5:6,5:6)=0;
-Components(end+1).mat = SensMod;
+Components(1).mat = SensMod;
 Components(end).name = [num2str(numel(Components)) '-Sensory modalities'];
 
 SensMod = BaseMatrix;
@@ -33,10 +30,10 @@ SensMod(3:4,3:4)=0;
 Components(end+1).mat = SensMod;
 Components(end).name = [num2str(numel(Components)) '-V stim'];
 
-% SensMod = BaseMatrix;
-% SensMod(5:6,5:6)=0;
-% Components(end+1).mat = SensMod;
-% Components(end).name = [num2str(numel(Components)) '-T stim'];
+SensMod = BaseMatrix;
+SensMod(5:6,5:6)=0;
+Components(end+1).mat = SensMod;
+Components(end).name = [num2str(numel(Components)) '-T stim'];
 
 
 NonPreferred_A = BaseMatrix;
@@ -66,38 +63,40 @@ Components(end).name = [num2str(numel(Components)) '-Ipsi Contra'];
 
 IpsiContra_VT = IpsiContra;
 IpsiContra_VT(1:2,:)=1; IpsiContra_VT(:,1:2)=1;
-IpsiContra_VT(1,1)=0; IpsiContra_VT(2,2)=0;
+% IpsiContra_VT(1,1)=0; IpsiContra_VT(2,2)=0;
 Components(end+1).mat = IpsiContra_VT;
 Components(end).name = [num2str(numel(Components)) '-Ipsi Contra_{VT}'];
 
 IpsiContra_A = IpsiContra;
-IpsiContra_A(3:6,3:6)=ID_Matrix(3:6,3:6);
+IpsiContra_A(3:6,3:6)=BaseMatrix(3:6,3:6);
 Components(end+1).mat = IpsiContra_A;
 Components(end).name = [num2str(numel(Components)) '-Ipsi Contra_{A}'];
 
 IpsiContra_AT = IpsiContra;
 IpsiContra_AT(3:4,:)=1; IpsiContra_AT(:,3:4)=1;
-IpsiContra_AT(3,3)=0; IpsiContra_AT(4,4)=0;
+% IpsiContra_AT(3,3)=0; IpsiContra_AT(4,4)=0;
 Components(end+1).mat = IpsiContra_AT;
 Components(end).name = [num2str(numel(Components)) '-Ipsi Contra_{AT}'];
 
 IpsiContra_V = IpsiContra;
 IpsiContra_V(1:2,5:6)=1; IpsiContra_V(5:6,1:2)=1;
-IpsiContra_V(1:2,1:2)=ID_Matrix(1:2,1:2);
-IpsiContra_V(5:6,5:6)=ID_Matrix(5:6,5:6);
+IpsiContra_V(1:2,1:2)=BaseMatrix(1:2,1:2);
+IpsiContra_V(5:6,5:6)=BaseMatrix(5:6,5:6);
 Components(end+1).mat = IpsiContra_V;
 Components(end).name = [num2str(numel(Components)) '-Ipsi Contra_{V}'];
 
-h = [];
+
 
 %% Print the RDMs
+h = [];
+[nVerPan, nHorPan]=rsa.fig.paneling(numel(Components));
 if print
     
     h(1) = figure('name', 'Components', 'Position', FigDim, 'Color', [1 1 1]);
-    
+
     for iCpt = 1:numel(Components)
         
-        subplot(4,3,iCpt);
+        subplot(nVerPan,nHorPan,iCpt);
         
         colormap('gray');
         
@@ -115,7 +114,6 @@ if print
     end
     
     mtit('Pattern components: RDMs', 'fontsize', 10, 'xoff',0,'yoff',.035);
-%     print(gcf, fullfile(PCM_dir, 'Cdt', 'Pattern_components_RDM.tif'), '-dtiff')
     
 end
 
@@ -134,7 +132,7 @@ if print
     
     for iCpt = 1:numel(Components)
         
-        subplot(4,3,iCpt);
+        subplot(nVerPan,nHorPan,iCpt);
         
         colormap('gray');
         
@@ -152,7 +150,6 @@ if print
     end
     
     mtit('Pattern components: G matrices', 'fontsize', 10, 'xoff',0,'yoff',.035);
-%     print(gcf, fullfile(PCM_dir, 'Cdt', 'Pattern_components_G_matrices.tif'), '-dtiff')
     
 end
 

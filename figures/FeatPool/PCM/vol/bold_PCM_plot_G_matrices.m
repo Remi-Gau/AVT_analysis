@@ -7,17 +7,12 @@ Get_dependencies('/home/rxg243/Dropbox/')
 
 surf = 0; % run of volumne whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
-Plot = 1; % plot figures
-do_null_free_only = 0;
-do_models_only = 0;
 
 cd(StartDir)
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
 NbLayers = 6;
-
-MaxIteration = 50000;
 
 if surf
     %     ToPlot={'Cst','Lin','Quad'};
@@ -41,6 +36,8 @@ end
 
 
 ColorMap = brain_colour_maps('hot_increasing');
+ColorMap2 = seismic(100);
+
 FigDim = [100, 100, 1000, 1500];
 
 PCM_dir = fullfile(StartDir, 'figures', 'PCM');
@@ -50,29 +47,6 @@ mkdir(PCM_dir, 'Cdt');
 Save_dir = fullfile(StartDir, 'results', 'PCM', Output_dir);
 mkdir(Save_dir)
 
-
-
-if ~do_null_free_only
-    %% Set the different pattern components
-    %     [Components, h] = Set_PCM_components(1, FigDim);
-    %     if ~isempty(h)
-    %         print(h(1), fullfile(PCM_dir, 'Cdt', 'Pattern_components_RDM.tif'), '-dtiff');
-    %         print(h(2), fullfile(PCM_dir, 'Cdt', 'Pattern_components_G_matrices.tif'), '-dtiff');
-    %     end
-    
-    [Components, h] = Set_PCM_components_Feature(1, FigDim);
-    if ~isempty(h)
-        print(h(1), fullfile(PCM_dir, 'PCM_features.tif'), '-dtiff');
-        print(h(2), fullfile(PCM_dir, 'PCM_G_matrix.tif'), '-dtiff');
-        print(h(3), fullfile(PCM_dir, 'PCM_RDMs.tif'), '-dtiff');
-    end
-    %% Display the different models
-    [Models_A, Models_V, h] = Set_PCM_models(Components, 1, FigDim);
-    if ~isempty(h)
-        print(h(1), fullfile(PCM_dir, 'Cdt', 'Models_for_auditory_ROIs.tif'), '-dtiff');
-        print(h(2), fullfile(PCM_dir, 'Cdt', 'Models_for_visual_ROIs.tif'), '-dtiff');
-    end
-end
 
 %% Loading data
 
@@ -126,7 +100,7 @@ for iSub = 1:NbSub
 end
 
 
-%% Stim VS Stim
+%%
 if surf
     conditionVec_day=repmat((1:6)',3,1);
     
@@ -139,10 +113,10 @@ else
     partition_day = repmat((1:3)',6,1);
 end
 
-fprintf('Running PCM\n')
+fprintf('\nEstimating G matrices\n')
 
 
-for iToPlot = 1:numel(ToPlot)
+for iToPlot = 1%:numel(ToPlot)
     
     for Target = 1
         
@@ -161,11 +135,6 @@ for iToPlot = 1:numel(ToPlot)
                 'T ipsi','T contra'...
                 };
         end
-        
-        AllTgroup=cell(numel(ROI),1);
-        Alltheta=cell(numel(ROI),1);
-        AllTcross=cell(numel(ROI),1);
-        AllthetaCr=cell(numel(ROI),1);
         
         for iROI = 1:numel(ROI)
             
@@ -192,15 +161,14 @@ for iToPlot = 1:numel(ToPlot)
                     end
                 end
                 
-                
                 if surf
                     if iSub==5
                         error('Not implemented')
                     else
-                        conditionVec=repmat((1:numel(CondNames))',Nb_sess(iSub),1);
-                        
-                        partitionVec = repmat(1:Nb_sess(iSub),numel(CondNames),1);
-                        partitionVec = partitionVec(:);
+                    conditionVec=repmat((1:numel(CondNames))',Nb_sess(iSub),1);
+                    
+                    partitionVec = repmat(1:Nb_sess(iSub),numel(CondNames),1);
+                    partitionVec = partitionVec(:);
                     end
                 else
                     if iSub==5
@@ -255,65 +223,14 @@ for iToPlot = 1:numel(ToPlot)
             end
             
             
-            %% Now build the models
-            if ~do_null_free_only
-                if iROI<3
-                    Models = Models_A;
-                else
-                    Models = Models_V;
-                end
-            end
-            
-            M = {};
-            
-            colors={'b'};
-            
-            if ~do_models_only
-                % null model
-                M{1}.type       = 'component';
-                M{1}.numGparams = 1;
-                M{1}.Gc         = nearestSPD(zeros(numel(CondNames)));
-                M{1}.name       = 'null';
-                M{1}.fitAlgorithm = 'minimize';
-            end
-            
-            
-            if ~do_null_free_only
-                % add each model
-                for iMod=1:numel(Models)
-                    
-                    M{end+1}.type       = 'component';
-                    
-                    M{end}.numGparams = numel(Models(iMod).Cpts);
-                    
-                    M{end}.Gc         = cat(3,Components(Models(iMod).Cpts).G);
-                    
-                    tmp = strrep(num2str(Models(iMod).Cpts),'  ', ' ');
-                    tmp = strrep(tmp,'  ', ' ');
-                    M{end}.name       = strrep(tmp,' ', '+'); clear tmp
-                    
-                    M{end}.fitAlgorithm = 'minimize';
-                    
-                    colors{end+1}='b';
-                    
-                end
-            end
-            
-            if ~do_models_only
-                % Free model as Noise ceiling
-                M{end+1}.type       = 'freechol';
-                M{end}.numCond    = numel(CondNames);
-                M{end}.name       = 'noiseceiling';
-                M{end}           = pcm_prepFreeModel(M{end});
-                M{end}.fitAlgorithm = 'minimize';
-            end
-            
             
             %% 1. Get the crossvalidated G-matrix for each data set
             G_hat = [];
             
             for iSub=1:length(Y)
+                
                 G_hat(:,:,iSub)=pcm_estGCrossval(Y{iSub},partVec{iSub},condVec{iSub});
+                
             end;
             
             Gm = mean(G_hat,3); % Mean estimate
@@ -325,15 +242,54 @@ for iToPlot = 1:numel(ToPlot)
             [COORD,l]=pcm_classicalMDS(Gm,'contrast',C);
             
             
-            %% Plot
-            figure('name', sprintf('PCM - %s - %s - %s - %s', Stim_suffix, Beta_suffix, ROI(iROI).name, ToPlot{iToPlot}),...
+            %% Plot individual G matrix
+            close all
+            
+            figure('name', sprintf('Individual G matrices - %s - %s - %s - %s', Stim_suffix, Beta_suffix, ROI(iROI).name, ToPlot{iToPlot}),...
+                'Position', FigDim, 'Color', [1 1 1]);
+            
+            [nVerPan, nHorPan]=rsa.fig.paneling(size(G_hat,3));
+            
+            for iSub=1:size(G_hat,3)
+                
+                % G matrix
+                subplot(nVerPan,nHorPan,iSub);
+                
+                colormap(ColorMap);
+                
+                imagesc(H*G_hat(:,:,iSub)*H');
+                colorbar
+                
+                axis on
+                set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', [], ...
+                    'ytick', 1:6,'yticklabel', CondNames, ...
+                    'ticklength', [0.01 0], 'fontsize', 4)
+                box off
+                axis square
+                t=title(SubLs(iSub).name);
+                set(t, 'fontsize', 10);
+                
+            end
+            
+            fig_name = sprintf('Individual G matrices - %s - %s - %s - %s', strrep(ROI(iROI).name, '_', '-'),...
+                Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+            
+            % Print
+            mtit(fig_name, 'fontsize', 12, 'xoff',0,'yoff',.035)
+            print(gcf, fullfile(PCM_dir, 'Cdt', [strrep(fig_name,' ','_') '.tif' ]), '-dtiff')
+            
+            %% Plot Group G matrices
+            
+            figure('name', sprintf('Group G matrices - %s - %s - %s - %s', Stim_suffix, Beta_suffix, ROI(iROI).name, ToPlot{iToPlot}),...
                 'Position', FigDim, 'Color', [1 1 1]);
             
             % G matrix
-            subplot(3,4,1);
+            subplot(1,2,1);
             colormap(ColorMap);
             
             imagesc(H*Gm*H');
+            
+            colorbar
             
             axis on
             set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', [], ...
@@ -341,92 +297,29 @@ for iToPlot = 1:numel(ToPlot)
                 'ticklength', [0.01 0], 'fontsize', 4)
             box off
             axis square
-            t=title('Crossvalidated G matrix');
+            t=title('Crossvalidated group-level G matrix');
             set(t, 'fontsize', 10);
             
             % MDS
-            subplot(3,4,3)
-            
+            subplot(1,2,2)
             
             plot(COORD(:,1),COORD(:,2),'o');
-            %             axis equal
-            axis square
+            axis equal
+            %             axis square
             grid on
             t=title('G matrix via MDS');
             set(t, 'fontsize', 10);
             
             
-            %% Run the PCM
-            % Treat the run effect as random or fixed?
-            % We are using a fixed run effect here, as we are not interested in the
-            % activity relative the the baseline (rest) - so as in RSA, we simply
-            % subtract out the mean patttern across all conditions.
-            runEffect  = 'fixed';
+            fig_name = sprintf('Group G matrices - %s - %s - %s - %s', strrep(ROI(iROI).name, '_', '-'), Stim_suffix, ...
+                Beta_suffix, ToPlot{iToPlot});
             
-            % Fit the models on the group level
-            [Tgroup,theta] = pcm_fitModelGroup(Y,M,partVec,condVec,'runEffect',runEffect,'fitScale',1);
-            
-            % Fit the models through cross-subject crossvalidation
-            [Tcross,thetaCr] = pcm_fitModelGroupCrossval(Y,M,partVec,condVec,'runEffect',runEffect,'groupFit',...
-                theta,'fitScale',1,'MaxIteration',MaxIteration);
-            
-            
-            %% Plot
-            if Plot && ~do_null_free_only && ~do_models_only
-                
-                % Provide a plot of the crossvalidated likelihoods
-                subplot(3,4,5:12);
-                hold on
-                
-                T = pcm_plotModelLikelihood(Tcross,M,'upperceil',Tgroup.likelihood(:,end), 'colors', colors);
-
-                % print subjects
-                binWidth = max(max(T.likelihood_norm(:,2:end-1))-min(T.likelihood_norm(:,2:end-1)));
-                
-                for iM=2:numel(M)-1
-                    h = plotSpread(T.likelihood_norm(:,iM), 'distributionIdx', ones(size(T.likelihood_norm(:,iM))), ...
-                        'distributionMarkers',{'o'},'distributionColors',{'w'}, ...
-                        'xValues', iM-1, 'binWidth', binWidth/100, 'spreadWidth', .8);
-                    set(h{1}, 'MarkerSize', 5, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1)
-                    labels{iM-1} = M{iM}.name;
-                end
-                ax=axis;
-                
-                MIN = min(min(T.likelihood_norm(:,2:end-1)));
-                MAX = max(max(T.likelihood_norm(:,2:end-1)));
-                
-                if MIN<0
-                    ax=axis;
-                    MIN = ceil(abs(MIN));
-                    axis([ax(1) ax(2) MIN*-1 MAX])
-                end
-
-                set(gca,'XTick',1:numel(M)-2);
-                set(gca,'XTickLabel',labels);
-                set(gca,'fontsize', 8)
-
-                mtit(sprintf('PCM - %s - %s - %s - %s', Stim_suffix, Beta_suffix, ROI(iROI).name, ToPlot{iToPlot}), 'fontsize', 12, 'xoff',0,'yoff',.035)
-                
-            end
-            
-            print(gcf, fullfile(PCM_dir, 'Cdt', sprintf('PCM_%s_%s_%s_%s.tif', Stim_suffix, Beta_suffix, ROI(iROI).name, ToPlot{iToPlot})), '-dtiff')
-            
-            %% Save
-            if do_null_free_only
-                save(fullfile(Save_dir, sprintf('PCM_null_free_%s_%s_%s_%s.mat', Stim_suffix, Beta_suffix, ROI(iROI).name, ToPlot{iToPlot})), ...
-                    'Tgroup', 'theta', 'Tcross', 'thetaCr', 'partVec', 'condVec', 'G_hat', 'M')
-            else
-                save(fullfile(Save_dir, sprintf('PCM_%s_%s_%s_%s_%s.mat', Stim_suffix, Beta_suffix, ROI(iROI).name, ...
-                    ToPlot{iToPlot}, datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
-                    'Tgroup', 'theta', 'Tcross', 'thetaCr', 'partVec', 'condVec', 'G_hat', 'M', 'Models_A', 'Models_V',...
-                    'Components')
-            end
+            % Print
+            mtit(fig_name, 'fontsize', 12, 'xoff',0,'yoff',.035)
+            print(gcf, fullfile(PCM_dir, 'Cdt', [strrep(fig_name,' ','_') '.tif' ]), '-dtiff')
             
             
         end
-        
-        %% save
-        
     end
 end
 
