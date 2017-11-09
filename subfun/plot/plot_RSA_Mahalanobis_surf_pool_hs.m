@@ -41,7 +41,7 @@ for iSubj=1:NbSub
     
     Sub_dir = fullfile(StartDir, SubLs(iSubj).name);
     
-    load(fullfile(Sub_dir,'results','profiles','surf','RSA','RSA_mahalanobis_results.mat'),  ...
+    load(fullfile(Sub_dir,'results','profiles','surf','RSA','RSA_mahalanobis_results_2.mat'),  ...
         'RDMs_CV', 'RDMs_CV_sens', 'RDMs_CV_side')
     
     for i = 1:3
@@ -220,7 +220,7 @@ RDM = nanmean(tmp(:,:,IsAllZero), 3);
 end
 
 function title_print(Name,Dest_dir)
-mtit(sprintf(strrep(Name, '8','\n')), 'fontsize', 10, 'xoff',0,'yoff',.025);
+mtit(sprintf(strrep([Name ' - 2'], '8','\n')), 'fontsize', 10, 'xoff',0,'yoff',.025);
 Name = strrep(Name, '8', ' - ');
 % saveFigure(fullfile(Dest_dir, strrep([Name '.pdf'], ' ', '_')));
 print(fullfile(Dest_dir, strrep([Name '.tiff'], ' ', '_')), '-dtiff')

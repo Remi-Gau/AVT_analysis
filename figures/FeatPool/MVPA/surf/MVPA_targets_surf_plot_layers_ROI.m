@@ -1,6 +1,6 @@
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..','..', '..');
+StartDir = fullfile(pwd, '..','..','..','..','..');
 cd (StartDir)
 
 addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
@@ -9,23 +9,22 @@ ResultsDir = fullfile(StartDir, 'results', 'SVM');
 FigureFolder = fullfile(StartDir, 'figures', 'SVM', 'surf');
 [~,~,~] = mkdir(FigureFolder);
 
-
-% SVM(1) = struct('name', 'A Ipsi VS Contra', 'ROI', 1:length(ROIs));
-% SVM(end+1) = struct('name', 'V Ipsi VS Contra', 'ROI', 1:length(ROIs));
-% SVM(end+1) = struct('name', 'T Ipsi VS Contra', 'ROI', 1:length(ROIs));
-%
-% SVM(end+1) = struct('name', 'A VS V Ipsi', 'ROI', 1:length(ROIs));
-% SVM(end+1) = struct('name', 'A VS T Ipsi', 'ROI', 1:length(ROIs));
-% SVM(end+1) = struct('name', 'V VS T Ipsi', 'ROI', 1:length(ROIs));
-%
-% SVM(end+1) = struct('name', 'A VS V Contra', 'ROI', 1:length(ROIs));
-% SVM(end+1) = struct('name', 'A VS T Contra', 'ROI', 1:length(ROIs));
-% SVM(end+1) = struct('name', 'V VS T Contra', 'ROI', 1:length(ROIs));
+%     SVM(1) = struct('name', 'A Ipsi VS Contra - Targets', 'ROI', 1:length(ROIs));
+%     SVM(end+1) = struct('name', 'V Ipsi VS Contra - Targets', 'ROI', 1:length(ROIs));
+%     SVM(end+1) = struct('name', 'T Ipsi VS Contra - Targets', 'ROI', 1:length(ROIs));
+%     
+%     SVM(end+1) = struct('name', 'A VS V Ipsi - Targets', 'ROI', 1:length(ROIs));
+%     SVM(end+1) = struct('name', 'A VS T Ipsi - Targets', 'ROI', 1:length(ROIs));
+%     SVM(end+1) = struct('name', 'V VS T Ipsi - Targets', 'ROI', 1:length(ROIs));
+%     
+%     SVM(end+1) = struct('name', 'A VS V Contra - Targets', 'ROI', 1:length(ROIs));
+%     SVM(end+1) = struct('name', 'A VS T Contra - Targets', 'ROI', 1:length(ROIs));
+%     SVM(end+1) = struct('name', 'V VS T Contra - Targets', 'ROI', 1:length(ROIs));
 
 TitSuf = {
-    'Contra_vs_Ipsi';...
-    'Between_Senses_Ipsi';...
-    'Between_Senses_Contra'};
+    'Targets-Contra_vs_Ipsi';...
+    'Targets-Between_Senses_Ipsi';...
+    'Targets-Between_Senses_Contra'};
 
 SubSVM = [1:3;4:6;7:9];
 
@@ -36,7 +35,7 @@ for iSub=1:size(SubLs,1)
 end
 [a, b, c, d, e, f, g, h, i, j] = ndgrid(sets{:});
 ToPermute = [a(:), b(:), c(:), d(:), e(:), f(:), g(:), h(:), i(:), j(:)];
-ToPermute = [];
+% ToPermute = [];
 
 opt.svm.log2c = 1;
 opt.svm.dargs = '-s 0';
@@ -50,7 +49,7 @@ for NbLayers=6
     for WithQuad= 1
         for WithPerm = 0
             
-            for Norm = 5:7
+            for Norm = [6 8]
                 
                 switch Norm
                     case 5
@@ -71,14 +70,20 @@ for NbLayers=6
                         opt.scaling.feat.mean = 1;
                         opt.scaling.feat.range = 0;
                         opt.scaling.feat.sessmean = 0;
+                    case 8
+                        opt.scaling.img.eucledian = 0;
+                        opt.scaling.img.zscore = 0;
+                        opt.scaling.feat.mean = 0;
+                        opt.scaling.feat.range = 0;
+                        opt.scaling.feat.sessmean = 0;                            
                 end
                 
                 SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
                 
                 if WithQuad
-                    File2Load = fullfile(ResultsDir, strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
+                    File2Load = fullfile(ResultsDir, strcat('GrpTargetsPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
                 else
-                    File2Load = fullfile(ResultsDir, strcat('GrpPoolNoQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
+                    File2Load = fullfile(ResultsDir, strcat('GrpTargetsPoolNoQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
                 end
                 
                 if exist(File2Load, 'file')

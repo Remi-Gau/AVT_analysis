@@ -67,9 +67,9 @@ end
 for target=0:1
     
     if target
-        load(fullfile(StartDir,'results','profiles','surf','RSA','RSA_targets_grp_results.mat'))
+        load(fullfile(StartDir,'results','profiles','surf','RSA','RSA_targets_grp_results_2.mat'))
     else
-        load(fullfile(StartDir,'results','profiles','surf','RSA','RSA_grp_results.mat'))
+        load(fullfile(StartDir,'results','profiles','surf','RSA','RSA_grp_results_2.mat'))
     end
     
     %% RSA
@@ -435,7 +435,7 @@ end
 
 
 function title_print(Name,Dest_dir)
-mtit(sprintf(strrep(Name, '8','\n')), 'fontsize', 10, 'xoff',0,'yoff',.025);
+mtit(sprintf(strrep([Name ' - 2'], '8','\n')), 'fontsize', 10, 'xoff',0,'yoff',.025);
 Name = strrep(Name, '8', ' - ');
 % saveFigure(fullfile(Dest_dir, strrep([Name '.pdf'], ' ', '_')));
 print(fullfile(Dest_dir, strrep([Name '.tiff'], ' ', '_')), '-dtiff')

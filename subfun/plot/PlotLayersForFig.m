@@ -189,7 +189,9 @@ for iCdt = 1:NbCdts
     %% Inset with betas
     tmp = squeeze(Beta(:,SubPlotOrder(iCdt),:));
     
-    tmp(2,:) = tmp(2,:)*-1;
+    if ~DATA.MVPA
+        tmp(2,:) = tmp(2,:)*-1;
+    end
     
     if ~isempty(ToPermute)
         for iPerm = 1:size(ToPermute,1)
@@ -305,7 +307,7 @@ end
 mtit(sprintf(Name), 'xoff', 0, 'yoff', +0.03, 'fontsize', 12)
 set(fig, 'Visible', Visible)
 
-print(fig, fullfile(DATA.FigureFolder, strcat(strrep(Name,'\n','-'), '_', num2str(NbLayers), 'Layers', suffix, '.pdf')), '-dpdf')
+% print(fig, fullfile(DATA.FigureFolder, strcat(strrep(Name,'\n','-'), '_', num2str(NbLayers), 'Layers', suffix, '.pdf')), '-dpdf')
 print(fig, fullfile(DATA.FigureFolder, strcat(strrep(Name,'\n','-'), '_', num2str(NbLayers), 'Layers', suffix, '.tif')), '-dtiff')
 
 end

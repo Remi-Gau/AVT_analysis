@@ -1,5 +1,12 @@
 function plot_RSA_Maha_Cor_Reg_vol_pool_hs(StartDir, SubLs, beta_type, ranktrans, isplotranktrans)
 
+Do_hs_Idpdtly = 1;
+if Do_hs_Idpdtly
+    hs_sufix='lhs';
+else
+    hs_sufix='';
+end
+
 if nargin < 3 || isempty(beta_type)
     beta_type = 0;
 end
@@ -120,9 +127,16 @@ for iSubj=1:NbSub
     
     Sub_dir = fullfile(StartDir, SubLs(iSubj).name);
     Save_dir = fullfile(Sub_dir,'results','profiles','vol','RSA');
-    
-    load(fullfile(Save_dir,['RSA_results_' Save_suffix '.mat']),  ...
-        'RDMs', 'RDMs_CV', 'BetaReg_CV', 'BetaReg')
+        
+    if Do_hs_Idpdtly
+        load(fullfile(Save_dir,['RSA_results_hs_idpdt_' Save_suffix '.mat']),  ...
+            'RDMs', 'RDMs_CV', 'BetaReg_CV', 'BetaReg')
+        ihs = 1;
+    else
+        load(fullfile(Save_dir,['RSA_results_2_' Save_suffix '.mat']),  ...
+            'RDMs', 'RDMs_CV', 'BetaReg_CV', 'BetaReg')
+        ihs = 1;
+    end
     
     for i = 1
         switch i
@@ -145,21 +159,21 @@ for iSubj=1:NbSub
                     
                     for RDM_to_plot = 1:2
                         Grp_Reg{i,target}{iROI,iToPlot,RDM_to_plot}(:,:,iSubj) = ...
-                            BetaReg{iROI,iToPlot,target,RDM_to_plot}; %#ok<*USENS,*NASGU>
+                            BetaReg{iROI,iToPlot,target,RDM_to_plot,ihs}; %#ok<*USENS,*NASGU>
                     end
                     for RDM_to_plot = 1:4
                         Grp_Reg{i,target}{iROI,iToPlot,2+RDM_to_plot}(:,:,iSubj) = ...
-                            BetaReg_CV{iROI,iToPlot,target,RDM_to_plot};
+                            BetaReg_CV{iROI,iToPlot,target,RDM_to_plot,ihs};
                     end
                     
                     
                     for RDM_to_plot = 1:2
                         Grp_RDMs{i,target}{iROI,iToPlot,RDM_to_plot}(:,:,iSubj) = ...
-                            RDMs{iROI,iToPlot,target,RDM_to_plot};
+                            RDMs{iROI,iToPlot,target,RDM_to_plot,ihs};
                     end
                     for RDM_to_plot = 1:6
                         Grp_RDMs{i,target}{iROI,iToPlot,2+RDM_to_plot}(:,:,iSubj) = ...
-                            RDMs_CV{iROI,iToPlot,target,RDM_to_plot};
+                            RDMs_CV{iROI,iToPlot,target,RDM_to_plot,ihs};
                     end
                     
                 end
@@ -290,7 +304,7 @@ for target = 0:(DoTarget-1)
                 
                 rename_subplot([3 3],CondNames,ROIs)
 
-                Name = sprintf('%s - %s - %s - %s8%s - %s', DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
+                Name = sprintf('%s - %s - %s - %s - %s8%s - %s', hs_sufix, DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
                 
                 title_print(Name,Dest_dir)
 
@@ -320,7 +334,7 @@ for target = 0:(DoTarget-1)
 
                     rename_subplot([4 3],CondNames,{SubLs.name}')
                     
-                    Name = sprintf('Subjects - %s - %s - %s - %s - %s8%s - %s', ROIs{iROI}, DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
+                    Name = sprintf('Subjects - %s - %s - %s - %s - %s - %s8%s - %s',hs_sufix, ROIs{iROI}, DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
  
                     title_print(Name,fullfile(Dest_dir,'Subjects'))
                 end
@@ -405,7 +419,7 @@ for target = 0:(DoTarget-1)
 %                     'ticklength', [0.01 0.01], 'fontsize', 8, 'YAxisLocation','right')
 %                 box off
                 
-                Name = sprintf('%s - %s - %s - %s8%s - %s', DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
+                Name = sprintf('%s - %s - %s - %s - %s8%s - %s', hs_sufix, DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
                 
                 title_print(Name,Dest_dir)
                 
@@ -451,7 +465,7 @@ for target = 0:(DoTarget-1)
 %                         'ticklength', [0.01 0.01], 'fontsize', 8, 'YAxisLocation','right')
 %                     box off
                     
-                    Name = sprintf('Subjects - %s - %s - %s - %s - %s8%s - %s', ROIs{iROI}, DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
+                    Name = sprintf('Subjects - %s - %s - %s - %s - %s - %s8%s - %s', hs_sufix, ROIs{iROI}, DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
  
                     title_print(Name,fullfile(Dest_dir,'Subjects'))
                 end
@@ -482,7 +496,7 @@ end
 
 
 function title_print(Name,Dest_dir)
-mtit(sprintf(strrep(Name, '8','\n')), 'fontsize', 10, 'xoff',0,'yoff',.025);
+mtit(sprintf(strrep([Name ' - 2'], '8','\n')), 'fontsize', 10, 'xoff',0,'yoff',.025);
 Name = strrep(Name, '8', ' - ');
 % saveFigure(fullfile(Dest_dir, strrep([Name '.pdf'], ' ', '_')));
 print(fullfile(Dest_dir, strrep([Name '.tiff'], ' ', '_')), '-dtiff')

@@ -29,14 +29,14 @@ for i=1:size(COLOR_Layer,1)
     rectangle('Position', [RecPos(i) 0 diff(RecPos(1:2)) 1], 'facecolor', COLOR_Layer(i,:), 'edgecolor', 'w');
     if LabelDepth
         t = text(RecPos(i)+diff(RecPos(1:2))/2-.023,0.5,num2str(TEXT(i)));
-        set(t,'fontsize',Fontsize-3);
+        set(t,'fontsize',Fontsize);
     end
 end
 
 axis([0 0.9 0 1])
 
-set(gca,'color', 'none', 'tickdir', 'out', 'xtick', [0 .9],'xticklabel',  {'wm/gm' 'gm/csf'}, ...
+set(gca,'color', 'none', 'tickdir', 'out', 'xtick', [0 0.45 .9],'xticklabel',  {'WM|     ' 'GM' '     |CSF'}, ...
     'ytick', [],'yticklabel', [], ...
-    'ticklength', [0.008 0], 'fontsize', 10)
+    'ticklength', [0.00001 0], 'fontsize', Fontsize)
 end
 

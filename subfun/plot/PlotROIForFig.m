@@ -183,7 +183,7 @@ end
 mtit(sprintf(Name), 'xoff', 0, 'yoff', +0.03, 'fontsize', 12)
 set(fig, 'Visible', Visible)
 
-print(fig, fullfile(DATA.FigureFolder, strcat(strrep(Name,'\n','-'), suffix, '.pdf')), '-dpdf')
+% print(fig, fullfile(DATA.FigureFolder, strcat(strrep(Name,'\n','-'), suffix, '.pdf')), '-dpdf')
 print(fig, fullfile(DATA.FigureFolder, strcat(strrep(Name,'\n','-'), suffix, '.tif')), '-dtiff')
 
 end
