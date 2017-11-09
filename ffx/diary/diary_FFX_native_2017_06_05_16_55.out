@@ -1,0 +1,33 @@
+
+
+Processing sub-19
+{Error using <a href="matlab:helpUtils.errorDocCallback('spm_jobman>fill_run_job', '/home/rxg243/Documents/MATLAB/spm12/spm_jobman.m', 461)" style="font-weight:bold">spm_jobman>fill_run_job</a> (<a href="matlab: opentoline('/home/rxg243/Documents/MATLAB/spm12/spm_jobman.m',461,0)">line 461</a>)
+No executable modules, but still unresolved dependencies or incomplete module inputs.
+
+Error in <a href="matlab:helpUtils.errorDocCallback('spm_jobman', '/home/rxg243/Documents/MATLAB/spm12/spm_jobman.m', 247)" style="font-weight:bold">spm_jobman</a> (<a href="matlab: opentoline('/home/rxg243/Documents/MATLAB/spm12/spm_jobman.m',247,0)">line 247</a>)
+        sts = fill_run_job('run', cjob, varargin{3:end});
+
+Error in <a href="matlab:helpUtils.errorDocCallback('FFX_native', '/home/rxg243/Documents/Data/AVT/derivatives/code/ffx/FFX_native.m', 265)" style="font-weight:bold">FFX_native</a> (<a href="matlab: opentoline('/home/rxg243/Documents/Data/AVT/derivatives/code/ffx/FFX_native.m',265,0)">line 265</a>)
+        spm_jobman('run', matlabbatch) %#ok<UNRCH>
+} 
+if system_dependent('IsDebugMode')==1, dbquit; end
+spm fmri\
+{Error using <a href="matlab:helpUtils.errorDocCallback('spm', '/home/rxg243/Documents/MATLAB/spm12/spm.m', 1274)" style="font-weight:bold">spm</a> (<a href="matlab: opentoline('/home/rxg243/Documents/MATLAB/spm12/spm.m',1274,0)">line 1274</a>)
+Unknown action string
+} 
+<a href="matlab: opentoline('/home/rxg243/Documents/MATLAB/spm12/spm.m',1274,1)">1274 </a>error('Unknown action string');
+if system_dependent('IsDebugMode')==1, dbquit; end
+spm fmri
+ ___  ____  __  __                                            
+/ __)(  _ \(  \/  )                                           
+\__ \ )___/ )    (   Statistical Parametric Mapping           
+(___/(__)  (_/\/\_)  SPM12 - http://www.fil.ion.ucl.ac.uk/spm/
+
+
+SPM12: v6685                                       16:56:17 - 05/06/2017
+========================================================================
+Initialising SPM                        :                   ........done
+
+SPM present working directory:
+	/home/rxg243/Documents/Data/AVT/derivatives/sub-19
+FFX_native
