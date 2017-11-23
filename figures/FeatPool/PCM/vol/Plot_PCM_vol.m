@@ -17,6 +17,7 @@ StartDir = fullfile(pwd, '..','..','..','..','..');
 addpath(genpath(fullfile(StartDir, 'code','subfun')))
 
 Get_dependencies('/home/rxg243/Dropbox/')
+Get_dependencies('D:\Dropbox/')
 
 surf = 0; % run of volumne whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
@@ -94,17 +95,22 @@ for iToPlot = 1:numel(ToPlot)
         if Target==2
             Stim_suffix = 'targ';
             CondNames = {...
-                'ATargL','ATargR',...
-                'VTargL','VTargR',...
-                'TTargL','TTargR',...
+                'A Targ L','A Targ R',...
+                'V Targ L','V Targ R',...
+                'T Targ L','T Targ R',...
                 };
         else
             Stim_suffix = 'stim';
             CondNames = {...
-                'A ipsi','A contra',...
-                'V ipsi','V contra',...
-                'T ipsi','T contra'...
+                'A Stim L','A Stim R',...
+                'V Stim L','V Stim R',...
+                'T Stim L','T Stim R',...
                 };
+            %             CondNames = {...
+            %                 'A ipsi','A contra',...
+            %                 'V ipsi','V contra',...
+            %                 'T ipsi','T contra'...
+            %                 };
         end
         
         for iROI = 1:numel(ROI)
@@ -127,6 +133,58 @@ for iToPlot = 1:numel(ToPlot)
                 hs_suffix = {''};
             end
             
+            Models_to_keep = 1:numel(M);
+            ToRemove = [14:18 20:24]+1;
+            Models_to_keep(ToRemove) = [];
+             
+            M(ToRemove)= [];
+            
+            for ihs=1:NbHS
+                G_pred_cr{ihs}(ToRemove) = [];
+                G_pred_gr{ihs}(ToRemove) = [];
+                G_pred_ind{ihs}(ToRemove) = [];
+                
+                
+                theta_ind{ihs}(ToRemove) = [];
+                theta_ind_cross{ihs}(ToRemove) = [];
+                theta_gr{ihs}(ToRemove) = [];
+                theta_cr{ihs}(ToRemove) = [];
+                
+                D{ihs}.noise(:,ToRemove)=[];
+                D{ihs}.likelihood(:,ToRemove)=[];
+                
+                
+                T_ind{ihs}.iterations(:,ToRemove)=[];
+                T_ind{ihs}.likelihood(:,ToRemove)=[];
+                T_ind{ihs}.noise(:,ToRemove)=[];
+                T_ind{ihs}.time(:,ToRemove)=[];
+                T_ind{ihs}.reg(:,ToRemove)=[];
+                
+                T_ind_cross{ihs}.noise(:,ToRemove)=[];
+                T_ind_cross{ihs}.iterations(:,ToRemove)=[];
+                T_ind_cross{ihs}.likelihood(:,ToRemove)=[];
+                T_ind_cross{ihs}.time(:,ToRemove)=[];
+                
+                T_group{ihs}.iterations(:,ToRemove)=[];
+                T_group{ihs}.time(:,ToRemove)=[];
+                T_group{ihs}.method(ToRemove)=[];
+                T_group{ihs}.noise(:,ToRemove)=[];
+                T_group{ihs}.scale(:,ToRemove)=[];
+                T_group{ihs}.likelihood(:,ToRemove)=[];
+                T_group{ihs}.reg(:,ToRemove)=[];
+                
+                T_cross{ihs}.iterations(:,ToRemove)=[];
+                T_cross{ihs}.time(:,ToRemove)=[];
+                T_cross{ihs}.fitLike(:,ToRemove)=[];
+                T_cross{ihs}.likelihood(:,ToRemove)=[];
+                T_cross{ihs}.noise(:,ToRemove)=[];
+                T_cross{ihs}.scale(:,ToRemove)=[];
+                T_cross{ihs}.reg(:,ToRemove)=[];
+                
+            end
+            
+            
+            
             % generate the predicted matrices for ind CV
             for ihs=1:NbHS
                 for iM = 1:numel(M)
@@ -139,23 +197,25 @@ for iToPlot = 1:numel(ToPlot)
             end
             
             c = pcm_indicatorMatrix('allpairs' ,1:size(M{1}.Ac,1));
-            H = eye(size(M{1}.Ac,1))-ones(size(M{1}.Ac,1))/size(M{1}.Ac,1);
+            %             H = eye(size(M{1}.Ac,1))-ones(size(M{1}.Ac,1))/size(M{1}.Ac,1);
+            H = 1;
             
             
             %% Plot models
+%             M{1}.name = 'null';
             colors={'b'};
             for iM=2:numel(M)-1
                 colors{end+1}='b'; %#ok<*SAGROW>
-                M{iM}.name=['Model:' num2str(iM-1) '-' strrep(strrep(M{iM}.name,'w/',''), ' ','')];
+                M{iM}.name=['Model-' num2str(iM-1) '-' strrep(strrep(M{iM}.name,'w/',''), ' ','')];
             end
             
-            %             if iROI==1
-            %                 fig_h = Plot_PCM_models_feature(M);
-            %
-            %                 for iFig = 1:numel(fig_h)
-            %                     print(fig_h(iFig), fullfile(PCM_dir, [fig_h(iFig).Name '.tif']), '-dtiff')
-            %                 end
-            %             end
+            if iROI==1
+                fig_h = Plot_PCM_models_feature(M);
+                
+                for iFig = 1:numel(fig_h)
+                    print(fig_h(iFig), fullfile(PCM_dir, [fig_h(iFig).Name '.tif']), '-dtiff')
+                end
+            end
             
             for iM=2:numel(M)-1
                 colors{end+1}='b'; %#ok<*SAGROW>
@@ -179,6 +239,8 @@ for iToPlot = 1:numel(ToPlot)
                     RDM_RSA_rk-RDM_PCM_rk
                     
                 end
+                
+                Grp_RDM_RSA{ihs}(:,:,iROI)=mean(RDMs_CV(:,:,:,ihs),3);
             end
             
             %% Plot results from individual fits
@@ -194,305 +256,465 @@ for iToPlot = 1:numel(ToPlot)
                 opt.FigName = sprintf('%s-%s-PCM_{ind}-%s-%s-%s', strrep(ROI(iROI).name, '_thresh',''), ...
                     hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
                 
-                fig_h = plot_PCM_ind(M, squeeze(G(:,:,:,ihs)), squeeze(G_hat(:,:,:,ihs)), ...
-                    T_ind{ihs}, D{ihs}, T_ind_cross{ihs}, theta_ind{ihs}, theta_ind_cross{ihs},...
-                    G_pred_ind{ihs}, G_pred_ind_CV{ihs}, squeeze(RDMs(:,:,:,ihs)), squeeze(RDMs_CV(:,:,:,ihs)), ...
-                    opt);
-                
-                for iFig = 1:numel(fig_h)
-                    print(fig_h(iFig), fullfile(PCM_dir, 'Cdt', [fig_h(iFig).Name '.tif']), '-dtiff')
-                end
-                
                 close all
+                
+%                                 fig_h = plot_PCM_ind(M, squeeze(G(:,:,:,ihs)), squeeze(G_hat(:,:,:,ihs)), ...
+%                                     T_ind{ihs}, D{ihs}, T_ind_cross{ihs}, theta_ind{ihs}, theta_ind_cross{ihs},...
+%                                     G_pred_ind{ihs}, G_pred_ind_CV{ihs}, squeeze(RDMs(:,:,:,ihs)), squeeze(RDMs_CV(:,:,:,ihs)), ...
+%                                     opt);
+%                 
+%                                 for iFig = 1:numel(fig_h)
+%                                     print(fig_h(iFig), fullfile(PCM_dir, 'Cdt', [fig_h(iFig).Name '.tif']), '-dtiff')
+%                                 end
+                
             end
             
             
             %% plot group results
+            close all
+            
             for ihs=1:NbHS
                 
                 clear RDM
                 
-                opt.FigName = sprintf('%s-%s-PCM_{grp}-%s-%s-%s', strrep(ROI(iROI).name, '_thresh',''), ...
-                    hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
-                
-                figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
-                
                 fprintf('\n  CV effect in %s %s\n', ROI(iROI).name, hs_suffix{ihs})
                 disp(T_group{ihs}.likelihood-T_cross{ihs}.likelihood)
                 
-                tmp = H*mean(G_hat(:,:,:,ihs),3)*H';
-                MIN = min(tmp(:));
-                MAX = max(tmp(:));
+                opt.FigName = sprintf('%s-%s-PCM_{grp}-%s-%s-%s', strrep(ROI(iROI).name, '_thresh',''), ...
+                    hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
                 
+                if mod(numel(M),2)==0
+                    HorPan = numel(M);
+                else
+                    HorPan = numel(M)+1;
+                end
                 
-                Subplot = 9*2+1;
-                
-                % G_{emp}
-                subplot(4,9,Subplot);
-                colormap(ColorMap);
-                imagesc(H*mean(G_hat(:,:,:,ihs),3)*H');
-                
-                axis on
-                set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', [], ...
-                    'ytick', 1:6,'yticklabel', CondNames, ...
-                    'ticklength', [0.01 0], 'fontsize', 6)
-                box off
-                axis square
-                %             colorbar
-                
-                t=title('CV_{ed} G_{emp}');
-                set(t, 'fontsize', 8);
-                
-                Subplot = Subplot+1;
-                
-                
-                % CVed G_{pred} free model
-                subplot(4,9,Subplot);
-                colormap(ColorMap);
-                imagesc(H*mean(G_pred_cr{ihs}{end},3)*H');
-                box off
-                axis square
-                %             colorbar
-                set(gca,'xtick', [],'ytick', [])
-                
-                t=ylabel('CVed G_{pred}');
-                set(t, 'fontsize', 8);
-                t=title('free');
-                set(t, 'fontsize', 10);
-                
-                Subplot = Subplot+1;
-                
-                % plot the CVed G_{pred} of each model
-                for iM=2:numel(M)-1
-                    subplot(4,9,Subplot);
+                for IndGrpColor=3
                     
-                    colormap(ColorMap);
-                    imagesc(H*mean(G_pred_cr{ihs}{iM},3));
+                    switch IndGrpColor
+                        case 1
+                            SameClim = '-GrpColorMap';
+                        case 2
+                            SameClim = '-IndColorMap';
+                        case 3
+                            SameClim = '';
+                    end
+                    
+                    figure('name', [opt.FigName SameClim], 'Position', FigDim, 'Color', [1 1 1]);
+                    
+                    tmp = H*mean(G_hat(:,:,:,ihs),3)*H';
+                    tmp(:,:,end+1) = H*mean(G(:,:,:,ihs),3)*H';
+                    for iM=1:numel(M)
+                        tmp(:,:,end+1) =H*mean(G_pred_cr{ihs}{iM},3)*H';
+                        tmp(:,:,end+1) =H*G_pred_gr{ihs}{iM}*H';
+                    end
+                    CLIM = floor([min(tmp(:)) max(tmp(:))]);
+                    
+                    
+                    
+                    Subplot = HorPan*2+1;
+                    % G_{emp}
+                    subplot(6,HorPan,Subplot:Subplot+1);
+                    colormap(ColorMap)
+                    if IndGrpColor==1
+                        imagesc(log10(H*mean(G_hat(:,:,:,ihs),3)*H'-CLIM(1)),log10(CLIM-CLIM(1)));
+                    else
+                        imagesc(H*mean(G_hat(:,:,:,ihs),3)*H');
+                    end
+                    set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', [], ...
+                        'ytick', 1:6,'yticklabel', CondNames, ...
+                        'ticklength', [0.01 0], 'fontsize', 6)
+                    if IndGrpColor==2
+                        colorbar
+                    end
                     box off
                     axis square
-                    %                 colorbar
-                    set(gca,'xtick', [],'ytick', [])
-                    t=title(['Model: ' num2str(M{iM}.name)]);
-                    set(t, 'fontsize', 9);
+                    t=xlabel('G_{emp}');
+                    set(t, 'fontsize', 8);
+                    t=ylabel('CV');
+                    set(t, 'fontsize', 12);
+                    Subplot = Subplot+2;
                     
-                    Subplot = Subplot+1;
+                    
+                    % CVed G_{pred} free model
+                    subplot(6,HorPan,Subplot:Subplot+1);
+                    colormap(ColorMap);
+                    if IndGrpColor==1
+                        imagesc(log10(H*mean(G_pred_cr{ihs}{end},3)*H'-CLIM(1)),log10(CLIM-CLIM(1)));
+                    else
+                        imagesc(H*mean(G_pred_cr{ihs}{end},3)*H');
+                    end
+                    set(gca,'xtick', [],'ytick', [])
+                    if IndGrpColor==2
+                        colorbar
+                    end
+                    box off
+                    axis square
+                    t=xlabel('G_{pred} free');
+                    set(t, 'fontsize', 8);
+                    Subplot = Subplot+2;
+                    
+                    
+                    % plot the CVed G_{pred} of each model
+                    for iM=2:numel(M)-1
+                        subplot(6,HorPan,Subplot:Subplot+1);
+                        
+                        colormap(ColorMap);
+                        if IndGrpColor==1
+                            imagesc(log10(H*mean(G_pred_cr{ihs}{iM},3)*H'-CLIM(1)),log10(CLIM-CLIM(1)));
+                        else
+                            imagesc(H*mean(G_pred_cr{ihs}{iM},3)*H');
+                        end
+                        if IndGrpColor==2
+                            colorbar
+                        end
+                        box off
+                        axis square
+                        set(gca,'xtick', [],'ytick', [])
+                        t=xlabel(['G_{pred} ' num2str(M{iM}.name)]);
+                        set(t, 'fontsize', 9);
+                        
+                        Subplot = Subplot+2;
+                    end
+                    
+                    
+                    
+                    
+                    Subplot = HorPan*4+1;
+                    % RDM or MDS or non CV G
+                    subplot(6,HorPan,Subplot:Subplot+1);
+                    
+                    colormap(ColorMap);
+                    if IndGrpColor==1
+                        imagesc(log10(H*mean(G(:,:,:,ihs),3)*H'-CLIM(1)),log10(CLIM-CLIM(1)));
+                    else
+                        imagesc(H*mean(G(:,:,:,ihs),3)*H');
+                    end
+                    
+                    
+                    set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', [], ...
+                        'ytick', 1:6,'yticklabel', CondNames, ...
+                        'ticklength', [0.01 0], 'fontsize', 6)
+                    if IndGrpColor==2
+                        colorbar
+                    end
+                    box off
+                    axis square
+                    t=xlabel('G_{emp}');
+                    set(t, 'fontsize', 8);
+                    t=ylabel('No CV');
+                    set(t, 'fontsize', 12);
+                    Subplot = Subplot+2;
+                    
+                    
+                    % G_{pred} free model
+                    subplot(6,HorPan,Subplot:Subplot+1);
+                    colormap(ColorMap);
+                    if IndGrpColor==1
+                        imagesc(log10(H*G_pred_gr{ihs}{end}*H'-CLIM(1)),log10(CLIM-CLIM(1)));
+                    else
+                        imagesc(H*G_pred_gr{ihs}{end}*H');
+                    end
+                    set(gca,'xtick', [],'ytick', [])
+                    if IndGrpColor==2
+                        colorbar
+                    end
+                    box off
+                    axis square
+                    t=xlabel('G_{pred} free');
+                    set(t, 'fontsize', 8);
+                    Subplot = Subplot+2;
+                    
+                    
+                    % plot the G_{pred} of each model
+                    for iM=2:numel(M)-1
+                        subplot(6,HorPan,Subplot:Subplot+1);
+                        
+                        colormap(ColorMap);
+                        if IndGrpColor==1
+                            imagesc(log10(H*G_pred_gr{ihs}{iM}*H'-CLIM(1)),log10(CLIM-CLIM(1)));
+                        else
+                            imagesc(H*G_pred_gr{ihs}{iM}*H');
+                        end
+                        
+                        set(gca,'xtick', [],'ytick', [])
+                        if IndGrpColor==2
+                            colorbar
+                        end
+                        box off
+                        axis square
+                        
+                        
+                        t=xlabel(['G_{pred} ' num2str(M{iM}.name)]);
+                        set(t, 'fontsize', 9);
+                        
+                        Subplot = Subplot+2;
+                    end
+                    
+                    if IndGrpColor==1
+                        ax = gca;
+                        axPos = ax.Position;
+                        axPos(1) = axPos(1)+axPos(3)+.02;
+                        axPos(3) = .02;
+                        axes('Position',axPos);
+                        colormap(ColorMap);
+                        imagesc(log10(repmat([CLIM(2):-100:CLIM(1)]', [1,200])-CLIM(1)), log10(CLIM-CLIM(1)))
+                        set(gca,'tickdir', 'out', 'xtick', [],'xticklabel',  [], ...
+                            'ytick', linspace(1,numel(CLIM(2):-100:CLIM(1)),5),...
+                            'yticklabel', round(10*linspace(CLIM(2),CLIM(1),5))/10, ...
+                            'ticklength', [0.01 0.01], 'fontsize', 8, 'YAxisLocation','right')
+                        box off
+                    end
+                    
+                    
+                    % Provide a plot of the crossvalidated likelihoods
+                    for i=1:3
+                        
+                        if i==1
+                            Data2Plot = T_group{ihs};
+                            SubPlotRange = [1:floor(HorPan/3) (HorPan+1):(HorPan+(floor(HorPan/3)))];
+                            Title = 'NoCV';
+                            Upperceil = Data2Plot.likelihood(:,end);
+                        elseif i==2
+                            Data2Plot = T_cross{ihs};
+                            SubPlotRange = [floor(HorPan/3+1):2*floor(HorPan/3) HorPan+(floor(HorPan/3+1):2*floor(HorPan/3))];
+                            Title = 'CV';
+                            Upperceil = T_group{ihs}.likelihood(:,end);
+                        elseif i==3 %
+                            Data2Plot = T_group{ihs};
+                            SubPlotRange = [2*floor(HorPan/3+1):3*floor(HorPan/3) HorPan+(2*floor(HorPan/3+1):3*floor(HorPan/3))];
+                            Title = 'AIC: ln(L_{NoCV})-k';
+                            for iM=1:size(Data2Plot.likelihood,2)
+                                Data2Plot.likelihood(:,iM)=...
+                                    -1*((M{iM}.numGparams+2) - Data2Plot.likelihood(:,iM)); %-AIC/2
+                            end
+                            Upperceil = T_group{ihs}.likelihood(:,end);
+                        end
+                        
+                        subplot(6,HorPan,SubPlotRange);
+                        hold on
+                        
+                        T = pcm_plotModelLikelihood(Data2Plot,M,'upperceil',Upperceil, 'colors', colors, ...
+                            'normalize',0);
+                        
+                        
+                        % print subjects
+                        binWidth = max(max(T.likelihood_norm(:,2:end-1))-min(T.likelihood_norm(:,2:end-1)));
+                        
+                        for iM=2:numel(M)-1
+                            h = plotSpread(T.likelihood_norm(:,iM), 'distributionIdx', ones(size(T.likelihood_norm(:,iM))), ...
+                                'distributionMarkers',{'o'},'distributionColors',{'w'}, ...
+                                'xValues', iM-0.8, 'binWidth', binWidth/100, 'spreadWidth', .2);
+                            set(h{1}, 'MarkerSize', 5, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1)
+                            labels{iM-1} = M{iM}.name;
+                        end
+                        
+                        MIN = min(min(T.likelihood_norm(:,2:end-1)));
+                        MAX = max(max(T.likelihood_norm(:,2:end-1)));
+                        
+                        ax=axis;
+                        %                         MIN = ceil(abs(MIN));
+                        if MIN>0
+                            MIN=0;
+                        end
+                        
+                        axis([ax(1) ax(2) MIN MAX])
+                        
+                        set(gca,'XTick',1:numel(M)-2, 'XTickLabel',labels);
+                        
+                        
+                        if i==1
+                            ylabel('Log-likelihood');
+                            set(gca,'fontsize', 8)
+                        else
+                            set(gca,'yaxislocation', 'right')
+                        end
+                        
+                        title(Title)
+                    end
+                    
+                    mtit(opt.FigName, 'fontsize', 12, 'xoff',0,'yoff',.035)
+                    
+                    print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName SameClim '.tif'] ), '-dtiff')
+                    
                 end
                 
                 
-                Subplot = 9*3+1;
                 
-                % RDM or MDS or non CV G
-                subplot(4,9,Subplot);
+                %% Plot only the best models
+                close all
                 
-                colormap(ColorMap);
-                imagesc(mean(G(:,:,:,ihs),3));
+                fig = figure('name', ['Best-models-' opt.FigName], 'Position', FigDim, 'Color', [1 1 1]);
                 
-                axis on
-                set(gca,'tickdir', 'out', 'xtick', [],'ytick', [])
-                box off
-                t=title('G_{emp}');
-                
-                
-                %             colormap(ColorMap);
-                %             RDM = squareform(diag(c*H*mean(G_hat,3)*c'));
-                %             RDM = rsa.util.rankTransform_equalsStayEqual(RDM,1);
-                %             imagesc(RDM);
-                %             axis on
-                %             box off
-                %             set(gca,'xtick', [],'ytick', [])
-                %             t=title('CV_{ed} RDM_{emp}');
-                
-                
-                %             plot(COORD(:,1),COORD(:,2),'o');
-                %             grid on
-                %             t=title('MDS');
-                
-                
-                set(t, 'fontsize', 8);
-                axis square
-                Subplot = Subplot+1;
-                
-                
-                % G_{pred} free model
-                subplot(4,9,Subplot);
-                colormap(ColorMap);
-                imagesc(H*G_pred_gr{ihs}{end});
-                box off
-                axis square
-                %             colorbar
-                set(gca,'xtick', [],'ytick', [])
-                t=ylabel('G_{pred}');
-                set(t, 'fontsize', 8);
-                
-                Subplot = Subplot+1;
-                
-                
-                % plot the G_{pred} of each model
-                for iM=2:numel(M)-1
-                    subplot(4,9,Subplot);
-                    
-                    colormap(ColorMap);
-                    imagesc(H*G_pred_gr{ihs}{iM}*H');
-                    box off
-                    axis square
-                    %                 colorbar
-                    set(gca,'xtick', [],'ytick', [])
-                    
-                    Subplot = Subplot+1;
+                Data2Plot = T_group{ihs};
+                for iM=1:size(Data2Plot.likelihood,2)
+                    Data2Plot.likelihood(:,iM)=...
+                        -1*((M{iM}.numGparams+2) - Data2Plot.likelihood(:,iM)); %-AIC/2
                 end
+                T = pcm_plotModelLikelihood(Data2Plot,M,'upperceil',T_group{ihs}.likelihood(:,end), 'colors', colors, ...
+                        'normalize',0);
                 
-                
+                [~,I] = sort(mean(T.likelihood_norm(:,1:end-1)),'ascend');
+                NULL = I(5);
+                I(1:5)=[];
+
                 % Provide a plot of the crossvalidated likelihoods
                 for i=1:3
                     
-                    %                 SubPlotRange = [3:numel(M) numel(M)+4:numel(M)*2];
-                    
                     if i==1
                         Data2Plot = T_group{ihs};
-                        %                     SubPlotRange = [1:numel(M)/2 (numel(M)+1):(numel(M)+(numel(M)/2))];
-                        SubPlotRange = [1:3 (1:3)+9];
+
                         Title = 'NoCV';
-                        Upperceil = Data2Plot.likelihood(:,end);
+                        
                     elseif i==2
                         Data2Plot = T_cross{ihs};
-                        %                     SubPlotRange = [(numel(M)/2+1):numel(M) (numel(M)+(numel(M)/2)+1):numel(M)*2];
-                        SubPlotRange = [4:6 (4:6)+9];
+                        
                         Title = 'CV';
-                        Upperceil = T_group{ihs}.likelihood(:,end);
+                        
                     elseif i==3 %
+                        
                         Data2Plot = T_group{ihs};
-                        %                     SubPlotRange = [(numel(M)/2+1):numel(M) (numel(M)+(numel(M)/2)+1):numel(M)*2];
-                        SubPlotRange = [7:9 (7:9)+9];
+                        
                         Title = 'AIC: ln(L_{NoCV})-k';
                         for iM=1:size(Data2Plot.likelihood,2)
                             Data2Plot.likelihood(:,iM)=...
                                 -1*((M{iM}.numGparams+2) - Data2Plot.likelihood(:,iM)); %-AIC/2
                         end
-                        Upperceil = T_group{ihs}.likelihood(:,end);
+
+                        
                     end
-                    
-                    subplot(4,numel(M),SubPlotRange);
-                    hold on
-                    
+
+                    subplot(1,3,i);
+                    Upperceil = T_group{ihs}.likelihood(:,end);
                     T = pcm_plotModelLikelihood(Data2Plot,M,'upperceil',Upperceil, 'colors', colors, ...
-                        'normalize',1);
+                        'normalize', 0, 'style', 'dot', 'mindx', I, 'Nnull', NULL, 'Nceil', numel(M));
+
+                    title(Title)
                     
+%                     MIN = min(mean(T.likelihood_norm(:,I))-nansem(T.likelihood_norm(:,I)));
+                    MIN = min(mean(T.likelihood_norm(:,I)));
                     
-                    % print subjects
-                    binWidth = max(max(T.likelihood_norm(:,2:end-1))-min(T.likelihood_norm(:,2:end-1)));
-                    
-                    for iM=2:numel(M)-1
-                        h = plotSpread(T.likelihood_norm(:,iM), 'distributionIdx', ones(size(T.likelihood_norm(:,iM))), ...
-                            'distributionMarkers',{'o'},'distributionColors',{'w'}, ...
-                            'xValues', iM-0.8, 'binWidth', binWidth/100, 'spreadWidth', .2);
-                        set(h{1}, 'MarkerSize', 5, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1)
-                        labels{iM-1} = M{iM}.name;
-                        
-                        
-                    end
-                    
-                    MIN = min(min(T.likelihood_norm(:,2:end-1)));
-                    MAX = max(max(T.likelihood_norm(:,2:end-1)));
+%                     MAX = mean(Upperceil-T_group{ihs}.likelihood(:,1));
                     
                     ax=axis;
-                    MIN = ceil(abs(MIN));
-                    if MIN>0
-                        MIN=0;
-                    end
                     
-                    axis([ax(1) ax(2) MIN*-1 MAX])
+%                     if MIN>0
+%                         MIN=0;
+%                     end
                     
-                    set(gca,'XTick',1:numel(M)-2);
-                    set(gca,'XTickLabel',labels);
+                    axis([ax(1) ax(2) MIN ax(4)])
                     
-                    if i==1
-                        ylabel('Log-likelihood');
-                        set(gca,'fontsize', 10)
-                    end
-                    
-                    title(Title)
+                    set(gca,'fontsize', 8)
                 end
                 
-                mtit(opt.FigName, 'fontsize', 12, 'xoff',0,'yoff',.035)
+                mtit(fig.Name, 'fontsize', 12, 'xoff',0,'yoff',.035)
                 
-                print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
-                
-                
-                
-                
+                print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif']  ), '-dtiff')
                 
                 %% Plot each model results at the group level
-                NbSubj = numel(T.SN);
+                %                 NbSubj = numel(T.SN);
+                %                 close all
+                %
+                %                 for iM=2:numel(M)-1
+                %
+                %                     fig = figure('name', ['Model-' M{iM}.name  '--'  opt.FigName] ,'Position', opt.FigDim , 'Color', [1 1 1]);
+                %
+                %                     % G matrix
+                %                     subplot(3,2,1);
+                %                     colormap(ColorMap);
+                %                     imagesc(H*mean(G_hat(:,:,:,ihs),3)*H');
+                %
+                %                     axis on
+                %                     set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', [], ...
+                %                         'ytick', 1:6,'yticklabel', CondNames, ...
+                %                         'ticklength', [0.01 0], 'fontsize', 4)
+                %                     box off
+                %                     axis square
+                %                     colorbar
+                %
+                %                     t=title('group G_{emp-CV}');
+                %                     set(t, 'fontsize', 10);
+                %
+                %
+                %                     % G matrix
+                %                     subplot(3,2,2);
+                %                     colormap(ColorMap);
+                %                     imagesc(H*mean(G_pred_cr{ihs}{iM},3)*H');
+                %
+                %                     axis on
+                %                     set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', [], ...
+                %                         'ytick', 1:6,'yticklabel', CondNames, ...
+                %                         'ticklength', [0.01 0], 'fontsize', 4)
+                %                     box off
+                %                     axis square
+                %                     colorbar
+                %
+                %                     t=title('group G_{pred-CV}');
+                %                     set(t, 'fontsize', 10);
+                %
+                %
+                %
+                %                     subplot(3,2,4:6);
+                %                     hold on
+                %
+                %                     Val2Plot = 1:M{iM}.numGparams;
+                %                     MEAN = mean(theta_cr{ihs}{iM}(Val2Plot,:),2);
+                %                     SEM = nansem(theta_cr{ihs}{iM}(Val2Plot,:),2);
+                %
+                %                     t = errorbar(Val2Plot-.1, MEAN, SEM, ' .k');
+                %                     set(t,'MarkerSize', 10)
+                %
+                %                     for iVal=Val2Plot
+                %                         for iSub=1:NbSub
+                %                             plot(iVal+.1+opt.scatter(iSub), theta_cr{ihs}{iM}(iVal,iSub), 'linestyle', 'none', ...
+                %                                 'Marker', '.', 'MarkerEdgeColor', COLOR_Subject(iSub,:), ...
+                %                                 'MarkerFaceColor', COLOR_Subject(iSub,:), 'MarkerSize', 28)
+                %                         end
+                %                     end
+                %
+                %                     plot([0.5 M{iM}.numGparams+.5],[0 0],'-- k')
+                %
+                %                     axis tight
+                %                     grid on
+                %                     set(gca, 'Xtick', 1:M{iM}.numGparams, 'Xticklabel', 1:M{iM}.numGparams)
+                %
+                %                     xlabel('Features')
+                %
+                %                     mtit(strrep(fig.Name, '_',' '), 'fontsize', 12, 'xoff',0,'yoff',.035)
+                %
+                %                     print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif'] ), '-dtiff')
+                %                 end
+                %
+            end
+            
+        end
+        
+        %% Plot RSA
+        
+        A = {'A1' 'PT' 'V1' 'V2' 'V3' 'V4' 'V5'};
+        
+        for i=0:1
+            
+            if i==1
+                Rank_trans = 'ranktrans-';
+            else
+                Rank_trans = 'raw-';
+            end
+            
+            for ihs=1:NbHS
                 
-                for iM=2:numel(M)-1
-                    
-                    fig = figure('name', ['Model-' M{iM}.name  '--'  opt.FigName] ,'Position', opt.FigDim , 'Color', [1 1 1]);
-                    
-                    % G matrix
-                    subplot(3,2,1);
-                    colormap(ColorMap);
-                    imagesc(H*mean(G_hat(:,:,:,ihs),3)*H');
-                    
-                    axis on
-                    set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', [], ...
-                        'ytick', 1:6,'yticklabel', CondNames, ...
-                        'ticklength', [0.01 0], 'fontsize', 4)
-                    box off
-                    axis square
-                    colorbar
-                    
-                    t=title('group G_{emp}');
-                    set(t, 'fontsize', 10);
-                    
-                    
-                    % G matrix
-                    subplot(3,2,2);
-                    colormap(ColorMap);
-                    imagesc(H*mean(G_pred_cr{ihs}{iM},3)*H');
-                    
-                    axis on
-                    set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', [], ...
-                        'ytick', 1:6,'yticklabel', CondNames, ...
-                        'ticklength', [0.01 0], 'fontsize', 4)
-                    box off
-                    axis square
-                    colorbar
-                    
-                    t=title('group G_{pred}');
-                    set(t, 'fontsize', 10);
-                    
-                    
-                    
-                    subplot(3,2,4:6);
-                    hold on
-                    
-                    Val2Plot = 1:M{iM}.numGparams;
-                    MEAN = mean(theta_cr{ihs}{iM}(Val2Plot,:),2);
-                    SEM = nansem(theta_cr{ihs}{iM}(Val2Plot,:),2);
-                    
-                    t = errorbar(Val2Plot-.1, MEAN, SEM, ' .k');
-                    set(t,'MarkerSize', 10)
-                    
-                    for iVal=Val2Plot
-                        for iSub=1:NbSub
-                            plot(iVal+.1+opt.scatter(iSub), theta_cr{ihs}{iM}(iVal,iSub), 'linestyle', 'none', ...
-                                'Marker', '.', 'MarkerEdgeColor', COLOR_Subject(iSub,:), ...
-                                'MarkerFaceColor', COLOR_Subject(iSub,:), 'MarkerSize', 28)
-                        end
-                    end
-                    
-                    plot([0.5 M{iM}.numGparams+.5],[0 0],'-- k')
-                    
-                    axis tight
-                    grid on
-                    set(gca, 'Xtick', 1:M{iM}.numGparams, 'Xticklabel', 1:M{iM}.numGparams)
-                    
-                    xlabel('Features')
-                    
-                    mtit(strrep(fig.Name, '_',' '), 'fontsize', 12, 'xoff',0,'yoff',.035)
-                    
-                    print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif'] ), '-dtiff')
-                end
+                opt.FigName = sprintf('%s-PCM_{grp}-%s-%s-%s', ...
+                    hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+                
+                fig = figure('name', ['Grp_avg_RDM_-' Rank_trans  opt.FigName] ,'Position', opt.FigDim , 'Color', [1 1 1]);
+                
+                rsa.fig.showRDMs(Grp_RDM_RSA{ihs}, gcf, i, [], 1, [], [], ColorMap);
+                
+                rename_subplot([3 3],CondNames,A)
+                
+                mtit(strrep(fig.Name, '_',' '), 'fontsize', 12, 'xoff',0,'yoff',.035)
+                
+                print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif'] ), '-dtiff')
                 
             end
             

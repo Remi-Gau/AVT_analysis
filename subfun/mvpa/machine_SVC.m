@@ -12,6 +12,10 @@ end
 [trdata, tedata] = deal(feat(tr,:), feat(te,:));
 [trlabel, telabel] = deal(cvmat(tr,1), cvmat(te,1));
 
+if isempty(telabel)
+    error('We got no labels for that test set.')
+end
+
 if strcmp(opt.svm.machine, 'epsilon-SVR') || strcmp(opt.svm.machine, 'nu-SVR')
     
     tmp = trlabel;
@@ -61,6 +65,8 @@ else
 end
 
 
+
+
 % 2-grid search for parameter selection (see LIBSVM guide)
 if strcmp(opt.svm.machine, 'epsilon-SVR') || strcmp(opt.svm.machine, 'nu-SVR')
     [args, grid] = grid_search_reg(trdata(:,idfeat), trlabel, sum(sum(trsession)), opt);
@@ -73,9 +79,9 @@ end
 if opt.rfe.do
     [idfeat, rfeacc] = rfe_calc(trdata, idfeat, trlabel, cvmat(tr,2), sum(sum(trsession)), args, opt);
     
-%     %takes the best accuracy before it starts dropping - minimize number of
-%     %features while maintaining high accuracy
-%     id = find(diff(mean(rfeacc,2))<0,1,'first');
+    %     %takes the best accuracy before it starts dropping - minimize number of
+    %     %features while maintaining high accuracy
+    %     id = find(diff(mean(rfeacc,2))<0,1,'first');
     
     id = [];
     if isempty(id)
@@ -91,8 +97,13 @@ end
 
 
 % Train machine
-model = svmtrain(trlabel, trdata(:,idfeat), args);
-
+if strfind(opt.svm.machine,'SVC') && sum(trlabel==-1)~=sum(trlabel==1)
+    %-wi weight : set the parameter C of class i to weight*C, for C-SVC
+    model = svmtrain(trlabel, trdata(:,idfeat), ...
+        [args '-w1 ' num2str(sum(trlabel==1)) ' -w-1 ' num2str(sum(trlabel==-1)) ]);
+else
+    model = svmtrain(trlabel, trdata(:,idfeat), args);
+end
 
 % Compute weights of the model (see LIBSVM FAQ)
 if strcmp(opt.svm.machine, 'epsilon-SVR') || strcmp(opt.svm.machine, 'nu-SVR')
@@ -109,16 +120,16 @@ else
 end
 
 
- % Make predictictions
+% Make predictictions
 if strcmp(opt.svm.machine, 'epsilon-SVR') || strcmp(opt.svm.machine, 'nu-SVR')
-
+    
     predlabel = nan(size(tedata,1),1);
     decvalue = nan(size(tedata,1),1);
-
+    
     genscheme = unique(svm.genscheme);
     for i=1:numel(genscheme)
         
-        cdt2pred = ismember(cvmat(te,1), svm.test_class(ismember(svm.genscheme,genscheme(i))));       
+        cdt2pred = ismember(cvmat(te,1), svm.test_class(ismember(svm.genscheme,genscheme(i))));
         
         % Normalization and scaling of test data
         if opt.scaling.idpdt == 1
@@ -130,13 +141,13 @@ if strcmp(opt.svm.machine, 'epsilon-SVR') || strcmp(opt.svm.machine, 'nu-SVR')
         [predlabel(cdt2pred),~, decvalue(cdt2pred)] = svmpredict(telabel(cdt2pred), tedata_tmp(:,idfeat),  model, '-b 0');
         
     end
-       
+    
 else
     
     if opt.scaling.idpdt == 1
         tedata = norm_calc_tr(tedata, cvmat, te, opt);
     end
-
+    
     [predlabel, ~, decvalue] = svmpredict(telabel, tedata(:,idfeat),  model);
     
     [~, acc, ~] = svmpredict(trlabel, trdata(:,idfeat),  model);
@@ -146,23 +157,17 @@ end
 
 % Number of support vectors
 % nsv = model.totalSV;
-
 model = rmfield(model, 'SVs');
 
 % Generate output
 if strcmp(opt.svm.machine, 'epsilon-SVR') || strcmp(opt.svm.machine, 'nu-SVR')
     results = struct('model', model, 'gridsearch', grid, ...
         'pred', predlabel, 'label', telabel, 'func', decvalue);
+elseif opt.permutation.test
+    results = struct('pred', predlabel, 'label', telabel);
 else
     results = struct('model', model, 'obj', dualobj, 'gridsearch', grid, 'fs', fs, ...
         'rfe', rfe, 'pred', predlabel, 'label', telabel, 'func', decvalue);
-    if opt.output.weight
-        results.w = w;
-    end
-end
-
-if opt.output.mask
-    results.idfeat = idfeat;
 end
 
 end

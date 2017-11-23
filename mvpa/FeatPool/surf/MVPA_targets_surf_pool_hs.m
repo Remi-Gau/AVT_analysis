@@ -1,13 +1,13 @@
-function MVPA_surf_pool_hs
+function MVPA_targets_surf_pool_hs
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..');
+StartDir = fullfile(pwd, '..','..','..','..');
 cd (StartDir)
 addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 
 NbLayers = 6;
 
-NbWorkers = 8;
+NbWorkers = 10;
 
 
 % Options for the SVM
@@ -21,12 +21,9 @@ opt.verbose = 0;
 
 
 CondNames = {...
-    'AStimL','AStimR';...
-    'VStimL','VStimR';...
-    'TStimL','TStimR';...
-%     'ATargL','ATargR';...
-%     'VTargL','VTargR';...
-%     'TTargL','TTargR';...
+    'ATargL','ATargR',...
+    'VTargL','VTargR',...
+    'TTargL','TTargR',...
     };
 
 Cdt_ROI_lhs = 1:6;
@@ -36,25 +33,25 @@ Cdt_ROI_rhs = [2 1 4 3 6 5];
 % --------------------------------------------------------- %
 %              Classes and associated conditions            %
 % --------------------------------------------------------- %
-Class(1) = struct('name', 'A Stim - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'AStimL'};
+Class(1) = struct('name', 'A Targ - Left', 'cond', cell(1), 'nbetas', 1);
+Class(end).cond = {'ATargL'};
 
-Class(2) = struct('name', 'A Stim - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'AStimR'};
-
-
-Class(3) = struct('name', 'V Stim - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'VStimL'};
-
-Class(4) = struct('name', 'V Stim - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'VStimR'};
+Class(2) = struct('name', 'A Targ - Right', 'cond', cell(1), 'nbetas', 1);
+Class(end).cond = {'ATargR'};
 
 
-Class(5) = struct('name', 'T Stim - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'TStimL'};
+Class(3) = struct('name', 'V Targ - Left', 'cond', cell(1), 'nbetas', 1);
+Class(end).cond = {'VTargL'};
 
-Class(6) = struct('name', 'T Stim - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'TStimR'};
+Class(4) = struct('name', 'V Targ - Right', 'cond', cell(1), 'nbetas', 1);
+Class(end).cond = {'VTargR'};
+
+
+Class(5) = struct('name', 'T Targ - Left', 'cond', cell(1), 'nbetas', 1);
+Class(end).cond = {'TTargL'};
+
+Class(6) = struct('name', 'T Targ - Right', 'cond', cell(1), 'nbetas', 1);
+Class(end).cond = {'TTargR'};
 
 ROIs_ori = {
     'A1',...
@@ -68,17 +65,17 @@ ROIs_ori = {
 % --------------------------------------------------------- %
 %                     Analysis to perform                   %
 % --------------------------------------------------------- %
-SVM_Ori(1) = struct('name', 'A Ipsi VS Contra', 'class', [1 2], 'ROI_2_analyse', 1:numel(ROIs_ori));
-SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [3 4], 'ROI_2_analyse', 1:numel(ROIs_ori));
-SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
-%
-SVM_Ori(end+1) = struct('name', 'A VS V Ipsi', 'class', [1 3], 'ROI_2_analyse', 1:numel(ROIs_ori));
-SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
-SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [3 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
+% SVM_Ori(1) = struct('name', 'A Ipsi VS Contra - Targets', 'class', [1 2], 'ROI_2_analyse', 1:numel(ROIs_ori));
+% SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra - Targets', 'class', [3 4], 'ROI_2_analyse', 1:numel(ROIs_ori));
+% SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra - Targets', 'class', [5 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
 
-SVM_Ori(end+1) = struct('name', 'A VS V Contra', 'class', [2 4], 'ROI_2_analyse', 1:numel(ROIs_ori));
-SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
-SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
+% SVM_Ori(end+1) = struct('name', 'A VS V Ipsi - Targets', 'class', [1 3], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(1) = struct('name', 'A VS T Ipsi - Targets', 'class', [1 5], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'V VS T Ipsi - Targets', 'class', [3 5], 'ROI_2_analyse', 1:numel(ROIs_ori));
+
+% SVM_Ori(end+1) = struct('name', 'A VS V Contra - Targets', 'class', [2 4], 'ROI_2_analyse', 1:numel(ROIs_ori));
+% SVM_Ori(end+1) = struct('name', 'A VS T Contra - Targets', 'class', [2 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
+% SVM_Ori(end+1) = struct('name', 'V VS T Contra - Targets', 'class', [4 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
 
 
 % --------------------------------------------------------- %
@@ -111,7 +108,7 @@ end
 
 % Randomization options
 if opt.permutation.test;
-    opt.permutation.nreps = 101; % #repetitions for permutation test
+    opt.permutation.nreps = 1000; % #repetitions for permutation test
 else
     opt.permutation.nreps = 1;
 end
@@ -121,7 +118,7 @@ end
 opt.session.subsample.nreps = 30;
 
 % Maximum numbers of CVs
-opt.session.maxcv = [];
+opt.session.maxcv = 25;
 
 
 % -------------------------%
@@ -142,7 +139,7 @@ for iSub = 1:NbSub
     
     SubDir = fullfile(StartDir, SubLs(iSub).name);
     
-    Data_dir = fullfile(SubDir, 'ffx_nat', 'betas', '6_surf');
+    Data_dir = fullfile(SubDir, 'ffx_nat', 'betas', '6_surf', 'targets');
     
     SaveDir = fullfile(SubDir, 'results', 'SVM');
     [~,~,~] = mkdir(SaveDir);
@@ -261,7 +258,7 @@ for iSub = 1:NbSub
     end
 
     %% Run for different type of normalization
-    for Norm = [5 7]
+    for Norm = [6 8] %[5 7]
         
         switch Norm
             case 1
@@ -306,6 +303,12 @@ for iSub = 1:NbSub
                 opt.scaling.feat.mean = 1;
                 opt.scaling.feat.range = 0;
                 opt.scaling.feat.sessmean = 0;
+            case 8
+                opt.scaling.img.eucledian = 0;
+                opt.scaling.img.zscore = 0;
+                opt.scaling.feat.mean = 0;
+                opt.scaling.feat.range = 0;
+                opt.scaling.feat.sessmean = 0;                
         end
         
         SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
@@ -315,29 +318,41 @@ for iSub = 1:NbSub
         %% Run cross-validation for each model and ROI
         SVM = SVM_Ori;
         for i=1:numel(SVM)
-            for j=1:numel(SVM_Ori(i).ROI_2_analyse)
-                SVM(i).ROI(j) = struct('name', ROI(j).name, ...
-                    'size', sum(cellfun('length',ROI(j).VertOfInt)),...
-                    'opt', opt); 
+            for j=SVM_Ori(i).ROI_2_analyse
+                if ~isfield(SVM,'ROI')
+                    SVM(i).ROI = struct('name', ROI(j).name, ...
+                        'size', sum(cellfun('length',ROI(j).VertOfInt)),...
+                        'opt', opt);
+                else
+                    SVM(i).ROI(end+1) = struct('name', ROI(j).name, ...
+                        'size', sum(cellfun('length',ROI(j).VertOfInt)),...
+                        'opt', opt);
+                end
             end
         end
         clear i j
         
         for iSVM=1:numel(SVM)
             
-            for iROI=1:numel(ROI)
+            for iROI=SVM(iSVM).ROI_2_analyse
                 
-
+                ROI_idx = find(SVM(iSVM).ROI_2_analyse==iROI);
                 
                 fprintf('Analysing subject %s\n', SubLs(iSub).name)
                 fprintf(' Running SVM:  %s\n', SVM(iSVM).name)
-                fprintf('  Running ROI:  %s\n', SVM(iSVM).ROI(iROI).name)
-                fprintf('  Number of vertices before FS/RFE: %i\n', SVM(iSVM).ROI(iROI).size)
+                fprintf('  Running ROI:  %s\n', SVM(iSVM).ROI(ROI_idx).name)
+                fprintf('  Number of vertices before FS/RFE: %i\n', SVM(iSVM).ROI(ROI_idx).size)
                 fprintf('   Running on %i layers\n', NbLayers)
 
                 
                 FeaturesBoth = FeaturesAll{iROI,1};
-                LogFeatBoth= ~any(isnan(FeaturesBoth));
+                
+                % create a logical index that is true when all depth of a
+                % vertex have date
+                LogFeatBoth = any(isnan(FeaturesBoth));
+                LogFeatBoth = reshape(LogFeatBoth',[NbLayers, numel(LogFeatBoth)/NbLayers]);
+                LogFeatBoth = repmat(any(LogFeatBoth), NbLayers, 1);
+                LogFeatBoth = ~LogFeatBoth(:);
                 FeaturesLayersBoth = repmat(NbLayers:-1:1, 1, size(FeaturesBoth,2)/NbLayers);
                 
 
@@ -373,14 +388,24 @@ for iSub = 1:NbSub
                     cartProd = [x(:) y(:) z(:)];
                     clear x y z RunPerSes Idx
                     
-                    for i=1:size(CV_id,1)
-                        TestSessList{i,1} = cartProd;
-                        % Limits to CV max
-                        %TestSessList{i,1} = nchoosek(CV_id(i,:), floor(opt.session.proptest*NbSess2Incl));
-                        %TestSessList{i,1} = TestSessList{i,1}(randperm(size(TestSessList{i,1},1)),:);
-                        %if size(TestSessList{i,1}, 1) >  opt.session.maxcv
-                        %   TestSessList{i,1} = TestSessList{i,1}(1:opt.session.maxcv,:);
-                        %end
+                    if opt.session.curve
+                        for i=1:size(CV_id,1)
+                            % Limits to CV max
+                            %TestSessList{i,1} = nchoosek(CV_id(i,:), floor(opt.session.proptest*NbSess2Incl));
+                            %TestSessList{i,1} = TestSessList{i,1}(randperm(size(TestSessList{i,1},1)),:);
+                            %if size(TestSessList{i,1}, 1) >  opt.session.maxcv
+                            %   TestSessList{i,1} = TestSessList{i,1}(1:opt.session.maxcv,:);
+                            %end
+                            %if opt.permutation.test
+                            %     TestSessList{i,1} = cartProd;
+                            %end
+                        end
+                    else
+                        TestSessList{1,1} = cartProd; % take all possible CVs
+                        if opt.permutation.test % limits the number of CV for permutation
+                            cartProd = cartProd(randperm(size(cartProd,1)),:);
+                            TestSessList{1,1} = cartProd(1:opt.session.maxcv,:);
+                        end
                     end
                     clear cartProd
                     
@@ -399,17 +424,23 @@ for iSub = 1:NbSub
                         end
                         
                         %%
+                        T = [];
                         for iPerm=1:NbPerm
+                            
+                                                        fprintf(1,'    Permutation %i out of %i\n',iPerm, NbPerm);
+                            tic
                             
                             CV_Mat = CV_Mat_Orig;
                             
                             %% Permute class within sessions when all sessions are included
                             if iPerm > 1
-                                for iRun=1:max(CV_Mat.session)
-                                    temp = CV_Mat((all([ismember(CV_Mat(:,1), SVM(iSVM).class), ...
-                                        ismember(CV_Mat(:,2), iRun)], 2)),1);
+                                for iRun=1:max(CV_Mat(:,2))
+                                    Cdt_2_perm = all([ismember(CV_Mat(:,1), SVM(iSVM).class), ...
+                                        ismember(CV_Mat(:,2), iRun)], 2);
                                     
-                                    CV_Mat(:,1) = CV_Mat(temp(randperm(length(temp))),1);
+                                    temp = CV_Mat(Cdt_2_perm,1);
+                                    
+                                    CV_Mat(Cdt_2_perm,1) = temp(randperm(length(temp)));
                                 end
                             end
                             clear temp
@@ -446,18 +477,20 @@ for iSub = 1:NbSub
                             end
                             fprintf(1,'\b]\n');
                             
-                            for iCV=1:size(CV_id, 2)
-                                for iSide=1:size(TEMP,2)
-                                    SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,iSide).layers.results =...
-                                        TEMP(iCV,iSide).layers.results;
-                                    SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,iSide).layers.acc = ...
-                                        TEMP(iCV,iSide).layers.acc;
-                                    SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,iSide).results = ...
-                                        TEMP(iCV,iSide).results;
-                                    SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,iSide).acc = ...
-                                        TEMP(iCV,iSide).acc;
-                                end
+                            for iCV=1:NbCV
+                                SVM(iSVM).ROI(ROI_idx).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,1).layers.results =...
+                                    TEMP(iCV,1).layers.results;
+                                SVM(iSVM).ROI(ROI_idx).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,1).layers.acc = ...
+                                    TEMP(iCV,1).layers.acc;
+                                SVM(iSVM).ROI(ROI_idx).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,1).results = ...
+                                    TEMP(iCV,1).results;
+                                SVM(iSVM).ROI(ROI_idx).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,1).acc = ...
+                                    TEMP(iCV,1).acc;
                             end
+                            
+                                                        T(end+1)=toc;
+                            fprintf(1,'    Avg time elapsed / permutation = %i secs ; ETA = %s\n',...
+                                round(mean(T)), Seconds_to_hours(round((NbPerm-iPerm)*mean(T))) );
                             
                         end % iPerm=1:NbPerm
                         %clear iPerm
@@ -469,26 +502,30 @@ for iSub = 1:NbSub
                 %clear NbSess2Incl
                 
                 %% Calculate prediction accuracies
-                
-                for Side = 1
-                    Class_Acc.TotAcc(Side) = ...
-                        nanmean([SVM(iSVM).ROI(iROI).session(end).rand.perm.CV(:,Side).acc]);
-                    for iCV=1:size(CV_id, 2)
-                        temp(:,:,iCV) = SVM(iSVM).ROI(iROI).session(end).rand.perm.CV(iCV,Side).layers.acc;
-                    end
-                    Class_Acc.TotAccLayers{Side} = nanmean(temp,3);
-                    temp = [];
+                Class_Acc.TotAcc(1) = ...
+                    nanmean([SVM(iSVM).ROI(ROI_idx).session(end).rand.perm(1).CV(:,1).acc]);
+                for iCV=1:size(CV_id, 2)
+                    temp(:,:,iCV) = SVM(iSVM).ROI(ROI_idx).session(end).rand.perm(1).CV(iCV,1).layers.acc;
                 end
+                Class_Acc.TotAccLayers{1} = nanmean(temp,3);
+                temp = [];
+                
                 
                 % Display some results
-                fprintf('\n   Accuracy %i layers\n', NbLayers);
-                disp(Class_Acc.TotAcc(:))
-                disp(Class_Acc.TotAccLayers{1})
+                if NbPerm==1
+                    fprintf('\n   Accuracy %i layers\n', NbLayers);
+                    disp(Class_Acc.TotAcc(:))
+                    disp(Class_Acc.TotAccLayers{1})
+                end
                 
                 
                 % Save data
-                Results = SVM(iSVM).ROI(iROI);
-                SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, iROI, SaveSufix)
+                Results = SVM(iSVM).ROI(ROI_idx);
+                SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, ROI_idx, SaveSufix)
+                
+                clear Results
+                
+                SVM(iSVM).ROI(ROI_idx).session = [];
                 
             end % iSubROI=1:numel(SVM(iSVM).ROI)
             clear Mask Features
@@ -534,6 +571,19 @@ else
     
     results = machine_SVC(SVM(iSVM), Features(:,LogFeat), CV_Mat, TrainSess, TestSess, opt);
     
+end
+
+end
+
+function str = Seconds_to_hours(s)
+
+h = floor(s/3600);
+min = floor(mod(s,3600)/60);
+
+if h==0
+    str = sprintf('%i min',min);
+else
+    str = sprintf('%i hrs %i min',h, min);
 end
 
 end

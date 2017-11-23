@@ -58,7 +58,7 @@ for iM=1:numel(M)
             SubPlot = SetAxis(SubPlot,ColorMap);
             t=ylabel(num2str(iFeat));
             set(gca, 'Xtick', 1:size(M{iM}.Ac(:,:,iFeat),2), 'Ytick', 1:size(M{iM}.Ac(:,:,iFeat),1),...
-                'Xticklabel',[],'Yticklabel',[])
+                'Xticklabel',[],'Yticklabel',[], 'tickdir', 'out')
             set(t,'fontsize',6)
             
             subplot(nVerPan,nHorPan,SubPlot)

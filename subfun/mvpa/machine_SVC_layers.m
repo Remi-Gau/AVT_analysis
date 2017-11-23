@@ -1,4 +1,4 @@
-function [acc weight results] = machine_SVC_layers(svm, feat, featlay, cvmat, trsession, tesession, opt)
+function [acc, weight, results] = machine_SVC_layers(svm, feat, featlay, cvmat, trsession, tesession, opt)
 
 % Separate training and test sets
 tr = ismember(cvmat(:,1), svm.class) & ismember(cvmat(:,2), find(trsession));
@@ -80,6 +80,8 @@ for ilayertr = 1:max(featlay)
     % Number of support vectors
     % nsv = model.totalSV;
     
+
+    
     % Generalize in turn to each layer of the test data
     predlabel = nan(size(telabel,1), max(featlay));
     decvalue = nan(size(telabel,1), max(featlay));
@@ -112,14 +114,20 @@ for ilayertr = 1:max(featlay)
         
     end
     
+
+    % Just to check how good the model is on itself
     [~, acc_tr, ~] = svmpredict(trlabel, trdata(:,idfeat),  model);
     model.acc = acc_tr(1)/100; clear acc_tr
     
     model = rmfield(model, 'SVs');
     
-    results{ilayertr} = struct(...
-        'model', model, 'obj', dualobj, 'gridsearch', grid, 'fs', fs, ...
-        'rfe', rfe, 'pred', predlabel, 'label', telabel, 'func', decvalue); %#ok<AGROW>
+    if opt.permutation.test
+        results{ilayertr} = struct('pred', predlabel, 'label', telabel); %#ok<AGROW>
+    else
+        results{ilayertr} = struct(...
+            'model', model, 'obj', dualobj, 'gridsearch', grid, 'fs', fs, ...
+            'rfe', rfe, 'pred', predlabel, 'label', telabel, 'func', decvalue); %#ok<AGROW>
+    end
     
     
 end
