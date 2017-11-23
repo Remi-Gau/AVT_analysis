@@ -54,18 +54,18 @@ mkdir(Save_dir)
 
 if ~do_null_free_only
     %% Set the different pattern components
-    %     [Components, h] = Set_PCM_components(1, FigDim);
-    %     if ~isempty(h)
-    %         print(h(1), fullfile(PCM_dir, 'Cdt', 'Pattern_components_RDM.tif'), '-dtiff');
-    %         print(h(2), fullfile(PCM_dir, 'Cdt', 'Pattern_components_G_matrices.tif'), '-dtiff');
-    %     end
-    
-    [Components, h] = Set_PCM_components_Feature(1, FigDim);
+    [Components, h] = Set_PCM_components_RDM(1, FigDim);
     if ~isempty(h)
-        print(h(1), fullfile(PCM_dir, 'PCM_features.tif'), '-dtiff');
-        print(h(2), fullfile(PCM_dir, 'PCM_G_matrix.tif'), '-dtiff');
-        print(h(3), fullfile(PCM_dir, 'PCM_RDMs.tif'), '-dtiff');
+        print(h(1), fullfile(PCM_dir, 'Cdt', 'Pattern_components_RDM.tif'), '-dtiff');
+        print(h(2), fullfile(PCM_dir, 'Cdt', 'Pattern_components_G_matrices.tif'), '-dtiff');
     end
+    
+%     [Components, h] = Set_PCM_components_Feature(1, FigDim);
+%     if ~isempty(h)
+%         print(h(1), fullfile(PCM_dir, 'PCM_features.tif'), '-dtiff');
+%         print(h(2), fullfile(PCM_dir, 'PCM_G_matrix.tif'), '-dtiff');
+%         print(h(3), fullfile(PCM_dir, 'PCM_RDMs.tif'), '-dtiff');
+%     end
     %% Display the different models
     [Models_A, Models_V, h] = Set_PCM_models(Components, 1, FigDim);
     if ~isempty(h)
@@ -167,7 +167,7 @@ for iToPlot = 1:numel(ToPlot)
         AllTcross=cell(numel(ROI),1);
         AllthetaCr=cell(numel(ROI),1);
         
-        for iROI = 1:numel(ROI)
+        for iROI = 3 %1:numel(ROI)
             
             fprintf('\n %s\n', ROI(iROI).name)
             

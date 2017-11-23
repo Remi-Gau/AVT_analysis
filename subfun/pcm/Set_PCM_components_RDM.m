@@ -30,10 +30,10 @@ SensMod(3:4,3:4)=0;
 Components(end+1).mat = SensMod;
 Components(end).name = [num2str(numel(Components)) '-V stim'];
 
-SensMod = BaseMatrix;
-SensMod(5:6,5:6)=0;
-Components(end+1).mat = SensMod;
-Components(end).name = [num2str(numel(Components)) '-T stim'];
+% SensMod = BaseMatrix;
+% SensMod(5:6,5:6)=0;
+% Components(end+1).mat = SensMod;
+% Components(end).name = [num2str(numel(Components)) '-T stim'];
 
 
 NonPreferred_A = BaseMatrix;

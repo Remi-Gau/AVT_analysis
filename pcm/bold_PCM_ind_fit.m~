@@ -458,8 +458,8 @@ for iToPlot = 1:numel(ToPlot)
                 'T_group','theta_gr','G_pred_gr',...
                 'T_cross','theta_cr','G_pred_cr' )
             
-            subject = sprintf('Analysis PCM %s %s done', ToPlot{iToPlot}, ROI(iROI).name);
-            matlabmail('remi_gau@hotmail.com', 'Analysis done', subject);
+            subject = sprintf('Analysis PCM ' ToPlot{iToPlot}, ROI(iROI).name)
+            matlabmail('remi_gau@hotmail.com', 'Analysis done', 'PCM ana');
             
             
             

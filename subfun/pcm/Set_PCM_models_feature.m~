@@ -1,5 +1,7 @@
 function M = Set_PCM_models_feature(A_or_V)
 
+A_or_V = 1;
+
 CondNames = {...
     'A ipsi','A contra',...
     'V ipsi','V contra',...
@@ -69,10 +71,11 @@ for iModel_2_create = 1:size(Features_to_add,1)
             M = Pref_idpdt(M,CondNames,IpsiContraScaled,A_or_V);
             if A_or_V==1
                 M = NonPref_scaled_A(M,CondNames,IpsiContraScaled);
+                M = NonPref_idpdt_A(M,CondNames,IpsiContraScaled);
             else
                 M = NonPref_scaled_V(M,CondNames,IpsiContraScaled);
+                M = NonPref_idpdt_V(M,CondNames,IpsiContraScaled);
             end
-            M = NonPref_idpdt(M,CondNames,IpsiContraScaled);
         case 5
             M = All_idpdt(M,CondNames,IpsiContraScaled);
     end
@@ -96,6 +99,8 @@ for iModel_2_create = 1:size(Features_to_add,1)
         num2str(Features_to_add(iModel_2_create,2)) ',' ...
         num2str(Features_to_add(iModel_2_create,3))];
     
+    M{end}.name
+    M{end}.Ac
 end
 
 
@@ -198,22 +203,8 @@ end
 end
 
 
-function M = NonPref_idpdt(M,CondNames,IpsiContraScaled)
-if IpsiContraScaled==1
-  col_num = [0 0 0 0 5 5];  
-else
-  col_num = [0 0 0 0 5 6];
-end
-for i=[5 6]
-    A = zeros(1,numel(CondNames));
-    A(i) = 1;
-    M{end}.Ac(:,col_num(i),end+1) = A;
-    if IpsiContraScaled==2 && mod(col_num(i),2)==0
-        A = zeros(1,numel(CondNames));
-        A(i) = 1;
-        M{end}.Ac(:,col_num(i)-1,end+1) = A;
-    end
-end
+function M = NonPref_idpdt_V(M,CondNames,IpsiContraScaled)
+
 end
 
 
@@ -227,7 +218,7 @@ for i=1:numel(CondNames)
     A = zeros(1,numel(CondNames));
     A(i) = 1;
     M{end}.Ac(:,col_num(i),end+1) = A;
-    if IpsiContraScaled==2 && mod(i,2)==0
+    if IpsiContraScaled==2 && col_num(i)==2
         A = zeros(1,numel(CondNames));
         A(i) = 1;
         M{end}.Ac(:,col_num(i)-1,end+1) = A;

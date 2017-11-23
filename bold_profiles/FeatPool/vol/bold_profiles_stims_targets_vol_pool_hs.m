@@ -249,16 +249,15 @@ for iSub = 1:NbSub % for each subject
         
         %% For ipsilateral stimulus
         Col2Sel = {...
-            [1 4], [7 10];
-            [2 5], [8 11];
-            [3 6], [9 12]};
+            [1 7], [4 10];
+            [2 8], [5 11];
+            [3 9], [6 12]};
         
         Data_ROI.StimTargIpsi.LayerMean = nan(NbLayers, 20, size(Col2Sel,1));
         
         for iCond = 1:size(Col2Sel,1)
             
             for iImg = 1:size(CondLines,2) % For each Block
-                
                 
                 BlockImgSens1 =  [...
                     Features_ROI_L(CondLines(iImg,Col2Sel{iCond,1}(1)),:) ...
@@ -319,9 +318,9 @@ for iSub = 1:NbSub % for each subject
         
         %% For contralateral stimulus
         Col2Sel = {...
-            [4 1], [10 7];
-            [5 2], [11 8];
-            [6 3], [12 9]};
+            [7 1], [10 4];
+            [8 2], [11 5];
+            [9 3], [12 6]};
         
         Data_ROI.StimTargContra.LayerMean = nan(NbLayers, 20, size(Col2Sel,1));
         
