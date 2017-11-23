@@ -5,8 +5,8 @@ fontsize = 6;
 SubPlots = {...
     [1 7] [2 8] [3 9] [4 10] [5 11] [6 12];...
     13, 14, 15, 16, 17, 18;...
-    19,20, 8;...
-    9, 10;...
+    19, 20, 21, 22, 23, 24;...
+    25, 26, 27 ,28, 29, 30;...
     };
 
 line_colors = [...
@@ -27,33 +27,33 @@ else
     suffix = '_perm';
 end
 
-    Name = strrep([ToPlot.TitSuf '--' ToPlot.Name], ' ', '_');
-    Name = strrep(Name, '_', '-');
+Name = strrep([ToPlot.TitSuf '---' ToPlot.Name], ' ', '_');
+Name = strrep(Name, '_', '-');
 
-    fig = figure('Name', Name, 'Position', [100, 100, 1000, 700], 'Color', [1 1 1], 'Visible', ToPlot.Visible);
-    
-    set(gca,'units','centimeters')
-    pos = get(gca,'Position');
-    ti = get(gca,'TightInset');
-    
-    set(fig, 'PaperUnits','centimeters');
-    set(fig, 'PaperSize', [pos(3)+ti(1)+ti(3) pos(4)+ti(2)+ti(4)]);
-    set(fig, 'PaperPositionMode', 'manual');
-    set(fig, 'PaperPosition',[0 0 pos(3)+ti(1)+ti(3) pos(4)+ti(2)+ti(4)]);
-    
-    set(fig, 'Visible', ToPlot.Visible)
+fig = figure('Name', Name, 'Position', [100, 50, 1200, 700], 'Color', [1 1 1], 'Visible', ToPlot.Visible);
+
+set(gca,'units','centimeters')
+pos = get(gca,'Position');
+ti = get(gca,'TightInset');
+
+set(fig, 'PaperUnits','centimeters');
+set(fig, 'PaperSize', [pos(3)+ti(1)+ti(3) pos(4)+ti(2)+ti(4)]);
+set(fig, 'PaperPositionMode', 'manual');
+set(fig, 'PaperPosition',[0 0 pos(3)+ti(1)+ti(3) pos(4)+ti(2)+ti(4)]);
+
+set(fig, 'Visible', ToPlot.Visible)
 
 for iCdt = 1:numel(ToPlot.Legend)
-
+    
     for MVPA_BOLD = 1:2
         
         ToPlot.Cst = 0;
         ToPlot.MVPA_BOLD = MVPA_BOLD;
         
         % plot profiles
-        subplot (5,6,SubPlots{1,MVPA_BOLD})
+        subplot (5,6,SubPlots{1,(iCdt-1)*2+MVPA_BOLD})
         PlotRectangle(6,fontsize)
-        subplot(5,6,SubPlots{1,MVPA_BOLD})
+        subplot(5,6,SubPlots{1,(iCdt-1)*2+MVPA_BOLD})
         hold on
         if MVPA_BOLD==2
             l=errorbar(...
@@ -70,8 +70,11 @@ for iCdt = 1:numel(ToPlot.Legend)
             set(l(iLine),'color', line_colors(iLine,:))
         end
         
+        if MVPA_BOLD==1 && iCdt==1
+            legend(ToPlot.ROIs_name, 'location', 'NorthWest','fontsize', fontsize-1)
+        end
+        
         if MVPA_BOLD==1
-            legend(ToPlot.ROIs_name, 'location', 'NorthWest')
             t=ylabel('Param. est. [a u]');
         else
             t=ylabel('Decoding accuracy');
@@ -79,27 +82,27 @@ for iCdt = 1:numel(ToPlot.Legend)
         set(t,'fontsize',fontsize);
         
         if MVPA_BOLD==2
-            plot([0.5 6.5], [0.5 0.5], '--k')
+            plot([0.8 6.2], [0.5 0.5], '--k')
         else
-            plot([0.5 6.5], [0 0], '--k')
+            plot([0.8 6.2], [0 0], '--k')
         end
         
         ax = axis;
-        axis([0.75 6.25 ax(3) ax(4)])
+        axis([0.8 6.2 ax(3) ax(4)])
         
         if MVPA_BOLD==2
-            title(['MVPA' ToPlot.Legend{iCdt}])
+            title(['MVPA - ' ToPlot.Legend{iCdt}])
         else
-            title(['BOLD' ToPlot.Legend{iCdt}])
+            title(['BOLD - ' ToPlot.Legend{iCdt}])
         end
         
         set(gca,'tickdir', 'out', 'xtick', [] , ...
             'xticklabel', ' ', 'ticklength', [0.01 0.01], ...
-            'fontsize', fontsize)
+            'fontsize', fontsize-1)
         
         
         % plot betas constant
-        subplot (5,2,SubPlots{2,MVPA_BOLD})
+        subplot (5,6,SubPlots{2,(iCdt-1)*2+MVPA_BOLD})
         hold on
         if MVPA_BOLD==2
             tmp = ToPlot.MVPA.beta(:,:,1,iCdt);
@@ -108,13 +111,15 @@ for iCdt = 1:numel(ToPlot.Legend)
         end
         plot_betas(tmp,ToPlot,fontsize)
         
-        ylabel(sprintf('constant\nParam. est. [a u]'));
-        set(t,'fontsize',fontsize);
+        if MVPA_BOLD==1 && iCdt==1
+            ylabel(sprintf('constant\nParam. est. [a u]'));
+            set(t,'fontsize',fontsize);
+        end
         
         
         
         % plot betas linear
-        subplot (5,2,SubPlots{3,MVPA_BOLD})
+        subplot (5,6,SubPlots{3,(iCdt-1)*2+MVPA_BOLD})
         hold on
         if MVPA_BOLD==2
             tmp = ToPlot.MVPA.beta(:,:,2,iCdt);
@@ -123,31 +128,37 @@ for iCdt = 1:numel(ToPlot.Legend)
         end
         plot_betas(tmp,ToPlot,fontsize)
         
-        ylabel(sprintf('linear\nParam. est. [a u]'));
-        set(t,'fontsize',fontsize);
+        if MVPA_BOLD==1 && iCdt==1
+            ylabel(sprintf('linear\nParam. est. [a u]'));
+            set(t,'fontsize',fontsize);
+        end
         
         
         % plot whole ROI
-        subplot (5,2,SubPlots{4,MVPA_BOLD})
+        subplot (5,6,SubPlots{4,(iCdt-1)*2+MVPA_BOLD})
         hold on
         if MVPA_BOLD==2
+            ToPlot.Cst = 1;
             tmp = ToPlot.MVPA.grp(:,:,iCdt);
         else
             tmp = ToPlot.ROI.grp(:,:,iCdt);
         end
-        ToPlot.Cst = 1;
+        
         plot_betas(tmp,ToPlot,fontsize)
         
-        ylabel(sprintf('whole ROI\nParam. est. [a u]'));
-        set(t,'fontsize',fontsize);
+        if MVPA_BOLD==1 && iCdt==1
+            ylabel(sprintf('whole ROI\nParam. est. [a u]'));
+            set(t,'fontsize',fontsize);
+        end
         
     end
     
-    mtit(sprintf(Name),'xoff', 0, 'yoff', +0.03, 'fontsize', fontsize+4)
-    
-    print(fig, fullfile(ToPlot.FigureFolder, ['All_ROIs_BOLD-MVPA_' strrep(Name,'\n','-'), suffix, '.tif']), '-dtiff')
     
 end
+
+mtit(sprintf(Name),'xoff', 0, 'yoff', +0.03, 'fontsize', fontsize+4)
+
+print(fig, fullfile(ToPlot.FigureFolder, ['All_ROIs_' strrep(Name,'\n','-'), suffix, '.tif']), '-dtiff')
 
 
 end
@@ -157,16 +168,16 @@ function plot_betas(tmp,ToPlot,fontsize)
 
 Alpha = 0.05;
 
-Xpos = [1 2 4:8];
+Xpos = [1 2 4:8]*2;
 
 % plot spead
 tmp_cell = mat2cell(tmp,size(tmp,1),ones(1,size(tmp,2)));
 h = plotSpread(tmp_cell, 'distributionMarkers',{'.'},...
     'xValues', (Xpos)+.2, 'binWidth', 1, 'spreadWidth', 1);
-set(h{1}, 'MarkerSize', 10, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1)
+set(h{1}, 'MarkerSize', 4, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1)
 
 % plot mean+SEM
-errorbar(Xpos-.2, nanmean(tmp), nansem(tmp), 'b. ')
+errorbar(Xpos-.2, nanmean(tmp), nansem(tmp), 'b. ', 'MarkerSize', 6)
 
 % plot zero line
 if ToPlot.Cst
@@ -176,7 +187,7 @@ else
 end
 
 set(gca, 'tickdir', 'out', 'xtick', Xpos,'xticklabel',ToPlot.ROIs_name, ...
-    'ticklength', [0.01 0.01], 'fontsize', fontsize)
+    'ticklength', [0.01 0.01], 'fontsize', fontsize-2)
 
 axis tight
 ax = axis;
@@ -225,6 +236,12 @@ else
 end
 
 for iP = 1:numel(P)
+    if mod(iP,2)==0
+        Y_offset = -.1;
+    else
+        Y_offset = 0;
+    end
+    
     Sig = [];
     if P(iP)<0.001
         Sig = sprintf('p<0.001 ');
@@ -232,14 +249,17 @@ for iP = 1:numel(P)
         Sig = sprintf('p=%.3f ',P(iP));
     end
     
-    t = text(Xpos(iP)-.2,ax(4)+ax(4)*.2,sprintf(Sig));
-    set(t,'fontsize',fontsize-1);
+    t = text(...
+        Xpos(iP)-.2,...
+        ax(4) + ax(4)*.3 + Y_offset*(ax(4)-ax(3)),...
+        sprintf(Sig));
+    set(t,'fontsize',fontsize-2);
     
     if P(iP)<Alpha
         set(t,'color','r');
     end
 end
 
-axis([0.5 8.5 ax(3) ax(4)+ax(4)*.25])
+axis([0.5 16.5 ax(3) ax(4)+ax(4)*.25])
 
 end

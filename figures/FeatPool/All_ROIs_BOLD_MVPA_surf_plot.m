@@ -58,11 +58,11 @@ SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
 
 % load BOLD and MVPA
 if IsStim
-    Stim_prefix = 'Stimuli-';
+    Stim_prefix = 'Stimuli';
     load(fullfile(BOLD_resultsDir, strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
     File2Load = fullfile(MVPA_resultsDir, strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
 else
-    Stim_prefix = 'Target-';
+    Stim_prefix = 'Target';
     load(fullfile(BOLD_resultsDir, strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
     File2Load = fullfile(MVPA_resultsDir, strcat('GrpTargetsPoolQuadGLM', SaveSufix)); %#ok<*UNRCH>
 end
