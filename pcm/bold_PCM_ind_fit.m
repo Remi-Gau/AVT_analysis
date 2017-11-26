@@ -4,16 +4,17 @@ StartDir = fullfile(pwd, '..','..');
 addpath(genpath(fullfile(StartDir, 'code','subfun')))
 
 Get_dependencies('/home/rxg243/Dropbox/')
+Get_dependencies('D:\Dropbox\')
 
 surf = 0; % run of volumne whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
 hs_idpdt = 1;
 
+print = 0;
+
 cd(StartDir)
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
-
-NbLayers = 6;
 
 MaxIteration = 50000;
 
@@ -51,8 +52,7 @@ else
     hs_suffix = {''};
 end
 
-
-ColorMap = brain_colour_maps('hot_increasing');
+ColorMap = brain_colour_maps('hot_increasing'); %#ok<*NASGU>
 FigDim = [100, 100, 1000, 1500];
 
 PCM_dir = fullfile(StartDir, 'figures', 'PCM');
@@ -66,20 +66,24 @@ mkdir(Save_dir)
 %% Build the models
 close all
 M_A = Set_PCM_models_feature(1);
-fig_h = Plot_PCM_models_feature(M_A);
-for iFig = 1:numel(fig_h)
-    print(fig_h(iFig), fullfile(PCM_dir, ...
-        ['Model:' num2str(iFig) '-' strrep(strrep(fig_h(iFig).Name ,'w/',''),' ','') '_A.tif']),...
-        '-dtiff')
+if print
+    fig_h = Plot_PCM_models_feature(M_A);
+    for iFig = 1:numel(fig_h)
+        print(fig_h(iFig), fullfile(PCM_dir, ...
+            ['Model-' num2str(iFig) '-' strrep(strrep(fig_h(iFig).Name ,'w/',''),' ','') '_A.tif']),...
+            '-dtiff')
+    end
 end
 
 close all
 M_V = Set_PCM_models_feature(2);
-fig_h = Plot_PCM_models_feature(M_V);
-for iFig = 1:numel(fig_h)
-    print(fig_h(iFig), fullfile(PCM_dir, ...
-        ['Model:' num2str(iFig) '-' strrep(strrep(fig_h(iFig).Name,'w/',''),' ','') '_V.tif']),...
-        '-dtiff')
+if print
+    fig_h = Plot_PCM_models_feature(M_V);
+    for iFig = 1:numel(fig_h)
+        print(fig_h(iFig), fullfile(PCM_dir, ...
+            ['Model-' num2str(iFig) '-' strrep(strrep(fig_h(iFig).Name,'w/',''),' ','') '_V.tif']),...
+            '-dtiff')
+    end
 end
 
 clear fig_h
@@ -120,7 +124,7 @@ for iSub = 1:NbSub
     Sub_dir = fullfile(StartDir, SubLs(iSub).name);
     
     load(fullfile(Sub_dir, 'ffx_nat', 'SPM.mat'))
-    Nb_sess(iSub) = numel(SPM.Sess); %#ok<*SAGROW>
+    Nb_sess(iSub) = numel(SPM.Sess);   %#ok<*SAGROW>
     clear SPM
     
     % Which session belings to which day (for day based CV)
@@ -182,7 +186,7 @@ for iToPlot = 1:numel(ToPlot)
                 };
         end
         
-        for iROI = 1:numel(ROI)
+        for iROI = 2:numel(ROI)
             
             fprintf('\n %s\n', ROI(iROI).name)
             
@@ -332,40 +336,41 @@ for iToPlot = 1:numel(ToPlot)
                 for ihs = 1:numel(hs_suffix)
                     
                     %%
-                    fig_h = figure('name', [SubLs(iSub).name '-' strrep(ROI(iROI).name,'_', ' ') '-' hs_suffix{ihs}], ...
-                        'Position', FigDim, 'Color', [1 1 1]);
-                    
-                    colormap(seismic(1000))
-                    
-                    Subplot = 1;
-                    
-                    subplot(1,2,Subplot)
-                    
-                    Data = Y{iSub,ihs};
-                    [~,I] = sort(mean(Data));
-                    Data = Data(:,I);
-                    imagesc(imgaussfilt(Data,[.001 50]), [-.5 .5])
-                    title('Y as f(mean(act))')
-                    colorbar
-                    set(gca,'Xtick',[],'Yticklabel', [], 'tickdir', 'out')
-                    
-                    Subplot = Subplot+1;
-                    
-                    subplot(1,2,Subplot)
-                    YY = Data*Data';
-                    MAX = min(abs([max(YY(:)) min(YY(:))]));
-                    imagesc(YY, [MAX*-1 MAX])
-                    hold on
-                    title('Y*Y^T')
-                    colorbar
-                    set(gca,'Xtick',[],'Yticklabel', [], 'tickdir', 'out')
-                    
-                    Subplot = Subplot+1;
-                    
-                    mtit(fig_h.Name, 'fontsize', 12, 'xoff',0,'yoff',.05)
-                    
-                    clear Data
-                    
+                    if print
+                        fig_h = figure('name', [SubLs(iSub).name '-' strrep(ROI(iROI).name,'_', ' ') '-' hs_suffix{ihs}], ...
+                            'Position', FigDim, 'Color', [1 1 1]);
+                        
+                        colormap(seismic(1000))
+                        
+                        Subplot = 1;
+                        
+                        subplot(1,2,Subplot)
+                        
+                        Data = Y{iSub,ihs};
+                        [~,I] = sort(mean(Data));
+                        Data = Data(:,I);
+                        imagesc(imgaussfilt(Data,[.001 50]), [-.5 .5])
+                        title('Y as f(mean(act))')
+                        colorbar
+                        set(gca,'Xtick',[],'Yticklabel', [], 'tickdir', 'out')
+                        
+                        Subplot = Subplot+1;
+                        
+                        subplot(1,2,Subplot)
+                        YY = Data*Data';
+                        MAX = min(abs([max(YY(:)) min(YY(:))]));
+                        imagesc(YY, [MAX*-1 MAX])
+                        hold on
+                        title('Y*Y^T')
+                        colorbar
+                        set(gca,'Xtick',[],'Yticklabel', [], 'tickdir', 'out')
+                        
+                        Subplot = Subplot+1;
+                        
+                        mtit(fig_h.Name, 'fontsize', 12, 'xoff',0,'yoff',.05)
+                        
+                        clear Data
+                    end
                     %%
                     G_hat(:,:,iSub,ihs)=pcm_estGCrossval(Y{iSub,ihs},partVec{iSub},condVec{iSub});
                     
@@ -384,8 +389,6 @@ for iToPlot = 1:numel(ToPlot)
             
             %% Get RSA
             fprintf('\n  Computing RDM\n')
-            
-            c= pcm_indicatorMatrix('allpairs',1:numel(CondNames));
             
             for iSub=1:size(Y,1)
                 for ihs = 1:numel(hs_suffix)
@@ -415,56 +418,70 @@ for iToPlot = 1:numel(ToPlot)
             
             
             %% Run the PCM
-            if ROI(iROI).name(1)=='V'
-                M = M_V;
-            else
-                M = M_A;
-            end
-              
-            % Treat the run effect as random or fixed?
-            % We are using a fixed run effect here, as we are not interested in the
-            % activity relative the the baseline (rest) - so as in RSA, we simply
-            % subtract out the mean patttern across all conditions.
-            runEffect  = 'fixed';
-            
-            for ihs = 1:numel(hs_suffix)
+%             try
                 
-                for iSub=1:size(Y,1)
-                    Data{1,iSub} = Y{iSub,ihs};
+                if ROI(iROI).name(1)=='V'
+                    M = M_V;
+                else
+                    M = M_A;
                 end
                 
-                fprintf('\n\n  Running PCM_ind\n\n')
-                [T_ind{ihs},theta_ind{ihs},G_pred_ind{ihs}] = pcm_fitModelIndivid(Data,M,partVec,condVec,'runEffect',runEffect,'MaxIteration',MaxIteration);
+                % Treat the run effect as random or fixed?
+                % We are using a fixed run effect here, as we are not interested in the
+                % activity relative the the baseline (rest) - so as in RSA, we simply
+                % subtract out the mean patttern across all conditions.
+                runEffect  = 'fixed';
                 
-                [D{ihs},T_ind_cross{ihs},theta_ind_cross{ihs}]=pcm_fitModelIndividCrossval(Data,M,partVec,condVec,'runEffect',runEffect,'MaxIteration',MaxIteration);
+                for ihs = 1:numel(hs_suffix)
+                    
+                    fprintf('\n\n  Running %s\n\n', hs_suffix{ihs})
+                    
+                    for iSub=1:size(Y,1)
+                        Data{1,iSub} = Y{iSub,ihs};
+                    end
+                    
+                    fprintf('\n\n  Running PCM_ind\n\n')
+                    [T_ind{ihs},theta_ind{ihs},G_pred_ind{ihs}] = pcm_fitModelIndivid(Data,M,partVec,condVec,'runEffect',runEffect,'MaxIteration',MaxIteration);
+                    
+                    [D{ihs},T_ind_cross{ihs},theta_ind_cross{ihs}]=pcm_fitModelIndividCrossval(Data,M,partVec,condVec,'runEffect',runEffect,'MaxIteration',MaxIteration);
+                    
+                    % Fit the models on the group level
+                    fprintf('\n\n  Running PCM_grp\n\n')
+                    [T_group{ihs},theta_gr{ihs},G_pred_gr{ihs}] = pcm_fitModelGroup(Data,M,partVec,condVec,'runEffect',runEffect,'fitScale',1);
+                    
+                    % Fit the models through cross-subject crossvalidation
+                    fprintf('\n\n  Running PCM_grp_cv\n\n')
+                    [T_cross{ihs},theta_cr{ihs},G_pred_cr{ihs}] = pcm_fitModelGroupCrossval(Data,M,partVec,condVec,'runEffect',runEffect,'groupFit',...
+                        theta_gr{ihs},'fitScale',1,'MaxIteration',MaxIteration);
+                    
+                end
                 
-                % Fit the models on the group level
-                fprintf('\n\n  Running PCM_grp\n\n')
-                [T_group{ihs},theta_gr{ihs},G_pred_gr{ihs}] = pcm_fitModelGroup(Data,M,partVec,condVec,'runEffect',runEffect,'fitScale',1);
+                %% Save
+                save(fullfile('/data', sprintf('PCM_features_%s_%s_%s_%s_%s.mat', Stim_suffix, Beta_suffix, ROI(iROI).name, ...
+                    ToPlot{iToPlot}, datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
+                    'M', 'partVec', 'condVec', 'G', 'G_hat', 'COORD', 'RDMs_CV', 'RDMs',...
+                    'T_ind','theta_ind','G_pred_ind',...
+                    'D','T_ind_cross','theta_ind_cross',...
+                    'T_group','theta_gr','G_pred_gr',...
+                    'T_cross','theta_cr','G_pred_cr' )
                 
-                % Fit the models through cross-subject crossvalidation
-                fprintf('\n\n  Running PCM_grp_cv\n\n')
-                [T_cross{ihs},theta_cr{ihs},G_pred_cr{ihs}] = pcm_fitModelGroupCrossval(Data,M,partVec,condVec,'runEffect',runEffect,'groupFit',...
-                    theta_gr{ihs},'fitScale',1,'MaxIteration',MaxIteration);
+%                 save(fullfile(Save_dir, sprintf('PCM_features_%s_%s_%s_%s_%s.mat', Stim_suffix, Beta_suffix, ROI(iROI).name, ...
+%                     ToPlot{iToPlot}, datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
+%                     'M', 'partVec', 'condVec', 'G', 'G_hat', 'COORD', 'RDMs_CV', 'RDMs',...
+%                     'T_group','theta_gr','G_pred_gr',...
+%                     'T_cross','theta_cr','G_pred_cr' )
                 
-            end
-            
-            %% Save
-            save(fullfile(Save_dir, sprintf('PCM_features_%s_%s_%s_%s_%s.mat', Stim_suffix, Beta_suffix, ROI(iROI).name, ...
-                ToPlot{iToPlot}, datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
-                'M', 'partVec', 'condVec', 'G', 'G_hat', 'COORD', 'RDMs_CV', 'RDMs',...
-                'T_ind','theta_ind','G_pred_ind',...
-                'D','T_ind_cross','theta_ind_cross',...
-                'T_group','theta_gr','G_pred_gr',...
-                'T_cross','theta_cr','G_pred_cr' )
-            
-            subject = sprintf('Analysis PCM %s %s done', ToPlot{iToPlot}, ROI(iROI).name);
-            matlabmail('remi_gau@hotmail.com', 'Analysis done', subject);
-            
+                subject = sprintf('Analysis PCM %s %s done', ToPlot{iToPlot}, ROI(iROI).name);
+                matlabmail('remi_gau@hotmail.com', 'Analysis done', subject);
+                
+%             catch ME
+%                 save(fullfile(Save_dir,['ME_' ROI(iROI).name '.mat']),'ME')
+%                 subject = sprintf('Analysis PCM %s %s failed', ToPlot{iToPlot}, ROI(iROI).name);
+%                 matlabmail('remi_gau@hotmail.com', 'Analysis failed', subject, fullfile(Save_dir,['ME_' ROI(iROI).name '.mat']));
+%             end
             
             
         end
         
     end
 end
-
