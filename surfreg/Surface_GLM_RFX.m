@@ -23,23 +23,20 @@ CondNames = {...
     };
 
 
-DesMat = (1:NbLayers)-mean(1:NbLayers);
-DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
-% DesMat = [ones(NbLayers,1) DesMat'];
-DesMat = spm_orth(DesMat);
+% DesMat = (1:NbLayers)-mean(1:NbLayers);
+% DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
+% % DesMat = [ones(NbLayers,1) DesMat'];
+% DesMat = spm_orth(DesMat);
 
-for iSubj=1:NbSub
-    sets{iSubj} = [-1 1];
-end
-[a, b, c, d, e, f, g, h, i, j] = ndgrid(sets{:});
-ToPermute = [a(:), b(:), c(:), d(:), e(:), f(:), g(:), h(:), i(:), j(:)];
+% for iSubj=1:NbSub
+%     sets{iSubj} = [-1 1];
+% end
+% [a, b, c, d, e, f, g, h, i, j] = ndgrid(sets{:});
+% ToPermute = [a(:), b(:), c(:), d(:), e(:), f(:), g(:), h(:), i(:), j(:)];
 
-Suffix = {'cst', 'lin', 'quad'};
-
-
-for Smooth = 1
+for Smooth = 0:1
     
-    for ihs= 1%:numel(hs)
+    for ihs= 1:numel(hs)
         
         clear AllLayers AllLayersNoSmooth
         
@@ -108,9 +105,11 @@ for Smooth = 1
             fprintf('\n')
             tabulate(sum(IsZero))
             
-            Cst = zeros(1, size(Mapping,2));
-            Lin = zeros(1, size(Mapping,2));
-            Quad = zeros(1, size(Mapping,2));
+%             Cst = zeros(1, size(Mapping,2));
+%             Lin = zeros(1, size(Mapping,2));
+%             Quad = zeros(1, size(Mapping,2));
+            Mean = zeros(1, size(Mapping,2));
+            T_map = zeros(1, size(Mapping,2));
             
             for NbSub2Excl = 0:(NbSub-5)
                 
@@ -124,24 +123,27 @@ for Smooth = 1
                     Y(:,iVert,:) = CrossSidelLayers(Subj2Exclu,VertOfInt(iVert),:);
                 end
                 
-                Y = shiftdim(Y,2);
-                Y = reshape(Y, [size(Y,1)*size(Y,2),size(Y,3)] );
+                Mean_tmp = mean(mean(Y,3));
+                T_map_temp = nanmean(mean(Y,3))./nansem(mean(Y,3));
                 
-                X = [];
-                for iSubj=1:(NbSub-NbSub2Excl)
-                    X((1:NbLayers)+NbLayers*(iSubj-1),(1:size(DesMat,2))+size(DesMat,2)*(iSubj-1)) = DesMat; %#ok<*SAGROW>
-                end
-                
-                B = pinv(X)*Y;
-                
-                Cst_tmp = mean(B(1:3:size(X,2),:));
-                Cst(VertOfInt) = Cst_tmp;
-                
-                Lin_tmp = mean(B(2:3:size(X,2),:));
-                Lin(VertOfInt) = Lin_tmp;
-                
-                Quad_tmp = mean(B(3:3:size(X,2),:));
-                Quad(VertOfInt) = Quad_tmp;
+%                 Y = shiftdim(Y,2);
+%                 Y = reshape(Y, [size(Y,1)*size(Y,2),size(Y,3)] );
+%                 
+%                 X = [];
+%                 for iSubj=1:(NbSub-NbSub2Excl)
+%                     X((1:NbLayers)+NbLayers*(iSubj-1),(1:size(DesMat,2))+size(DesMat,2)*(iSubj-1)) = DesMat; %#ok<*SAGROW>
+%                 end
+%                 
+%                 B = pinv(X)*Y;
+%                 
+%                 Cst_tmp = mean(B(1:3:size(X,2),:));
+%                 Cst(VertOfInt) = Cst_tmp;
+%                 
+%                 Lin_tmp = mean(B(2:3:size(X,2),:));
+%                 Lin(VertOfInt) = Lin_tmp;
+%                 
+%                 Quad_tmp = mean(B(3:3:size(X,2),:));
+%                 Quad(VertOfInt) = Quad_tmp;
                 
                 %
                 %                 if NbSub2Excl==0
@@ -195,12 +197,18 @@ for Smooth = 1
                 
                 fprintf('\n');
                 
-                write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSide', ...
-                    [CrossSideName{iCond} '_' hs(ihs) 'h_lin_inf' suffix '.vtk']), InfVertex, InfFace, Lin')
-                write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSide', ...
-                    [CrossSideName{iCond} '_' hs(ihs) 'h_cst_inf' suffix '.vtk']), InfVertex, InfFace, Cst')
-                write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSide', ...
-                    [CrossSideName{iCond} '_' hs(ihs) 'h_quad_inf' suffix '.vtk']), InfVertex, InfFace, Quad')
+%                 write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSide', ...
+%                     [CrossSideName{iCond} '_' hs(ihs) 'h_lin_inf' suffix '.vtk']), InfVertex, InfFace, Lin')
+%                 write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSide', ...
+%                     [CrossSideName{iCond} '_' hs(ihs) 'h_cst_inf' suffix '.vtk']), InfVertex, InfFace, Cst')
+%                 write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSide', ...
+%                     [CrossSideName{iCond} '_' hs(ihs) 'h_quad_inf' suffix '.vtk']), InfVertex, InfFace, Quad')
+                
+                write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSide',...
+                    [CrossSideName{iCond} '_' hs(ihs) 'h_mean_inf' suffix '.vtk']), InfVertex, InfFace, Mean');
+                
+                write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSide',...
+                    [CrossSideName{iCond} '_' hs(ihs) 'h_T_map_inf' suffix '.vtk']), InfVertex, InfFace, T_map');
                 
 %                 write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'Baseline', ...
 %                     [CondNames{iCond} '_' hs(ihs) 'h_lin' suffix '.vtk']), Vertex, Face, Lin')
@@ -249,9 +257,11 @@ for Smooth = 1
             fprintf('\n')
             tabulate(sum(IsZero))
             
-            Cst = zeros(1, size(Mapping,2));
-            Lin = zeros(1, size(Mapping,2));
-            Quad = zeros(1, size(Mapping,2));
+%             Cst = zeros(1, size(Mapping,2));
+%             Lin = zeros(1, size(Mapping,2));
+%             Quad = zeros(1, size(Mapping,2));
+            Mean = zeros(1, size(Mapping,2));
+            T_map = zeros(1, size(Mapping,2));
             
             for NbSub2Excl = 0:(NbSub-5)
                 
@@ -265,24 +275,27 @@ for Smooth = 1
                     Y(:,iVert,:) = CrossSenslLayers(Subj2Exclu,VertOfInt(iVert),:);
                 end
                 
-                Y = shiftdim(Y,2);
-                Y = reshape(Y, [size(Y,1)*size(Y,2),size(Y,3)] );
+                Mean_tmp = mean(mean(Y,3));
+                T_map_temp = nanmean(mean(Y,3))./nansem(mean(Y,3));
                 
-                X = [];
-                for iSubj=1:(NbSub-NbSub2Excl)
-                    X((1:NbLayers)+NbLayers*(iSubj-1),(1:size(DesMat,2))+size(DesMat,2)*(iSubj-1)) = DesMat; %#ok<*SAGROW>
-                end
-                
-                B = pinv(X)*Y;
-                
-                Cst_tmp = mean(B(1:3:size(X,2),:));
-                Cst(VertOfInt) = Cst_tmp;
-                
-                Lin_tmp = mean(B(2:3:size(X,2),:));
-                Lin(VertOfInt) = Lin_tmp;
-                
-                Quad_tmp = mean(B(3:3:size(X,2),:));
-                Quad(VertOfInt) = Quad_tmp;
+%                 Y = shiftdim(Y,2);
+%                 Y = reshape(Y, [size(Y,1)*size(Y,2),size(Y,3)] );
+%                 
+%                 X = [];
+%                 for iSubj=1:(NbSub-NbSub2Excl)
+%                     X((1:NbLayers)+NbLayers*(iSubj-1),(1:size(DesMat,2))+size(DesMat,2)*(iSubj-1)) = DesMat; %#ok<*SAGROW>
+%                 end
+%                 
+%                 B = pinv(X)*Y;
+%                 
+%                 Cst_tmp = mean(B(1:3:size(X,2),:));
+%                 Cst(VertOfInt) = Cst_tmp;
+%                 
+%                 Lin_tmp = mean(B(2:3:size(X,2),:));
+%                 Lin(VertOfInt) = Lin_tmp;
+%                 
+%                 Quad_tmp = mean(B(3:3:size(X,2),:));
+%                 Quad(VertOfInt) = Quad_tmp;
                 
                 %
                 %                 if NbSub2Excl==0
@@ -336,12 +349,18 @@ for Smooth = 1
                 
                 fprintf('\n');
                 
-                write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSens', ...
-                    [CrossSensName{iCond} '_' hs(ihs) 'h_lin_inf' suffix '.vtk']), InfVertex, InfFace, Lin')
-                write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSens', ...
-                    [CrossSensName{iCond} '_' hs(ihs) 'h_cst_inf' suffix '.vtk']), InfVertex, InfFace, Cst')
-                write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSens', ...
-                    [CrossSensName{iCond} '_' hs(ihs) 'h_quad_inf' suffix '.vtk']), InfVertex, InfFace, Quad')
+%                 write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSens', ...
+%                     [CrossSensName{iCond} '_' hs(ihs) 'h_lin_inf' suffix '.vtk']), InfVertex, InfFace, Lin')
+%                 write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSens', ...
+%                     [CrossSensName{iCond} '_' hs(ihs) 'h_cst_inf' suffix '.vtk']), InfVertex, InfFace, Cst')
+%                 write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSens', ...
+%                     [CrossSensName{iCond} '_' hs(ihs) 'h_quad_inf' suffix '.vtk']), InfVertex, InfFace, Quad')
+                
+                write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSens',...
+                    [CrossSensName{iCond} '_' hs(ihs) 'h_mean_inf' suffix '.vtk']), InfVertex, InfFace, Mean');
+                
+                write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'CrossSens',...
+                    [CrossSensName{iCond} '_' hs(ihs) 'h_T_map_inf' suffix '.vtk']), InfVertex, InfFace, T_map');
                 
 %                 write_vtk(fullfile(DataFolder, [upper(hs(ihs)) 'H'], 'Baseline', ...
 %                     [CondNames{iCond} '_' hs(ihs) 'h_lin' suffix '.vtk']), Vertex, Face, Lin')
