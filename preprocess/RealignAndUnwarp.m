@@ -17,6 +17,7 @@ addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
+% In case you want a speed up you can run a par for loop over subjects
 % [KillGcpOnExit] = OpenParWorkersPool(2);
 
 for iSub = NbSub % for each subject
@@ -32,9 +33,8 @@ for iSub = NbSub % for each subject
     SesLs = dir('ses*');
     NbSes = numel(SesLs);
     
-    % --------------------------%
-    %     DEFINES    BATCH      %
-    % --------------------------%
+    
+    %% DEFINES BATCH
     matlabbatch = {};
     matlabbatch{1,1}.spm.spatial.realignunwarp.eoptions.quality = 1;
     matlabbatch{1,1}.spm.spatial.realignunwarp.eoptions.sep = 2;
@@ -117,9 +117,12 @@ for iSub = NbSub % for each subject
         spm_jobman('run',matlabbatch)
     end
     
+    % Saving
     if UseVDM;
         SaveMatLabBatch(strcat('RealignAndUnwarpVDM_', SubLs(iSub).name, '_', datestr(now, DateFormat), '_matlabbatch'),matlabbatch)
         try
+            % in case SPM created a .ps file output we rename it so it is
+            % not overwritten later
             PsFile = dir('spm_*.ps');
             move(PsFile.name, ['RealignAndUnwarpVDM_' PsFile.name])
         catch
@@ -133,6 +136,8 @@ for iSub = NbSub % for each subject
         end
     end
     
+    % To save space we can delete the unzipped raw nitfti files that have
+    % been unzipped
 %     fprintf(' Cleaning')
 %     for iSes = 1:NbSes
 %         cd(fullfile(SubDir, SesLs(iSes).name, 'func'))

@@ -1,3 +1,5 @@
+% Gets the file from the BIDS and unzips some of them
+
 clear; clc
 
 StartDir = fullfile(pwd, '..','..');

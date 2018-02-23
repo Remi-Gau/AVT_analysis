@@ -51,7 +51,7 @@ for iSub = NbSub % for each subject
     end
     
     spm_coreg_reorient_save(TargetScan,SourceScan,Img2Process,flags);
-    
+     
 end
 
 cd(StartDir)

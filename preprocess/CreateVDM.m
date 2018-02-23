@@ -48,7 +48,8 @@ for iSub = NbSub % for each subject
     SesLs = dir('ses*');
     NbSes = numel(SesLs);
     
-    % Identify the first image of the first run
+    
+    %% Identify the first image of the first run
     TargetFile = spm_select('FPList', fullfile(SubDir, SesLs(1).name, 'func'),...
         ['^' SubLs(iSub).name '_ses-1_task-audiovisualtactile_run-01_bold.nii$']);
     if ~exist(TargetFile,'file')
@@ -59,13 +60,11 @@ for iSub = NbSub % for each subject
             TargetFile = spm_select('FPList', fullfile(SubDir, SesLs(1).name, 'func'),...
                 ['^' SubLs(iSub).name '_ses-1_task-audiovisualtactile_run-01_bold.nii$']);
         catch
-            error('it seems that we are missing the reference image')
+            error('It seems that we are missing the reference image')
         end
     end
     
-    % --------------------------%
-    %     DEFINES    BATCH      %
-    % --------------------------%
+    %% DEFINES BATCH
     matlabbatch = {};
     
     RunInd = 1;
@@ -152,6 +151,7 @@ for iSub = NbSub % for each subject
         
     end
     
+    %% Saves and run the batch
     cd(fullfile(SubDir))
     save (strcat('Create_VDM_Subj_', SubLs(iSub).name, '_', datestr(now, DateFormat), '_matlabbatch.mat'), 'matlabbatch');
     
