@@ -1,7 +1,7 @@
 function fig_h = Plot_PCM_models_feature(M)
 
 ColorMap = brain_colour_maps('hot_increasing');
-FigDim = [100, 100, 1000, 1500];
+FigDim = [100, 50, 1300, 700];
 
 for iM=1:numel(M)
     

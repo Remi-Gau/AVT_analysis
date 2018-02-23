@@ -1,8 +1,8 @@
-function bold_PCM_plot_data
+function plot_PCM_data
 
 clc; clear; close all
 
-StartDir = fullfile(pwd, '..', '..', '..', '..');
+StartDir = fullfile(pwd, '..');
 addpath(genpath(fullfile(StartDir, 'code','subfun')))
 
 Get_dependencies('/home/rxg243/Dropbox/')

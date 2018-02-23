@@ -1,6 +1,6 @@
 clc; clear; close all
 
-StartDir = fullfile(pwd, '..','..');
+StartDir = fullfile(pwd, '..');
 addpath(genpath(fullfile(StartDir, 'code','subfun')))
 
 Get_dependencies('/home/rxg243/Dropbox/')
