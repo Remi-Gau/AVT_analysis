@@ -29,6 +29,10 @@ if opt.session.curve
     SaveSufix = [SaveSufix '_lear-1'];
 end
 
+if opt.session.loro
+    SaveSufix = [SaveSufix '_loro-1'];
+end
+
 SaveSufix = [SaveSufix '_NORM'];
 if opt.scaling.idpdt
     SaveSufix = [SaveSufix '-Idpdt'];
