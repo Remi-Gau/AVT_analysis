@@ -1,9 +1,9 @@
 clc; clear;
 
-Target = 0;
-
 StartDir = fullfile(pwd, '..','..','..');
 addpath(genpath(fullfile(StartDir, 'code','subfun')))
+Get_dependencies('/home/rxg243/Dropbox/')
+Get_dependencies('D:\Dropbox\')
 
 cd(StartDir)
 SubLs = dir('sub*');
@@ -11,25 +11,21 @@ NbSub = numel(SubLs);
 
 NbLayers = 6;
 
-if Target
-    CondNames = {...
-        'ATargL','ATargR',...
-        'VTargL','VTargR',...
-        'TTargL','TTargR',...
-        };
-else
-    CondNames = {...
-        'AStimL','AStimR',...
-        'VStimL','VStimR',...
-        'TStimL','TStimR'}; %#ok<*UNRCH>
-end
+CondNames = {...
+    'AStimL','AStimR',...
+    'VStimL','VStimR',...
+    'TStimL','TStimR',...
+    'ATargL','ATargR',...
+    'VTargL','VTargR',...
+    'TTargL','TTargR',...
+    };
 
 DesMat = (1:NbLayers)-mean(1:NbLayers);
-DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
-% DesMat = [ones(NbLayers-2,1) DesMat'];
+% DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
+DesMat = [ones(NbLayers,1) DesMat'];
 DesMat = spm_orth(DesMat);
 
-ToPlot={'Cst','Lin','Quad'};
+ToPlot={'Cst','Lin'};
 
 for iSub = 1:NbSub
     
@@ -38,16 +34,13 @@ for iSub = 1:NbSub
     fprintf('Processing %s\n', SubLs(iSub).name)
     
     Sub_dir = fullfile(StartDir, SubLs(iSub).name);
-    GLM_dir = fullfile(Sub_dir, 'ffx_nat');
+    GLM_dir = fullfile(Sub_dir, 'ffx_rsa');
+    Data_dir = fullfile('E:\derivatives', SubLs(iSub).name, 'ffx_rsa', 'betas','6_surf');
+    %     Data_dir = fullfile(GLM_dir,'betas','6_surf');
     
-    if Target
-        Data_dir = fullfile(GLM_dir,'betas','6_surf', 'targets');
-    else
-        Data_dir = fullfile(GLM_dir,'betas','6_surf');
-    end
     
     % Get number of sessions, regressors of interest numbers, and names of conditions
-    load(fullfile(GLM_dir, 'SPM.mat'))
+    load(fullfile(Sub_dir, 'ffx_nat', 'SPM.mat'))
     [BetaOfInterest, BetaNames] = GetBOI(SPM,CondNames);
     Nb_sess = numel(SPM.Sess);
     clear SPM
@@ -81,7 +74,7 @@ for iSub = 1:NbSub
             num2str(NbLayers) '_surf.mat']);
         
         InfSurfFile=spm_select('FPList', fullfile(Sub_dir, 'anat', 'cbs'), ...
-            ['^' SubLs(iSub).name '.*' HsSufix 'cr_gm_avg_inf.vtk$']);
+            ['^' SubLs(iSub).name '.*' HsSufix 'cr_gm_avg.vtk$']);
         [inf_vertex,inf_faces,~] = read_vtk(InfSurfFile, 0, 1);
         
         NbVertices(hs)=size(inf_vertex,2);
@@ -105,7 +98,7 @@ for iSub = 1:NbSub
             % Identify the relevant betas
             Beta2Sel = [];
             for iSess = 1:Nb_sess
-                if strcmp(SubLs(iSub).name,'sub-06') && iSess==17
+                if strcmp(SubLs(iSub).name,'sub-06') && iSess==17 && (iCdt<3 || iCdt==7 || iCdt==8)
                 else
                     Beta2Sel = [Beta2Sel ;find(strcmp(cellstr(BetaNames), ...
                         ['Sn(' num2str(iSess) ') ' CondNames{iCdt}  '*bf(1)']))];   %#ok<*AGROW>
@@ -128,14 +121,18 @@ for iSub = 1:NbSub
             % Run the "cross-validation"
             for iCV = 1:size(Features,3)
                 Sess2Sel = iCV;
-                if strcmp(SubLs(iSub).name,'sub-06') && iCdt<3 && iCV==17
-                    %                     BetaCdt{hs,iCV}(:,:,iCdt) = nan(size(DesMat,2),size(Features,1));
+                if strcmp(SubLs(iSub).name,'sub-06') && iSess==17 && (iCdt<3 || iCdt==7 || iCdt==8)
+%                     BetaCdt{hs,iCV}(1:size(DesMat,2),:,iCdt) = nan(size(DesMat,2),size(Features,1));
+%                     BetaCdt{hs,iCV}(size(DesMat,2)+1,:,iCdt) = nan(1,size(Features,1));
                 else
                     Y = Features(:,:,Sess2Sel);
+                    AllData{hs,iCV}(:,:,iCdt) = Y;
                     X=repmat(DesMat,size(Y,3),1);
                     Y = shiftdim(Y,1);
                     B = pinv(X)*Y;
-                    BetaCdt{hs,iCV}(:,:,iCdt) = B;
+                    BetaCdt{hs,iCV}(1:size(DesMat,2),:,iCdt) = B;
+                    BetaCdt{hs,iCV}(size(DesMat,2)+1,:,iCdt) = mean(Y);
+                    
                 end
             end
             
@@ -156,50 +153,40 @@ for iSub = 1:NbSub
     end
     
     %%
-    if strcmp(SubLs(iSub).name,'sub-06')
-        Nb_sess = 19;
-    end
-    
-    Cdt_ROI_lhs = 1:6;
-    Cdt_ROI_rhs = [2 1 4 3 6 5];
-    
-    for iToPlot = 1:numel(ToPlot)
+    for iToPlot = 1:size(BetaCdt{1,1},1)
         
         X_lh = nan(size(CondNames,2)*Nb_sess,NbVertex(1));
         X_rh = nan(size(CondNames,2)*Nb_sess,NbVertex(2));
         row=1;
         
-        for iCV = 1:Nb_sess
-            for iCdt = 1:size(CondNames,2)
-                X_lh(row,VertexWithDataHS{1}) = BetaCdt{1,iCV}(iToPlot,:,Cdt_ROI_lhs(iCdt));
-                X_rh(row,VertexWithDataHS{2}) = BetaCdt{2,iCV}(iToPlot,:,Cdt_ROI_rhs(iCdt));
+        for iCdt = 1:size(CondNames,2)
+            for iCV = 1:Nb_sess
+                X_lh(row,VertexWithDataHS{1}) = BetaCdt{1,iCV}(iToPlot,:,iCdt);
+                X_rh(row,VertexWithDataHS{2}) = BetaCdt{2,iCV}(iToPlot,:,iCdt);
                 row=row+1;
             end
         end
         
         for iROI = 1:numel(ROI)
-            
-            X = [X_lh(:,ROI(iROI).VertOfInt{1}) X_rh(:,ROI(iROI).VertOfInt{2})];
-            
             % Stores data for PCM
-            PCM_data{iToPlot,iROI} = X;
-            
+            PCM_data{iToPlot,iROI,1} = X_lh(:,ROI(iROI).VertOfInt{1});
+            PCM_data{iToPlot,iROI,2} = X_rh(:,ROI(iROI).VertOfInt{2});
         end
-        
     end
     
-    clear BetaCdt
+    X_lh = nan(size(CondNames,2)*Nb_sess,NbVertex(1));
+    X_rh = nan(size(CondNames,2)*Nb_sess,NbVertex(2));
+    row=1;
     
-    mkdir(fullfile(Sub_dir,'results','profiles','surf','PCM'))
     
-    if Target
-        save(fullfile(Sub_dir,'results','profiles','surf','PCM','Data_PCM_targets_raw_beta.mat'), '-v7.3', 'PCM_data')
-    else
-        save(fullfile(Sub_dir,'results','profiles','surf','PCM','Data_PCM_stim_raw_beta.mat'), '-v7.3', 'PCM_data')
-    end
     
+    %%
+    %     mkdir(fullfile(Sub_dir,'results','profiles','surf','PCM'))
+    save(fullfile(Sub_dir,'results','profiles','surf','PCM','Data_PCM.mat'), '-v7.3',  ...
+        'PCM_data')
+    
+    clear BetaCdt PCM_data
     
 end
 
 cd(StartDir)
-
