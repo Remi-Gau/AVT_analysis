@@ -74,7 +74,7 @@ else
 end
 
 %%
-fig = figure('Name', Name, 'Position', [100, 100, 1500, 1000], 'Color', [1 1 1], 'Visible', Visible);
+fig = figure('Name', Name, 'Position', [100, 100, 1500, 600], 'Color', [1 1 1], 'Visible', Visible);
 
 box off
 

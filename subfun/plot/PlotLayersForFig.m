@@ -128,7 +128,7 @@ end
 
 
 %%
-fig = figure('Name', Name, 'Position', [100, 100, 1500, 1000], 'Color', [1 1 1], 'Visible', Visible);
+fig = figure('Name', Name, 'Position', [100, 100, 1500, 600], 'Color', [1 1 1], 'Visible', Visible);
 
 box off
 
@@ -156,10 +156,10 @@ for iCdt = 1:NbCdts
     shadedErrorBar(1:NbLayers, Mean(:,SubPlotOrder(iCdt)),ErrorBar(:,SubPlotOrder(iCdt)), ...
         {'Marker', Marker, 'MarkerSize', MarkerSize, 'LineStyle', LineStyle, 'LineWidth', 3, 'Color', 'k'}, Transparent)
     for SubjInd = 1:NbSubjects
-        %         plot(1:NbLayers, Subjects(:,SubPlotOrder(iCdt),SubjInd), '-', ...
-        %             'LineWidth', 1, 'Color', COLOR_Subject(SubjInd,:));
         plot(1:NbLayers, Subjects(:,SubPlotOrder(iCdt),SubjInd), '-', ...
-            'LineWidth', 1, 'Color', [.7 .7 .7]);
+            'LineWidth', 1, 'Color', COLOR_Subject(SubjInd,:));
+        %         plot(1:NbLayers, Subjects(:,SubPlotOrder(iCdt),SubjInd), '-', ...
+        %             'LineWidth', 1, 'Color', [.7 .7 .7]);
     end
     shadedErrorBar(1:NbLayers, Mean(:,SubPlotOrder(iCdt)),ErrorBar(:,SubPlotOrder(iCdt)), ...
         {'Marker', Marker, 'MarkerSize', MarkerSize, 'LineStyle', LineStyle, 'LineWidth', 3, 'Color', 'k'}, Transparent)
