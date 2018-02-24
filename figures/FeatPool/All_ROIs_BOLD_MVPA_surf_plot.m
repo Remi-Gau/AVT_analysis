@@ -23,17 +23,26 @@ NbSub = numel(SubLs);
 
 NbLayers=6;
 
+% ROIs = {
+%     'A1'
+%     'PT'
+%     'V1'
+%     'V2'
+%     'V3'
+%     'V4'
+%     'V5'};
+% NbROI = numel(ROIs);
+% ROI_order_BOLD = [1 NbROI 2:NbROI-1];
+% ROI_order_MVPA = [NbROI-1 NbROI 1:NbROI-2];
+
 ROIs = {
     'A1'
     'PT'
     'V1'
     'V2'
-    'V3'
-    'V4'
-    'V5'};
-NbROI = numel(ROIs);
-ROI_order_BOLD = [1 NbROI 2:NbROI-1];
-ROI_order_MVPA = [NbROI-1 NbROI 1:NbROI-2];
+    'V3'};
+ROI_order_BOLD = [1 7 2:4];
+ROI_order_MVPA = [6 7 1:3];
 
 TitSuf = {
     'Contra_vs_Ipsi';...
@@ -81,7 +90,7 @@ end
 
 close all
 
-for iAnalysis= 2 %:numel(TitSuf)
+for iAnalysis= 1:numel(TitSuf)
     
     clear ToPlot ToPlot2
     ToPlot.TitSuf = TitSuf{iAnalysis};
@@ -115,7 +124,7 @@ for iAnalysis= 2 %:numel(TitSuf)
             
             % Same for the MVPA data
             ToPlot.Row = 2; % a new row means a new figure
-            Data = Get_data_MVPA(ROIs,SubSVM,iAnalysis,SVM);
+            Data = Get_data_MVPA(1:7,SubSVM,iAnalysis,SVM);
             ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             
             % To know which type of data we are plotting every time
@@ -165,13 +174,13 @@ for iAnalysis= 2 %:numel(TitSuf)
             % Same for the MVPA data (contra)
             ToPlot.Col = 1;
             ToPlot.Row = 3:4;
-            Data = Get_data_MVPA(ROIs,SubSVM,3,SVM);
+            Data = Get_data_MVPA(1:7,SubSVM,3,SVM);
             ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             
             % Same for the MVPA data (ipsi)
             ToPlot.Col = 2;
             ToPlot.Row = 3:4;
-            Data = Get_data_MVPA(ROIs,SubSVM,2,SVM);
+            Data = Get_data_MVPA(1:7,SubSVM,2,SVM);
             ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             
             % To know which type of data we are plotting every time

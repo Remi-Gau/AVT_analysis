@@ -66,11 +66,11 @@ for iRow = 1:size(ToPlot.Legend,1)
         end
         
         l=errorbar(...
-            repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,7),6,1),...
+            repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,NbROI),6,1),...
             ToPlot.profile(iRow,iColumn).MEAN,...
             ToPlot.profile(iRow,iColumn).SEM);
         l2=plot(...
-            repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,7),6,1),...
+            repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,NbROI),6,1),...
             ToPlot.profile(iRow,iColumn).MEAN);
         for iLine=1:numel(l)
             set(l(iLine),'color', line_colors(iLine,:))
@@ -159,6 +159,7 @@ function plot_betas(tmp,ToPlot,fontsize)
 Alpha = 0.05;
 
 Xpos = [1 3 6:2:14];
+Xpos = Xpos(1:numel(ToPlot.ROIs_name));
 
 % plot zero line
 if ToPlot.Cst
@@ -267,7 +268,7 @@ for iP = 1:numel(P)
 end
 
 
-axis([-.4 14.8 MIN MAX])
+axis([-.4 Xpos(end)+.8 MIN MAX])
 
 
 
