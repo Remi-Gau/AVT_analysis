@@ -2,34 +2,9 @@ function Plot_BOLD_MVPA_all_ROIs(ToPlot)
 
 fontsize = 9;
 
-% if size(ToPlot.profile.MEAN,3)==3
-%     m=4;
-%     n=6;
-%     SubPlots = {...
-%         [1 7] [2 8] [3 9] [4 10] [5 11] [6 12];...
-%         13, 14, 15, 16, 17, 18;...
-%         19, 20, 21, 22, 23, 24;...
-%         25, 26, 27 ,28, 29, 30;...
-%         };
-% elseif size(ToPlot.profile.MEAN,3)==2
-%     m=4;
-%     n=4;
-%     SubPlots = {...
-%         [1 5] [2 6] [3 7] [4 8];...
-%         9, 10, 11, 12;...
-%         13, 14, 15, 16;...
-%         17, 18, 19 ,20;...
-%         };
-% end
-
-m=4;
-n=2;
-SubPlots = {...
-    [1 3] [2 4];...
-    5, 6;...
-    7, 8;...
-    9, 10;...
-    };
+m=ToPlot.m;
+n=ToPlot.n;
+SubPlots=ToPlot.SubPlots;
 
 line_colors = [...
     37,52,148;...
@@ -53,9 +28,9 @@ end
 Name = strrep([ToPlot.TitSuf '--' ToPlot.Name], ' ', '_');
 Name = strrep(Name, '_', '-');
 
-for iCdt = 1:size(ToPlot.Legend,1)
+for iRow = 1:size(ToPlot.Legend,1)
     
-    fig = figure('Name', [Name '\n' ToPlot.Titles{iCdt,1}], ...
+    fig = figure('Name', [Name '\n' ToPlot.Titles{iRow,1}], ...
         'Position', [100, 50, 1300, 750], 'Color', [1 1 1], 'Visible', ToPlot.Visible);
     
     set(gca,'units','centimeters')
@@ -69,15 +44,16 @@ for iCdt = 1:size(ToPlot.Legend,1)
     
     set(fig, 'Visible', ToPlot.Visible)
     
-    for iColumn = 1:2
+    for iColumn = 1:size(SubPlots,2)
         
-        MVPA_BOLD = 1+ToPlot.IsMVPA(iCdt,iColumn);
+        MVPA_BOLD = 1+ToPlot.IsMVPA(iRow,iColumn);
         ToPlot.Cst = 0;
         ToPlot.MVPA_BOLD = MVPA_BOLD;
         
+        
+        
         % plot profiles
         subplot(m,n,SubPlots{1,iColumn})
-        %         subplot(m,n,SubPlots{1,(iCdt-1)*2+iColumn})
         PlotRectangle(6,fontsize)
         subplot(m,n,SubPlots{1,iColumn})
         
@@ -89,23 +65,13 @@ for iCdt = 1:size(ToPlot.Legend,1)
             plot([-5 15], [0 0], '-k','linewidth',.8)
         end
         
-        if iColumn==2
-            l=errorbar(...
-                repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,7),6,1),...
-                ToPlot.MVPA.MEAN(:,:,iCdt),...
-                ToPlot.MVPA.SEM(:,:,iCdt));
-            l2=plot(...
-                repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,7),6,1),...
-                ToPlot.MVPA.MEAN(:,:,iCdt));
-        else
-            l=errorbar(...
-                repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,7),6,1),...
-                ToPlot.profile.MEAN(:,:,iCdt),...
-                ToPlot.profile.SEM(:,:,iCdt));
-            l2=plot(...
-                repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,7),6,1),...
-                ToPlot.profile.MEAN(:,:,iCdt));
-        end
+        l=errorbar(...
+            repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,7),6,1),...
+            ToPlot.profile(iRow,iColumn).MEAN,...
+            ToPlot.profile(iRow,iColumn).SEM);
+        l2=plot(...
+            repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,7),6,1),...
+            ToPlot.profile(iRow,iColumn).MEAN);
         for iLine=1:numel(l)
             set(l(iLine),'color', line_colors(iLine,:))
             set(l2(iLine),'color', line_colors(iLine,:),'linewidth',2)
@@ -114,15 +80,15 @@ for iCdt = 1:size(ToPlot.Legend,1)
         axis tight
         ax = axis;
         if isfield(ToPlot,'MinMax')
-            MIN = ToPlot.MinMax{1,iCdt}(iColumn,1);
-            MAX = ToPlot.MinMax{1,iCdt}(iColumn,2);
+            MIN = ToPlot.MinMax{1,iRow}(iColumn,1);
+            MAX = ToPlot.MinMax{1,iRow}(iColumn,2);
         else
             MIN = ax(3)-0.02;
             MAX = ax(4)+0.02;
         end
         axis([0.4 6.6 MIN MAX])
         
-        title(ToPlot.Legend{iCdt,iColumn})
+        title(ToPlot.Legend{iRow,iColumn})
         
         set(gca,'tickdir', 'out', 'xtick', [] , ...
             'xticklabel', ' ', 'ticklength', [0.01 0.01], ...
@@ -136,71 +102,50 @@ for iCdt = 1:size(ToPlot.Legend,1)
         set(t,'fontsize',fontsize); clear t
         
         
+        
         % plot betas constant
-        %         subplot (m,n,SubPlots{2,(iCdt-1)*2+iColumn})
         subplot(m,n,SubPlots{2,iColumn})
+        
         hold on
-        if iColumn==2
-            tmp = ToPlot.MVPA.beta(:,:,1,iCdt);
-        else
-            tmp = ToPlot.profile.beta(:,:,1,iCdt);
-        end
+        
+        tmp = ToPlot.profile(iRow,iColumn).beta(:,:,1);
+        
         if isfield(ToPlot,'MinMax')
-            ToPlot.MIN = ToPlot.MinMax{2,iCdt}(iColumn,1);
-            ToPlot.MAX = ToPlot.MinMax{2,iCdt}(iColumn,2);
+            ToPlot.MIN = ToPlot.MinMax{2,iRow}(iColumn,1);
+            ToPlot.MAX = ToPlot.MinMax{2,iRow}(iColumn,2);
         end
         plot_betas(tmp,ToPlot,fontsize)
         
-%         if iColumn==1 && iCdt==1
-            t=ylabel(sprintf('constant\nS Param. est. [a u]'));
-            set(t,'fontsize',fontsize);
-%         end
+        t=ylabel(sprintf('constant\nS Param. est. [a u]'));
+        set(t,'fontsize',fontsize);
+        
         
         
         % plot betas linear
-        %         subplot (m,n,SubPlots{3,(iCdt-1)*2+iColumn})
         subplot(m,n,SubPlots{3,iColumn})
+        
         hold on
-        if iColumn==2
-            tmp = ToPlot.MVPA.beta(:,:,2,iCdt);
-        else
-            tmp = ToPlot.profile.beta(:,:,2,iCdt)*-1;
+        
+        tmp = ToPlot.profile(iRow,iColumn).beta(:,:,2);
+        if MVPA_BOLD==1
+            tmp=tmp*-1;
         end
+        
         if isfield(ToPlot,'MinMax')
-            ToPlot.MIN = ToPlot.MinMax{3,iCdt}(iColumn,1);
-            ToPlot.MAX = ToPlot.MinMax{3,iCdt}(iColumn,2);
+            ToPlot.MIN = ToPlot.MinMax{3,iRow}(iColumn,1);
+            ToPlot.MAX = ToPlot.MinMax{3,iRow}(iColumn,2);
         end
         plot_betas(tmp,ToPlot,fontsize)
         
-%         if iColumn==1 && iCdt==1
-            t=ylabel(sprintf('linear\nS Param. est. [a u]'));
-            set(t,'fontsize',fontsize);
-%         end
-        
-        
-        % plot whole ROI
-        %         subplot (m,n,SubPlots{4,(iCdt-1)*2+iColumn})
-        %  subplot(m,n,SubPlots{4,iColumn})
-        %         hold on
-        %         if iColumn==2
-        %             ToPlot.Cst = 1;
-        %             tmp = ToPlot.MVPA.grp(:,:,iCdt);
-        %         else
-        %             tmp = ToPlot.ROI.grp(:,:,iCdt);
-        %         end
-        %
-        %         plot_betas(tmp,ToPlot,fontsize)
-        %
-        %         if iColumn==1 && iCdt==1
-        %             ylabel(sprintf('whole ROI\nS Param. est. [a u]'));
-        %             set(t,'fontsize',fontsize);
-        %         end
+        t=ylabel(sprintf('linear\nS Param. est. [a u]'));
+        set(t,'fontsize',fontsize);
         
     end
     
-    mtit(ToPlot.Titles{iCdt,1},'xoff', 0, 'yoff', +0.04, 'fontsize', fontsize+4)
+    mtit(ToPlot.Titles{iRow,1},'xoff', 0, 'yoff', +0.04, 'fontsize', fontsize+4)
     
     print(fig, fullfile(ToPlot.FigureFolder, ['All_ROIs_' strrep(fig.Name,'\n','-'), suffix, '.tif']), '-dtiff')
+    
     
 end
 

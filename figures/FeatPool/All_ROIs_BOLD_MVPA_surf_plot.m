@@ -37,10 +37,8 @@ ROI_order_MVPA = [NbROI-1 NbROI 1:NbROI-2];
 
 TitSuf = {
     'Contra_vs_Ipsi';...
-    'Between_Senses_Ipsi';...
-    'Between_Senses_Contra';
+    'Between_Senses';...
     'Contra_&_Ipsi'};
-
 
 SubSVM = [1:3;4:6;7:9];
 
@@ -83,15 +81,15 @@ end
 
 close all
 
-for iSubSVM= 1:numel(TitSuf)
+for iAnalysis= 2 %:numel(TitSuf)
     
     clear ToPlot ToPlot2
-    ToPlot.TitSuf = TitSuf{iSubSVM};
+    ToPlot.TitSuf = TitSuf{iAnalysis};
     ToPlot.ROIs_name = ROIs;
     ToPlot.Visible= 'on';
     ToPlot.FigureFolder=FigureFolder;
     ToPlot.OneSideTTest = {'both' 'both'};
-
+    
     ToPlot.profile.MEAN=[];
     ToPlot.profile.SEM=[];
     ToPlot.profile.beta=[];
@@ -104,112 +102,175 @@ for iSubSVM= 1:numel(TitSuf)
     
     
     %% Get BOLD
-    switch iSubSVM
+    switch iAnalysis
         case 1
+            % Get BOLD data for Contra - Ipsi
             Data = cat(1,AllSubjects_Data_BOLD(:).Contra_VS_Ipsi);
-            Legend{1,1} = 'BOLD - [Contra-Ipsi]_A';
-            Legend{2,1} = 'BOLD - [Contra-Ipsi]_V'; 
-            Legend{3,1} = 'BOLD - [Contra-Ipsi]_T'; 
-            Legend{1,2} = 'MVPA - [Contra VS Ipsi]_A';
-            Legend{2,2} = 'MVPA - [Contra VS Ipsi]_V';
-            Legend{3,2} = 'MVPA - [Contra VS Ipsi]_T'; 
             
-            ToPlot.Titles{1,1} = '[Contra-Ipsi]_A';
-            ToPlot.Titles{2,1} = '[Contra-Ipsi]_V';
-            ToPlot.Titles{3,1} = '[Contra-Ipsi]_T';
-                      
-        case 2
-            Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModIpsi);
-            Legend{1,1} = 'BOLD - [A-T]_{ipsi}';
-            Legend{2,1} = 'BOLD - [V-T]_{ipsi}';
-            Legend{1,2} = 'MVPA - [A VS T]_{ipsi}';
-            Legend{2,2} = 'MVPA - [V VS T]_{ipsi}';
+            % which conditions goes into which column and row
+            ToPlot.Col = [1 2 3]; 
+            ToPlot.Row = 1;
+            ToPlot.Cdt = 1:3;
+            ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
             
-            ToPlot.Titles{1,1} = '[A-T]';
-            ToPlot.Titles{2,1} = '[V-T]';
+            % Same for the MVPA data
+            ToPlot.Row = 2; % a new row means a new figure
+            Data = Get_data_MVPA(ROIs,SubSVM,iAnalysis,SVM);
+            ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             
-            ToPlot.MinMax={...
-                [-0.3 4.5;.42 1] , [-.5 3;.42 1];...
-                [-1 4;-.15 .62] , [-1 4;-.15 .62];...
-                [-0.2 1.3;-.1 .2] , [-0.2 1.3;-.1 .2];...
+            % To know which type of data we are plotting every time
+            ToPlot.IsMVPA = [...
+                0 0 0; ...
+                1 1 1];
+            
+            % Defines the number of subplots on each figure
+            ToPlot.m=4;
+            ToPlot.n=3;
+            ToPlot.SubPlots = {... %Each column of this cell is a new condition
+                [1 4] [2 5] [3 6];...
+                7, 8, 9;...
+                10, 11, 12;...
+                13, 14, 15;... %The fourth row is for the plotting of the whole ROI
                 };
+            
+            Legend{1,1} = 'BOLD - [Contra-Ipsi]_A';
+            Legend{1,2} = 'BOLD - [Contra-Ipsi]_V';
+            Legend{1,3} = 'BOLD - [Contra-Ipsi]_T';
+            Legend{2,1} = 'MVPA - [Contra VS Ipsi]_A';
+            Legend{2,2} = 'MVPA - [Contra VS Ipsi]_V';
+            Legend{2,3} = 'MVPA - [Contra VS Ipsi]_T';
+            
+            ToPlot.Titles{1,1} = '[Contra-Ipsi] - BOLD';
+            ToPlot.Titles{2,1} = '[Contra-Ipsi] - MVPA';
+            
+            
+            
+        case 2
+            % Get BOLD data for between senses contrasts (contra)
+            Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModContra);
+            ToPlot.Col = 1;
+            ToPlot.Row = 1:2;
+            ToPlot.Cdt = [...
+                2 2;... % Skip 1 so to not plot the contrast and SVC or [A vs V]
+                3 3;...
+                2 2;...
+                3 3]; 
+            ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+            
+            % Get BOLD data for between senses contrasts (ipsi)
+            Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModIpsi);
+            ToPlot.Col = 2;
+            ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+            
+            % Same for the MVPA data (contra)
+            ToPlot.Col = 1;
+            ToPlot.Row = 3:4;
+            Data = Get_data_MVPA(ROIs,SubSVM,3,SVM);
+            ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+            
+            % Same for the MVPA data (ipsi)
+            ToPlot.Col = 2;
+            ToPlot.Row = 3:4;
+            Data = Get_data_MVPA(ROIs,SubSVM,2,SVM);
+            ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+            
+            % To know which type of data we are plotting every time
+            ToPlot.IsMVPA = [...
+                0 0; ...
+                0 0; ...
+                1 1; ...
+                1 1];
+            
+            % Defines the number of subplots on each figure
+            ToPlot.m=4;
+            ToPlot.n=2;
+            ToPlot.SubPlots = {...
+                [1 3] [2 4];...
+                5, 6;...
+                7, 8;...
+                9, 10;...
+                };
+            
+            Legend{1,2} = 'BOLD - [A-T]_{ipsi}';
+            Legend{1,1} = 'BOLD - [A-T]_{contra}';
+            Legend{2,2} = 'BOLD - [V-T]_{ipsi}';
+            Legend{2,1} = 'BOLD - [V-T]_{contra}';
+            Legend{3,2} = 'MVPA - [A VS T]_{ipsi}';
+            Legend{3,1} = 'MVPA - [A VS T]_{contra}';
+            Legend{4,2} = 'MVPA - [V VS T]_{ipsi}';
+            Legend{4,1} = 'MVPA - [V VS T]_{contra}';
+            
+            tmp={...
+                [-0.3 4.5;-0.3 4.5] , [.42 1;.42 1];...
+                [-1 4;-1 4] , [-.15 .62;-.15 .62];...
+                [-0.2 1.3;-0.2 1.3] , [-.1 .2;-.1 .2];...
+                };
+            
+            for i=1:2
+                for j = 1:3
+                    ToPlot.MinMax{j,i}=tmp{j,1};
+                end
+            end
+            for i=3:4
+                for j = 1:3
+                    ToPlot.MinMax{j,i}=tmp{j,2};
+                end
+            end
+            
+            ToPlot.Titles{1,1} = '[A-T] - BOLD';
+            ToPlot.Titles{2,1} = '[V-T] - BOLD';
+            ToPlot.Titles{3,1} = '[A-T] - MVPA';
+            ToPlot.Titles{4,1} = '[V-T] - MVPA';
+             
+            
             
         case 3
-            Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModContra);
-            Legend{1,1} = 'BOLD - [A-T]_{contra}'; 
-            Legend{2,1} = 'BOLD - [V-T]_{contra}'; 
-            Legend{1,2} = 'MVPA - [A VS T]_{contra}'; 
-            Legend{2,2} = 'MVPA - [V VS T]_{contra}'; 
+            % Get BOLD data for Cdt-Fix Contra
+            Data = cat(1,AllSubjects_Data_BOLD(:).Contra);
+            ToPlot.Col = 1;
+            ToPlot.Row = 1:3;
+            ToPlot.Cdt = [1;2;3];
+            ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
             
-            ToPlot.Titles{1,1} = '[A-T]';
-            ToPlot.Titles{2,1} = '[V-T]';
+            Data = cat(1,AllSubjects_Data_BOLD(:).Ispi);
+            ToPlot.Col = 2;
+            ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
             
-            ToPlot.MinMax={...
-                [-0.3 4.5;.42 1] , [-.5 3;.42 1];...
-                [-1 4;-.15 .62] , [-1 4;-.15 .62];...
-                [-0.2 1.3;-.1 .2] , [-0.2 1.3;-.1 .2];...
+            ToPlot.IsMVPA = [...
+                0 0;...
+                0 0;...
+                0 0];
+            
+            ToPlot.m=4;
+            ToPlot.n=2;
+            ToPlot.SubPlots = {...
+                [1 3] [2 4];...
+                5, 6;...
+                7, 8;...
+                9, 10;...
                 };
             
-        case 4
-            Data = cat(1,AllSubjects_Data_BOLD(:).Contra);
-            Legend{1,1} = 'BOLD - [A-Fix]_{contra}'; 
-            Legend{2,1} = 'BOLD - [V-Fix]_{contra}'; 
-            Legend{3,1} = 'BOLD - [T-Fix]_{contra}'; 
-            Legend{1,2} = 'BOLD - [A-Fix]_{ipsi}'; 
-            Legend{2,2} = 'BOLD - [V-Fix]_{ipsi}'; 
-            Legend{3,2} = 'BOLD - [T-Fix]_{ipsi}'; 
+            Legend{1,1} = 'BOLD - [A-Fix]_{contra}';
+            Legend{2,1} = 'BOLD - [V-Fix]_{contra}';
+            Legend{3,1} = 'BOLD - [T-Fix]_{contra}';
+            Legend{1,2} = 'BOLD - [A-Fix]_{ipsi}';
+            Legend{2,2} = 'BOLD - [V-Fix]_{ipsi}';
+            Legend{3,2} = 'BOLD - [T-Fix]_{ipsi}';
             
             ToPlot.Titles{1,1} = '[A-Fix]';
             ToPlot.Titles{2,1} = '[V-Fix]';
             ToPlot.Titles{3,1} = '[T-Fix]';
             
-            ToPlot.MinMax={...
+            % set maximum and minimum for B parameters profiles (row 1) and
+            % for S param (row 2: Cst; row 3: Lin)
+            ToPlot.MinMax={... 
                 repmat([-1 4.2],2,1) , repmat([-1.2 2.2],2,1) , repmat([-1.4 0.1],2,1);...
                 repmat([-1.2 4],2,1) , repmat([-1.5 2.5],2,1) , repmat([-1.5 1],2,1);...
                 repmat([-0.4 1.3],2,1) , repmat([-0.4 0.65],2,1) , repmat([-0.5 0.35],2,1);...
                 };
             
     end
-    ToPlot = Get_data_BOLD(ToPlot,Data,ROI_order_BOLD);
-    
-    ToPlot.IsMVPA = [0 1;0 1;0 1];
-    
-    % Big ugly rearrangement of data to plot ispi and contra versus
-    % baseline on the same figure... Yuck
-    if iSubSVM==4
-        ToPlot2.TitSuf = TitSuf{iSubSVM};
-        Data = cat(1,AllSubjects_Data_BOLD(:).Ispi);
-        ToPlot2 = Get_data_BOLD(ToPlot2,Data,ROI_order_BOLD);
-        
-        ToPlot.IsMVPA = [0 0;0 0;0 0];
-
-        % Pass BOLD data as MVPA data but whatever...
-        ToPlot.MVPA.MEAN=ToPlot2.profile.MEAN;
-        ToPlot.MVPA.SEM=ToPlot2.profile.SEM;
-        ToPlot.MVPA.beta=ToPlot2.profile.beta;
-        ToPlot.MVPA.beta(:,:,2,:)=ToPlot.MVPA.beta(:,:,2,:)*-1;
-        ToPlot.MVPA.grp=ToPlot2.ROI.grp;
-    end
-    
-    %% Get MVPA
-    if iSubSVM<4
-        for iROI = 1:numel(ROIs)
-
-            for iSVM = SubSVM(iSubSVM,:)
-
-                AllSubjects_Data(iROI).whole_roi_grp(:,iSVM+1-SubSVM(iSubSVM,1)) = SVM(iSVM).ROI(iROI).grp;
-                
-                AllSubjects_Data(iROI).MEAN(:,iSVM+1-SubSVM(iSubSVM,1)) = flipud(SVM(iSVM).ROI(iROI).layers.MEAN(1:end)');
-                AllSubjects_Data(iROI).SEM(:,iSVM+1-SubSVM(iSubSVM,1)) = flipud(SVM(iSVM).ROI(iROI).layers.SEM(1:end)');
-                AllSubjects_Data(iROI).Beta.DATA(:,iSVM+1-SubSVM(iSubSVM,1),:) = ...
-                    reshape(SVM(iSVM).ROI(iROI).layers.Beta.DATA, [3,1,size(SVM(iSVM).ROI(iROI).layers.Beta.DATA,2)]);
-                
-            end
-            
-        end
-        ToPlot = Get_data_MVPA(ToPlot,AllSubjects_Data,ROI_order_MVPA);
-        clear tmp
-    end
+   
     
     %% Plot
     for WithPerm = 1
@@ -228,20 +289,7 @@ for iSubSVM= 1:numel(TitSuf)
         ToPlot.Legend = Legend; clear Legend
         ToPlot.ToPermute = ToPermute;
         ToPlot.Name = ['BOLD-MVPA-' Stim_prefix '\n' SaveSufix(15:end-12)];
-        
-        % Do not plot the contrast and SVC or [A vs V] and recombine ispi
-        % and contra on the same figure.
-        if iSubSVM==2 || iSubSVM==3
-            ToPlot.ROI.grp(:,:,1)=[];
-            ToPlot.profile.MEAN(:,:,1)=[];
-            ToPlot.profile.SEM(:,:,1)=[];
-            ToPlot.profile.beta(:,:,:,1)=[];
-            ToPlot.MVPA.MEAN(:,:,1)=[];
-            ToPlot.MVPA.SEM(:,:,1)=[];
-            ToPlot.MVPA.beta(:,:,:,1)=[];
-            ToPlot.MVPA.grp(:,:,1)=[];
-        end
-        
+
         Plot_BOLD_MVPA_all_ROIs(ToPlot)
         
     end
@@ -254,35 +302,42 @@ end
 
 
 
-function ToPlot = Get_data_BOLD(ToPlot,Data,ROI_order)
+function ToPlot = Get_data(ToPlot,Data,ROI_order)
 ROI_idx = 1;
 for iROI = ROI_order
-    ToPlot.profile.MEAN(:,ROI_idx,:) = Data(iROI).MEAN; %#ok<*SAGROW>
-    ToPlot.profile.SEM(:,ROI_idx,:) = Data(iROI).SEM;
-    % Do not plot quadratic
-    % 1rst dimension: subject
-    % 2nd dimension: ROI
-    % 3rd dimension: Cst, Lin
-    % 4th dimension : different conditions (e.g A, V, T)
-    ToPlot.profile.beta(:,ROI_idx,:,:) = shiftdim(Data(iROI).Beta.DATA(1:2,:,:),2);
-    ToPlot.ROI.grp(:,ROI_idx,:) = Data(iROI).whole_roi_grp;
+    for iRow = 1:numel(ToPlot.Row)
+        for iCol = 1:numel(ToPlot.Col)
+            
+            ToPlot.profile(ToPlot.Row(iRow),ToPlot.Col(iCol)).MEAN(:,ROI_idx) = Data(iROI).MEAN(:,ToPlot.Cdt(iRow,iCol));
+            ToPlot.profile(ToPlot.Row(iRow),ToPlot.Col(iCol)).SEM(:,ROI_idx) = Data(iROI).SEM(:,ToPlot.Cdt(iRow,iCol));
+            ToPlot.ROI(ToPlot.Row(iRow),ToPlot.Col(iCol)).grp(:,ROI_idx,:) = Data(iROI).whole_roi_grp(:,ToPlot.Cdt(iRow,iCol));
+            
+            % Do not plot quadratic
+            % 1rst dimension: subject
+            % 2nd dimension: ROI
+            % 3rd dimension: Cst, Lin
+            % 4th dimension : different conditions (e.g A, V, T)
+            ToPlot.profile(ToPlot.Row(iRow),ToPlot.Col(iCol)).beta(:,ROI_idx,:,:) = shiftdim(Data(iROI).Beta.DATA(1:2,ToPlot.Cdt(iRow,iCol),:),2);
+        end
+    end
     ROI_idx = ROI_idx + 1;
 end
 end
 
 
-function ToPlot = Get_data_MVPA(ToPlot,Data,ROI_order)
-ROI_idx = 1;
-for iROI = ROI_order
-    ToPlot.MVPA.MEAN(:,ROI_idx,:) = Data(iROI).MEAN; %#ok<*SAGROW>
-    ToPlot.MVPA.SEM(:,ROI_idx,:) = Data(iROI).SEM;
-    % Do not plot quadratic
-    % 1rst dimension: subject
-    % 2nd dimension: ROI
-    % 3rd dimension: Cst, Lin
-    % 4th dimension : different conditions (e.g A, V, T)
-    ToPlot.MVPA.beta(:,ROI_idx,:,:) = shiftdim(Data(iROI).Beta.DATA(1:2,:,:),2);
-    ToPlot.MVPA.grp(:,ROI_idx,:) = Data(iROI).whole_roi_grp;
-    ROI_idx = ROI_idx + 1;
-end
+function Data = Get_data_MVPA(ROIs,SubSVM,iSubSVM,SVM)
+        for iROI = 1:numel(ROIs)
+            
+            for iSVM = SubSVM(iSubSVM,:)
+                
+                Data(iROI).whole_roi_grp(:,iSVM+1-SubSVM(iSubSVM,1)) = SVM(iSVM).ROI(iROI).grp;
+                
+                Data(iROI).MEAN(:,iSVM+1-SubSVM(iSubSVM,1)) = flipud(SVM(iSVM).ROI(iROI).layers.MEAN(1:end)');
+                Data(iROI).SEM(:,iSVM+1-SubSVM(iSubSVM,1)) = flipud(SVM(iSVM).ROI(iROI).layers.SEM(1:end)');
+                Data(iROI).Beta.DATA(:,iSVM+1-SubSVM(iSubSVM,1),:) = ...
+                    reshape(SVM(iSVM).ROI(iROI).layers.Beta.DATA, [3,1,size(SVM(iSVM).ROI(iROI).layers.Beta.DATA,2)]);
+                
+            end
+            
+        end
 end
