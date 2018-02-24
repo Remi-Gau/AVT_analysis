@@ -51,7 +51,7 @@ end
 
 ColorMap = brain_colour_maps('hot_increasing');
 FigDim = [50, 50, 1400, 750];
-visible = 'off';
+visible = 'on';
 
 
 PCM_dir = fullfile(StartDir, 'figures', 'PCM');
@@ -178,7 +178,7 @@ for iToPlot = 1%:numel(ToPlot)
                 opt.FigDim = FigDim;
                 
                 %% plot group results
-                if 0
+                if 1
                 m = 3;
                 n = 8;
                 close all
@@ -304,7 +304,7 @@ for iToPlot = 1%:numel(ToPlot)
                 end
                 
                 %% Provide a plot of the crossvalidated likelihoods
-                if 0
+                if 1
                     close all
                 
                 opt.FigName = sprintf('Likelihoods-Factorial-%s-%s-PCM_{grp}-%s-%s-%s', strrep(ROI(iROI).name, '_thresh',''), ...
@@ -397,9 +397,64 @@ for iToPlot = 1%:numel(ToPlot)
                 tmp = repmat(1:6,3,1);
                 family.partition=tmp(:)';
                 family.names={'fam1','fam2','fam3','fam4','fam5','fam6'};
-                [family,model] = spm_compare_families(lme,family)
+                [family_col,model_col] = spm_compare_families(lme,family);
                 
-                model.xp
+                family.partition=repmat(1:3,1,6);
+                family.names={'fam1','fam2','fam3'};
+                [family_row,model_row] = spm_compare_families(lme,family);
+                
+                tmp = model_row.xp;
+                xp_row = tmp(ModelOrderForPlot-1);
+                
+                tmp = model_col.xp;
+                xp_col = tmp(ModelOrderForPlot-1);
+                
+                xp_col-xp_row
+                
+                %
+                close all
+                tmp = [xp_col(:);xp_row(:)];
+                
+                opt.FigName = sprintf('Model family comparison-%s-%s-PCM_{grp}-%s-%s-%s', strrep(ROI(iROI).name, '_thresh',''), ...
+                    hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+                
+                figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', 'on');
+                
+                colormap(gray)
+                
+                subplot(2,3,1)
+                bar(family_col.xp([1 6 3:5 2]))
+                ylabel('Exceedance probability')
+                xlabel('Model family')
+                set(gca,'ygrid','off','ytick',0:.1:1,'yticklabel',0:.1:1, ...
+                    'xtick', 1:6,  'xticklabel',1:6)
+                ax=axis;
+                axis([0.5 6.5 0 ax(4)])
+                grid on
+                
+                subplot(2,3,4)
+                imagesc(xp_col, [min(tmp) max(tmp)])
+                axis off
+                
+                subplot(2,3,5)
+                imagesc(xp_row, [min(tmp) max(tmp)])
+                axis off
+                colorbar
+
+                subplot(2,3,6)
+                barh(fliplr(family_row.xp));
+                xlabel('Exceedance probability')
+                ylabel('Model family')
+                
+                set(gca,'ygrid','off','xtick',0:.1:1,'xticklabel',0:.1:1, ...
+                'ytick', 1:3,  'yticklabel',1:3)
+                ax=axis;
+                axis([0 ax(2) 0.5 3.5])
+                grid on
+                
+                mtit(opt.FigName, 'fontsize', 12, 'xoff',0,'yoff',.035)
+                print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
+                
                 %% Plot of the likelihoods of each subject
                 close all
                 
