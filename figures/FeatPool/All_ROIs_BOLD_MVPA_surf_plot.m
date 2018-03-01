@@ -220,6 +220,9 @@ for iAnalysis= 1:numel(TitSuf)
                     ToPlot.MinMax{j,i}=tmp{j,1};
                 end
             end
+            ToPlot.MinMax{1,2}=[-0.5 2.3;-0.5 2.3];
+            ToPlot.MinMax{2,2}=[-.8 3.1;-.8 3.1];
+            ToPlot.MinMax{3,2}=[-0.3 .8;-0.3 .8];
             for i=3:4
                 for j = 1:3
                     ToPlot.MinMax{j,i}=tmp{j,2};

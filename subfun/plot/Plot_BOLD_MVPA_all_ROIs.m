@@ -50,8 +50,7 @@ for iRow = 1:size(ToPlot.Legend,1)
         ToPlot.Cst = 0;
         ToPlot.MVPA_BOLD = MVPA_BOLD;
         
-        
-        
+
         % plot profiles
         subplot(m,n,SubPlots{1,iColumn})
         PlotRectangle(6,fontsize)
@@ -156,7 +155,7 @@ end
 
 function plot_betas(tmp,ToPlot,fontsize)
 
-Alpha = 0.05;
+Alpha = 0.05/5;
 
 Xpos = [1 3 6:2:14];
 Xpos = Xpos(1:numel(ToPlot.ROIs_name));
