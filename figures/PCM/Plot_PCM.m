@@ -211,7 +211,7 @@ for iToPlot = 1 %numel(ToPlot)
                     else
                         HorPan = numel(M)+1;
                     end
-                    
+                    if 0
                     for IndGrpColor=3
                         
                         switch IndGrpColor
@@ -469,10 +469,11 @@ for iToPlot = 1 %numel(ToPlot)
                         print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName SameClim '.tif'] ), '-dtiff')
                         
                     end
-                    
+                    end
                     
                     
                     %% Plot only the best models
+                    if 0
                     close all
                     
                     fig = figure('name', ['Best-models-' opt.FigName], 'Position', FigDim, 'Color', [1 1 1]);
@@ -545,11 +546,11 @@ for iToPlot = 1 %numel(ToPlot)
                     mtit(fig.Name, 'fontsize', 12, 'xoff',0,'yoff',.035)
                     
                     print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif']  ), '-dtiff')
-                    
+                    end
                     
                     %% G matrix recap figures
                     close all
-                    
+                    if 0
                     AllMat = [];
                     
                     for iScale = 1:2
@@ -669,7 +670,7 @@ for iToPlot = 1 %numel(ToPlot)
                         print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif']  ), '-dtiff')
                         
                     end
-                    
+                    end
                     %% Plot each model results at the group level
                     if 0 %Plot_model_group
                         NbSubj = numel(T.SN);
@@ -781,6 +782,8 @@ for iToPlot = 1 %numel(ToPlot)
                 print(gcf, fullfile(StartDir, 'figures','RSA', 'Cdt', [fig.Name, '.tif'] ), '-dtiff')
                 
             end
+            
+            
         end
     end
 end
