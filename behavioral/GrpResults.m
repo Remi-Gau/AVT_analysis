@@ -29,6 +29,10 @@ for iSub = 1:NbSub % for each subject
     
     % Subject directory
     SubDir = fullfile(StartDir, SubLs(iSub).name);
+    
+    %     copyfile(fullfile('E:\derivatives',SubLs(iSub).name,['Behavior_' SubLs(iSub).name '.mat']),...
+    %         fullfile(SubDir,['Behavior_' SubLs(iSub).name '.mat']))
+    %
     load(fullfile(SubDir,['Behavior_' SubLs(iSub).name '.mat']), 'D_prime', 'CorrectRejection', 'Miss', 'Hits', ...
         'FalseAlarms')
     
@@ -192,7 +196,7 @@ ToPlotMean = GrpRes.D_prime.MEAN;
 ToPlotDispersion = GrpRes.D_prime.STD;
 
 h=errorbar(1:4, ToPlotMean, ToPlotDispersion, '.k');
-       
+
 SubjData = GrpRes.D_prime.mean;
 
 for iSubj=1:size(COLOR_Subject,1)
@@ -215,3 +219,46 @@ t=ylabel('D prime');
 set(t,'fontsize',12);
 
 print(gcf, fullfile(FigureFolder, 'GrpResulst_d_prime.tif'), '-dtiff')
+
+
+%%
+SavedTxt = fullfile(FigureFolder, 'Behavioral_results.csv');
+fid = fopen (SavedTxt, 'w');
+
+fprintf (fid, 'Condition,,hit,,,,,miss,,,,,faslse alarm,,,,,correct rejection,,,,,accuracy,,,,,d prime,,,,,');
+
+for iCdt = 1:4
+    
+    fprintf (fid, '\n');
+    
+    fprintf(fid, '%s,,',Titles{iCdt});
+    
+    for Output=1:6
+        switch Output
+            case 1
+                Data = GrpRes.Hits;
+            case 2
+                Data = GrpRes.Miss;
+            case 3
+                Data = GrpRes.FalseAlarms;
+            case 4
+                Data = GrpRes.CorrectRejection;
+            case 5
+                Data = GrpRes.Accuracy;
+            case 6
+                Data = GrpRes.D_prime;
+        end
+        
+        
+        for i=1:2
+            if i==1
+                fprintf (fid, '%f,',Data.MEAN(iCdt));
+            else
+                fprintf (fid, '(,%f,),,',Data.STD(iCdt));
+            end
+        end
+    end
+
+end
+
+fclose(fid);
