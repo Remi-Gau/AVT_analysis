@@ -90,7 +90,7 @@ end
 
 close all
 
-for iAnalysis= 1:numel(TitSuf)
+for iAnalysis= 2 %1:numel(TitSuf)
     
     clear ToPlot ToPlot2
     ToPlot.TitSuf = TitSuf{iAnalysis};
@@ -142,15 +142,15 @@ for iAnalysis= 1:numel(TitSuf)
                 13, 14, 15;... %The fourth row is for the plotting of the whole ROI
                 };
             
-            Legend{1,1} = 'BOLD - [Contra-Ipsi]_A';
-            Legend{1,2} = 'BOLD - [Contra-Ipsi]_V';
-            Legend{1,3} = 'BOLD - [Contra-Ipsi]_T';
-            Legend{2,1} = 'MVPA - [Contra VS Ipsi]_A';
-            Legend{2,2} = 'MVPA - [Contra VS Ipsi]_V';
-            Legend{2,3} = 'MVPA - [Contra VS Ipsi]_T';
+            Legend{1,1} = 'Auditory';
+            Legend{1,2} = 'Visual';
+            Legend{1,3} = 'Tactile';
+            Legend{2,1} = 'Auditory';
+            Legend{2,2} = 'Visual';
+            Legend{2,3} = 'Tactile';
             
-            ToPlot.Titles{1,1} = '[Contra-Ipsi] - BOLD';
-            ToPlot.Titles{2,1} = '[Contra-Ipsi] - MVPA';
+            ToPlot.Titles{1,1} = '[Contra - Ipsi]';
+            ToPlot.Titles{2,1} = '[Contra VS Ipsi]';
             
             
             
@@ -200,14 +200,14 @@ for iAnalysis= 1:numel(TitSuf)
                 9, 10;...
                 };
             
-            Legend{1,2} = 'BOLD - [A-T]_{ipsi}';
-            Legend{1,1} = 'BOLD - [A-T]_{contra}';
-            Legend{2,2} = 'BOLD - [V-T]_{ipsi}';
-            Legend{2,1} = 'BOLD - [V-T]_{contra}';
-            Legend{3,2} = 'MVPA - [A VS T]_{ipsi}';
-            Legend{3,1} = 'MVPA - [A VS T]_{contra}';
-            Legend{4,2} = 'MVPA - [V VS T]_{ipsi}';
-            Legend{4,1} = 'MVPA - [V VS T]_{contra}';
+            Legend{1,2} = 'ipsi';
+            Legend{1,1} = 'contra';
+            Legend{2,2} = 'ipsi';
+            Legend{2,1} = 'contra';
+            Legend{3,2} = 'ipsi';
+            Legend{3,1} = 'contra';
+            Legend{4,2} = 'ipsi';
+            Legend{4,1} = 'contra';
             
             tmp={...
                 [-0.3 4.5;-0.3 4.5] , [.42 1;.42 1];...
@@ -229,10 +229,10 @@ for iAnalysis= 1:numel(TitSuf)
                 end
             end
             
-            ToPlot.Titles{1,1} = '[A-T] - BOLD';
-            ToPlot.Titles{2,1} = '[V-T] - BOLD';
-            ToPlot.Titles{3,1} = '[A-T] - MVPA';
-            ToPlot.Titles{4,1} = '[V-T] - MVPA';
+            ToPlot.Titles{1,1} = '[A - T]';
+            ToPlot.Titles{2,1} = '[V - T]';
+            ToPlot.Titles{3,1} = '[A VS T]';
+            ToPlot.Titles{4,1} = '[V VS T]';
              
             
             
@@ -262,16 +262,16 @@ for iAnalysis= 1:numel(TitSuf)
                 9, 10;...
                 };
             
-            Legend{1,1} = 'BOLD - [A-Fix]_{contra}';
-            Legend{2,1} = 'BOLD - [V-Fix]_{contra}';
-            Legend{3,1} = 'BOLD - [T-Fix]_{contra}';
-            Legend{1,2} = 'BOLD - [A-Fix]_{ipsi}';
-            Legend{2,2} = 'BOLD - [V-Fix]_{ipsi}';
-            Legend{3,2} = 'BOLD - [T-Fix]_{ipsi}';
+            Legend{1,1} = 'contra';
+            Legend{2,1} = 'contra';
+            Legend{3,1} = 'contra';
+            Legend{1,2} = 'ipsi';
+            Legend{2,2} = 'ipsi';
+            Legend{3,2} = 'ipsi';
             
-            ToPlot.Titles{1,1} = '[A-Fix]';
-            ToPlot.Titles{2,1} = '[V-Fix]';
-            ToPlot.Titles{3,1} = '[T-Fix]';
+            ToPlot.Titles{1,1} = '[A - Fix]';
+            ToPlot.Titles{2,1} = '[V - Fix]';
+            ToPlot.Titles{3,1} = '[T - Fix]';
             
             % set maximum and minimum for B parameters profiles (row 1) and
             % for S param (row 2: Cst; row 3: Lin)

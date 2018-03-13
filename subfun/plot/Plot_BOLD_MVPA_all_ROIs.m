@@ -28,10 +28,16 @@ end
 Name = strrep([ToPlot.TitSuf '--' ToPlot.Name], ' ', '_');
 Name = strrep(Name, '_', '-');
 
+if size(SubPlots,2)==3
+    figdim = [50, 50, 1800, 800];
+elseif size(SubPlots,2)==2
+    figdim = [50, 50, 1200, 600];
+end
+
 for iRow = 1:size(ToPlot.Legend,1)
     
     fig = figure('Name', [Name '\n' ToPlot.Titles{iRow,1}], ...
-        'Position', [100, 50, 1300, 750], 'Color', [1 1 1], 'Visible', ToPlot.Visible);
+        'Position', figdim, 'Color', [1 1 1], 'Visible', ToPlot.Visible);
     
     set(gca,'units','centimeters')
     pos = get(gca,'Position');
@@ -53,7 +59,7 @@ for iRow = 1:size(ToPlot.Legend,1)
 
         % plot profiles
         subplot(m,n,SubPlots{1,iColumn})
-        PlotRectangle(6,fontsize)
+        PlotRectangle(6,fontsize-1)
         subplot(m,n,SubPlots{1,iColumn})
         
         hold on
@@ -87,7 +93,8 @@ for iRow = 1:size(ToPlot.Legend,1)
         end
         axis([0.4 6.6 MIN MAX])
         
-        title(ToPlot.Legend{iRow,iColumn})
+        t = title(ToPlot.Legend{iRow,iColumn});
+        set(t,'fontsize',fontsize+1); clear t
         
         set(gca,'tickdir', 'out', 'xtick', [] , ...
             'xticklabel', ' ', 'ticklength', [0.01 0.01], ...
@@ -194,7 +201,7 @@ if isfield(ToPlot,'MinMax')
     MAX = ToPlot.MAX;
 else
     MIN = ax(3);
-    MAX = ax(4)*1.2;
+    MAX = ax(4)*1.1;
 end
 
 if ToPlot.MVPA_BOLD==2 && ToPlot.Cst
@@ -241,12 +248,6 @@ else
 end
 
 for iP = 1:numel(P)
-    if mod(iP,2)==0
-        Y_offset = -.1;
-    else
-        Y_offset = 0;
-    end
-    
     Sig = []; %#ok<NASGU>
     if P(iP)<0.001
         Sig = sprintf('p<0.001 ');
@@ -256,7 +257,7 @@ for iP = 1:numel(P)
     
     t = text(...
         Xpos(iP)-.8,...
-        MAX + MAX*0.005 + Y_offset*(MAX-MIN),...
+        MAX,...
         sprintf(Sig));
     set(t,'fontsize',fontsize-2);
     
