@@ -78,7 +78,7 @@ else
     NbHS = 1;
 end
 
-for iToPlot = 1 %numel(ToPlot)
+for iToPlot = 1:2 %numel(ToPlot)
     
     for Target = 1
         
@@ -108,9 +108,9 @@ for iToPlot = 1 %numel(ToPlot)
                     };
             else
                 CondNames = {...
-                    'A ipsi','A contra',...
-                    'V ipsi','V contra',...
-                    'T ipsi','T contra'...
+                    'A_i','A_c',...
+                    'V_i','V_c',...
+                    'T_i','T_c'...
                     };
             end
         end
@@ -141,7 +141,6 @@ for iToPlot = 1 %numel(ToPlot)
         %% G matrix recap figures
         close all
         
-        
         FigDim = [50, 50, 600, 600];
         ColorMap = seismic(1000);
         
@@ -149,7 +148,7 @@ for iToPlot = 1 %numel(ToPlot)
             
             clc
             
-            for iScale = 1:2
+            for iScale = 1%:2
                 
                 if iScale==1
                     Scaling = '';
@@ -158,7 +157,7 @@ for iToPlot = 1 %numel(ToPlot)
                     Mat2Plot = H*Mat2Plot*H';
                 else
                     Scaling = 'Scaled-log_10-';
-%                   H = eye(size(M{1}.Ac,1))-ones(size(M{1}.Ac,1))/size(M{1}.Ac,1);
+                    %                   H = eye(size(M{1}.Ac,1))-ones(size(M{1}.Ac,1))/size(M{1}.Ac,1);
                     H = 1;
                     Mat2Plot = mean(G_Mat_all_ROIs{iROI,1},3);
                     Mat2Plot = H*Mat2Plot*H';
@@ -178,12 +177,12 @@ for iToPlot = 1 %numel(ToPlot)
                 
                 fig = figure('name', ['Recap-G-matrix-' Scaling opt.FigName], ...
                     'Position', FigDim, 'Color', [1 1 1]);
-                
+
                 % adapts color scale so that 0 is white
                 MIN = min(Mat2Plot(:));
                 MAX = max(Mat2Plot(:));
                 [AbsMax,Idx] = max(abs([MIN MAX]));
-                Scale = linspace(-1*AbsMax,AbsMax,1000)';
+                Scale = linspace(-1*AbsMax,AbsMax,size(ColorMap,1))';
                 if Idx==2
                     Idx = Scale<MIN;
                     NewColorMap = ColorMap(~Idx,:);
@@ -194,21 +193,37 @@ for iToPlot = 1 %numel(ToPlot)
                 
                 colormap(NewColorMap);
                 imagesc(Mat2Plot);
+                hold on
                 
-                axis square
-                set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', [], ...
+                set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', CondNames, ...
                     'ytick', 1:6,'yticklabel', CondNames, ...
-                    'ticklength', [0.01 0], 'fontsize', 12)
+                    'ticklength', [0.02 0.02], 'fontsize', 18)
                 
-                t=title(ROI(iROI).name);
-                set(t, 'fontsize', 12);
+                %                 t=title(ROI(iROI).name);
+                %                 set(t, 'fontsize', 12);
                 
                 colorbar
                 
-%                 mtit(fig.Name, 'fontsize', 12, 'xoff',0,'yoff',.035)
+                % Add white lines
+                Pos = 2.5;
+                for  i=1:2
+                    plot([Pos Pos],[0.52 6.52],'w','linewidth', 2)
+                    plot([0.52 6.52],[Pos Pos],'w','linewidth', 2)
+                    Pos = Pos + 2 ;
+                end
+                plot([0.5 0.5],[0.51 6.51],'k','linewidth', 1)
+                plot([6.5 6.5],[0.51 6.51],'k','linewidth', 1)
+                plot([0.51 6.51],[0.5 0.5],'k','linewidth', 1)
+                plot([0.51 6.51],[6.5 6.5],'k','linewidth', 1)
+                
+%                 axis tight
+                axis square
+                box off
+                
+                %                 mtit(fig.Name, 'fontsize', 12, 'xoff',0,'yoff',.035)
                 
                 print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif']  ), '-dtiff')
-                print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.svg']  ), '-dsvg')
+                %                 print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.svg']  ), '-dsvg')
                 
                 %%
                 if iScale==2
@@ -219,7 +234,7 @@ for iToPlot = 1 %numel(ToPlot)
                     colormap(NewColorMap)
                     
                     imagesc(repmat(linspace(MAX,MIN,1000)',1,100))
-
+                    
                     NbYtick = 10;
                     set(gca,'tickdir', 'out', 'xtick',[],'xticklabel', [], ...
                         'ytick', linspace(1,1000,NbYtick),...
@@ -246,10 +261,10 @@ for iToPlot = 1 %numel(ToPlot)
                         'ytick', linspace(1,1000,NbYtick),...
                         'yticklabel', YTickLabel, ...
                         'YAxisLocation','right',...
-                        'ticklength', [0.01 0.01], 'fontsize', 12)
+                        'ticklength', [0.01 0.01], 'fontsize', 14)
                     
-                    print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif']  ), '-dtiff')
-                    print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.svg']  ), '-dsvg')
+                    %                     print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif']  ), '-dtiff')
+                    %                     print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.svg']  ), '-dsvg')
                     
                 end
                 
