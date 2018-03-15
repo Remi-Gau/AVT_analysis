@@ -24,6 +24,8 @@ cd(StartDir)
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
+ColorSubject = ColorSubject();
+
 
 if surf
     ToPlot={'Cst','Lin','Avg','ROI'};
@@ -121,7 +123,7 @@ for iToPlot = 1%:numel(ToPlot)
             end
         end
         
-        for iROI = 1:5%numel(ROI)
+        for iROI = 1:5 %numel(ROI)
             
             for ihs=1:NbHS
                 
@@ -158,120 +160,97 @@ for iToPlot = 1%:numel(ToPlot)
                 m = 9;
                 n = 5;
                 close all
-                FigDim = [50, 50, 500, 700];
+                FigDim = [50, 50, 1500, 700];
                 
-                for SameScale=1:2
+                
+                %% Plot G matrices
+                if 0
                     
-                    if SameScale==2
-                        ScaleSuffix='-SameScale';
-                    else
-                        ScaleSuffix='';
-                    end
-                    
-                    
-                    opt.FigName = sprintf('GMat-3Models-%s-%s-%s-PCM_{grp}-%s-%s-%s', ...
-                        ScaleSuffix,strrep(ROI(iROI).name, '_thresh',''), ...
-                        hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
-                    
-                    figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', visible);
-                    
-                    Subplot=1;
-                    
-                    for iComp = 1:numel(M_all)
+                    for SameScale=1
                         
-                        switch iComp
-                            case 1
-                                CdtToSelect = 1:2;
-                            case 2
-                                CdtToSelect = 3:4;
-                            case 3
-                                CdtToSelect = 5:6;
-                            case 4
-                                CdtToSelect = [1 3];
-                            case 5
-                                CdtToSelect = [1 5];
-                            case 6
-                                CdtToSelect = [3 5];
-                            case 7
-                                CdtToSelect = [2 4];
-                            case 8
-                                CdtToSelect = [2 6];
-                            case 9
-                                CdtToSelect = [4 6];
-                        end
-                        
-                        G_hat = G_hat_all{iComp,1};
-                        G_pred_cr = G_pred_cr_all{iComp,1};
-                        M = M_all{iComp,1};
-                        
-                        
-                        % Get min and max for same scale plotting
-                        tmp = H*mean(G_hat,3)*H';
-                        %                         tmp = H*mean(G_pred_cr{end},3)*H';
-                        %                         for iM=2:4
-                        %                             tmp(:,:,end+1) = H*mean(G_pred_cr{iM},3)*H';
-                        %                         end
-                        CLIM = [min(tmp(:)) max(tmp(:))];
-                        clear tmp
-                        
-                        
-                        % CVed G_{emp}
-                        subplot(m,n,Subplot);
-                        colormap(ColorMap)
-                        imagesc(H*mean(G_hat,3)*H');
-                        %                         if SameScale==2
-                        %                             imagesc(H*mean(G_hat,3)*H', CLIM);
-                        %                         end
-                        set(gca,'tickdir', 'out', 'xtick', 1:2,'xticklabel', [], ...
-                            'ytick', 1:2,'yticklabel', {CondNames{CdtToSelect}}, ...
-                            'ticklength', [0.01 0], 'fontsize', 8)
-                        
-                        box off
-                        axis square
-                        
-                        if iComp==1
-                            t=title('G_{emp} CV');
-                            set(t, 'fontsize', 8);
-                        end
-                        
-                        Subplot = Subplot+1;
-                        
-                        % CVed G_{pred} free model
-                        subplot(m,n,Subplot);
-                        colormap(ColorMap);
-                        imagesc(H*mean(G_pred_cr{end},3)*H');
                         if SameScale==2
-                            imagesc(H*mean(G_pred_cr{end},3)*H', CLIM);
-                        end
-                        set(gca,'tickdir', 'out', 'xtick', [],'xticklabel', [], ...
-                            'ytick', [],'yticklabel', [], ...
-                            'ticklength', [0.01 0], 'fontsize', 8)
-                        
-                        box off
-                        axis square
-                        
-                        if iComp==1
-                            t=title('G_{pred} free CV');
-                            set(t, 'fontsize', 6);
+                            ScaleSuffix='-SameScale';
+                        else
+                            ScaleSuffix='';
                         end
                         
-                        Subplot = Subplot+1;
                         
+                        opt.FigName = sprintf('GMat-3Models-%s-%s-%s-PCM_{grp}-%s-%s-%s', ...
+                            ScaleSuffix,strrep(ROI(iROI).name, '_thresh',''), ...
+                            hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
                         
-                        % plot pred G mat from each model
-                        for iModel=2:4
-                            subplot(m,n,Subplot);
-                            colormap(ColorMap)
-                            try
-                                imagesc(H*mean(G_pred_cr{iModel},3)*H');
-                                if SameScale==2
-                                    imagesc(H*mean(G_pred_cr{iModel},3)*H', CLIM);
-                                end
-                            catch
-                                warning('model %i has an imaginary G_pred_CV', iModel)
-                                imagesc(H*mean(real(G_pred_cr{iModel}),3)*H');
+                        figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', visible);
+                        
+                        Subplot=1;
+                        
+                        for iComp = 1:numel(M_all)
+                            
+                            switch iComp
+                                case 1
+                                    CdtToSelect = 1:2;
+                                case 2
+                                    CdtToSelect = 3:4;
+                                case 3
+                                    CdtToSelect = 5:6;
+                                case 4
+                                    CdtToSelect = [1 3];
+                                case 5
+                                    CdtToSelect = [1 5];
+                                case 6
+                                    CdtToSelect = [3 5];
+                                case 7
+                                    CdtToSelect = [2 4];
+                                case 8
+                                    CdtToSelect = [2 6];
+                                case 9
+                                    CdtToSelect = [4 6];
                             end
                             
+                            G_hat = G_hat_all{iComp,1};
+                            G_pred_cr = G_pred_cr_all{iComp,1};
+                            M = M_all{iComp,1};
+                            
+                            
+                            % Get min and max for same scale plotting
+                            tmp = H*mean(G_hat,3)*H';
+                            %                         tmp = H*mean(G_pred_cr{end},3)*H';
+                            %                         for iM=2:4
+                            %                             tmp(:,:,end+1) = H*mean(G_pred_cr{iM},3)*H';
+                            %                         end
+                            CLIM = [min(tmp(:)) max(tmp(:))];
+                            clear tmp
+                            
+                            
+                            % CVed G_{emp}
+                            subplot(m,n,Subplot);
+                            colormap(ColorMap)
+                            imagesc(H*mean(G_hat,3)*H');
+                            %                         if SameScale==2
+                            %                             imagesc(H*mean(G_hat,3)*H', CLIM);
+                            %                         end
+                            colorbar
+                            set(gca,'tickdir', 'out', 'xtick', 1:2,'xticklabel', [], ...
+                                'ytick', 1:2,'yticklabel', {CondNames{CdtToSelect}}, ...
+                                'ticklength', [0.01 0], 'fontsize', 8)
+                            
+                            box off
+                            axis square
+                            
+                            if iComp==1
+                                t=title('G_{emp} CV');
+                                set(t, 'fontsize', 8);
+                            end
+                            
+                            Subplot = Subplot+1;
+                            
+                            % CVed G_{pred} free model
+                            subplot(m,n,Subplot);
+                            colormap(ColorMap);
+                            imagesc(H*mean(G_pred_cr{end},3)*H');
+                            if SameScale==2
+                                imagesc(H*mean(G_pred_cr{end},3)*H', CLIM);
+                            end
+                            colorbar
                             set(gca,'tickdir', 'out', 'xtick', [],'xticklabel', [], ...
                                 'ytick', [],'yticklabel', [], ...
                                 'ticklength', [0.01 0], 'fontsize', 8)
@@ -280,13 +259,284 @@ for iToPlot = 1%:numel(ToPlot)
                             axis square
                             
                             if iComp==1
-                                t=title(M{iModel}.name);
+                                t=title('G_{pred} free CV');
                                 set(t, 'fontsize', 6);
                             end
                             
                             Subplot = Subplot+1;
+                            
+                            
+                            % plot pred G mat from each model
+                            for iModel=2:4
+                                subplot(m,n,Subplot);
+                                colormap(ColorMap)
+                                try
+                                    imagesc(H*mean(G_pred_cr{iModel},3)*H');
+                                    if SameScale==2
+                                        imagesc(H*mean(G_pred_cr{iModel},3)*H', CLIM);
+                                    end
+                                catch
+                                    warning('model %i has an imaginary G_pred_CV', iModel)
+                                    imagesc(H*mean(real(G_pred_cr{iModel}),3)*H');
+                                end
+                                colorbar
+                                set(gca,'tickdir', 'out', 'xtick', [],'xticklabel', [], ...
+                                    'ytick', [],'yticklabel', [], ...
+                                    'ticklength', [0.01 0], 'fontsize', 8)
+                                
+                                box off
+                                axis square
+                                
+                                if iComp==1
+                                    t=title(M{iModel}.name);
+                                    set(t, 'fontsize', 6);
+                                end
+                                
+                                Subplot = Subplot+1;
+                            end
+                            
+                            
                         end
                         
+                        mtit(opt.FigName, 'fontsize', 12, 'xoff',0,'yoff',.035)
+                        set(gcf,'visible', visible')
+                        
+                        print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
+                        
+                    end
+                    
+                end
+                
+                %% Provide a plot of the likelihoods as bar plots
+                if 0
+                    
+                    close all
+                    clear Likelihood
+                    
+                    YAxis = {...
+                        'A stim';
+                        'V stim';
+                        'T stim';
+                        'A_i & V_i';
+                        'A_i & T_i';
+                        'V_i & T_i';
+                        'A_c & V_c';
+                        'A_c & T_c';
+                        'V_c & T_c'};
+                    
+                    
+                    
+                    FigDim = [50, 50, 1000, 700];
+                    
+                    for WithSubj = 1:2
+                        
+                        opt.FigName = sprintf('LikelihoodsBarPlot-3Models-%s-%s-PCM_{grp}-%s-%s-%s', strrep(ROI(iROI).name, '_thresh',''), ...
+                            hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+                        if WithSubj==2
+                            opt.FigName = sprintf('LikelihoodsBarPlot-SUBJ-3Models-%s-%s-PCM_{grp}-%s-%s-%s', strrep(ROI(iROI).name, '_thresh',''), ...
+                                hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+                        end
+                        
+                        figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', visible);
+                        
+                        Subplot = 1;
+                        
+                        for iComp = 1:numel(M_all)
+                            
+                            for j=1:2
+                                
+                                colors={'b';'b';'b'};
+                                
+                                subplot(numel(M_all),2,Subplot)
+                                
+                                if j==2
+                                    Normalize=1;
+                                else
+                                    Normalize = 0;
+                                end
+                                
+                                Upperceil = T_group_all{iComp,1}.likelihood(:,end);
+                                Data2Plot = T_cross_all{iComp,1};
+                                M = M_all{iComp,1};
+                                
+                                T = pcm_plotModelLikelihood(Data2Plot,M,'upperceil',Upperceil, 'colors', colors, ...
+                                    'normalize',Normalize);
+                                
+                                if j==1
+                                    loglike = mean(T.likelihood_norm(:,2:end-1));
+                                    [loglike_sorted,idx] = sort(mean(T.likelihood_norm(:,2:end-1)));
+                                    if loglike(idx(end-1))+3<loglike(idx(end))
+                                        colors{idx(end)} = 'r';
+                                        T = pcm_plotModelLikelihood(Data2Plot,M,'upperceil',Upperceil, 'colors', colors, ...
+                                            'normalize',Normalize);
+                                    end
+                                end
+                                
+                                
+                                if WithSubj==2
+                                    hold on
+                                    Scatter = linspace(-.3, .3, NbSub);
+                                    for iM=2:numel(M)-1
+                                        %                                     h = plotSpread(T.likelihood_norm(:,iM), ...
+                                        %                                         'distributionIdx', ones(size(T.likelihood_norm(:,iM))), ...
+                                        %                                         'distributionMarkers',{'o'},'distributionColors',{'w'}, ...
+                                        %                                         'xValues', iM-1, 'binWidth', 100, 'spreadWidth', .5);
+                                        %                                     set(h{1}, 'MarkerSize', 3, 'MarkerEdgeColor', 'k', ...
+                                        %                                         'MarkerFaceColor', 'w', 'LineWidth', 1)
+                                        for isubj=1:NbSub
+                                            plot(iM-1+Scatter(isubj),T.likelihood_norm(isubj,iM),...
+                                                'marker', 'o', 'MarkerSize', 3,...
+                                                'MarkerEdgeColor', ColorSubject(isubj,:), ...
+                                                'MarkerFaceColor', ColorSubject(isubj,:))
+                                        end
+                                    end
+                                end
+                                
+                                ylabel('')
+                                if j==1
+                                    t = ylabel(YAxis{iComp});
+                                    set(t, 'fontsize', 8)
+                                end
+                                
+                                set(gca,'fontsize', 8, ...
+                                    'xtick', 1:3,...
+                                    'xticklabel', {'S';'S+I';'I'})
+                                
+                                if WithSubj==2
+                                    MIN = min(min(T.likelihood_norm(:,2:end-1)));
+                                    MAX = max(max(T.likelihood_norm(:,2:end-1)));
+                                    MAX = MAX*1.1;
+                                else
+                                    MIN = min(mean(T.likelihood_norm(:,2:end-1)))-...
+                                        max(nansem(T.likelihood_norm(:,2:end-1)))/4;
+                                    
+                                    MAX = max(mean(T.likelihood_norm(:,2:end-1)))+...
+                                        max(nansem(T.likelihood_norm(:,2:end-1)));
+                                    MAX = MAX*1.005;
+                                    if MAX < 1.005
+                                        MAX = 1.005;
+                                    end
+                                end
+                                
+                                if i==iComp
+                                    if j==2
+                                        t = title('Normalized log-likelihood - Cross validation');
+                                    else
+                                        t = title('Log-likelihood - Cross validation');
+                                    end
+                                    set(t,'fontsize', 12)
+                                end
+                                
+                                axis([0.5 3.5 MIN MAX])
+                                
+                                Subplot = Subplot + 1;
+                            end
+                            
+                        end
+                        
+                        mtit(opt.FigName, 'fontsize', 12, 'xoff',0,'yoff',.035)
+                        set(gcf,'visible', visible')
+                        
+                        print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
+                        
+                    end
+                    
+                end
+                
+                
+                %% Provide a plot of the likelihoods as bar plots with the worst model as null
+                if 0
+                    
+                    close all
+                    clear Likelihood
+                    
+                    YAxis = {...
+                        'A stim';
+                        'V stim';
+                        'T stim';
+                        'A_i & V_i';
+                        'A_i & T_i';
+                        'V_i & T_i';
+                        'A_c & V_c';
+                        'A_c & T_c';
+                        'V_c & T_c'};
+                    
+                    colors={'b';'b';'b'};
+                    
+                    FigDim = [50, 50, 1000, 700];
+                    
+                    
+                    opt.FigName = sprintf('LikelihoodsBarPlot-NewNull-3Models-%s-%s-PCM_{grp}-%s-%s-%s', strrep(ROI(iROI).name, '_thresh',''), ...
+                        hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+                    figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', visible);
+                    
+                    Subplot = 1;
+                    
+                    for iComp = 1:numel(M_all)
+                        
+                        for j=1:2
+                            
+                            subplot(numel(M_all),2,Subplot)
+                            
+                            if j==2
+                                Normalize=1;
+                            else
+                                Normalize = 0;
+                            end
+                            
+                            Upperceil = T_group_all{iComp,1}.likelihood(:,end);
+                            Data2Plot = T_cross_all{iComp,1};
+                            M = M_all{iComp,1};
+                            [~,Null]=min(mean(Data2Plot.likelihood(:,2:end-1)));
+                            Models_left = setxor(2:4,Null+1);
+                            
+                            
+                            T = pcm_plotModelLikelihood(Data2Plot,M,'upperceil',Upperceil, 'colors', colors, ...
+                                'normalize',Normalize, 'Nnull', Null+1, 'mindx', 2:4);
+                            
+                            %                         for iM=2:numel(M)-1
+                            %                             h = plotSpread(T.likelihood_norm(:,iM), 'distributionIdx', ones(size(T.likelihood_norm(:,iM))), ...
+                            %                                 'distributionMarkers',{'o'},'distributionColors',{'w'}, ...
+                            %                                 'xValues', iM-1, 'binWidth', 100, 'spreadWidth', .5);
+                            %                             set(h{1}, 'MarkerSize', 3, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1)
+                            %                         end
+                            
+                            ylabel('')
+                            if j==1
+                                t = ylabel(YAxis{iComp});
+                                set(t, 'fontsize', 8)
+                            end
+                            
+                            set(gca,'fontsize', 8, ...
+                                'xtick', 1:3,...
+                                'xticklabel', {'S';'S+I';'I'})
+                            
+                            MIN = min(mean(T.likelihood_norm(:,Models_left)))-...
+                                max(nansem(T.likelihood_norm(:,Models_left)))/4;
+                            %                         if MIN < 0
+                            %                             MIN = 0;
+                            %                         end
+                            
+                            MAX = max(mean(T.likelihood_norm(:,Models_left)))+...
+                                max(nansem(T.likelihood_norm(:,Models_left)));
+                            MAX = MAX*1.005;
+                            if MAX < 1.005
+                                MAX = 1.005;
+                            end
+                            
+                            axis([0.5 3.5 MIN MAX])
+                            
+                            if i==iComp
+                                if j==2
+                                    t = title('Normalized log-likelihood - Cross validation');
+                                else
+                                    t = title('Log-likelihood - Cross validation');
+                                end
+                                set(t,'fontsize', 12)
+                            end
+                            
+                            Subplot = Subplot + 1;
+                        end
                         
                     end
                     
@@ -297,26 +547,27 @@ for iToPlot = 1%:numel(ToPlot)
                     
                 end
                 
-                
-                %% Provide a plot of the crossvalidated likelihoods
+                %% Provide a plot of the likelihoods as matrices
                 close all
                 clear Likelihood
+                
+                colors={'b';'b';'b'};
                 
                 YAxis = {...
                     'A stim';
                     'V stim';
                     'T stim';
-                    'A & V ipsi';
-                    'A & T ipsi';
-                    'V & T ipsi';
-                    'A & V contra';
-                    'A & T contra';
-                    'V & T contra'};
-                
-                colors={'b';'b';'b';'b';'b'};
+                    'A_i & V_i';
+                    'A_i & T_i';
+                    'V_i & T_i';
+                    'A_c & V_c';
+                    'A_c & T_c';
+                    'V_c & T_c'};
                 
                 FigDim = [50, 50, 1000, 800];
                 
+                opt.FigName = sprintf('Likelihoods-3Models-%s-%s-PCM_{grp}-%s-%s-%s', strrep(ROI(iROI).name, '_thresh',''), ...
+                    hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
                 figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', visible);
                 
                 for iComp = 1:numel(M_all)
@@ -349,13 +600,7 @@ for iToPlot = 1%:numel(ToPlot)
                     
                 end
                 
-                
-                opt.FigName = sprintf('Likelihoods-3Models-%s-%s-PCM_{grp}-%s-%s-%s', strrep(ROI(iROI).name, '_thresh',''), ...
-                    hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
-                
-                
                 Subplot = 1;
-                
                 for j=1:2
                     
                     for i=1:2
@@ -395,11 +640,7 @@ for iToPlot = 1%:numel(ToPlot)
                             end
                             set(t,'fontsize', 12)
                         end
-                        
-                        
-                        %                         title(sprintf([Title '\nLower noise ceiling: %0.4f'], tmp(end)))
-                        
-                        
+                        title(Title)
                         Subplot = Subplot+1;
                     end
                 end
@@ -408,9 +649,67 @@ for iToPlot = 1%:numel(ToPlot)
                 set(gcf,'visible', visible')
                 
                 print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
+                
+                [~,I]=max(Likelihood(:,2:4,:,:),[],2);
+                All_likelihood(:,iROI,:,:) = I;
+                
             end
-            
-            
         end
+        
+        %% Plot with color coding to tell which model wins
+        close all
+        clear Likelihood
+        
+        A = {'A1' 'PT' 'V1' 'V2' 'V3'};
+        
+        FigDim = [50, 50, 1000, 800];
+        
+        opt.FigName = sprintf('BestModel-3Models-%s-PCM_{grp}-%s-%s-%s', ...
+            hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+        figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', visible);
+        
+        Subplot = 1;
+        for j=1:2
+            
+            for i=1:2
+                
+                subplot(2,2,Subplot);
+                colormap([0 0 0;.5 .5 .5;1 1 1])
+                
+                imagesc(All_likelihood(:,:,i,j))
+                
+                set(gca,'tickdir', 'out', 'xtick', 1:5,'xticklabel', ...
+                    A, ...
+                    'ytick', 1:9,'yticklabel', YAxis, ...
+                    'ticklength', [0.01 0], 'fontsize', 8)
+                
+                
+                colorbar
+                
+                if i==1
+                    Title = 'NoCV';
+                elseif i==2
+                    Title = 'CV';
+                end
+                title(Title)
+                
+                if i==1
+                    if j==2
+                        t = ylabel('Normalized log-likelihood');
+                    else
+                        t = ylabel('Log-likelihood');
+                    end
+                    set(t,'fontsize', 12)
+                end
+                Subplot = Subplot+1;
+            end
+        end
+        
+        mtit(opt.FigName, 'fontsize', 12, 'xoff',0,'yoff',.035)
+        set(gcf,'visible', visible')
+        
+        print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
+        
+        
     end
 end
