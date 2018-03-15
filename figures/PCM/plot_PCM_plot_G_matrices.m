@@ -1,18 +1,5 @@
 clc; clear; close all
 
-COLOR_Subject= [
-    31,120,180;
-    178,223,138;
-    51,160,44;
-    251,154,153;
-    227,26,28;
-    253,191,111;
-    255,127,0;
-    202,178,214;
-    106,61,154;
-    0,0,130];
-COLOR_Subject=COLOR_Subject/255;
-
 StartDir = fullfile(pwd, '..', '..', '..');
 addpath(genpath(fullfile(StartDir, 'code','subfun')))
 
@@ -27,12 +14,26 @@ Do_ind = 0;
 Do_group = 1;
 Plot_model_group = 1;
 
+Switch = 1;
+if Switch
+    %     Ac Ai Vc Vi Tc Ti
+    PositionToFill = [1 7 6 9 8 3 2 5 4 10 14 13 12 11 15];
+    DiagToExtract = [1 8 15 22 29 36];
+    DiagToFill = [8 1 22 15 36 29];
+    ConditionOrder = [2 1 4 3 6 5];
+else
+    %     Ai Ac Vi Vc Ti Tc
+    ConditionOrder = 1:6;
+end
+
 cd(StartDir)
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
 set(0,'defaultAxesFontName','Arial')
 set(0,'defaultTextFontName','Arial')
+FigDim = [50, 50, 600, 600];
+ColorMap = seismic(1000);
 
 
 if surf
@@ -140,36 +141,39 @@ for iToPlot = 1:2 %numel(ToPlot)
         
         %% G matrix recap figures
         close all
-        
-        FigDim = [50, 50, 600, 600];
-        ColorMap = seismic(1000);
-        
+
         for iROI = 1:numel(G_Mat_all_ROIs)
             
             clc
             
             for iScale = 1%:2
                 
+                H = 1;
+                Mat2Plot = mean(G_Mat_all_ROIs{iROI,1},3);
+                Mat2Plot = H*Mat2Plot*H';
+                
+                if Switch
+                    tmp = Mat2Plot;
+                    tmp(DiagToExtract)=0;
+                    tmp = squareform(tmp);
+                    tmp(PositionToFill) = tmp;
+                    tmp = squareform(tmp);
+                    tmp(DiagToFill) = Mat2Plot(DiagToExtract);
+                    Mat2Plot = tmp;
+                end
+                
                 if iScale==1
                     Scaling = '';
-                    H = 1;
-                    Mat2Plot = mean(G_Mat_all_ROIs{iROI,1},3);
-                    Mat2Plot = H*Mat2Plot*H';
                 else
                     Scaling = 'Scaled-log_10-';
-                    %                   H = eye(size(M{1}.Ac,1))-ones(size(M{1}.Ac,1))/size(M{1}.Ac,1);
-                    H = 1;
-                    Mat2Plot = mean(G_Mat_all_ROIs{iROI,1},3);
-                    Mat2Plot = H*Mat2Plot*H';
-                    
+
                     % normalize the data
                     Sign = sign(Mat2Plot);
                     Mat2Plot = abs(Mat2Plot); %take absolute values to avoid problems when going to log scale
                     Min2Keep = min(Mat2Plot(:));
                     Mat2Plot = Mat2Plot/(min(Mat2Plot(:))); %normalize by minimum value
                     Mat2Plot = log10(Mat2Plot); % log scale
-                    Mat2Plot = Mat2Plot.*Sign; % put the sign back in
-                    
+                    Mat2Plot = Mat2Plot.*Sign; % put the sign back in  
                 end
                 
                 opt.FigName = sprintf('%s-PCM_{grp}-%s-%s-%s-%s', ROI(iROI).name,...
@@ -195,8 +199,8 @@ for iToPlot = 1:2 %numel(ToPlot)
                 imagesc(Mat2Plot);
                 hold on
                 
-                set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', CondNames, ...
-                    'ytick', 1:6,'yticklabel', CondNames, ...
+                set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', CondNames(ConditionOrder), ...
+                    'ytick', 1:6,'yticklabel', CondNames(ConditionOrder), ...
                     'ticklength', [0.02 0.02], 'fontsize', 18)
                 
                 %                 t=title(ROI(iROI).name);
@@ -207,8 +211,8 @@ for iToPlot = 1:2 %numel(ToPlot)
                 % Add white lines
                 Pos = 2.5;
                 for  i=1:2
-                    plot([Pos Pos],[0.52 6.52],'w','linewidth', 2)
-                    plot([0.52 6.52],[Pos Pos],'w','linewidth', 2)
+                    plot([Pos Pos],[0.52 6.52],'w','linewidth', 3)
+                    plot([0.52 6.52],[Pos Pos],'w','linewidth', 3)
                     Pos = Pos + 2 ;
                 end
                 plot([0.5 0.5],[0.51 6.51],'k','linewidth', 1)
