@@ -249,7 +249,7 @@ for iToPlot = 1%:numel(ToPlot)
                 Img2Plot = triu(Img2Plot);
             end
             
-            for i=1:3
+            for i=1:4
                 
                 tmp = Img2Plot;
                 
@@ -262,10 +262,17 @@ for iToPlot = 1%:numel(ToPlot)
                         tmp(1:2,3:6) = 0;
                         tmp(3:4,5:6) = 0;
                     case 3
-                        suffix = '-C&I';
+                        suffix = '-C';
                         tmp(1,2) = 0;
                         tmp(3,4) = 0;
                         tmp(5,6) = 0;
+                        tmp(2,3:6) = 0;
+                        tmp(4,5:6) = 0;
+                    case 4
+                        suffix = '-I';
+                        tmp(5,6) = 0;
+                        tmp(1,2:6) = 0;
+                        tmp(3,4:6) = 0;
                 end
                 
                 
@@ -324,7 +331,7 @@ for iToPlot = 1%:numel(ToPlot)
                 Img2Plot(Img2Plot==0)=1;
             end
             
-            for i=1:3
+            for i=1:4
                 
                 tmp = Img2Plot;
                 
@@ -337,9 +344,16 @@ for iToPlot = 1%:numel(ToPlot)
                         tmp(1:2,3:6,:) = 1;
                         tmp(3:4,5:6,:) = 1;
                     case 3
-                        suffix = '-C&I';
+                        suffix = '-C';
                         tmp(1,2,:) = 1;
                         tmp(3,4,:) = 1;
+                        tmp(5,6,:) = 1;
+                        tmp(2,3:6,:) = 1;
+                        tmp(4,5:6,:) = 1;
+                    case 4
+                        suffix = '-I';
+                        tmp(1,2:6,:) = 1;
+                        tmp(3,4:6,:) = 1;
                         tmp(5,6,:) = 1;
                 end
                 
