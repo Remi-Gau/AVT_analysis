@@ -16,11 +16,20 @@ Plot_model_group = 1;
 
 Switch = 1;
 if Switch
-    %     Ac Ai Vc Vi Tc Ti
-    PositionToFill = [1 7 6 9 8 3 2 5 4 10 14 13 12 11 15];
+    
     DiagToExtract = [1 8 15 22 29 36];
-    DiagToFill = [8 1 22 15 36 29];
-    ConditionOrder = [2 1 4 3 6 5];
+    
+    %     Ac Ai Vc Vi Tc Ti
+%     PositionToFill = [1 7 6 9 8 3 2 5 4 10 14 13 12 11 15];
+%     DiagToFill = [8 1 22 15 36 29];
+%     ConditionOrder = [2 1 4 3 6 5];
+    
+    %     Ac Vc Tc Ai Vi Ti
+    DiagToFill = [22 1 29 8 36 15];
+    PositionToFill = [3 13 7 14 10 4 1 5 2 8 15 11 9 6 12];
+    ConditionOrder = [2 4 6 1 3 5];
+    
+    
 else
     %     Ai Ac Vi Vc Ti Tc
     ConditionOrder = 1:6;
@@ -113,6 +122,14 @@ for iToPlot = 1:2 %numel(ToPlot)
                     'V_i','V_c',...
                     'T_i','T_c'...
                     };
+                
+                if all(ConditionOrder == [2 4 6 1 3 5])
+                CondNames = {...
+                    'A','A',...
+                    'V','V',...
+                    'T','T'...
+                    };
+                end
             end
         end
         
@@ -201,7 +218,8 @@ for iToPlot = 1:2 %numel(ToPlot)
                 
                 set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', CondNames(ConditionOrder), ...
                     'ytick', 1:6,'yticklabel', CondNames(ConditionOrder), ...
-                    'ticklength', [0.02 0.02], 'fontsize', 18)
+                    'ticklength', [0.02 0.02], 'fontsize', 22,...
+                    'XAxisLocation','top')
                 
                 %                 t=title(ROI(iROI).name);
                 %                 set(t, 'fontsize', 12);
@@ -209,12 +227,18 @@ for iToPlot = 1:2 %numel(ToPlot)
                 colorbar
                 
                 % Add white lines
-                Pos = 2.5;
-                for  i=1:2
-                    plot([Pos Pos],[0.52 6.52],'w','linewidth', 3)
-                    plot([0.52 6.52],[Pos Pos],'w','linewidth', 3)
-                    Pos = Pos + 2 ;
-                end
+%                 Pos = 2.5;
+%                 for  i=1:2
+%                     plot([Pos Pos],[0.52 6.52],'w','linewidth', 3)
+%                     plot([0.52 6.52],[Pos Pos],'w','linewidth', 3)
+%                     Pos = Pos + 2 ;
+%                 end
+                
+                plot([3.5 3.5],[0.52 6.52],'w','linewidth', 3)
+                plot([0.52 6.52],[3.5 3.5],'w','linewidth', 3)
+
+                
+                
                 plot([0.5 0.5],[0.51 6.51],'k','linewidth', 1)
                 plot([6.5 6.5],[0.51 6.51],'k','linewidth', 1)
                 plot([0.51 6.51],[0.5 0.5],'k','linewidth', 1)
@@ -264,7 +288,7 @@ for iToPlot = 1:2 %numel(ToPlot)
                     set(gca,'tickdir', 'out', 'xtick',[],'xticklabel', [], ...
                         'ytick', linspace(1,1000,NbYtick),...
                         'yticklabel', YTickLabel, ...
-                        'YAxisLocation','right',...
+                        'YAxisLocation','right', ...
                         'ticklength', [0.01 0.01], 'fontsize', 14)
                     
                     %                     print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif']  ), '-dtiff')

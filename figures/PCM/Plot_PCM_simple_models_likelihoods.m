@@ -39,12 +39,12 @@ if Switch
     SwitchSuffix = 'switched';
     %   Ac Vc Tc Ai Vi Ti
     PositionToFill = [3 8 12 13 14 15 1 2 6];
-    ConditionOrder = [1:2:6 2:2:6];
+    ConditionOrder = [2:2:6 1:2:6];
 else
     SwitchSuffix = '';
     %     Ai Ac Vi Vc Ti Tc
-    %     PositionToFill = [1 10 15 2 4 11 7 9 14];
-    %     ConditionOrder = 1:6;
+%         PositionToFill = [1 10 15 2 4 11 7 9 14];
+%         ConditionOrder = 1:6;
     
     %     Ac Ai Vc Vi Tc Ti
     PositionToFill = [1 10 15 7 9 14 2 4 11];
@@ -159,6 +159,13 @@ for iToPlot = 1%:numel(ToPlot)
                     'V_i','V_c',...
                     'T_i','T_c'...
                     };
+                if Switch
+                    CondNames = {...
+                        'A','A',...
+                        'V','V',...
+                        'T','T'...
+                        };
+                end
             end
         end
         
@@ -240,10 +247,6 @@ for iToPlot = 1%:numel(ToPlot)
             
             figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
             
-            TmpColorMap = ColorMap;
-            TmpColorMap((max(Data2Plot)+2):end,:)=[];
-            colormap(TmpColorMap)
-            
             Img2Plot = squareform(Data2Plot);
             if UpperTri
                 Img2Plot = triu(Img2Plot);
@@ -253,35 +256,41 @@ for iToPlot = 1%:numel(ToPlot)
                 
                 tmp = Img2Plot;
                 
-                
-                switch i
-                    case 1
-                        suffix = '';
-                    case 2
-                        suffix = '-CvsI';
-                        tmp(1:2,3:6) = 0;
-                        tmp(3:4,5:6) = 0;
-                    case 3
-                        suffix = '-C';
-                        tmp(1,2) = 0;
-                        tmp(3,4) = 0;
-                        tmp(5,6) = 0;
-                        tmp(2,3:6) = 0;
-                        tmp(4,5:6) = 0;
-                    case 4
-                        suffix = '-I';
-                        tmp(5,6) = 0;
-                        tmp(1,2:6) = 0;
-                        tmp(3,4:6) = 0;
+                if Switch==1
+                    suffix = '';
+                else
+                    switch i
+                        case 1
+                            suffix = '';
+                        case 2
+                            suffix = '-CvsI';
+                            tmp(1:2,3:6) = 0;
+                            tmp(3:4,5:6) = 0;
+                        case 3
+                            suffix = '-C';
+                            tmp(1,2) = 0;
+                            tmp(3,4) = 0;
+                            tmp(5,6) = 0;
+                            tmp(2,3:6) = 0;
+                            tmp(4,5:6) = 0;
+                        case 4
+                            suffix = '-I';
+                            tmp(5,6) = 0;
+                            tmp(1,2:6) = 0;
+                            tmp(3,4:6) = 0;
+                    end
                 end
                 
-                
                 clf
+                
+                TmpColorMap = ColorMap;
+                TmpColorMap((max(tmp(:))+2):end,:)=[];
+                colormap(TmpColorMap)
                 
                 imagesc(tmp)
                 
                 % Add white lines
-                Add_lines_frame(UpperTri)
+                Add_lines_frame(UpperTri,Switch)
                 
                 axis square
                 box off
@@ -331,37 +340,40 @@ for iToPlot = 1%:numel(ToPlot)
                 Img2Plot(Img2Plot==0)=1;
             end
             
+            
             for i=1:4
                 
                 tmp = Img2Plot;
                 
-                
-                switch i
-                    case 1
-                        suffix = '';
-                    case 2
-                        suffix = '-CvsI';
-                        tmp(1:2,3:6,:) = 1;
-                        tmp(3:4,5:6,:) = 1;
-                    case 3
-                        suffix = '-C';
-                        tmp(1,2,:) = 1;
-                        tmp(3,4,:) = 1;
-                        tmp(5,6,:) = 1;
-                        tmp(2,3:6,:) = 1;
-                        tmp(4,5:6,:) = 1;
-                    case 4
-                        suffix = '-I';
-                        tmp(1,2:6,:) = 1;
-                        tmp(3,4:6,:) = 1;
-                        tmp(5,6,:) = 1;
+                if Switch==1
+                    suffix = '';
+                else
+                    switch i
+                        case 1
+                            suffix = '';
+                        case 2
+                            suffix = '-CvsI';
+                            tmp(1:2,3:6,:) = 1;
+                            tmp(3:4,5:6,:) = 1;
+                        case 3
+                            suffix = '-C';
+                            tmp(1,2,:) = 1;
+                            tmp(3,4,:) = 1;
+                            tmp(5,6,:) = 1;
+                            tmp(2,3:6,:) = 1;
+                            tmp(4,5:6,:) = 1;
+                        case 4
+                            suffix = '-I';
+                            tmp(1,2:6,:) = 1;
+                            tmp(3,4:6,:) = 1;
+                            tmp(5,6,:) = 1;
+                    end
                 end
-                
                 
                 image(tmp)
                 
                 % Add white lines
-                Add_lines_frame(UpperTri)
+                Add_lines_frame(UpperTri,Switch)
                 
                 axis square
                 box off
@@ -416,23 +428,33 @@ end
 end
 
 
-function Add_lines_frame(UpperTri)
+function Add_lines_frame(UpperTri,Switch)
 hold on
+
 if UpperTri
-    plot([2.5 2.5],[0.5 2.5],'color',[.5 .5 .5],'linewidth', 3)
-    plot([4.5 4.5],[0.5 4.5],'color',[.5 .5 .5],'linewidth', 3)
-    plot([2.5 6.5],[2.5 2.5],'color',[.5 .5 .5],'linewidth', 3)
-    plot([4.5 6.5],[4.5 4.5],'color',[.5 .5 .5],'linewidth', 3)
+    if Switch
+        plot([3.5 3.5],[0.5 3.5],'color',[.5 .5 .5],'linewidth', 3)
+        plot([3.5 6.5],[3.5 3.5],'color',[.5 .5 .5],'linewidth', 3)
+    else
+        plot([2.5 2.5],[0.5 2.5],'color',[.5 .5 .5],'linewidth', 3)
+        plot([4.5 4.5],[0.5 4.5],'color',[.5 .5 .5],'linewidth', 3)
+        plot([2.5 6.5],[2.5 2.5],'color',[.5 .5 .5],'linewidth', 3)
+        plot([4.5 6.5],[4.5 4.5],'color',[.5 .5 .5],'linewidth', 3)
+    end
     plot([0.51 6.51],[0.5 6.5],'k','linewidth', 1)
 else
-    Pos = 2.5;
-    for  i=1:2
-        plot([Pos Pos],[0.52 6.52],'color',[.5 .5 .5],'linewidth', 3)
-        plot([0.52 6.52],[Pos Pos],'color',[.5 .5 .5],'linewidth', 3)
-        Pos = Pos + 2 ;
+    if Switch
+        error('Not implemented')
+    else
+        Pos = 2.5;
+        for  i=1:2
+            plot([Pos Pos],[0.52 6.52],'color',[.5 .5 .5],'linewidth', 3)
+            plot([0.52 6.52],[Pos Pos],'color',[.5 .5 .5],'linewidth', 3)
+            Pos = Pos + 2 ;
+        end
+        plot([0.51 6.51],[6.5 6.5],'k','linewidth', 1)
+        plot([0.5 0.5],[0.51 6.51],'k','linewidth', 1)
     end
-    plot([0.51 6.51],[6.5 6.5],'k','linewidth', 1)
-    plot([0.5 0.5],[0.51 6.51],'k','linewidth', 1)
 end
 plot([0.51 6.51],[0.5 0.5],'k','linewidth', 1)
 plot([6.5 6.5],[0.51 6.51],'k','linewidth', 1)
@@ -443,10 +465,10 @@ if UpperTri
     set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', CondNames, ...
         'ytick', 1:6,'yticklabel', CondNames, 'YAxisLocation','right',...
         'XAxisLocation','top',...
-        'ticklength', [0.02 0.02], 'fontsize', 18)
+        'ticklength', [0.02 0.02], 'fontsize', 22)
 else
     set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', CondNames, ...
         'ytick', 1:6,'yticklabel', CondNames, ...
-        'ticklength', [0.02 0.02], 'fontsize', 18)
+        'ticklength', [0.02 0.02], 'fontsize', 22)
 end
 end
