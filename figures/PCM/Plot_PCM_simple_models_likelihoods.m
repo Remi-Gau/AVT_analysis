@@ -21,13 +21,36 @@ Comp_suffix{end+1} = 'A_V_contra';
 Comp_suffix{end+1} = 'A_T_contra';
 Comp_suffix{end+1} = 'V_T_contra';
 
+Comp_label{1} = 'Ai/Ac';
+Comp_label{end+1} = 'Vi/Vc';
+Comp_label{end+1} = 'Ti/Tc';
+Comp_label{end+1} = 'Ai Vi';
+Comp_label{end+1} = 'Ai Ti';
+Comp_label{end+1} = 'Vi Ti';
+Comp_label{end+1} = 'Ac Vc';
+Comp_label{end+1} = 'Ac Tc';
+Comp_label{end+1} = 'Vc Tc';
+
 UpperTri=1;
 Switch=0;
 surf = 1; % run of volumne whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
 hs_idpdt = 0;
 Split_half = 0; % only implemented for surface
+on_merged_ROI = 0;
+% RFX = 1;
+%
+% if RFX==1
+%     RFX_suffix = 'RFX1';
+% else
+%     RFX_suffix = 'RFX2';
+% end
 
+if on_merged_ROI
+    NbROI = 1;
+else
+    NbROI = 5;
+end
 
 if UpperTri
     UpTriSuffix = 'uptri';
@@ -43,8 +66,8 @@ if Switch
 else
     SwitchSuffix = '';
     %     Ai Ac Vi Vc Ti Tc
-%         PositionToFill = [1 10 15 2 4 11 7 9 14];
-%         ConditionOrder = 1:6;
+    %         PositionToFill = [1 10 15 2 4 11 7 9 14];
+    %         ConditionOrder = 1:6;
     
     %     Ac Ai Vc Vi Tc Ti
     PositionToFill = [1 10 15 7 9 14 2 4 11];
@@ -92,7 +115,9 @@ end
 
 
 % To know how many ROIs we have
-if surf
+if on_merged_ROI
+    ROI(1).name ='V2V3';
+elseif surf
     load(fullfile(StartDir, 'sub-02', 'roi', 'surf','sub-02_ROI_VertOfInt.mat'), 'ROI', 'NbVertex')
 else
     ROI(1).name ='A1';
@@ -125,7 +150,7 @@ ColorMap(all(ColorMap==0,2),:)=repmat([1 1 1],sum(all(ColorMap==0,2)),1);
 ColorMap(14+1,1:3) = [0 0 0];
 
 
-for iToPlot = 1%:numel(ToPlot)
+for iToPlot = 2 %[1 3:numel(ToPlot)]
     
     for Target = 1
         
@@ -169,16 +194,23 @@ for iToPlot = 1%:numel(ToPlot)
             end
         end
         
-        for iROI = 1:5 %numel(ROI)
+        for iROI = 1:NbROI
             
             for ihs=1:NbHS
                 
                 for iComp = 1:9
                     
-                    ls_files_2_load = dir(fullfile(Save_dir, ...
-                        sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_201*.mat', ...
-                        Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
-                        ToPlot{iToPlot}, Split_suffix, Comp_suffix{iComp})));
+                    if on_merged_ROI
+                        ls_files_2_load = dir(fullfile(Save_dir, ...
+                            sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_201*.mat', ...
+                            Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
+                            ToPlot{iToPlot}, Comp_suffix{iComp})));
+                    else
+                        ls_files_2_load = dir(fullfile(Save_dir, ...
+                            sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_201*.mat', ...
+                            Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
+                            ToPlot{iToPlot}, Split_suffix, Comp_suffix{iComp})));
+                    end
                     
                     disp(fullfile(Save_dir,ls_files_2_load(end).name))
                     load(fullfile(Save_dir,ls_files_2_load(end).name),...
@@ -214,13 +246,18 @@ for iToPlot = 1%:numel(ToPlot)
             end
         end
         
-        %% Plot with color coding to tell which model wins
         close all
-        clc
         
-        for iROI = 1:numel(Likelihood_norm)
+        for iROI = 1:NbROI
+            
             
             %% FFX
+            opt.FigName = sprintf('BestModel-FFX-3Models-%s-%s-PCM_{grp}-%s-%s-%s-%s-%s', ...
+                ROI(iROI).name, hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot},...
+                UpTriSuffix, SwitchSuffix);
+            
+            figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
+            
             Data2Plot = zeros(15,1);
             for iComp = 1:numel(M_all)
                 
@@ -241,18 +278,12 @@ for iToPlot = 1%:numel(ToPlot)
                 
             end
             
-            opt.FigName = sprintf('BestModel-FFX-3Models-%s-%s-PCM_{grp}-%s-%s-%s-%s-%s', ...
-                ROI(iROI).name, hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot},...
-                UpTriSuffix, SwitchSuffix);
-            
-            figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
-            
             Img2Plot = squareform(Data2Plot);
             if UpperTri
                 Img2Plot = triu(Img2Plot);
             end
             
-            for i=1:4
+            for i=1
                 
                 tmp = Img2Plot;
                 
@@ -296,33 +327,98 @@ for iToPlot = 1%:numel(ToPlot)
                 box off
                 
                 Label_axis(UpperTri,CondNames(ConditionOrder))
-                
+
                 print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '.tif'] ), '-dtiff')
                 %             print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName, '.svg']  ), '-dsvg')
                 
             end
-            close all
             
-            %% RFX
-            Data2Plot = ones(15,3);
-            Alpha2Plot = zeros(15,1);
+            
+            
+            %% RFX: perform bayesian model selection
+            % Compute exceedance probabilities
+            Data2Plot = zeros(15,3);
             for iComp = 1:numel(M_all)
                 
                 loglike = Likelihood{iROI,ihs}(:,2:end-1,iComp);
                 
-                [alpha,exp_r,xp,pxp,bor] = spm_BMS(loglike);
+                % compare the 3 models together
+                [~,~,~,pxp3,~] = spm_BMS(loglike);
+                All_pxp(iComp,:) = pxp3;
+                clear pxp3
                 
-                Data2Plot(PositionToFill(iComp),:) = pxp;
-                Alpha2Plot(PositionToFill(iComp),:) = bor;
+                % compares model 1 and 3 (S Vs I) and then compares the winner to S+I
+                [~,~,~,pxp(iComp,:,1),~] = spm_BMS(loglike(:,[1 3]));
+                [~,~,~,pxp(iComp,:,2),~] = spm_BMS(loglike(:,[1 2]));
+                [~,~,~,pxp(iComp,:,3),~] = spm_BMS(loglike(:,[2 3]));
+                if pxp(iComp,1,1)>pxp(iComp,2,1)
+                    Data2Plot(PositionToFill(iComp),[1 2]) = pxp(iComp,:,2);
+                    Data2Plot(PositionToFill(iComp),3) = eps;
+                else
+                    Data2Plot(PositionToFill(iComp),[2 3]) = pxp(iComp,:,3);
+                    Data2Plot(PositionToFill(iComp),1) = eps;
+                end
+                Data2Plot2(PositionToFill(iComp),:) = [pxp(iComp,1,1) pxp(iComp,2,2) pxp(iComp,2,3)];
+                
             end
             
             
-            %%
-            opt.FigName = sprintf('BestModel-RFX-3Models-%s-%s-PCM_{grp}-%s-%s-%s-%s-%s', ...
+            %% plot the 3 models compared all together
+            opt.FigName = sprintf('BestModel-RFX1-3Models-%s-%s-PCM_{grp}-%s-%s-%s-%s-%s', ...
                 ROI(iROI).name, hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot},...
                 UpTriSuffix, SwitchSuffix);
             
             figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
+            
+            [h,hg,htick]=terplot;
+            hter=ternaryc(All_pxp(:,1),All_pxp(:,2),All_pxp(:,3));
+            hlabels=terlabel('S','S+I','I');
+            
+            set(hter(1:3), 'color', 'k', 'MarkerFaceColor', 'k')
+            set(hter(4:6), 'color', 'r', 'MarkerFaceColor', 'r')
+            
+            set(hter(1:3:9), 'marker', 'o')
+            set(hter(2:3:9), 'marker', 'square')
+            
+            set(hter(:), 'MarkerSize', 12)
+            
+            p=mtit([ROI(iROI).name ' - ' ToPlot{iToPlot}],...
+                'fontsize',14,...
+                'xoff',0,'yoff',.025);
+            
+            print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '_ternary_plot.tif'] ), '-dtiff')
+            
+            
+            %% plot the 3 models compared by pair
+            opt.FigName = sprintf('BestModel-RFX2-3Models-%s-%s-PCM_{grp}-%s-%s-%s-%s-%s', ...
+                ROI(iROI).name, hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot},...
+                UpTriSuffix, SwitchSuffix);
+            
+            figure('name', opt.FigName, 'Position', [50, 50, 1200, 600], 'Color', [1 1 1]);
+            
+            
+            subplot(1,2,1)
+            hold on
+            % plot probability of Scaled when doing Scaled VS Scaled+Independent
+            plot(1:9,pxp(:,1,2),'r', 'linewidth', 2)
+            % plot probability of Scaled+Independent when doing Scaled+Independent VS Independent
+            plot(1:9,pxp(:,1,3),'g', 'linewidth', 2)
+            % plot probability of Scaled when doing Scaled VS Independent
+            plot(1:9,pxp(:,1,1),'k', 'linewidth', 2)            
+            
+            plot([1 9], [.5 .5], '--k')
+            
+            set(gca,'tickdir', 'out', 'xtick', 1:9,'xticklabel', Comp_label, ...
+                'ytick', 0:.1:1,'yticklabel', 0:.1:1, ...
+                'ticklength', [0.01 0.001], 'fontsize', 8)
+           
+            axis([.5 9.5 0 1])
+            
+            legend({'p(S_{S vs S+I})','p(S+I_{S+I vs I})','p(S_{S vs I})'},...
+                'Location','NorthOutside')
+            
+            % plot color scaled of the probability of the second step of the RFX
+            subplot(1,2,2)
             
             L1 = squareform(Data2Plot(:,1));
             L2 = squareform(Data2Plot(:,2));
@@ -341,7 +437,7 @@ for iToPlot = 1%:numel(ToPlot)
             end
             
             
-            for i=1:4
+            for i=1
                 
                 tmp = Img2Plot;
                 
@@ -380,50 +476,89 @@ for iToPlot = 1%:numel(ToPlot)
                 
                 Label_axis(UpperTri,CondNames(ConditionOrder))
                 
-                print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '.tif'] ), '-dtiff')
+                p=mtit([ROI(iROI).name ' - ' ToPlot{iToPlot}],...
+                    'fontsize',14,...
+                    'xoff',0,'yoff',.025);
+                
+                print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
                 %             print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName, '.svg']  ), '-dsvg')
                 
             end
             
         end
         
-        
-        %% Color wheel
-        close all
-        
-        figure('name', 'color wheel','Color', [1 1 1])
-        img = Colour_Wheel('Polar', 90, 1, 1);
-        
-        % make back ground white
-        tmp = all(img==0,3);
-        for i=1:3
-            L = img(:,:,i);
-            L(tmp)=1;
-            img(:,:,i)=L;
-        end
-        
-        % add transparency
-        %         radius = (size(img,2)-1)/2;
-        %         [x y] = meshgrid(-radius:radius, -radius:radius);
-        %         [t r] = cart2pol(x,y);
-        %         for i=1:radius-20
-        %             for RGB=1:3
-        %                 L = img(:,:,RGB);
-        %                 Annulus = all(cat(3,i<r,r<i+1),3);
-        %                 L(Annulus)=L(Annulus)+1*(1-i/(radius-20));
-        %                 img(:,:,RGB)=L;
-        %             end
-        %         end
-        
-        image(img);
-        axis square
-        axis off
-        
-        print(gcf, fullfile(PCM_dir, 'Cdt', 'Color_wheel.tif' ), '-dtiff')
-        %         print(gcf, fullfile(PCM_dir, 'Cdt', 'Color_wheel.svg'  ), '-dsvg')
-        
     end
 end
+
+return
+
+% close all
+
+
+%% Color wheel
+figure('name', 'color wheel','Color', [1 1 1])
+img = Colour_Wheel('Polar', 90, 1, 1);
+
+% make back ground white
+tmp = all(img==0,3);
+for i=1:3
+    L = img(:,:,i);
+    L(tmp)=1;
+    img(:,:,i)=L;
+end
+
+% add transparency
+%         radius = (size(img,2)-1)/2;
+%         [x y] = meshgrid(-radius:radius, -radius:radius);
+%         [t r] = cart2pol(x,y);
+%         for i=1:radius-20
+%             for RGB=1:3
+%                 L = img(:,:,RGB);
+%                 Annulus = all(cat(3,i<r,r<i+1),3);
+%                 L(Annulus)=L(Annulus)+1*(1-i/(radius-20));
+%                 img(:,:,RGB)=L;
+%             end
+%         end
+
+image(img);
+axis square
+axis off
+
+print(gcf, fullfile(PCM_dir, 'Cdt', 'Color_wheel.tif' ), '-dtiff')
+%         print(gcf, fullfile(PCM_dir, 'Cdt', 'Color_wheel.svg'  ), '-dsvg')
+
+
+%% Color scales
+X = 1:-.001:0;
+tmp = zeros(1,1001,3);
+
+figure('name', 'color scales','Color', [1 1 1],'Position', FigDim)
+
+subplot(2,1,1)
+img = tmp;
+img(:,:,1) = X;
+img(:,:,2) = fliplr(X);
+image(img);
+title('S VS S+I')
+set(gca,'tickdir', 'out', 'xtick', linspace(1,1001,11),'xticklabel', linspace(0,1,11), ...
+    'ytick', [],'yticklabel', [], ...
+    'ticklength', [0.01 0.001], 'fontsize', 14)
+box off
+
+subplot(2,1,2)
+img = tmp;
+img(:,:,2) = X;
+img(:,:,3) = fliplr(X);
+image(img);
+title('S+I VS I')
+set(gca,'tickdir', 'out', 'xtick', linspace(1,1001,11),'xticklabel', linspace(0,1,11), ...
+    'ytick', [],'yticklabel', [], ...
+    'ticklength', [0.01 0.001], 'fontsize', 14)
+box off
+
+print(gcf, fullfile(PCM_dir, 'Cdt', 'Color_scales.tif' ), '-dtiff')
+
+
 
 end
 
