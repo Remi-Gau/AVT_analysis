@@ -9,6 +9,8 @@ addpath(genpath(fullfile(Dir, 'Code','MATLAB','From_Web', 'mtit')))
 addpath(genpath(fullfile(Dir, 'Code','MATLAB','From_Web', 'matlab-save-figure')))
 addpath(genpath(fullfile(Dir, 'Code','MATLAB','From_Web', 'myBinomTest')))
 addpath(genpath(fullfile(Dir, 'Code','MATLAB','From_Web', 'herrorbar')))
+addpath(genpath(fullfile(Dir, 'Code','MATLAB','From_Web', 'ternary2')))
+
 
 addpath(genpath(fullfile(Dir, 'GitHub', 'prevalence-permutation-1.1.0')))
 addpath(genpath(fullfile(Dir, 'GitHub', 'pcm_toolbox')))
