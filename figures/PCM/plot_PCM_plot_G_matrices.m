@@ -9,10 +9,13 @@ Get_dependencies('D:\Dropbox/')
 surf = 1; % run of volumne whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
 hs_idpdt = 0;
+on_merged_ROI = 1;
 
-Do_ind = 0;
-Do_group = 1;
-Plot_model_group = 1;
+if on_merged_ROI
+    NbROI = 1;
+else
+    NbROI = 5;
+end
 
 Switch = 1;
 if Switch
@@ -20,14 +23,14 @@ if Switch
     DiagToExtract = [1 8 15 22 29 36];
     
     %     Ac Ai Vc Vi Tc Ti
-%     PositionToFill = [1 7 6 9 8 3 2 5 4 10 14 13 12 11 15];
-%     DiagToFill = [8 1 22 15 36 29];
-%     ConditionOrder = [2 1 4 3 6 5];
+    PositionToFill = [1 7 6 9 8 3 2 5 4 10 14 13 12 11 15];
+    DiagToFill = [8 1 22 15 36 29];
+    ConditionOrder = [2 1 4 3 6 5];
     
     %     Ac Vc Tc Ai Vi Ti
-    DiagToFill = [22 1 29 8 36 15];
-    PositionToFill = [3 13 7 14 10 4 1 5 2 8 15 11 9 6 12];
-    ConditionOrder = [2 4 6 1 3 5];
+    %     DiagToFill = [22 1 29 8 36 15];
+    %     PositionToFill = [3 13 7 14 10 4 1 5 2 8 15 11 9 6 12];
+    %     ConditionOrder = [2 4 6 1 3 5];
     
     
 else
@@ -68,7 +71,9 @@ PCM_dir = fullfile(StartDir, 'figures', 'PCM');
 Save_dir = fullfile(StartDir, 'results', 'PCM', Output_dir);
 
 % to know how many ROIs we have
-if surf
+if on_merged_ROI
+     ROI(1).name ='V2V3';
+elseif surf
     load(fullfile(StartDir, 'sub-02', 'roi', 'surf','sub-02_ROI_VertOfInt.mat'), 'ROI', 'NbVertex')
 else
     ROI(1).name ='A1';
@@ -88,7 +93,7 @@ else
     NbHS = 1;
 end
 
-for iToPlot = 1:2 %numel(ToPlot)
+for iToPlot = 1:4 %numel(ToPlot)
     
     for Target = 1
         
@@ -124,30 +129,27 @@ for iToPlot = 1:2 %numel(ToPlot)
                     };
                 
                 if all(ConditionOrder == [2 4 6 1 3 5])
-                CondNames = {...
-                    'A','A',...
-                    'V','V',...
-                    'T','T'...
-                    };
+                    CondNames = {...
+                        'A','A',...
+                        'V','V',...
+                        'T','T'...
+                        };
                 end
             end
         end
         
-        for iROI = 1:5 %numel(ROI)
+        for iROI = 1:NbROI
             
             for ihs=1:NbHS
                 
                 clear M partVec condVec G G_hat COORD RDMs_CV RDMs T_ind theta_ind G_pred_ind...
                     D T_ind_cross theta_ind_cross T_group theta_gr G_pred_gr T_cross theta_cr G_pred_cr
                 
-                if Do_ind
-                    ls_files_2_load = dir( fullfile(Save_dir, sprintf('PCM_ind_features_%s_%s_%s_%s_%s*.mat', Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs}, ...
+                ls_files_2_load = dir( fullfile(Save_dir, ...
+                    sprintf('PCM_group_features_%s_%s_%s_%s_%s_201*.mat', ...
+                    Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
                         ToPlot{iToPlot})) );
-                else
-                    ls_files_2_load = dir( fullfile(Save_dir, sprintf('PCM_group_features_%s_%s_%s_%s_%s_201*.mat', Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
-                        ToPlot{iToPlot})) );
-                end
-                
+
                 disp(fullfile(Save_dir,ls_files_2_load(end).name))
                 load(fullfile(Save_dir,ls_files_2_load(end).name))
                 
@@ -158,7 +160,7 @@ for iToPlot = 1:2 %numel(ToPlot)
         
         %% G matrix recap figures
         close all
-
+        
         for iROI = 1:numel(G_Mat_all_ROIs)
             
             clc
@@ -183,14 +185,14 @@ for iToPlot = 1:2 %numel(ToPlot)
                     Scaling = '';
                 else
                     Scaling = 'Scaled-log_10-';
-
+                    
                     % normalize the data
                     Sign = sign(Mat2Plot);
                     Mat2Plot = abs(Mat2Plot); %take absolute values to avoid problems when going to log scale
                     Min2Keep = min(Mat2Plot(:));
                     Mat2Plot = Mat2Plot/(min(Mat2Plot(:))); %normalize by minimum value
                     Mat2Plot = log10(Mat2Plot); % log scale
-                    Mat2Plot = Mat2Plot.*Sign; % put the sign back in  
+                    Mat2Plot = Mat2Plot.*Sign; % put the sign back in
                 end
                 
                 opt.FigName = sprintf('%s-PCM_{grp}-%s-%s-%s-%s', ROI(iROI).name,...
@@ -198,7 +200,7 @@ for iToPlot = 1:2 %numel(ToPlot)
                 
                 fig = figure('name', ['Recap-G-matrix-' Scaling opt.FigName], ...
                     'Position', FigDim, 'Color', [1 1 1]);
-
+                
                 % adapts color scale so that 0 is white
                 MIN = min(Mat2Plot(:));
                 MAX = max(Mat2Plot(:));
@@ -227,24 +229,25 @@ for iToPlot = 1:2 %numel(ToPlot)
                 colorbar
                 
                 % Add white lines
-%                 Pos = 2.5;
-%                 for  i=1:2
-%                     plot([Pos Pos],[0.52 6.52],'w','linewidth', 3)
-%                     plot([0.52 6.52],[Pos Pos],'w','linewidth', 3)
-%                     Pos = Pos + 2 ;
-%                 end
+                if all(ConditionOrder == [2 4 6 1 3 5])
+                    plot([3.5 3.5],[0.52 6.52],'w','linewidth', 3)
+                    plot([0.52 6.52],[3.5 3.5],'w','linewidth', 3)
+                else
+                    Pos = 2.5;
+                    for  i=1:2
+                        plot([Pos Pos],[0.52 6.52],'w','linewidth', 3)
+                        plot([0.52 6.52],[Pos Pos],'w','linewidth', 3)
+                        Pos = Pos + 2 ;
+                    end
+                end
                 
-                plot([3.5 3.5],[0.52 6.52],'w','linewidth', 3)
-                plot([0.52 6.52],[3.5 3.5],'w','linewidth', 3)
-
-                
-                
+                % add black line contours
                 plot([0.5 0.5],[0.51 6.51],'k','linewidth', 1)
                 plot([6.5 6.5],[0.51 6.51],'k','linewidth', 1)
                 plot([0.51 6.51],[0.5 0.5],'k','linewidth', 1)
                 plot([0.51 6.51],[6.5 6.5],'k','linewidth', 1)
                 
-%                 axis tight
+                %                 axis tight
                 axis square
                 box off
                 
@@ -253,7 +256,7 @@ for iToPlot = 1:2 %numel(ToPlot)
                 print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif']  ), '-dtiff')
                 %                 print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.svg']  ), '-dsvg')
                 
-                %%
+                %% Print log and non-log scale together
                 if iScale==2
                     % Create a scale with the original values
                     fig = figure('name', ['Scale-G-matrix-' Scaling opt.FigName], ...
