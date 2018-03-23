@@ -35,8 +35,8 @@ for iSub = 1:NbSub
     
     Sub_dir = fullfile(StartDir, SubLs(iSub).name);
     GLM_dir = fullfile(Sub_dir, 'ffx_rsa');
-    Data_dir = fullfile('E:\derivatives', SubLs(iSub).name, 'ffx_rsa', 'betas','6_surf');
-    %     Data_dir = fullfile(GLM_dir,'betas','6_surf');
+%     Data_dir = fullfile('E:\derivatives', SubLs(iSub).name, 'ffx_rsa', 'betas','6_surf');
+        Data_dir = fullfile(GLM_dir,'betas','6_surf');
     
     
     % Get number of sessions, regressors of interest numbers, and names of conditions
@@ -181,7 +181,7 @@ for iSub = 1:NbSub
     
     
     %%
-    %     mkdir(fullfile(Sub_dir,'results','profiles','surf','PCM'))
+        mkdir(fullfile(Sub_dir,'results','profiles','surf','PCM'))
     save(fullfile(Sub_dir,'results','profiles','surf','PCM','Data_PCM.mat'), '-v7.3',  ...
         'PCM_data')
     

@@ -13,6 +13,10 @@ else
     SaveSufix = '_results_surf';
 end
 
+if opt.MVNN
+    SaveSufix = [SaveSufix '_mvnn-1']; %#ok<*AGROW>
+end
+
 if opt.fs.do
     SaveSufix = [SaveSufix '_fs-1']; %#ok<*AGROW>
 end
@@ -57,6 +61,10 @@ if opt.scaling.feat.sessmean
     SaveSufix = [SaveSufix '-SessMeanCent'];
 end
 
+if isfield(opt, 'ToPlot')
+    SaveSufix = [SaveSufix '_' opt.toplot];
+end
+
 if exist('NbLayers', 'var')
 SaveSufix = [SaveSufix '_l-' num2str(NbLayers)];
 end
@@ -66,6 +74,8 @@ SaveSufix = [SaveSufix '_s-' num2str(FWHM)  '.mat'];
 else
     SaveSufix = [SaveSufix '.mat'];
 end
+
+
 
 end
 

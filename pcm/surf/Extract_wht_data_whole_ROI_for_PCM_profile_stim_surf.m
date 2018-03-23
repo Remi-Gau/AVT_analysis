@@ -2,6 +2,7 @@ clc; clear;
 
 StartDir = fullfile(pwd, '..','..','..');
 addpath(genpath(fullfile(StartDir, 'code','subfun')))
+Get_dependencies('/home/rxg243/Dropbox/')
 Get_dependencies('D:\Dropbox\')
 
 cd(StartDir)
@@ -19,7 +20,7 @@ CondNames = {...
     'TTargL','TTargR',...
     };
 
-for iSub = 5%1:NbSub
+for iSub = 1:NbSub
     
     fprintf('\n\n\n')
     
@@ -27,8 +28,8 @@ for iSub = 5%1:NbSub
     
     Sub_dir = fullfile(StartDir, SubLs(iSub).name);
     GLM_dir = fullfile(Sub_dir, 'ffx_rsa');
-    Data_dir = fullfile('E:\derivatives', SubLs(iSub).name, 'ffx_rsa', 'betas','6_surf');
-    %     Data_dir = fullfile(GLM_dir,'betas','6_surf');
+%     Data_dir = fullfile('E:\derivatives', SubLs(iSub).name, 'ffx_rsa', 'betas','6_surf');
+        Data_dir = fullfile(GLM_dir,'betas','6_surf');
     
     
     % Get number of sessions, regressors of interest numbers, and names of conditions
