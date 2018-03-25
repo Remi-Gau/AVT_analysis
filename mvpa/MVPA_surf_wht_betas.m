@@ -7,7 +7,7 @@ addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 
 NbLayers = 6;
 
-NbWorkers = 3;
+NbWorkers = 6;
 
 
 % Options for the SVM
@@ -83,6 +83,28 @@ SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 
 
+
+SVM_Ori(end+1) = struct('name', 'A_L VS A_R', 'class', [1 2], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+SVM_Ori(end+1) = struct('name', 'V_L VS V_R', 'class', [3 4], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+SVM_Ori(end+1) = struct('name', 'T_L VS T_R', 'class', [5 6], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+
+% SVM_Ori(end+1) = struct('name', 'A_L VS V_L', 'class', [1 3], ...
+% 'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+SVM_Ori(end+1) = struct('name', 'A_L VS T_L', 'class', [1 5], ...
+    'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 0);
+SVM_Ori(end+1) = struct('name', 'V_L VS T_L', 'class', [3 5], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+
+% SVM_Ori(end+1) = struct('name', 'A_R VS V_R', 'class', [2 4], ...
+% 'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+SVM_Ori(end+1) = struct('name', 'A_R VS T_R', 'class', [2 6], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+SVM_Ori(end+1) = struct('name', 'V_R VS T_R', 'class', [4 6], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+
 % --------------------------------------------------------- %
 %          Data pre-processing and SVM parameters           %
 % --------------------------------------------------------- %
@@ -134,7 +156,7 @@ opt.session.maxcv = 25;
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
-for iToPlot = 1:numel(ToPlot)
+for iToPlot = [2 4]
     
     opt.toplot = ToPlot{iToPlot};
     
@@ -179,7 +201,7 @@ for iToPlot = 1:numel(ToPlot)
         
         partitionVec = repmat((1:Nb_sess)',numel(CondNames)*2,1);
         
-        if iToPlot==4
+        if iToPlot==4 && iSub==5
             % remove lines corresponding to auditory stim and
             % targets for sub-06
             ToRemove = all([any([conditionVec<3 conditionVec==7 conditionVec==8],2) partitionVec==17],2);
@@ -192,11 +214,7 @@ for iToPlot = 1:numel(ToPlot)
         partitionVec(conditionVec>6)=0;
         conditionVec(conditionVec>6)=0;
         %         conditionVec(conditionVec>6)=conditionVec(conditionVec>6)-6;
-        
-        CV_Mat_Orig = [conditionVec partitionVec];
-        CV_Mat_Orig(conditionVec==0,:) = [];
-        
-        
+
         %% Read features
         fprintf(' Reading features\n')
         if iToPlot<4
@@ -209,12 +227,9 @@ for iToPlot = 1:numel(ToPlot)
         else
             FeatureSaveFile = 'Data_PCM_whole_ROI.mat';
             load(fullfile(Data_dir,FeatureSaveFile), 'PCM_data')
-            for iROI = 1:numel(ROI)
-                Data{iROI,1} = PCM_data{iROI,1};
-                Data{iROI,2} = PCM_data{iROI,2};
-            end
+            Data = PCM_data;
         end
-        
+        clear PCM_data
         
         %% Remove extra data and checks for zeros and NANs
         for iROI = 1:numel(ROI)
@@ -223,31 +238,82 @@ for iToPlot = 1:numel(ToPlot)
             Data{iROI,2}(conditionVec==0,:)=[];
             
             % Remove nans
-            ToRemove = find(any(isnan(Data{iROI,1})));
-            Data{iROI,1}(:,ToRemove)=[];
-            ToRemove = find(any(isnan(Data{iROI,2})));
-            Data{iROI,2}(:,ToRemove)=[];
+            if iToPlot==4
+                % reshape data to remove a whole vertex even if it has one
+                % NAN
+                Data{iROI,1} = reshape(Data{iROI,1}, ...
+                    [size(Data{iROI,1},1), NbLayers, numel(ROI(iROI).VertOfInt{1})]);
+                Data{iROI,2} = reshape(Data{iROI,2}, ...
+                    [size(Data{iROI,2},1), NbLayers, numel(ROI(iROI).VertOfInt{2})]);
+                
+                ToRemove = find(any(any(isnan(Data{iROI,1}))));
+                Data{iROI,1}(:,:,ToRemove)=[];
+                ToRemove = find(any(any(isnan(Data{iROI,2}))));
+                Data{iROI,2}(:,:,ToRemove)=[];
+                
+                % Puts them back in original shape
+                Data{iROI,1} = reshape(Data{iROI,1}, ...
+                    [size(Data{iROI,1},1), NbLayers*size(Data{iROI,1},3)]);
+                Data{iROI,2} = reshape(Data{iROI,2}, ...
+                    [size(Data{iROI,2},1), NbLayers*size(Data{iROI,2},3)]);
+            else
+                ToRemove = find(any(isnan(Data{iROI,1})));
+                Data{iROI,1}(:,ToRemove)=[];
+                ToRemove = find(any(isnan(Data{iROI,2})));
+                Data{iROI,2}(:,ToRemove)=[];
+            end
+            clear ToRemove
             
             if any(all(isnan(Data{iROI,1}),2)) || any(all(Data{iROI,1}==0,2)) || ...
                     any(all(isnan(Data{iROI,2}),2)) || any(all(Data{iROI,2}==0,2))
-                error('We have some NaNs issue.')
+                warning('We have some NaNs or zeros issue: ignore if sub-06')
+                ZeroRowsToRemove(:,iROI) = any([all(isnan(Data{iROI,1}),2) all(Data{iROI,1}==0,2) ...
+                    all(isnan(Data{iROI,2}),2) all(Data{iROI,2}==0,2)],2);
+                Data{iROI,1}(ZeroRowsToRemove(:,iROI),:) = [];
+                Data{iROI,2}(ZeroRowsToRemove(:,iROI),:) = [];
             end
             
-            % check that we have the same number of conditions in each partition
-            A = tabulate(CV_Mat_Orig(:,2));
-            A = A(:,1:2);
-            if numel(unique(A(:,2)))>1
-                warning('We have different numbers of conditions in at least one partition.')
-                Sess2Remove = find(A(:,2)<numel(unique(conditionVec)));
-                conditionVec(ismember(partitionVec,Sess2Remove)) = [];
-                Data{iROI,1}(ismember(partitionVec,Sess2Remove),:) = [];
-                Data{iROI,2}(ismember(partitionVec,Sess2Remove),:) = [];
-                partitionVec(ismember(partitionVec,Sess2Remove)) = [];
-                Sess2Remove = [];
+            % construc a vector that identify what column belongs to which
+            % layer
+            if iToPlot==4
+                FeaturesLayers{iROI,1} = ...
+                    repmat(NbLayers:-1:1, 1, size(Data{iROI,1},2)/NbLayers);
+                FeaturesLayers{iROI,2} = ...
+                    repmat(NbLayers:-1:1, 1, size(Data{iROI,2},2)/NbLayers);
             end
+            
         end
         
+        if exist('ZeroRowsToRemove', 'var')
+            partitionVec(any(ZeroRowsToRemove,2),:)=[];
+            conditionVec(any(ZeroRowsToRemove,2),:)=[];
+        end
+        
+        CV_Mat_Orig = [conditionVec partitionVec];
+        CV_Mat_Orig(conditionVec==0,:) = [];
+        partitionVec(conditionVec==0,:) = [];
+        conditionVec(conditionVec==0,:) = [];
+        
+     
+        %% check that we have the same number of conditions in each partition
+        A = tabulate(CV_Mat_Orig(:,2));
+        A = A(:,1:2);
+        if numel(unique(A(:,2)))>1
+            warning('We have different numbers of conditions in at least one partition.')
+            Sess2Remove = find(A(:,2)<numel(unique(conditionVec)));
+            conditionVec(ismember(partitionVec,Sess2Remove)) = [];
+            for iROI = 1:numel(ROI)
+                Data{iROI,1}(ismember(partitionVec,Sess2Remove),:) = [];
+                Data{iROI,2}(ismember(partitionVec,Sess2Remove),:) = [];
+            end
+            CV_Mat_Orig(ismember(partitionVec,Sess2Remove),:) = [];
+            partitionVec(ismember(partitionVec,Sess2Remove)) = [];
+            Sess2Remove = [];
+        end
+        clear A Sess2Remove
 
+        
+        
         %% Run for different type of normalization
         for Norm = 6
             
@@ -357,6 +423,12 @@ for iToPlot = 1:numel(ToPlot)
                     
                     FeaturesBoth = FeaturesAll{iROI,1};
                     LogFeatBoth= ~any(isnan(FeaturesBoth));
+                    if iToPlot==4
+                        FeaturesLayersBoth = ...
+                            [FeaturesLayers{iROI,1} FeaturesLayers{iROI,2}];
+                    else
+                        FeaturesLayersBoth = [];
+                    end
                     
                     % RNG init
                     rng('default');
@@ -403,7 +475,7 @@ for iToPlot = 1:numel(ToPlot)
                                 %     TestSessList{i,1} = cartProd;
                                 %end
                             end
-                        else         
+                        else
                             if opt.session.loro
                                 TestSessList{1,1} = (1:sum(RunPerSes))';
                                 if iSub==5
@@ -456,8 +528,7 @@ for iToPlot = 1:numel(ToPlot)
                                 
                                 fprintf(1,'    [%s]\n    [ ',repmat('.',1,NbCV));
                                 parfor iCV=1:NbCV
-                                    
-                                    fprintf(1,'\b.\n');
+                                    fprintf(1,'.');
                                     
                                     TestSess = []; %#ok<NASGU>
                                     TrainSess = []; %#ok<NASGU>
@@ -472,15 +543,44 @@ for iToPlot = 1:numel(ToPlot)
                                     
                                     TEMP(iCV,1).results = {results};
                                     TEMP(iCV,1).acc = mean(results.pred==results.label);
-                                    
                                 end
                                 fprintf(1,'\b]\n');
+                                
+                                %do the same but layer by layer if needed
+                                if iToPlot==4
+                                    fprintf(1,'    [%s]\n    [ ',repmat('.',1,NbCV));
+                                    parfor iCV=1:NbCV
+                                        fprintf(1,'.');
+                                        
+                                        TestSess = []; %#ok<NASGU>
+                                        TrainSess = []; %#ok<NASGU>
+                                        
+                                        % Separate training and test sessions
+                                        [TestSess, TrainSess] = deal(false(size(1:Nb_sess)));
+                                        
+                                        TestSess(TestSessList{iSubSampSess,1}(iCV,:)) = 1; %#ok<*PFBNS>
+                                        TrainSess(setdiff(CV_id(iSubSampSess,:), TestSessList{iSubSampSess,1}(iCV,:)) )= 1;
+                                        
+                                        [acc_layer, results_layer, ~] = RunSVM(SVM, FeaturesBoth, LogFeatBoth, FeaturesLayersBoth, CV_Mat, TrainSess, TestSess, opt, iSVM);
+                                        TEMP(iCV,1).layers.results = {results_layer};
+                                        TEMP(iCV,1).layers.acc = acc_layer;
+                                    end
+                                    fprintf(1,'\b]\n');
+                                end
                                 
                                 for iCV=1:NbCV
                                     SVM(iSVM).ROI(ROI_idx).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,1).results = ...
                                         TEMP(iCV,1).results;
                                     SVM(iSVM).ROI(ROI_idx).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,1).acc = ...
                                         TEMP(iCV,1).acc;
+                                    
+                                    if iToPlot==4
+                                        SVM(iSVM).ROI(ROI_idx).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,1).layers.results =...
+                                            TEMP(iCV,1).layers.results;
+                                        SVM(iSVM).ROI(ROI_idx).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,1).layers.acc = ...
+                                            TEMP(iCV,1).layers.acc;
+                                    end
+                                    
                                 end
                                 
                             end % iPerm=1:NbPerm
@@ -496,9 +596,20 @@ for iToPlot = 1:numel(ToPlot)
                     Class_Acc.TotAcc(1) = ...
                         nanmean([SVM(iSVM).ROI(ROI_idx).session(end).rand.perm(1).CV(:,1).acc]);
                     
+                    if iToPlot==4
+                        for iCV=1:size(CV_id, 2)
+                            temp(:,:,iCV) = SVM(iSVM).ROI(ROI_idx).session(end).rand.perm(1).CV(iCV,1).layers.acc;
+                        end
+                        Class_Acc.TotAccLayers{1} = nanmean(temp,3);
+                        temp = [];
+                    end
+                    
                     % Display some results
                     if NbPerm==1
                         disp(Class_Acc.TotAcc(:))
+                        if iToPlot==4
+                            disp(Class_Acc.TotAccLayers{1})
+                        end
                     end
                     
                     % Save data
@@ -533,5 +644,34 @@ end
 function SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, iROI, SaveSufix) %#ok<INUSL>
 
 save(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]), 'Results', 'opt', 'Class_Acc', '-v7.3');
+
+end
+
+function [acc_layer, results_layer, weight] = RunSVM(SVM, Features, LogFeat, FeaturesLayers, CV_Mat, TrainSess, TestSess, opt, iSVM)
+
+if isempty(Features) || all(Features(:)==Inf)
+    
+    warning('Empty ROI')
+    
+    acc_layer = NaN;
+    results_layer = struct();
+    weight = [];
+    
+else
+    
+    if ~opt.permutation.test
+        [acc_layer, weight, results_layer] = machine_SVC_layers(SVM(iSVM), ...
+            Features(:,LogFeat), FeaturesLayers(:,LogFeat), CV_Mat, TrainSess, TestSess, opt);
+    else
+        acc_layer = NaN;
+        results_layer = struct();
+        weight = [];
+    end
+    
+    if opt.verbose
+        fprintf('\n       Running on all layers.')
+    end
+    
+end
 
 end

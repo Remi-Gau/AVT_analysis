@@ -61,7 +61,7 @@ if opt.scaling.feat.sessmean
     SaveSufix = [SaveSufix '-SessMeanCent'];
 end
 
-if isfield(opt, 'ToPlot')
+if isfield(opt, 'toplot')
     SaveSufix = [SaveSufix '_' opt.toplot];
 end
 
