@@ -63,7 +63,7 @@ ToPlot={'Constant','Linear','Quadratic'};
 
 for iToPlot = 1 %:numel(ToPlot)
     
-    for iROI = 1:numel(ROI)
+    for iROI = 1 %:numel(ROI)
         
         close all
         
@@ -71,7 +71,7 @@ for iToPlot = 1 %:numel(ToPlot)
         
         fprintf('    %s\n',ROI(iROI).name)
         
-        for iCdt = 1:6
+        for iCdt = 1%:6
             
             clear Sorting_Raster
             
@@ -174,9 +174,9 @@ for iToPlot = 1 %:numel(ToPlot)
                 [imind,cm] = rgb2ind(im,256);
                 
 
-                imwrite(imind,cm,FileName,'tiff');
+%                 imwrite(imind,cm,FileName,'tiff');
 
-                close all
+%                 close all
 
             
         end
