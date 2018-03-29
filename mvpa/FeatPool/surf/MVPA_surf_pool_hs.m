@@ -7,14 +7,14 @@ addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 
 NbLayers = 6;
 
-NbWorkers = 8;
+NbWorkers = 6;
 
 
 % Options for the SVM
 opt.fs.do = 0; % feature selection
 opt.rfe.do = 0; % recursive feature elimination
 opt.scaling.idpdt = 1; % scale test and training sets independently
-opt.permutation.test = 1;  % do permutation test
+opt.permutation.test = 1;  % do label permutation test
 opt.session.curve = 0; % learning curves on a subsample of all the sessions
 opt.session.proptest = 0.2; % proportion of all sessions to keep as a test set
 opt.verbose = 0;
@@ -64,17 +64,23 @@ ROIs_ori = {
 % --------------------------------------------------------- %
 %                     Analysis to perform                   %
 % --------------------------------------------------------- %
-% SVM_Ori(1) = struct('name', 'A Ipsi VS Contra', 'class', [1 2], 'ROI_2_analyse', 1);
+% SVM_Ori(1) = struct('name', 'A Ipsi VS Contra', 'class', [1 2], 'ROI_2_analyse', 1:numel(ROIs_ori));
 % SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [3 4], 'ROI_2_analyse', 1:numel(ROIs_ori));
 % SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
-
+% 
 % SVM_Ori(end+1) = struct('name', 'A VS V Ipsi', 'class', [1 3], 'ROI_2_analyse', 1:numel(ROIs_ori));
+% SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], 'ROI_2_analyse', 1:numel(ROIs_ori));
+% SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [3 5], 'ROI_2_analyse', 1:numel(ROIs_ori));
+
 SVM_Ori(1) = struct('name', 'A VS T Ipsi', 'class', [1 5], 'ROI_2_analyse',3);
-% SVM_Ori(1) = struct('name', 'V VS T Ipsi', 'class', [3 5], 'ROI_2_analyse', 1);
+%SVM_Ori(1) = struct('name', 'V VS T Ipsi', 'class', [3 5], 'ROI_2_analyse', 1);
 
 % SVM_Ori(end+1) = struct('name', 'A VS V Contra', 'class', [2 4], 'ROI_2_analyse', 1:numel(ROIs_ori));
+% SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
+% SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
+
 SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], 'ROI_2_analyse', 3);
-% SVM_Ori(1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse', 1);
+%SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse', 1);
 
 
 % --------------------------------------------------------- %
@@ -112,12 +118,15 @@ else
     opt.permutation.nreps = 1;
 end
 
+% CV scheme
+opt.session.loro = 1;
+
 % Learning curve
 % #repetitions for session subsampling if needed
 opt.session.subsample.nreps = 30;
 
 % Maximum numbers of CVs
-opt.session.maxcv = 25;
+opt.session.maxcv = 100;
 
 
 % -------------------------%
@@ -129,7 +138,7 @@ SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
 
-for iSub = 2:NbSub    
+for iSub = 8:NbSub    
     
     % --------------------------------------------------------- %
     %                        Subject data                       %
@@ -256,7 +265,7 @@ for iSub = 2:NbSub
         
     end
     
-    %% Run for different type of normalization
+    %% Run for different type of normalization/scaling
     for Norm = 6
         
         switch Norm
@@ -358,11 +367,13 @@ for iSub = 2:NbSub
                     
                     % All possible ways of only choosing X sessions of the total
                     CV_id = nchoosek(1:NbRuns, NbSess2Incl);
-                    CV_id = CV_id(randperm(size(CV_id, 1)),:);
-                    
+
                     % Limits the number of permutation if too many
-                    if size(CV_id, 1) > opt.session.subsample.nreps
-                        CV_id = CV_id(1:opt.session.subsample.nreps,:);
+                    if opt.session.curve
+                        CV_id = CV_id(randperm(size(CV_id, 1)),:);
+                        if size(CV_id, 1) > opt.session.subsample.nreps
+                            CV_id = CV_id(1:opt.session.subsample.nreps,:);
+                        end
                     end
                     
                     % Defines the test sessions for the CV: take one
@@ -377,11 +388,12 @@ for iSub = 2:NbSub
                         RunPerSes(1)+RunPerSes(2)+1:sum(RunPerSes)};
                     [x, y, z] = ndgrid(sets{:});
                     cartProd = [x(:) y(:) z(:)];
-                    clear x y z RunPerSes Idx
+                    clear x y z Idx
                     
                     % Test sets for the different CVs
                     if opt.session.curve
                         for i=1:size(CV_id,1)
+                            error('not implemented')
                             % Limits to CV max
                             %TestSessList{i,1} = nchoosek(CV_id(i,:), floor(opt.session.proptest*NbSess2Incl));
                             %TestSessList{i,1} = TestSessList{i,1}(randperm(size(TestSessList{i,1},1)),:);
@@ -393,13 +405,20 @@ for iSub = 2:NbSub
                             %end
                         end
                     else
-                        TestSessList{1,1} = cartProd; % take all possible CVs
-                        if opt.permutation.test % limits the number of CV for permutation
-                            cartProd = cartProd(randperm(size(cartProd,1)),:);
-                            TestSessList{1,1} = cartProd(1:opt.session.maxcv,:);
+                        if opt.session.loro
+                            TestSessList{1,1} = (1:sum(RunPerSes))';
+                            if iSub==5
+                                TestSessList{1,1}(TestSessList{1,1}==17) = [];
+                            end
+                        else
+                            TestSessList{1,1} = cartProd; % take all possible CVs
+                            if opt.permutation.test % limits the number of CV for permutation
+                                cartProd = cartProd(randperm(size(cartProd,1)),:);
+                                TestSessList{1,1} = cartProd(1:opt.session.maxcv,:);
+                            end
                         end
                     end
-                    clear cartProd
+                    clear cartProd RunPerSes
                     
                     
                     %% Subsampled sessions loop
@@ -441,8 +460,8 @@ for iSub = 2:NbSub
                             
                             fprintf(1,'    [%s]\n    [ ',repmat('.',1,NbCV));
                             parfor iCV=1:NbCV
-                                
-                                fprintf(1,'\b.\n');
+%                                 fprintf(1,'\b.\n')
+                                fprintf(1,'.')
                                 
                                 TestSess = []; %#ok<NASGU>
                                 TrainSess = []; %#ok<NASGU>
@@ -461,6 +480,7 @@ for iSub = 2:NbSub
                                 TEMP(iCV,1).acc = mean(results.pred==results.label);
                                 
                             end
+%                             fprintf(1,'\b]\n');
                             fprintf(1,'\b]\n');
                             
                             for iCV=1:NbCV
@@ -492,7 +512,7 @@ for iSub = 2:NbSub
                 %% Calculate prediction accuracies
                 Class_Acc.TotAcc(1) = ...
                     nanmean([SVM(iSVM).ROI(ROI_idx).session(end).rand.perm(1).CV(:,1).acc]);
-                for iCV=1:size(CV_id, 2)
+                for iCV=1:NbCV
                     temp(:,:,iCV) = SVM(iSVM).ROI(ROI_idx).session(end).rand.perm(1).CV(iCV,1).layers.acc;
                 end
                 Class_Acc.TotAccLayers{1} = nanmean(temp,3);
@@ -510,6 +530,11 @@ for iSub = 2:NbSub
                 % Save data
                 Results = SVM(iSVM).ROI(ROI_idx);
                 SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, ROI_idx, SaveSufix)
+
+                subject = sprintf('Analysis subject %s - SVM %s - ROI %s : done', ...
+                    SubLs(iSub).name, SVM(iSVM).name, SVM(iSVM).ROI(ROI_idx).name);
+                message = sprintf('Accuracy = %f', Class_Acc.TotAcc(:));
+                matlabmail('remi_gau@hotmail.com', message, subject);
                 
                 clear Results
                 
@@ -523,6 +548,10 @@ for iSub = 2:NbSub
         
     end % for Norm = 6:7
     clear Features RegNumbers
+    
+    subject = sprintf('Analysis subject %s : done', ...
+        SubLs(iSub).name);
+    matlabmail('remi_gau@hotmail.com', 'done', subject);
     
 end % for iSub = 1:NbSub
 

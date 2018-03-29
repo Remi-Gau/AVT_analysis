@@ -12,6 +12,11 @@ axPos(4) = YDim;
 axes('Position',axPos);
 hold on
 
+MAX = max(abs(Values2Plot))*1.25;
+Axis(3) = MAX*-1;
+Axis(4) = MAX;
+
+
 plot([0.9 1.9],[0 0],':k', 'linewidth', 2)
 
 if isempty(ToPermute)
@@ -28,10 +33,10 @@ if P<0.001
 else
     Sig = sprintf('\np=%.3f ',P);
 end
-t = text(.95,Axis(4),sprintf(Sig));
-set(t,'fontsize',6);
+t = text(.95,0.05,sprintf(Sig));
+set(t,'fontsize',10);
 
-if P<.05
+if P<.01
     set(t,'color','r');
 end
 
@@ -45,7 +50,7 @@ h = plotSpread(Values2Plot', ...
 set(h{1}, 'MarkerSize', 9, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'k', 'LineWidth', 1)
 
 set(gca,'tickdir', 'out', 'ticklength', [0.01 0.01], 'fontsize', 6, ...
-    'xtick', 1.1 ,'xticklabel',XTickLabel, 'ytick', -3:.5:3 ,'yticklabel', -3:.5:3,...
+    'xtick', 1.1 ,'xticklabel',[], 'ytick', -3:.015:3 ,'yticklabel', -3:.015:3,...
     'ygrid', 'on')
 axis(Axis)
 
