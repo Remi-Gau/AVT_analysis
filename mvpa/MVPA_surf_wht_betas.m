@@ -72,14 +72,14 @@ SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 
 SVM_Ori(end+1) = struct('name', 'A VS V Ipsi', 'class', [1 3], ...
-'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], ...
     'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 1);
 SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [3 5], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 
 SVM_Ori(end+1) = struct('name', 'A VS V Contra', 'class', [2 4], ...
-'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], ...
@@ -95,14 +95,14 @@ SVM_Ori(end+1) = struct('name', 'T_L VS T_R', 'class', [5 6], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
 
 SVM_Ori(end+1) = struct('name', 'A_L VS V_L', 'class', [1 3], ...
-'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
 SVM_Ori(end+1) = struct('name', 'A_L VS T_L', 'class', [1 5], ...
     'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 0);
 SVM_Ori(end+1) = struct('name', 'V_L VS T_L', 'class', [3 5], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
 
 SVM_Ori(end+1) = struct('name', 'A_R VS V_R', 'class', [2 4], ...
-'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
 SVM_Ori(end+1) = struct('name', 'A_R VS T_R', 'class', [2 6], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
 SVM_Ori(end+1) = struct('name', 'V_R VS T_R', 'class', [4 6], ...
@@ -159,11 +159,11 @@ opt.session.maxcv = 25;
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
-for iToPlot = 1:2
+for iToPlot = 4
     
     opt.toplot = ToPlot{iToPlot};
     
-    for iSub = 9 %1:NbSub
+    for iSub = 1:5 %NbSub
         
         % --------------------------------------------------------- %
         %                        Subject data                       %
@@ -211,13 +211,14 @@ for iToPlot = 1:2
             
             partitionVec(ToRemove) = [];
             conditionVec(ToRemove) = [];
+            clear ToRemove
         end
         
         % "remove" rows corresponding to targets
         partitionVec(conditionVec>6)=0;
         conditionVec(conditionVec>6)=0;
         %         conditionVec(conditionVec>6)=conditionVec(conditionVec>6)-6;
-
+        
         %% Read features
         fprintf(' Reading features\n')
         if iToPlot<4
@@ -250,9 +251,9 @@ for iToPlot = 1:2
                     [size(Data{iROI,2},1), NbLayers, numel(ROI(iROI).VertOfInt{2})]);
                 
                 ToRemove = find(any(any(isnan(Data{iROI,1}))));
-                Data{iROI,1}(:,:,ToRemove)=[];
+                Data{iROI,1}(:,:,ToRemove)=[]; clear ToRemove
                 ToRemove = find(any(any(isnan(Data{iROI,2}))));
-                Data{iROI,2}(:,:,ToRemove)=[];
+                Data{iROI,2}(:,:,ToRemove)=[]; clear ToRemove
                 
                 % Puts them back in original shape
                 Data{iROI,1} = reshape(Data{iROI,1}, ...
@@ -261,11 +262,11 @@ for iToPlot = 1:2
                     [size(Data{iROI,2},1), NbLayers*size(Data{iROI,2},3)]);
             else
                 ToRemove = find(any(isnan(Data{iROI,1})));
-                Data{iROI,1}(:,ToRemove)=[];
+                Data{iROI,1}(:,ToRemove)=[]; clear ToRemove
                 ToRemove = find(any(isnan(Data{iROI,2})));
-                Data{iROI,2}(:,ToRemove)=[];
+                Data{iROI,2}(:,ToRemove)=[]; clear ToRemove
             end
-            clear ToRemove
+           
             
             if any(all(isnan(Data{iROI,1}),2)) || any(all(Data{iROI,1}==0,2)) || ...
                     any(all(isnan(Data{iROI,2}),2)) || any(all(Data{iROI,2}==0,2))
@@ -291,13 +292,14 @@ for iToPlot = 1:2
             partitionVec(any(ZeroRowsToRemove,2),:)=[];
             conditionVec(any(ZeroRowsToRemove,2),:)=[];
         end
+        clear ZeroRowsToRemove
         
         CV_Mat_Orig = [conditionVec partitionVec];
         CV_Mat_Orig(conditionVec==0,:) = [];
         partitionVec(conditionVec==0,:) = [];
         conditionVec(conditionVec==0,:) = [];
         
-     
+        
         %% check that we have the same number of conditions in each partition
         A = tabulate(CV_Mat_Orig(:,2));
         A = A(:,1:2);
@@ -314,7 +316,7 @@ for iToPlot = 1:2
             Sess2Remove = [];
         end
         clear A Sess2Remove
-
+        
         
         
         %% Run for different type of normalization

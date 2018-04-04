@@ -47,6 +47,8 @@ TitSuf = {
     'Between_Senses-IC';...
     'Left_vs_Right';...
     'Between_Senses-LR';...
+    'Between_Senses-AvsV-IC';...
+    'Between_Senses-AvsV-LR';...
     };
 
 SubSVM = [1:3;4:6;7:9;10:12;13:15;16:18];
@@ -69,7 +71,7 @@ opt.scaling.feat.sessmean = 0;
 
 ParamToPlot={'Cst','Lin','Avg','ROI'};
 
-for iToPlot = 2
+for iToPlot = 4
     
     opt.toplot = ParamToPlot{iToPlot};
     
@@ -100,6 +102,7 @@ for iToPlot = 2
         ToPlot.Visible= 'on';
         ToPlot.FigureFolder=FigureFolder;
         ToPlot.OneSideTTest = {'both' 'both'};
+%         ToPlot.plot_subjects = 1;
         
         ToPlot.profile.MEAN=[];
         ToPlot.profile.SEM=[];
@@ -219,6 +222,58 @@ for iToPlot = 2
                 
                 ToPlot.Titles{1,1} = '[A VS T]';
                 ToPlot.Titles{2,1} = '[V VS T]';
+                
+                
+            case 5
+                % Same for the MVPA data (contra)
+                ToPlot.Col = 1;
+                ToPlot.Row = 1:2;
+                ToPlot.Cdt = [...
+                    1 1;...
+                    1 1];
+                Data = Get_data_MVPA(1:5,SubSVM,3,SVM);
+                ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+                
+                % Same for the MVPA data (ipsi)
+                ToPlot.Col = 2;
+                Data = Get_data_MVPA(1:5,SubSVM,2,SVM);
+                ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+                
+                % Defines the number of subplots on each figure
+                ToPlot.m=1;
+                ToPlot.n=2;
+                ToPlot.SubPlots = {1,2};
+                
+                Legend{1,2} = 'ipsi';
+                Legend{1,1} = 'contra';
+                
+                ToPlot.Titles{1,1} = '[A VS V]';
+                
+            case 6
+                % Same for the MVPA data (contra)
+                ToPlot.Col = 1;
+                ToPlot.Row = 1:2;
+                ToPlot.Cdt = [...
+                    1 1;...
+                    1 1];
+                Data = Get_data_MVPA(1:5,SubSVM,6,SVM);
+                ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+                
+                ToPlot.Col = 2;
+                Data = Get_data_MVPA(1:5,SubSVM,5,SVM);
+                ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+                
+                
+                % Defines the number of subplots on each figure
+                ToPlot.m=1;
+                ToPlot.n=2;
+                ToPlot.SubPlots = {1,2};
+                
+                Legend{1,2} = 'right';
+                Legend{1,1} = 'left';
+                
+                ToPlot.Titles{1,1} = '[A VS V]';
+                
         end
         
         
@@ -236,11 +291,26 @@ for iToPlot = 2
         ToPlot.Name = ['MVPA-wht_betas-' Stim_prefix '\n' SaveSufix(15:end-12)];
         
         Plot_MVPA_wht_betas_all_ROIs(ToPlot)
-        
-        
+
     end
     
     cd(StartDir)
+    
+end
+
+if ToPlot.plot_subjects
+    
+    COLOR_Subject = ColorSubject();
+    
+    figure('Name', 'Subjects_colors', 'Color', [1 1 1], 'Visible', ToPlot.Visible);
+    hold on
+    for isubj=1:NbSub
+        plot([1 2],[isubj isubj], '-o', 'Color', COLOR_Subject(isubj,:), ...
+            'MarkerSize',5,'LineWidth', 2)
+    end
+    legend(SubLs.name, 'location', 'EastOutside')
+    print(gcf, fullfile(ToPlot.FigureFolder, ...
+        'Subjects_colors.tif'), '-dtiff')
     
 end
 

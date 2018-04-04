@@ -150,8 +150,8 @@ else
     
     [predlabel, ~, decvalue] = svmpredict(telabel, tedata(:,idfeat),  model);
     
-    [~, acc, ~] = svmpredict(trlabel, trdata(:,idfeat),  model);
-    model.acc = acc(1)/100; clear acc
+%     [~, acc, ~] = svmpredict(trlabel, trdata(:,idfeat),  model);
+%     model.acc = acc(1)/100; clear acc
     
 end
 

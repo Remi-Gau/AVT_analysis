@@ -29,7 +29,12 @@ opt.session.loro = 0;
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
-for iToPlot = [1 2]
+DesMat = (1:NbLayers)-mean(1:NbLayers);
+DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
+% DesMat = [DesMat' ones(NbLayers,1)];
+DesMat = spm_orth(DesMat);
+
+for iToPlot = 4
     
     opt.toplot = ToPlot{iToPlot};
                  
@@ -136,8 +141,6 @@ for Norm = 6
                     SVM(iSVM).ROI(iROI).grp(iSubj) = Class_Acc.TotAcc;
                     if Do_layers
                         SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = Class_Acc.TotAccLayers{1};
-                        SVM(iSVM).ROI(iROI).layers.grp
-                        Class_Acc.TotAccLayers{1}
                     end
                     
                     % Extract results

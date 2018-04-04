@@ -56,9 +56,10 @@ for iRow = 1:size(ToPlot.Legend,1)
         tmp = ToPlot.ROI(iRow,iColumn).grp;
         
         subplot(m,n,SubPlots{iColumn})
+        hold on
         
         plot_betas(tmp,ToPlot,fontsize)
-
+        
         t = title(ToPlot.Legend{iRow,iColumn});
         set(t,'fontsize',fontsize+1); clear t
         
@@ -81,6 +82,17 @@ end
 
 function plot_betas(tmp,ToPlot,fontsize)
 
+if ~isfield(ToPlot, 'plot_subjects')
+    plot_subjects = 0;
+else
+    plot_subjects = ToPlot.plot_subjects;
+end
+
+if plot_subjects
+    COLOR_Subject = ColorSubject();
+    scatter = linspace(-0.4,0.4,size(tmp,1));
+end
+
 Alpha = 0.05/5;
 
 Xpos = [1 3 6:2:14];
@@ -96,10 +108,18 @@ for i=1:numel(Xpos)
     distributionPlot(tmp_cell{i}, 'xValues', Xpos(i), 'color', ToPlot.line_colors(i,:), ...
         'distWidth', 1.2, 'showMM', 0, ...
         'globalNorm', 2)
-    h = plotSpread(tmp_cell{i}, 'distributionMarkers',{'.'},...
-        'xValues', (Xpos(i)), 'binWidth', 1, 'spreadWidth', 1);
-    set(h{1}, 'MarkerSize', 7, 'MarkerEdgeColor', 'k', ...
-        'MarkerFaceColor', 'k', 'LineWidth', 1)
+    if plot_subjects
+        for isubj=1:size(tmp,1)
+            plot(Xpos(i)+scatter(isubj), tmp_cell{i}(isubj),...
+                'o', 'MarkerSize', 5, 'MarkerEdgeColor', COLOR_Subject(isubj,:), ...
+                'MarkerFaceColor', COLOR_Subject(isubj,:))
+        end
+    else
+        h = plotSpread(tmp_cell{i}, 'distributionMarkers',{'.'},...
+            'xValues', (Xpos(i)), 'binWidth', 1, 'spreadWidth', 1);
+        set(h{1}, 'MarkerSize', 7, 'MarkerEdgeColor', 'k', ...
+            'MarkerFaceColor', 'k', 'LineWidth', 1)
+    end
 end
 
 % plot mean+SEM
