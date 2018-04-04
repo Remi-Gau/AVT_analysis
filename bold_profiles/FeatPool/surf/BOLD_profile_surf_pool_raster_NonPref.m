@@ -1,7 +1,7 @@
 %%
 clc; clear; close all;
 
-StartDir = fullfile(pwd, '..','..', '..','..','..');
+StartDir = fullfile(pwd, '..','..', '..','..');
 cd (StartDir)
 addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 
@@ -38,17 +38,17 @@ Folds = {...
 Cdt_ROI_lhs = 1:6;
 Cdt_ROI_rhs = [2 1 4 3 6 5];
 
-sets{1} = 1:4; %#ok<*AGROW>
-sets{2} = 1:6;
-[a, b] = ndgrid(sets{:});
-Cdt = [a(:), b(:)];
-clear sets a b
+% sets{1} = 1:4; %#ok<*AGROW>
+% sets{2} = 1:6;
+% [a, b] = ndgrid(sets{:});
+% Cdt = [a(:), b(:)];
+% clear sets a b
+
+A = repmat(1:6,6,1);
+Cdt = [A(:), repmat((1:6)',6,1)];
+clear A
 
 ToPlot={'Constant','Linear','Quad'};
-
-%% load data
-% load(fullfile(StartDir,'results','profiles','surf','rasters','RasterAllCdt.mat'), ...
-%     'ROI', 'All_X_sort', 'All_Profiles')
 
 for iSub = 1:NbSub
     
@@ -60,17 +60,7 @@ for iSub = 1:NbSub
     GLM_dir = fullfile(Sub_dir, 'ffx_nat');
     Data_dir = fullfile(GLM_dir,'betas','6_surf');
     
-    Results_dir = fullfile(Sub_dir, 'results', 'profiles', 'surf', 'rasters');
-    
-    %     load(fullfile(Sub_dir,'results','profiles','surf','rasters',[SubLs(iSub).name '-SurfRasters.mat']), ...
-    %         'ROI', ...
-    %         'All_X_sort', 'All_Profiles')
-    %
-    %     X_Sort{iSub} = All_X_sort;
-    %     Profiles{iSub} = All_Profiles;
-    %
-    %     clear All_X_sort All_Profiles
-    
+    Results_dir = fullfile(Sub_dir, 'results', 'profiles', 'surf', 'rasters');   
     
     % Get number of sessions, regressors of interest numbers, and names of conditions
     load(fullfile(GLM_dir, 'SPM.mat'))

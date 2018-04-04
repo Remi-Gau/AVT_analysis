@@ -5,8 +5,6 @@ StartDir = fullfile(pwd, '..','..', '..','..','..');
 cd (StartDir)
 addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 
-Get_dependencies('D:\Dropbox\')
-
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
@@ -105,12 +103,12 @@ Visibility = 'on';
 
 Xpos = [1:2 4:5];
 
-for iROI = 1:5
+for iROI = 1
     
     FileName = fullfile(FigureFolder,'cdt', ...
-        ['GrpLvl_Regressions_AllCdt_' ROI(iROI).name '.tif']);
+        ['GrpLvl_regressions_AllCdt_' ROI(iROI).name '.tif']);
     
-    fig = figure('name', ROI(iROI).name, 'Position', FigDim*2, 'Color', [1 1 1], 'Visible', Visibility); %#ok<*UNRCH>
+    fig = figure('name', ROI(iROI).name, 'Position', FigDim, 'Color', [1 1 1], 'Visible', Visibility); %#ok<*UNRCH>
     
     iSubPlot = 1;
     
@@ -146,12 +144,6 @@ for iROI = 1:5
             h = errorbar(Xpos, mean(tmp), nanstd(tmp), 'o','LineStyle','none','Color',[0 0 0]);
             set(h, 'MarkerSize', 3, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1)
             
-            h = plotSpread(tmp, ...
-                'distributionMarkers',{'.'},'distributionColors',{'k'}, ...
-                'xValues', Xpos+.4, 'binWidth', 0.5, 'spreadWidth', 0.6);
-            set(h{1}, 'MarkerSize', 5, 'MarkerEdgeColor', 'b', 'MarkerFaceColor', 'b', 'LineWidth', 1)
-            
-            
             plot([0 10],[0 0],':k', 'linewidth', 2)
             
             
@@ -162,7 +154,7 @@ for iROI = 1:5
                 if P(i)<0.001
                     Sig = sprintf('\np<0.001');
                 else
-                    Sig = sprintf('\np=%.3f',P(i));
+                    Sig = sprintf('\np=%.3f\n%.3f+/-%.3f',P(i), mean(tmp(:,i)), std(tmp(:,i)));
                 end
                 t = text(Xpos(i)-.25,MAX,sprintf(Sig));
                 set(t,'fontsize',5);
@@ -171,9 +163,8 @@ for iROI = 1:5
                     set(t,'color','r');
                 end
                 
-                
-                t = text(Xpos(i)-.25,MAX*-0.75,...
-                    sprintf('%.3f\n+/-%.3f%', mean(tmp(:,i)), std(tmp(:,i))));
+                sprintf('%.3f+/-%.3f%', mean(tmp(:,i)), std(tmp(:,i))
+                t = text(Xpos(i)-.25,MAX,sprintf(Sig));
                 set(t,'fontsize',5);
                 
             end
@@ -202,7 +193,8 @@ for iROI = 1:5
             
         end
     end
-    print(fig, FileName, '-dtiff')
+    %     pause(1)
+    %      print(gcf, fullfile(FigureFolder, 'cdt', ['Vertex_wise_reg_' ROI(iROI).name '.tif']), '-dtiff')
 end
 
 
