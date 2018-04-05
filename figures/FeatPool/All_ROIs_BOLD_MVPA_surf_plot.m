@@ -44,12 +44,15 @@ ROIs = {
 ROI_order_BOLD = [1 7 2:4];
 ROI_order_MVPA = [6 7 1:3];
 
+ROIs_to_get = 1:7;
+
 TitSuf = {
     'Contra_vs_Ipsi';...
     'Between_Senses';...
     'Contra_&_Ipsi'};
 
 SubSVM = [1:3;4:6;7:9];
+
 
 opt.svm.log2c = 1;
 opt.svm.dargs = '-s 0';
@@ -59,6 +62,15 @@ opt.permutation.test = 0;
 opt.session.curve = 0;
 opt.scaling.idpdt = 1;
 opt.session.loro = 0;
+opt.MVNN = 0;
+
+if opt.MVNN
+    ParamToPlot={'Cst','Lin','Avg','ROI'};
+    opt.toplot = ParamToPlot{4};
+    ROI_order_MVPA = 1:5;
+    ROIs_to_get = 1:5;
+    SubSVM = [1:3;4:6;7:9;10:12;13:15;16:18];
+end
 
 opt.scaling.img.eucledian = 0;
 opt.scaling.img.zscore = 1;
@@ -90,7 +102,7 @@ end
 
 close all
 
-for iAnalysis= 2 %1:numel(TitSuf)
+for iAnalysis= 1:2 %1:numel(TitSuf)
     
     clear ToPlot ToPlot2
     ToPlot.TitSuf = TitSuf{iAnalysis};
@@ -124,7 +136,7 @@ for iAnalysis= 2 %1:numel(TitSuf)
             
             % Same for the MVPA data
             ToPlot.Row = 2; % a new row means a new figure
-            Data = Get_data_MVPA(1:7,SubSVM,iAnalysis,SVM);
+            Data = Get_data_MVPA(ROIs_to_get,SubSVM,iAnalysis,SVM);
             ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             
             % To know which type of data we are plotting every time
@@ -174,13 +186,13 @@ for iAnalysis= 2 %1:numel(TitSuf)
             % Same for the MVPA data (contra)
             ToPlot.Col = 1;
             ToPlot.Row = 3:4;
-            Data = Get_data_MVPA(1:7,SubSVM,3,SVM);
+            Data = Get_data_MVPA(ROIs_to_get,SubSVM,3,SVM);
             ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             
             % Same for the MVPA data (ipsi)
             ToPlot.Col = 2;
             ToPlot.Row = 3:4;
-            Data = Get_data_MVPA(1:7,SubSVM,2,SVM);
+            Data = Get_data_MVPA(ROIs_to_get,SubSVM,2,SVM);
             ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             
             % To know which type of data we are plotting every time
@@ -344,8 +356,10 @@ function Data = Get_data_MVPA(ROIs,SubSVM,iSubSVM,SVM)
                 
                 Data(iROI).whole_roi_grp(:,iSVM+1-SubSVM(iSubSVM,1)) = SVM(iSVM).ROI(iROI).grp;
                 
-                Data(iROI).MEAN(:,iSVM+1-SubSVM(iSubSVM,1)) = flipud(SVM(iSVM).ROI(iROI).layers.MEAN(1:end)');
-                Data(iROI).SEM(:,iSVM+1-SubSVM(iSubSVM,1)) = flipud(SVM(iSVM).ROI(iROI).layers.SEM(1:end)');
+                Data(iROI).MEAN(:,iSVM+1-SubSVM(iSubSVM,1)) = ...
+                    flipud(SVM(iSVM).ROI(iROI).layers.MEAN(1:end)');
+                Data(iROI).SEM(:,iSVM+1-SubSVM(iSubSVM,1)) = ...
+                    flipud(SVM(iSVM).ROI(iROI).layers.SEM(1:end)');
                 Data(iROI).Beta.DATA(:,iSVM+1-SubSVM(iSubSVM,1),:) = ...
                     reshape(SVM(iSVM).ROI(iROI).layers.Beta.DATA, [3,1,size(SVM(iSVM).ROI(iROI).layers.Beta.DATA,2)]);
                 
