@@ -13,6 +13,12 @@ NbSub = numel(SubLs);
 addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 
 NbLayers = 6;
+MVNN = 1;
+if MVNN
+    suffix = 'Wht_Betas';
+else
+    suffix = '_';
+end
 
 CondNames = {...
     'AStimL','AStimR';...
@@ -56,7 +62,7 @@ for iSub = 1:NbSub
     
     for iROI=1:numel(ROIs)
         
-        File2Load = fullfile(SaveDir, strcat('Data_Pooled_Surf_', AllSubjects_Data(iROI).name, '_l-', ...
+        File2Load = fullfile(SaveDir, strcat('Data_Pooled_Surf_', suffix, AllSubjects_Data(iROI).name, '_l-', ...
             num2str(NbLayers), '.mat'));
         
         if exist(File2Load,'file')
@@ -320,7 +326,11 @@ for iROI = 1:numel(AllSubjects_Data)
         '_SurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results')
 end
 
-save( fullfile(ResultsDir, strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')) )
+if MVNN
+    save( fullfile(ResultsDir, strcat('ResultsSurfPoolQuadGLM',suffix,'_l-', num2str(NbLayers), '.mat')) )
+else
+    save( fullfile(ResultsDir, strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')) )
+end
 
 cd(StartDir)
 

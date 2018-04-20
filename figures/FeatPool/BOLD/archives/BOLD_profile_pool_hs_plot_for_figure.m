@@ -1,6 +1,6 @@
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..', '..','..');
+StartDir = fullfile(pwd, '..','..', '..','..','..');
 cd (StartDir)
 
 addpath(genpath(fullfile(StartDir, 'code', 'subfun')))

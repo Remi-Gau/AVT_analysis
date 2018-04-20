@@ -1,7 +1,7 @@
 function bold_profiles_vol_pool_hs_grp_avg
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..', '..');
+StartDir = fullfile(pwd, '..','..', '..', '..');
 cd (StartDir)
 
 ResultsDir = fullfile(StartDir, 'results', 'profiles');
@@ -13,6 +13,8 @@ NbSub = numel(SubLs);
 addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 
 NbLayers = 6;
+
+MVNN = 0;
 
 CondNames = {...
     'AStimL','AStimR';...
@@ -68,8 +70,13 @@ for iSub = 1:NbSub
     
     for iROI=1:numel(ROIs)
         
-        File2Load = fullfile(SaveDir, strcat('Data_Pooled_', AllSubjects_Data(iROI).name, '_l-', ...
-            num2str(NbLayers), '.mat'));
+        if MVNN
+            File2Load = fullfile(SaveDir, strcat('Data_Pooled_Wht_Betas_', AllSubjects_Data(iROI).name, '_l-', ...
+                num2str(NbLayers), '.mat'));
+        else
+            File2Load = fullfile(SaveDir, strcat('Data_Pooled_', AllSubjects_Data(iROI).name, '_l-', ...
+                num2str(NbLayers), '.mat'));
+        end
         
         if exist(File2Load,'file')
             
@@ -281,11 +288,20 @@ fprintf('\nSaving\n')
 
 for iROI = 1:numel(AllSubjects_Data)
     Results = AllSubjects_Data(iROI);
-    save( fullfile(ResultsDir, strcat('Results_', AllSubjects_Data(iROI).name, ...
-        '_VolPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results')
+    if MVNN
+        save( fullfile(ResultsDir, strcat('ResultsWhtBetas_', AllSubjects_Data(iROI).name, ...
+            '_VolPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results')
+    else
+        save( fullfile(ResultsDir, strcat('Results_', AllSubjects_Data(iROI).name, ...
+            '_VolPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results')
+    end
 end
 
-save( fullfile(ResultsDir, strcat('ResultsVolPoolQuadGLM_l-', num2str(NbLayers), '.mat')) )
+if MVNN
+    save( fullfile(ResultsDir, strcat('ResultsVolWhtBetasPoolQuadGLM_l-', num2str(NbLayers), '.mat')) )
+else
+    save( fullfile(ResultsDir, strcat('ResultsVolPoolQuadGLM_l-', num2str(NbLayers), '.mat')) )
+end
 
 cd(StartDir)
 
