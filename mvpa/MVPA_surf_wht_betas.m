@@ -10,7 +10,7 @@ Get_dependencies('D:\Dropbox/')
 
 NbLayers = 6;
 
-NbWorkers = 6;
+NbWorkers = 3;
 
 
 % Options for the SVM
@@ -21,7 +21,7 @@ opt.permutation.test = 0;  % do permutation test
 opt.session.curve = 0; % learning curves on a subsample of all the sessions
 opt.session.proptest = 0.2; % proportion of all sessions to keep as a test set
 opt.verbose = 0;
-opt.session.loro = 0;
+opt.session.loro = 1;
 opt.MVNN = 1;
 
 CondNames = {...
@@ -64,49 +64,49 @@ ToPlot={'Cst','Lin','Avg','ROI'};
 % --------------------------------------------------------- %
 %                     Analysis to perform                   %
 % --------------------------------------------------------- %
-SVM_Ori(1) = struct('name', 'A Ipsi VS Contra', 'class', [1 2], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [3 4], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], ...
+% SVM_Ori(1) = struct('name', 'A Ipsi VS Contra', 'class', [1 2], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+% SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [3 4], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+% SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+% 
+% SVM_Ori(end+1) = struct('name', 'A VS V Ipsi', 'class', [1 3], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+% SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], ...
+%     'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 1);
+% SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [3 5], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+
+% SVM_Ori(1) = struct('name', 'A VS V Contra', 'class', [2 4], ...
+%     'ROI_2_analyse', 1, 'Featpool', 1);
+% SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+SVM_Ori(1) = struct('name', 'V VS T Contra', 'class', [4 6], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 
-SVM_Ori(end+1) = struct('name', 'A VS V Ipsi', 'class', [1 3], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], ...
-    'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 1);
-SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [3 5], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-
-SVM_Ori(end+1) = struct('name', 'A VS V Contra', 'class', [2 4], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 
 
-
-SVM_Ori(end+1) = struct('name', 'A_L VS A_R', 'class', [1 2], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-SVM_Ori(end+1) = struct('name', 'V_L VS V_R', 'class', [3 4], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-SVM_Ori(end+1) = struct('name', 'T_L VS T_R', 'class', [5 6], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-
-SVM_Ori(end+1) = struct('name', 'A_L VS V_L', 'class', [1 3], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-SVM_Ori(end+1) = struct('name', 'A_L VS T_L', 'class', [1 5], ...
-    'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 0);
-SVM_Ori(end+1) = struct('name', 'V_L VS T_L', 'class', [3 5], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-
-SVM_Ori(end+1) = struct('name', 'A_R VS V_R', 'class', [2 4], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-SVM_Ori(end+1) = struct('name', 'A_R VS T_R', 'class', [2 6], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-SVM_Ori(end+1) = struct('name', 'V_R VS T_R', 'class', [4 6], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+% SVM_Ori(end+1) = struct('name', 'A_L VS A_R', 'class', [1 2], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+% SVM_Ori(end+1) = struct('name', 'V_L VS V_R', 'class', [3 4], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+% SVM_Ori(end+1) = struct('name', 'T_L VS T_R', 'class', [5 6], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+% 
+% SVM_Ori(end+1) = struct('name', 'A_L VS V_L', 'class', [1 3], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+% SVM_Ori(end+1) = struct('name', 'A_L VS T_L', 'class', [1 5], ...
+%     'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 0);
+% SVM_Ori(end+1) = struct('name', 'V_L VS T_L', 'class', [3 5], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+% 
+% SVM_Ori(end+1) = struct('name', 'A_R VS V_R', 'class', [2 4], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+% SVM_Ori(end+1) = struct('name', 'A_R VS T_R', 'class', [2 6], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+% SVM_Ori(end+1) = struct('name', 'V_R VS T_R', 'class', [4 6], ...
+%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
 
 % --------------------------------------------------------- %
 %          Data pre-processing and SVM parameters           %
@@ -163,7 +163,7 @@ for iToPlot = 4
     
     opt.toplot = ToPlot{iToPlot};
     
-    for iSub = 1:5 %NbSub
+    for iSub = 1 %NbSub
         
         % --------------------------------------------------------- %
         %                        Subject data                       %
@@ -465,7 +465,7 @@ for iToPlot = 4
                             RunPerSes(1)+RunPerSes(2)+1:sum(RunPerSes)};
                         [x, y, z] = ndgrid(sets{:});
                         cartProd = [x(:) y(:) z(:)];
-                        clear x y z RunPerSes Idx
+                        clear x y Idx
                         
                         % Test sets for the different CVs
                         if opt.session.curve
@@ -494,7 +494,7 @@ for iToPlot = 4
                                 end
                             end
                         end
-                        clear cartProd
+                        clear cartProd RunPerSes
                         
                         
                         %% Subsampled sessions loop
@@ -528,7 +528,7 @@ for iToPlot = 4
                                 end
                                 clear temp
                                 
-                                %% Leave-one-run-out (LORO) cross-validation
+                                %% Run cross-validations
                                 NbCV = size(TestSessList{iSubSampSess,1}, 1);
                                 
                                 fprintf(1,'    [%s]\n    [ ',repmat('.',1,NbCV));

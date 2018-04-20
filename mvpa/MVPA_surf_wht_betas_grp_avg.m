@@ -139,9 +139,9 @@ for Norm = 6
                     load(File2Load, 'Results', 'Class_Acc', 'opt')
 
                     SVM(iSVM).ROI(iROI).grp(iSubj) = Class_Acc.TotAcc;
-                    if Do_layers
-                        SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = Class_Acc.TotAccLayers{1};
-                    end
+%                     if Do_layers
+%                         SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = Class_Acc.TotAccLayers{1};
+%                     end
                     
                     % Extract results
                     CV = Results.session(end).rand.perm.CV;
@@ -171,7 +171,7 @@ for Norm = 6
                     SVM(iSVM).ROI(iROI).grp(iSubj) = NaN;
                     if Do_layers
                         SVM(iSVM).ROI(iROI).layers.DATA{iSubj} = [];
-                        SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = nan(NbLayers);
+%                         SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = nan(NbLayers);
                     end
                     
                 end

@@ -62,7 +62,8 @@ opt.permutation.test = 0;
 opt.session.curve = 0;
 opt.scaling.idpdt = 1;
 opt.session.loro = 0;
-opt.MVNN = 0;
+opt.MVNN = 1;
+opt.vol = 1;
 
 if opt.MVNN
     ParamToPlot={'Cst','Lin','Avg','ROI'};
@@ -70,6 +71,11 @@ if opt.MVNN
     ROI_order_MVPA = 1:5;
     ROIs_to_get = 1:5;
     SubSVM = [1:3;4:6;7:9;10:12;13:15;16:18];
+    suffix = 'Wht_Betas';
+end
+
+if opt.vol
+    BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles');
 end
 
 opt.scaling.img.eucledian = 0;
@@ -83,7 +89,15 @@ SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
 % load BOLD and MVPA
 if IsStim
     Stim_prefix = 'Stimuli';
-    load(fullfile(BOLD_resultsDir, strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
+    if opt.MVNN
+        if opt.vol
+            load( fullfile(BOLD_resultsDir, strcat('ResultsVolWhtBetasPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
+        else
+            load( fullfile(BOLD_resultsDir, strcat('ResultsSurfPoolQuadGLM',suffix,'_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
+        end
+    else
+        load( fullfile(BOLD_resultsDir, strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
+    end
     File2Load = fullfile(MVPA_resultsDir, strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
 else
     Stim_prefix = 'Target';
@@ -95,14 +109,14 @@ AllSubjects_Data_BOLD = AllSubjects_Data;
 clear AllSubjects_Data
 
 if exist(File2Load, 'file')
-    load(File2Load, 'SVM', 'opt')
+    load(File2Load, 'SVM')
 else
     warning('This file %s does not exist', File2Load)
 end
 
 close all
 
-for iAnalysis= 1:2 %1:numel(TitSuf)
+for iAnalysis= 1:numel(TitSuf)
     
     clear ToPlot ToPlot2
     ToPlot.TitSuf = TitSuf{iAnalysis};
@@ -241,6 +255,10 @@ for iAnalysis= 1:2 %1:numel(TitSuf)
                 end
             end
             
+            if opt.MVNN
+                ToPlot = rmfield(ToPlot,'MinMax');
+            end
+            
             ToPlot.Titles{1,1} = '[A - T]';
             ToPlot.Titles{2,1} = '[V - T]';
             ToPlot.Titles{3,1} = '[A VS T]';
@@ -293,6 +311,10 @@ for iAnalysis= 1:2 %1:numel(TitSuf)
                 repmat([-0.4 1.3],2,1) , repmat([-0.4 0.65],2,1) , repmat([-0.5 0.35],2,1);...
                 };
             
+            if opt.MVNN
+                ToPlot = rmfield(ToPlot,'MinMax');
+            end
+            
     end
    
     
@@ -312,7 +334,12 @@ for iAnalysis= 1:2 %1:numel(TitSuf)
         
         ToPlot.Legend = Legend; clear Legend
         ToPlot.ToPermute = ToPermute;
-        ToPlot.Name = ['BOLD-MVPA-' Stim_prefix '\n' SaveSufix(15:end-12)];
+        if opt.vol
+            ToPlot.Name = ['BOLD_vol-MVPA-' Stim_prefix '\n' SaveSufix(15:end-12)];
+        else
+             ToPlot.Name = ['BOLD-MVPA-' Stim_prefix '\n' SaveSufix(15:end-12)];
+        end
+
 
         Plot_BOLD_MVPA_all_ROIs(ToPlot)
         
@@ -334,7 +361,10 @@ for iROI = ROI_order
             
             ToPlot.profile(ToPlot.Row(iRow),ToPlot.Col(iCol)).MEAN(:,ROI_idx) = Data(iROI).MEAN(:,ToPlot.Cdt(iRow,iCol));
             ToPlot.profile(ToPlot.Row(iRow),ToPlot.Col(iCol)).SEM(:,ROI_idx) = Data(iROI).SEM(:,ToPlot.Cdt(iRow,iCol));
-            ToPlot.ROI(ToPlot.Row(iRow),ToPlot.Col(iCol)).grp(:,ROI_idx,:) = Data(iROI).whole_roi_grp(:,ToPlot.Cdt(iRow,iCol));
+            
+            if isfield(Data, 'whole_roi_grp')
+                ToPlot.ROI(ToPlot.Row(iRow),ToPlot.Col(iCol)).grp(:,ROI_idx,:) = Data(iROI).whole_roi_grp(:,ToPlot.Cdt(iRow,iCol));
+            end
             
             % Do not plot quadratic
             % 1rst dimension: subject

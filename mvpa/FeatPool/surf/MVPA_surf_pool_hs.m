@@ -7,17 +7,18 @@ addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 
 NbLayers = 6;
 
-NbWorkers = 6;
+NbWorkers = 3;
 
 
 % Options for the SVM
 opt.fs.do = 0; % feature selection
 opt.rfe.do = 0; % recursive feature elimination
 opt.scaling.idpdt = 1; % scale test and training sets independently
-opt.permutation.test = 1;  % do label permutation test
+opt.permutation.test = 0;  % do label permutation test
 opt.session.curve = 0; % learning curves on a subsample of all the sessions
 opt.session.proptest = 0.2; % proportion of all sessions to keep as a test set
 opt.verbose = 0;
+opt.MVNN = 0;
 
 
 CondNames = {...
@@ -72,15 +73,15 @@ ROIs_ori = {
 % SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], 'ROI_2_analyse', 1:numel(ROIs_ori));
 % SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [3 5], 'ROI_2_analyse', 1:numel(ROIs_ori));
 
-SVM_Ori(1) = struct('name', 'A VS T Ipsi', 'class', [1 5], 'ROI_2_analyse',3);
-%SVM_Ori(1) = struct('name', 'V VS T Ipsi', 'class', [3 5], 'ROI_2_analyse', 1);
+% SVM_Ori(1) = struct('name', 'A VS T Ipsi', 'class', [1 5], 'ROI_2_analyse',3);
+% SVM_Ori(1) = struct('name', 'V VS T Ipsi', 'class', [3 5], 'ROI_2_analyse', 1);
 
-% SVM_Ori(end+1) = struct('name', 'A VS V Contra', 'class', [2 4], 'ROI_2_analyse', 1:numel(ROIs_ori));
-% SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
-% SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
+% SVM_Ori(1) = struct('name', 'A VS V Contra', 'class', [2 4], 'ROI_2_analyse', 1);
+% SVM_Ori(1) = struct('name', 'A VS T Contra', 'class', [2 6], 'ROI_2_analyse', 1);
+SVM_Ori(1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse', 1);
 
-SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], 'ROI_2_analyse', 3);
-%SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse', 1);
+% SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], 'ROI_2_analyse', 3);
+% SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse', 1);
 
 
 % --------------------------------------------------------- %
@@ -112,7 +113,7 @@ else
 end
 
 % Randomization options
-if opt.permutation.test;
+if opt.permutation.test
     opt.permutation.nreps = 1000; % #repetitions for permutation test
 else
     opt.permutation.nreps = 1;
@@ -138,7 +139,7 @@ SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
 
-for iSub = 8:NbSub    
+for iSub = 1%8:NbSub    
     
     % --------------------------------------------------------- %
     %                        Subject data                       %
@@ -525,8 +526,7 @@ for iSub = 8:NbSub
                     disp(Class_Acc.TotAcc(:))
                     disp(Class_Acc.TotAccLayers{1})
                 end
-                
-                
+       
                 % Save data
                 Results = SVM(iSVM).ROI(ROI_idx);
                 SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, ROI_idx, SaveSufix)
@@ -579,7 +579,7 @@ if isempty(Features) || all(Features(:)==Inf)
     
 else
     
-    if ~opt.permutation.test
+    if ~opt.permutation.test % only do it if we are not doing label permutation
         [acc_layer, weight, results_layer] = machine_SVC_layers(SVM(iSVM), ...
             Features(:,LogFeat), FeaturesLayers(:,LogFeat), CV_Mat, TrainSess, TestSess, opt);
     else

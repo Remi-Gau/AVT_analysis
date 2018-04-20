@@ -23,6 +23,8 @@ opt.rfe.do = 0;
 opt.permutation.test = 0;
 opt.session.curve = 0;
 opt.scaling.idpdt = 1;
+opt.MVNN = 0;
+opt.session.loro = 0;
 
 
 DesMat = (1:NbLayers)-mean(1:NbLayers);
@@ -79,12 +81,12 @@ for Norm = 6
     ROIs(end+1) = struct('name', 'PT');
     
     % Analysis
-    SVM(1) = struct('name', 'A Ipsi VS Contra', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'V Ipsi VS Contra', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'T Ipsi VS Contra', 'ROI', 1:length(ROIs));
-    
-    SVM(end+1) = struct('name', 'A VS V Ipsi', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'A VS T Ipsi', 'ROI', 1:length(ROIs));
+%     SVM(1) = struct('name', 'A Ipsi VS Contra', 'ROI', 1:length(ROIs));
+%     SVM(end+1) = struct('name', 'V Ipsi VS Contra', 'ROI', 1:length(ROIs));
+%     SVM(end+1) = struct('name', 'T Ipsi VS Contra', 'ROI', 1:length(ROIs));
+%     
+%     SVM(end+1) = struct('name', 'A VS V Ipsi', 'ROI', 1:length(ROIs));
+    SVM(1) = struct('name', 'A VS T Ipsi', 'ROI', 1:length(ROIs));
     SVM(end+1) = struct('name', 'V VS T Ipsi', 'ROI', 1:length(ROIs));
     
     SVM(end+1) = struct('name', 'A VS V Contra', 'ROI', 1:length(ROIs));
@@ -123,7 +125,7 @@ for Norm = 6
                     %                 save(File2Save, 'Results', 'Class_Acc', 'opt')
                     
                     SVM(iSVM).ROI(iROI).grp(iSubj) = Class_Acc.TotAcc;
-                    SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = Class_Acc.TotAccLayers{1};
+%                     SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = Class_Acc.TotAccLayers{1};
                     
                     % Extract results
                     CV = Results.session(end).rand.perm.CV;
@@ -133,7 +135,7 @@ for Norm = 6
                         
                         % For the whole ROI
                         SVM(iSVM).ROI(iROI).DATA{iSubj}(iCV) = CV(iCV).acc;
-                        
+
                         for iLayer = 1:NbLayers
                             label = CV(iCV).layers.results{1}{iLayer}.label;
                             pred = CV(iCV).layers.results{1}{iLayer}.pred(:,iLayer);
