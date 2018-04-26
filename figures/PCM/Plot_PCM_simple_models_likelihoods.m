@@ -37,7 +37,7 @@ surf = 1; % run of volumne whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
 hs_idpdt = 0;
 Split_half = 0; % only implemented for surface
-on_merged_ROI = 0;
+on_merged_ROI = 1;
 % RFX = 1;
 %
 % if RFX==1
@@ -150,7 +150,7 @@ ColorMap(all(ColorMap==0,2),:)=repmat([1 1 1],sum(all(ColorMap==0,2)),1);
 ColorMap(14+1,1:3) = [0 0 0];
 
 
-for iToPlot = 2 %[1 3:numel(ToPlot)]
+for iToPlot = 1:numel(ToPlot)
     
     for Target = 1
         
@@ -361,34 +361,7 @@ for iToPlot = 2 %[1 3:numel(ToPlot)]
                 Data2Plot2(PositionToFill(iComp),:) = [pxp(iComp,1,1) pxp(iComp,2,2) pxp(iComp,2,3)];
                 
             end
-            
-            
-            %% plot the 3 models compared all together
-            opt.FigName = sprintf('BestModel-RFX1-3Models-%s-%s-PCM_{grp}-%s-%s-%s-%s-%s', ...
-                ROI(iROI).name, hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot},...
-                UpTriSuffix, SwitchSuffix);
-            
-            figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
-            
-            [h,hg,htick]=terplot;
-            hter=ternaryc(All_pxp(:,1),All_pxp(:,2),All_pxp(:,3));
-            hlabels=terlabel('S','S+I','I');
-            
-            set(hter(1:3), 'color', 'k', 'MarkerFaceColor', 'k')
-            set(hter(4:6), 'color', 'r', 'MarkerFaceColor', 'r')
-            
-            set(hter(1:3:9), 'marker', 'o')
-            set(hter(2:3:9), 'marker', 'square')
-            
-            set(hter(:), 'MarkerSize', 12)
-            
-            p=mtit([ROI(iROI).name ' - ' ToPlot{iToPlot}],...
-                'fontsize',14,...
-                'xoff',0,'yoff',.025);
-            
-            print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '_ternary_plot.tif'] ), '-dtiff')
-            
-            
+
             %% plot the 3 models compared by pair
             opt.FigName = sprintf('BestModel-RFX2-3Models-%s-%s-PCM_{grp}-%s-%s-%s-%s-%s', ...
                 ROI(iROI).name, hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot},...
