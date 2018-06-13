@@ -2,6 +2,8 @@ clc; clear;
 
 StartDir = fullfile(pwd, '..','..','..');
 addpath(genpath(fullfile(StartDir, 'code','subfun')))
+Get_dependencies('/home/rxg243/Dropbox/')
+Get_dependencies('D:\Dropbox/')
 
 cd(StartDir)
 SubLs = dir('sub*');
@@ -19,8 +21,8 @@ CondNames = {...
     };
 
 DesMat = (1:NbLayers)-mean(1:NbLayers);
-DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
-% DesMat = [ones(NbLayers-2,1) DesMat'];
+% DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
+DesMat = [ones(NbLayers,1) DesMat'];
 DesMat = spm_orth(DesMat);
 
 VTK_sufix = {'Cst', 'Lin', 'Quad'};
@@ -37,7 +39,7 @@ for iSub =  1:NbSub
     
     Results_dir = fullfile(Sub_dir, 'results', 'profiles', 'surf');
     [~,~,~]=mkdir(Results_dir);
-
+    
     
     %% Load Vertices of interest for each ROI;
     load(fullfile(Sub_dir, 'roi', 'surf',[SubLs(iSub).name  '_ROI_VertOfInt.mat']), 'ROI', 'NbVertex')
@@ -102,24 +104,23 @@ for iSub =  1:NbSub
             
             % Extract them
             Features = AllMapping(:,:,Beta2Sel); %#ok<*FNDSB>
-            Mapping{hs}(VertexWithData,iCdt,hs) = nanmean(nanmean(Features,3),2);
             
-            %% Change or adapt dimensions for GLM
-            %             X=repmat(DesMat,size(Features,3),1);
-            %
-            %             Y = shiftdim(Features,1);
-            %             Y = reshape(Y, [size(Y,1)*size(Y,2), size(Y,3)] );
-            %
-            %             B = pinv(X)*Y;
+            % Change or adapt dimensions for GLM
+            X = repmat(DesMat,size(Features,3),1);
             
-            %             fprintf('    Writing VTKs\n')
-            %             for iBeta = 1:size(B,1)
-            %                 Mapping{} = zeros(size(inf_vertex,2));
-            %                 Mapping(VertexWithData) = B(iBeta,:);
-            %                 write_vtk(fullfile(Results_dir,'cdt',...
-            %                     [SubLs(iSub).name '_' HsSufix 'cr_' CondNames{iCdt} ...
-            %                     '_' VTK_sufix{iBeta} '.vtk']), inf_vertex, inf_faces, Mapping)
-            %             end
+            Y = shiftdim(Features,1);
+            Y = reshape(Y, [size(Y,1)*size(Y,2), size(Y,3)] );
+            
+            if sum(isnan(Features(:)))>0
+                warning('We have %i NaNs for %s', sum(isnan(Features(:))), CondNames{iCdt})
+            end
+            if sum(Features(:)==0)>0
+                warning('We have %i zeros for %s', sum(Features(:)==0), CondNames{iCdt})
+            end
+            
+            B = pinv(X)*Y;
+            
+            Mapping{hs}(VertexWithData,iCdt,hs) = B(1,:);
             
             clear Features Beta2Sel B X Y iBeta iSess
         end
@@ -136,11 +137,25 @@ for iSub =  1:NbSub
             
             fprintf(['  '  Data_ROI.name '\n'])
             
-            T1_Data =  T1_mapping{hs}(ROI(iROI).VertOfInt{hs});
+            T1_Data(:,1) =  T1_mapping{hs}(ROI(iROI).VertOfInt{hs});
             for iCdt = 1:numel(CondNames)
                 BOLD_Data(:,iCdt) = Mapping{hs}(ROI(iROI).VertOfInt{hs},iCdt,hs);
-                RHO(iCdt,hs,iSub,iROI) = corr(T1_Data',BOLD_Data(:,iCdt));
             end
+            
+            ToRemove = cat(2,isnan(BOLD_Data), BOLD_Data==0);
+            ToRemove = any(ToRemove,2);
+            
+            BOLD_Data(ToRemove,:) = [];
+            T1_Data(ToRemove,:) = [];
+            
+            for iCdt = 1:numel(CondNames)     
+                RHO(iCdt,hs,iSub,iROI) = corr(T1_Data,BOLD_Data(:,iCdt));
+                %                 scatter(T1_Data,BOLD_Data(:,iCdt),'.')
+            end
+            
+            clear BOLD_Data T1_Data
+            
+            
         end
         
     end
@@ -149,5 +164,34 @@ for iSub =  1:NbSub
     
 end
 
+%%
+save(fullfile(StartDir, 'results','profiles','surf','T1_BOLD_cor.mat'), ...
+    'RHO')
 
 cd(StartDir)
+
+%%
+close all
+for iSubplot=1:4
+    switch iSubplot
+        case 1
+            ROI = 1;
+            hs = 1;
+        case 2
+            ROI = 1;
+            hs = 2;
+        case 3
+            ROI = 2;
+            hs = 1;
+        case 4
+            ROI = 2;
+            hs = 2;
+    end
+    subplot(2,2,iSubplot)
+    grid on
+    hold on
+    plot( repmat((1:6)',1,10), squeeze(RHO(:,hs,:,ROI)), 'color', [.5 .5 .5] )
+    errorbar(1:6, mean(squeeze(RHO(:,hs,:,ROI)),2), nansem(squeeze(RHO(:,hs,:,ROI)),2), ...
+        '-k', 'linewidth', 2 )
+    axis([0 7 -0.3 0.3])
+end
