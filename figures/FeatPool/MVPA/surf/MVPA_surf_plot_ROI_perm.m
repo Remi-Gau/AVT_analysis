@@ -140,7 +140,7 @@ for iSVM = 1:numel(SVM)
         
         clear tmp Grp_lvl_btstrp_perms SignPerms
         
-        % null distribution FFX
+        % null distribution a la Seltzer (Monte Carlo)
         tmp = SVM(iSVM).ROI(iROI).perms;
         for iPerm = 1:NbMCPerm
             IND = sub2ind(size(tmp),randi(size(tmp,1),1,size(tmp,2)),1:size(tmp,2));
