@@ -35,7 +35,7 @@ DesMat = spm_orth(DesMat);
 HS = 'lr';
 
 
-for iSub =  7 %[4 6 7]
+for iSub = [4 6 7 8:10] %[4 6 7]
     
     fprintf('\n\n\n')
     
@@ -156,7 +156,7 @@ for iSub =  7 %[4 6 7]
         Col = reshape(1:18,3,6)';
         
         for iCdt = 1:numel(CondNames)
-            Data = mean(S_Param_day(:,Col(iCdt,:)));
+            Data = mean(S_Param_day(:,Col(iCdt,:)),2);
             Filename = fullfile(StartDir, SubLs(iSub).name, 'ffx_nat','betas','6_surf',...
                 [SubLs(iSub).name '_' CondNames{iCdt} '_' HS(hs) 'h_cst_inf.vtk']);
             write_vtk(Filename, inf_vertex, inf_face, Data');
