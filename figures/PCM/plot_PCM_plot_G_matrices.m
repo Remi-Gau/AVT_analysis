@@ -9,7 +9,7 @@ Get_dependencies('D:\Dropbox/')
 surf = 1; % run of volumne whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
 hs_idpdt = 0;
-on_merged_ROI = 1;
+on_merged_ROI = 0;
 
 if on_merged_ROI
     NbROI = 1;
@@ -17,7 +17,7 @@ else
     NbROI = 5;
 end
 
-Switch = 1;
+Switch = 0;
 if Switch
     
     DiagToExtract = [1 8 15 22 29 36];
@@ -93,7 +93,7 @@ else
     NbHS = 1;
 end
 
-for iToPlot = 1:4 %numel(ToPlot)
+for iToPlot = 1%:4 %numel(ToPlot)
     
     for Target = 1
         
@@ -138,7 +138,7 @@ for iToPlot = 1:4 %numel(ToPlot)
             end
         end
         
-        for iROI = 1:NbROI
+        for iROI = 2 %1:NbROI
             
             for ihs=1:NbHS
                 
@@ -161,7 +161,7 @@ for iToPlot = 1:4 %numel(ToPlot)
         %% G matrix recap figures
         close all
         
-        for iROI = 1:numel(G_Mat_all_ROIs)
+        for iROI = 2 %1:numel(G_Mat_all_ROIs)
             
             clc
             
@@ -202,17 +202,7 @@ for iToPlot = 1:4 %numel(ToPlot)
                     'Position', FigDim, 'Color', [1 1 1]);
                 
                 % adapts color scale so that 0 is white
-                MIN = min(Mat2Plot(:));
-                MAX = max(Mat2Plot(:));
-                [AbsMax,Idx] = max(abs([MIN MAX]));
-                Scale = linspace(-1*AbsMax,AbsMax,size(ColorMap,1))';
-                if Idx==2
-                    Idx = Scale<MIN;
-                    NewColorMap = ColorMap(~Idx,:);
-                else
-                    Idx = Scale>MAX;
-                    NewColorMap = ColorMap(~Idx,:);
-                end
+                [ NewColorMap ] = Create_non_centered_diverging_colormap(Mat2Plot, ColorMap);
                 
                 colormap(NewColorMap);
                 imagesc(Mat2Plot);
@@ -294,7 +284,7 @@ for iToPlot = 1:4 %numel(ToPlot)
                         'YAxisLocation','right', ...
                         'ticklength', [0.01 0.01], 'fontsize', 14)
                     
-                    %                     print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif']  ), '-dtiff')
+%                                         print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif']  ), '-dtiff')
                     %                     print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.svg']  ), '-dsvg')
                     
                 end
