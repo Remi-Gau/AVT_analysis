@@ -1,5 +1,6 @@
 function All_ROIs_BOLD_MVPA_surf_tables
-clc; clear;
+% clc; 
+clear;
 
 StartDir = fullfile(pwd, '..','..','..');
 cd (StartDir)
@@ -53,9 +54,10 @@ ROI_order_BOLD = [1 7 2:4];
 ROI_order_MVPA = [6 7 1:3];
 
 TitSuf = {
+    'Contra_&_Ipsi'
     'Contra_vs_Ipsi';...
     'Between_Senses';...
-    'Contra_&_Ipsi'};
+    };
 
 SubSVM = [1:3;4:6;7:9];
 
@@ -73,6 +75,18 @@ opt.scaling.img.zscore = 1;
 opt.scaling.feat.mean = 1;
 opt.scaling.feat.range = 0;
 opt.scaling.feat.sessmean = 0;
+
+opt.MVNN = 0;
+opt.vol = 0;
+% 
+if opt.MVNN
+    ParamToPlot={'Cst','Lin','Avg','ROI'};
+    opt.toplot = ParamToPlot{4};
+    ROI_order_MVPA = 1:5;
+    ROIs_to_get = 1:5;
+    SubSVM = [1:3;4:6;7:9;10:12;13:15;16:18];
+    suffix = 'Wht_Betas';
+end
 
 SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
 
@@ -245,11 +259,11 @@ end
 function Print2TableROI(fid, ROIs, ToPrint)
 
 if ~isempty(ToPrint.ToPermute)
-    Legends1 = {'', '', 'Constant', '','','','','','','','','','','Linear','','','','','','','','','','','Whole ROI'};
-    Legends2 = {'', 'mean', '', '','STD','', '', 'p value', '', 'effect size'};
+    Legends1 = {'', '', 'Constant', '','','','','','','','','','','','','','Linear','','','','','','','','','','','','','','Whole ROI'};
+    Legends2 = {'', 'mean', '', '','STD','', '', 'p value', '', 'Hedge G bca','','',''};
 else
-    Legends1 = {'', '', 'Constant', '','','','','','','','','','','','','Linear','','','','','','','','','','','','','Whole ROI'};
-    Legends2 = {'', 'mean', '', '','STD','', '', 't value','','p value', '', 'effect size'};
+    Legends1 = {'', '', 'Constant', '','','','','','','','','','','','','','','','','','Linear','','','','','','','','','','','','','','','','','','Whole ROI'};
+    Legends2 = {'', 'mean', '', '','STD','', '', 't value','','p value', '', 'Hedge G bca','','',''};
 end
 
 
@@ -393,8 +407,8 @@ for iCdt = 1:size(ToPrint.profile.beta,4)
             end
             
             % Print effect size
-%             fprintf (fid, ',');
-            fprintf (fid, '%f,',abs(nanmean(tmp)/nanstd(tmp)));
+            CI = bootci(1000,{@(x) Unbiased_ES(x), tmp},'alpha',0.05,'type','bca');
+            fprintf (fid, '[,%f,-,%f,]',CI(1),CI(2));
             fprintf (fid, ',');
             
             
@@ -436,4 +450,12 @@ for iROI = 1:numel(ROIs)
     end
     
 end
+end
+
+function du = Unbiased_ES(grp_data)
+% from DOI 10.1177/0013164404264850
+d = mean(grp_data)/std(grp_data);
+nu = length(grp_data)-1;
+G = gamma(nu/2)/(sqrt(nu/2)*gamma((nu-1)/2));
+du = d*G;
 end
