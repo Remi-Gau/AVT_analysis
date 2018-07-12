@@ -6,6 +6,7 @@ cd (StartDir)
 
 addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 Get_dependencies('/home/rxg243/Dropbox/')
+Get_dependencies('D:\Dropbox/')
 
 
 ResultsDir = fullfile(StartDir, 'results', 'profiles','surf');
@@ -40,7 +41,7 @@ for WithPerm = 1
     
     
     NbROI = length(Stimuli_data);
-    ROI_order = [1 NbROI 2:NbROI-1];
+    ROI_order = [1 NbROI 2:4]; %[1 NbROI 2:NbROI-1];
     
     ROI_idx = 1;
     for iROI = ROI_order
@@ -56,19 +57,19 @@ for WithPerm = 1
     ToPlot.FigureFolder=FigureFolder;
     ToPlot.ToPermute = ToPermute;
     
-    fig = figure('Name', 'Interactions', 'Position', [100, 100, 1500, 1000], 'Color', [1 1 1], 'Visible', ToPlot.Visible);
+    f = figure('Name', 'Interactions', 'Position', [50, 50, 1400, 700], 'Color', [1 1 1], 'Visible', ToPlot.Visible);
     
     set(gca,'units','centimeters')
     pos = get(gca,'Position');
     ti = get(gca,'TightInset');
     
-    set(fig, 'PaperUnits','centimeters');
-    set(fig, 'PaperSize', [pos(3)+ti(1)+ti(3) pos(4)+ti(2)+ti(4)]);
-    set(fig, 'PaperPositionMode', 'manual');
-    set(fig, 'PaperPosition',[0 0 pos(3)+ti(1)+ti(3) pos(4)+ti(2)+ti(4)]);
+    set(f, 'PaperUnits','centimeters');
+    set(f, 'PaperSize', [pos(3)+ti(1)+ti(3) pos(4)+ti(2)+ti(4)]);
+    set(f, 'PaperPositionMode', 'manual');
+    set(f, 'PaperPosition',[0 0 pos(3)+ti(1)+ti(3) pos(4)+ti(2)+ti(4)]);
     
-    set(fig, 'Visible', ToPlot.Visible)
-    
+    set(f, 'Visible', ToPlot.Visible)
+
     
     %% Contra-Ipsi
     ToPlot.Legend = {'(Contra-Ipsi)_A', '(Contra-Ipsi)_V','(Contra-Ipsi)_T'};
@@ -77,7 +78,9 @@ for WithPerm = 1
     Data_target = cat(1,Target_data(:).Contra_VS_Ipsi);
     ToPlot = GetData(ToPlot,Data_stim,Data_target,ROI_order);
     
+    get(f)
     Plot_interaction(ToPlot)
+%     Plot_interaction_XY(ToPlot)
     
     
     %% Contrast between sensory modalities Ispi
@@ -86,8 +89,10 @@ for WithPerm = 1
     Data_stim = cat(1,Stimuli_data(:).ContSensModIpsi);
     Data_target = cat(1,Target_data(:).ContSensModIpsi);
     ToPlot = GetData(ToPlot,Data_stim,Data_target,ROI_order);
-    
+       
+    get(f) 
     Plot_interaction(ToPlot)
+%     Plot_interaction_XY(ToPlot)
     
     %% Contrast between sensory modalities Contra
     ToPlot.Legend = {'(Audio-Visual)_{contra}', '(Audio-Tactile)_{contra}','(Visual-Tactile)_{contra}'};
@@ -95,13 +100,17 @@ for WithPerm = 1
     Data_stim = cat(1,Stimuli_data(:).ContSensModContra);
     Data_target = cat(1,Target_data(:).ContSensModContra);
     ToPlot = GetData(ToPlot,Data_stim,Data_target,ROI_order);
-    
+    ToPlot.Xlabel = 1;
+        
+    get(f)
     Plot_interaction(ToPlot)
+%     Plot_interaction_XY(ToPlot)
     
     %%
+    get(f)
     mtit('Interactions','xoff', 0, 'yoff', +0.05, 'fontsize', 12)
-    
-    print(fig, fullfile(ToPlot.FigureFolder, 'All_ROIs_interactions.tif'), '-dtiff')
+    print(f, fullfile(ToPlot.FigureFolder, 'All_ROIs_interactions.tif'), '-dtiff')
+
 end
 cd(StartDir)
 
@@ -118,7 +127,7 @@ end
 
 function Plot_interaction(ToPlot)
 
-Xpos = [1 3 7:2:15];
+Xpos = [1 3 7:2:11];
 
 Alpha = 0.05;
 
@@ -129,12 +138,16 @@ for iCdt = 1:size(ToPlot.ROI.grp,3)
     
     for iROI=1:size(ToPlot.ROI.grp,4)
         A = ToPlot.ROI.grp(:,:,iCdt,iROI);
-        plot(repmat([Xpos(iROI)-.25;Xpos(iROI)+0.25],1,size(A,2)),A, '.-k')
+        % plot each subject
+        plot(repmat([Xpos(iROI)-.25;Xpos(iROI)+0.25],1,size(A,2)),A, '.-', ...
+            'color', [.6 .6 .6])
+        % plot group mean
+        plot([Xpos(iROI)-.25;Xpos(iROI)+0.25],mean(A,2), '.-k', ...
+            'linewidth', 1.5, 'markersize', 8)
     end
-    
+
     plot([-20 20], [0 0], '--k')
     
-    axis tight
     set(gca, 'tickdir', 'out', 'xtick', Xpos,'xticklabel',ToPlot.ROIs_name, ...
         'ticklength', [0.01 0.01], 'fontsize', 10)
     
@@ -144,8 +157,9 @@ for iCdt = 1:size(ToPlot.ROI.grp,3)
     t=ylabel(sprintf('Param. est. [a u]'));
     set(t,'fontsize',10);
     
+    axis tight
     ax = axis;
-    axis([0.5 15.5 ax(3) ax(4)+ax(4)*.25])
+    axis([0.5 11.5 ax(3) ax(4)+ax(4)*.25])
     
     
     tmp = squeeze(ToPlot.ROI.grp(1,:,iCdt,:)-ToPlot.ROI.grp(2,:,iCdt,:));
@@ -177,6 +191,60 @@ for iCdt = 1:size(ToPlot.ROI.grp,3)
         end
     end
     
+end
+
+end
+
+
+function Plot_interaction_XY(ToPlot)
+
+line_colors = [...
+    37,52,148;...
+    65,182,196;...
+    0,94,45;...
+    89,153,74;...
+    110,188,111;...
+    184,220,143;...
+    235,215,184;...
+    ]/255;
+
+for iCdt = 1:size(ToPlot.ROI.grp,3)
+    
+    subplot(3,3,ToPlot.SubplotNumber(iCdt))
+    hold on
+    
+    for iROI=1:size(ToPlot.ROI.grp,4)
+        A = ToPlot.ROI.grp(:,:,iCdt,iROI);
+        errorbar(mean(A(1,:)),mean(A(2,:)),...
+            nansem(A(2,:)),nansem(A(2,:)),...
+            nansem(A(1,:)),nansem(A(1,:)),...
+            'color', line_colors(iROI,:), 'linewidth', 2 )
+    end
+    
+    axis tight
+    ax = axis;
+    
+    plot([-10 10], [-10 10], '--k')
+    plot([0 0], [-10 10], '-k')
+    plot([-10 10], [0 0], '-k')
+    
+    axis(ax*1.2);
+
+    t=title(ToPlot.Legend{iCdt});
+    set(t,'fontsize',10);
+    
+    if isfield(ToPlot,'Xlabel')
+        if ToPlot.Xlabel
+            t=xlabel(sprintf('Stimuli\nParam. est. [a u]'));
+            set(t,'fontsize',10);
+        end
+    end
+    
+    if iCdt == 1
+        t=ylabel(sprintf('Target\nParam. est. [a u]'));
+        set(t,'fontsize',10);
+    end
+
 end
 
 end
