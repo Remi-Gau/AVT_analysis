@@ -1,6 +1,3 @@
-% print vtk files of daily averaged S-parameters surface mapping for each
-% subject
-
 % computes for each subject the correlation between one session and all the
 % others for all ROIs
 
@@ -32,8 +29,8 @@ DesMat = (1:NbLayers)-mean(1:NbLayers);
 DesMat = [ones(NbLayers,1) DesMat'];
 DesMat = spm_orth(DesMat);
 
-
-for iSub =  9:NbSub
+%%
+for iSub =  5:NbSub
     
     fprintf('\n\n\n')
     
@@ -109,6 +106,10 @@ for iSub =  9:NbSub
             for iBeta = 1:numel(Beta2Sel)
                 Features = AllMapping(:,:,Beta2Sel(iBeta)); %
                 
+                % keep track of the Beta selected to reorder the betaimages
+                % at the end of this loop
+                Beta_New_Order(Column) = Beta2Sel(iBeta);
+                
                 % Change or adapt dimensions for GLM
                 X = repmat(DesMat,size(Features,3),1);
                 Y = shiftdim(Features,1);
@@ -122,10 +123,17 @@ for iSub =  9:NbSub
             
         end
         
-        clear AllMapping
+        % we keep all the profiles for each session/condition for the next
+        % loop
+        ToRemove = setxor(Beta_New_Order,1:size(AllMapping,3));
+        AllMapping(:,:,ToRemove) = [];
+        Mapping(:,ToRemove) = [];
+        AllProfiles = zeros(size(inf_vertex,2), NbLayers, size(AllMapping,3));
+        AllProfiles(VertexWithData,:,:) = AllMapping(:,:,Beta_New_Order);
+        clear Beta_New_Order AllMapping ToRemove
         
         %% Session to session and Day to day correlation
-        for iROI = 1:4
+        for iROI = 1:5
             
             clear BOLD_Data
             
@@ -133,12 +141,21 @@ for iSub =  9:NbSub
             
             fprintf(['  '  Data_ROI.name '\n'])
             
+            Profiles = AllProfiles(ROI(iROI).VertOfInt{hs},:,:);
             BOLD_Data_session = Mapping(ROI(iROI).VertOfInt{hs},:);
             
+            % removing NAN and zero values
             ToRemove = cat(2,isnan(BOLD_Data_session), BOLD_Data_session==0);
             ToRemove = any(ToRemove,2);
             
             BOLD_Data_session(ToRemove,:) = [];
+            Profiles(ToRemove,:,:) = [];
+            
+            % Get median and mean for each layer
+            Profile_Mean(:,:,hs,iROI) = squeeze(mean(Profiles));
+            Profile_Median(:,:,hs,iROI) = squeeze(median(Profiles));
+            
+            clear Profiles ToRemove
             
             
             %% session to session correlation
@@ -174,165 +191,14 @@ for iSub =  9:NbSub
             
         end
         
-        clear Mapping
+        clear Mapping AllProfiles
         
     end
     
     %%
     save(fullfile(Results_dir,[SubLs(iSub).name '-Day2DayCorrelation.mat']), ...
-        'RHO_day', 'RHO_session')
-    
-    clear RHO_session RHO_day
+        'RHO_day', 'RHO_session', 'Profile_Mean', 'Profile_Median')
+
+    clear RHO_session RHO_day Profile_Mean Profile_Median
 end
 
-
-
-%% Plot results day by day
-Col = reshape(1:18,3,6)';
-
-set(0,'defaultAxesFontName','Arial')
-set(0,'defaultTextFontName','Arial')
-FigDim = [50, 50, 1300, 600];
-ColorMap = seismic(1000);
-
-HS = 'LR';
-
-for  iSub =  NbSub
-    
-    Sub_dir = fullfile(StartDir, SubLs(iSub).name);
-    Results_dir = fullfile(Sub_dir, 'results', 'profiles', 'surf', 'correlations');
-    load(fullfile(Results_dir,[SubLs(iSub).name '-Day2DayCorrelation.mat']), ...
-        'RHO_day', 'RHO_session')
-    
-    close all
-    
-    % set limits for imagesc
-    tmp = RHO_day(:,:,:,:);
-    tmp = sort(unique(tmp));
-%     CLIM = [min(tmp(:)) tmp(end-1)];
-    CLIM = [-.1 0.6];
-    
-    % adapts color scale so that 0 is white
-    MIN = CLIM(1);
-    MAX = CLIM(2);
-    [AbsMax,Idx] = max(abs([MIN MAX]));
-    Scale = linspace(-1*AbsMax,AbsMax,size(ColorMap,1))';
-    if Idx==2
-        Idx = Scale<MIN;
-        NewColorMap = ColorMap(~Idx,:);
-    else
-        Idx = Scale>MAX;
-        NewColorMap = ColorMap(~Idx,:);
-    end
-    
-    for iROI = 1:4
-        
-        opt.FigName = sprintf('%s - Day2DayCorrelation - %s', ...
-            SubLs(iSub).name, ROI(iROI).name);
-        
-        fig = figure('name', opt.FigName, ...
-            'Position', FigDim, 'Color', [1 1 1]);
-        colormap(NewColorMap);
-        
-        iSubplot = 1;
-        
-        for hs = 1:2
-            for iCdt = 1:numel(CondNames)
-                subplot(2,6,iSubplot)
-                imagesc(RHO_day(Col(iCdt,:),Col(iCdt,:),hs,iROI), ...
-                    CLIM)
-                axis square
-                iSubplot = iSubplot + 1;
-                
-                if hs==1
-                    title(CondNames{iCdt})
-                end
-                
-                if iCdt==1
-                    ylabel(['Hemisphere ' HS(hs)])
-                end
-            end
-        end
-        
-        mtit(opt.FigName)
-        
-    end
-    
-end
-
-
-%% Plot results session by session
-clc
-
-Col = reshape(1:(6*sum(RunPerSes(iSub).RunsPerSes)),...
-    sum(RunPerSes(iSub).RunsPerSes),6)';
-
-set(0,'defaultAxesFontName','Arial')
-set(0,'defaultTextFontName','Arial')
-FigDim = [50, 50, 1300, 600];
-ColorMap = seismic(1000);
-
-HS = 'LR';
-
-for  iSub =  4%:NbSub
-
-    Sub_dir = fullfile(StartDir, SubLs(iSub).name);
-    Results_dir = fullfile(Sub_dir, 'results', 'profiles', 'surf', 'correlations');
-    load(fullfile(Results_dir,[SubLs(iSub).name '-Day2DayCorrelation.mat']), ...
-        'RHO_day', 'RHO_session')
-    
-    close all
-    
-    % set limits for imagesc
-    tmp = RHO_session(:,:,:,:);
-    tmp = sort(unique(tmp));
-%     CLIM = [min(tmp(:)) tmp(end-1)]
-    CLIM = [-.05 0.4];
-    
-    % adapts color scale so that 0 is white
-    MIN = CLIM(1);
-    MAX = CLIM(2);
-    [AbsMax,Idx] = max(abs([MIN MAX]));
-    Scale = linspace(-1*AbsMax,AbsMax,size(ColorMap,1))';
-    if Idx==2
-        Idx = Scale<MIN;
-        NewColorMap = ColorMap(~Idx,:);
-    else
-        Idx = Scale>MAX;
-        NewColorMap = ColorMap(~Idx,:);
-    end
-    
-    for iROI = 1:4
-        
-        opt.FigName = sprintf('%s - Run2RunCorrelation - %s', ...
-            SubLs(iSub).name, ROI(iROI).name);
-        
-        fig = figure('name', opt.FigName, ...
-            'Position', FigDim, 'Color', [1 1 1]);
-        colormap(NewColorMap);
-        
-        iSubplot = 1;
-        
-        for hs = 1:2
-            for iCdt = 1:numel(CondNames)
-                subplot(2,6,iSubplot)
-                imagesc(RHO_session(Col(iCdt,:),Col(iCdt,:),hs,iROI), ...
-                    CLIM)
-                axis square
-                iSubplot = iSubplot + 1;
-                
-                if hs==1
-                    title(CondNames{iCdt})
-                end
-                
-                if iCdt==1
-                    ylabel(['Hemisphere ' HS(hs)])
-                end
-            end
-        end
-        
-        mtit(opt.FigName)
-        
-    end
-    
-end
