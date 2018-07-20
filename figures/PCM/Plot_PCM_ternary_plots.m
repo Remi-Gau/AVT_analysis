@@ -85,7 +85,7 @@ set(0,'defaultTextFontName','Arial')
 FigDim = [50, 50, 600, 600];
 
 
-for iToPlot = 1 %:numel(ToPlot)
+for iToPlot = 1:2 %:numel(ToPlot)
     
     for Target = 1
         
@@ -146,7 +146,7 @@ for iToPlot = 1 %:numel(ToPlot)
         
         
         %%
-        for iROI = 1:NbROI
+        for iROI = 1%:NbROI
             close all 
             clc
             
@@ -154,7 +154,7 @@ for iToPlot = 1 %:numel(ToPlot)
             % Compute exceedance probabilities
             for iComp = 1:numel(M_all)
                 
-                loglike = Likelihood{iROI,ihs}(:,2:end-1,iComp);
+                loglike = Likelihood{iROI,ihs}(:,2:end-1,iComp)%-Likelihood{iROI,ihs}(:,1,iComp);
                 
                 % compare the 3 models together
                 [~,~,~,pxp3,~] = spm_BMS(loglike);
@@ -164,6 +164,7 @@ for iToPlot = 1 %:numel(ToPlot)
             end
             
             
+            %% Plot
             for iSubplot = 1:3
                 
                 switch iSubplot
@@ -178,54 +179,52 @@ for iToPlot = 1 %:numel(ToPlot)
                         suffix = ' - C';
                 end
                 
-%                 %% Ternary plots likelihoods
-%                 opt.FigName = sprintf('Likelihoods-3Models-%s-%s-PCM_{grp}-%s-%s-%s', ...
-%                     ROI(iROI).name, hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
-%                 
-%                 figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
-%                 
-%                 [h,hg,htick]=terplot;
-%                 set(htick(:),'fontsize',11)
-%                 set(hg(:), 'linewidth', 1, 'linestyle', '-')
-%                 
-%                 for i=1:3
-%                     tmp = Likelihood{iROI,ihs}(:,2:end-1,CdtToPlot(i))
-%                     tmp = tmp./repmat(sum(tmp,2),1,3)
-%                     hter=ternaryc(tmp(:,1),tmp(:,2),tmp(:,3));
-%                     
-%                     switch i
-%                         case 1
-%                             set(hter, 'marker', '+')
-%                         case 2
-%                             set(hter, 'marker', 'diamond')
-%                         case 3
-%                             set(hter, 'marker', 'o')
-%                     end
-%                     
-%                     if iSubplot==1
-%                         set(hter, 'color', 'k')
-%                     elseif iSubplot==2
-%                         set(hter, 'color', 'r')
-%                     end
-%                     
-%                     set(hter, 'MarkerSize', 5, 'linewidth', 3, 'MarkerFaceColor', 'none')
-%                 end
-%                 
-%                 hlabels=terlabel('p(Scaled)','p(Scaled and independent)','p(Independent)');
-%                 set(hlabels(:),'fontsize',11)
-% 
-%                                 p=mtit([ROI(iROI).name ' - ' ToPlot{iToPlot} suffix],...
-%                                     'fontsize',14,...
-%                                     'xoff',0,'yoff',.025);
-%                 
-%                 
-%                 set(gca, 'ticklength', [10 0.1])
-%                 
-%                 p=mtit(' ',...
-%                     'fontsize',14,...
-%                     'xoff',0,'yoff',.025);
-%                 
-%                 print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '_ternary_plot.tif'] ), '-dtiff')
+                %% Ternary plots likelihoods
+                opt.FigName = sprintf('Likelihoods-3Models-%s-%s-PCM_{grp}-%s-%s-%s', ...
+                    ROI(iROI).name, hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+                
+                figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
+                
+                hold on
+                
+                [h,hg,htick]=terplot;
+                set(htick(:),'fontsize',11)
+                set(hg(:), 'linewidth', 1, 'linestyle', '-')
+                
+                for i=1:3
+                    tmp = Likelihood{iROI,ihs}(:,2:end-1,CdtToPlot(i))...
+                        -Likelihood{iROI,ihs}(:,1,CdtToPlot(i)); % remove null model log like value
+                    tmp = mean(tmp./repmat(sum(tmp,2),1,3)); % take mean across subjects
+                    hter=ternaryc(tmp(:,1),tmp(:,2),tmp(:,3));
+                    
+                    switch i
+                        case 1
+                            set(hter, 'marker', '+')
+                        case 2
+                            set(hter, 'marker', 'diamond')
+                        case 3
+                            set(hter, 'marker', 'o')
+                    end
+                    
+                    if iSubplot==1
+                        set(hter, 'color', 'k')
+                    elseif iSubplot==2
+                        set(hter, 'color', 'r')
+                    end
+                    
+                    set(hter, 'MarkerSize', 15, 'linewidth', 3, 'MarkerFaceColor', 'none')
+                end
+                
+                hlabels=terlabel('p(Scaled)','p(Scaled and independent)','p(Independent)');
+                set(hlabels(:),'fontsize',11)
+
+                p=mtit([ROI(iROI).name ' - Relative loglikelihood - ' ToPlot{iToPlot} suffix],...
+                    'fontsize',14,...
+                    'xoff',0,'yoff',.025);
+
+                set(gca, 'ticklength', [10 0.1])
+                
+                print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '_ternary_plot.tif'] ), '-dtiff')
 %                 print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '_ternary_plot.svg'] ), '-dsvg')
 %                 
                 %% ternary plots: the 3 models compared all together
@@ -255,17 +254,17 @@ for iToPlot = 1 %:numel(ToPlot)
                 
                 set(hter(:), 'MarkerSize', 20, 'linewidth', 3)
                 
-                %                 p=mtit([ROI(iROI).name ' - ' ToPlot{iToPlot} suffix],...
-                %                     'fontsize',14,...
-                %                     'xoff',0,'yoff',.025);
-                
-                p=mtit(' ',...
+                p=mtit([ROI(iROI).name ' - Ex probability - ' ToPlot{iToPlot} suffix],...
                     'fontsize',14,...
                     'xoff',0,'yoff',.025);
                 
-                print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '_ternary_plot.tif'] ), '-dtiff')
-                print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '_ternary_plot.svg'] ), '-dsvg')
+%                 p=mtit(' ',...
+%                     'fontsize',14,...
+%                     'xoff',0,'yoff',.025);
                 
+                print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '_ternary_plot.tif'] ), '-dtiff')
+%                 print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '_ternary_plot.svg'] ), '-dsvg')
+%                 
             end
             
             
