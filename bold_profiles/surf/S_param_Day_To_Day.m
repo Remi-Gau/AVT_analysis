@@ -35,7 +35,7 @@ DesMat = spm_orth(DesMat);
 HS = 'lr';
 
 
-for iSub = [4 6 7 8:10] %[4 6 7]
+for iSub = 5 %1:10
     
     fprintf('\n\n\n')
     
@@ -126,8 +126,19 @@ for iSub = [4 6 7 8:10] %[4 6 7]
         
         %to know which columns to avg
         Col2Avg= cumsum(RunPerSes(iSub).RunsPerSes);
+        if iSub == 5 % one session for this subject did not have auditory stimuli
+            Col2Avg(end) = Col2Avg(end)-1;
+        end
         for i=2:numel(CondNames)
-            Col2Avg(end+1,:) = Col2Avg(1,:)+sum(RunPerSes(iSub).RunsPerSes)*(i-1);
+            if iSub == 5
+                if i==2 % one session for this subject did not have auditory stimuli
+                    Col2Avg(end+1,:)= Col2Avg(1,:)+sum(RunPerSes(iSub).RunsPerSes)-1;
+                else
+                    Col2Avg(end+1,:) = Col2Avg(2,:)+sum(RunPerSes(iSub).RunsPerSes)*(i-2);
+                end
+            else
+                Col2Avg(end+1,:) = Col2Avg(1,:)+sum(RunPerSes(iSub).RunsPerSes)*(i-1);
+            end
         end
         Col2Avg=Col2Avg'; Col2Avg=Col2Avg(:);
         
