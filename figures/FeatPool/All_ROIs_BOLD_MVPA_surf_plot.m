@@ -13,8 +13,6 @@ FigureFolder = fullfile(StartDir, 'figures');
 MVPA_resultsDir = fullfile(StartDir, 'results', 'SVM');
 BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles','surf');
 
-IsStim = 1;
-
 set(0,'defaultAxesFontName','Arial')
 set(0,'defaultTextFontName','Arial')
 
@@ -63,7 +61,7 @@ opt.session.curve = 0;
 opt.scaling.idpdt = 1;
 opt.session.loro = 0;
 opt.MVNN = 1;
-opt.vol = 1;
+opt.vol = 0;
 
 if opt.MVNN
     ParamToPlot={'Cst','Lin','Avg','ROI'};
@@ -342,6 +340,7 @@ for iAnalysis= 1:numel(TitSuf)
 
 
         Plot_BOLD_MVPA_all_ROIs(ToPlot)
+        
         
     end
     

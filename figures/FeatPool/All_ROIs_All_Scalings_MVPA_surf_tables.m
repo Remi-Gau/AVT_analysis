@@ -1,4 +1,4 @@
-function All_ROIs_BOLD_MVPA_surf_tables
+function All_ROIs_All_Scalings_MVPA_surf_tables
 clc; clear;
 
 StartDir = fullfile(pwd, '..','..','..');

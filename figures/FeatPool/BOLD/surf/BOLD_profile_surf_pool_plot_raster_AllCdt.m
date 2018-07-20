@@ -61,7 +61,7 @@ clear A
 
 ToPlot={'Constant','Linear','Quadratic'};
 
-for iToPlot = 1 %:numel(ToPlot)
+for iToPlot = 3 %1 %:numel(ToPlot)
     
     for iROI = 1 %:numel(ROI)
         

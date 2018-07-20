@@ -1,4 +1,5 @@
-Tail = 'both';
+clear
+Tail = 'left'
 
 % These are the betas I get from a GLM fit: 
 % each line is a different component of my fit (constant, linear, quadratic
@@ -53,5 +54,4 @@ end
 P
 
 % [~,P2] = ttest(betas, 0, 'alpha', 0.05, 'tail', Tail)
-        
 

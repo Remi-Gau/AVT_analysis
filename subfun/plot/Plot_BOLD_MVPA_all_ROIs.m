@@ -91,6 +91,8 @@ for iRow = 1:size(ToPlot.Legend,1)
             MIN = ax(3)-0.02;
             MAX = ax(4)+0.02;
         end
+%         MIN = ax(3)-0.02;
+%         MAX = ax(4)+0.02;
         axis([0.4 6.6 MIN MAX])
         
         t = title(ToPlot.Legend{iRow,iColumn});

@@ -27,7 +27,7 @@ DesMat = spm_orth(DesMat);
 
 ToPlot={'Cst','Lin'};
 
-for iSub = 1:NbSub
+for iSub = 2:NbSub
     
     fprintf('\n\n\n')
     
@@ -126,7 +126,7 @@ for iSub = 1:NbSub
 %                     BetaCdt{hs,iCV}(size(DesMat,2)+1,:,iCdt) = nan(1,size(Features,1));
                 else
                     Y = Features(:,:,Sess2Sel);
-                    AllData{hs,iCV}(:,:,iCdt) = Y;
+%                     AllData{hs,iCV}(:,:,iCdt) = Y;
                     X=repmat(DesMat,size(Y,3),1);
                     Y = shiftdim(Y,1);
                     B = pinv(X)*Y;

@@ -32,7 +32,7 @@ Folds = {...
     2,[1 3];...
     3,1:2};
 
-for iSub = 5:NbSub
+for iSub = 2:NbSub
     
     fprintf('\n\n\n')
     
@@ -81,7 +81,7 @@ for iSub = 5:NbSub
             num2str(NbLayers) '_surf.mat']);
         
         InfSurfFile=spm_select('FPList', fullfile(Sub_dir, 'anat', 'cbs'), ...
-            ['^' SubLs(iSub).name '.*' HsSufix 'cr_gm_avg_inf.vtk$']);
+            ['^' SubLs(iSub).name '.*' HsSufix 'cr_gm_avg_inf_qT1.vtk$']);
         [inf_vertex,inf_faces,~] = read_vtk(InfSurfFile, 0, 1);
         
         NbVertices(hs)=size(inf_vertex,2);
@@ -324,9 +324,9 @@ for iSub = 5:NbSub
     
     fprintf('\n Rasters: Stim = f(Stim)\n')
     
-    for iToPlot = 1:2 %:numel(ToPlot)
+    for iToPlot = 1:numel(ToPlot)
         
-        for iROI = 1:numel(ROI)
+        for iROI = 1%:numel(ROI)
             
             NbBin = MinVert(strcmp(ROI(iROI).name,{MinVert.name}')).MinVert;
             
@@ -419,9 +419,9 @@ for iSub = 5:NbSub
     
     fprintf('\n Rasters: Contra-Ipsi = f(Stim)\n')
     
-    for iToPlot = 1:2 %numel(ToPlot)
+    for iToPlot = 1:numel(ToPlot)
         
-        for iROI = 1:numel(ROI)
+        for iROI = 1%:numel(ROI)
             
             NbBin = MinVert(strcmp(ROI(iROI).name,{MinVert.name}')).MinVert;
             
@@ -513,9 +513,9 @@ for iSub = 5:NbSub
     
     fprintf('\n Rasters: Sens = f(Stim)\n')
     
-    for iToPlot = 1:2 %numel(ToPlot)
+    for iToPlot = 1:numel(ToPlot)
         
-        for iROI = 1:numel(ROI)
+        for iROI = 1%:numel(ROI)
             
             NbBin = MinVert(strcmp(ROI(iROI).name,{MinVert.name}')).MinVert;
             
@@ -607,9 +607,9 @@ for iSub = 5:NbSub
     
     fprintf('\n Rasters: cross-sensory ipsi = f(cross-sensory contra)\n')
     
-    for iToPlot = 1:2 %numel(ToPlot)
+    for iToPlot = 1:numel(ToPlot)
         
-        for iROI = 1:numel(ROI)
+        for iROI = 1%:numel(ROI)
             
             NbBin = MinVert(strcmp(ROI(iROI).name,{MinVert.name}')).MinVert;
             
@@ -705,9 +705,9 @@ for iSub = 5:NbSub
     
     fprintf('\n Rasters: ipsi-contra sense A = f(ipsi-contra sense B)\n')
     
-    for iToPlot = 1:2 %numel(ToPlot)
+    for iToPlot = 1:numel(ToPlot)
         
-        for iROI = 1:numel(ROI)
+        for iROI = 1%:numel(ROI)
             
             NbBin = MinVert(strcmp(ROI(iROI).name,{MinVert.name}')).MinVert;
             
@@ -794,7 +794,7 @@ for iSub = 5:NbSub
     
 
     %%
-    save(fullfile(Sub_dir,'results','profiles','surf','rasters',[SubLs(iSub).name '-SurfRasters.mat']), ...
+    save(fullfile(Sub_dir,'results','profiles','surf','rasters',[SubLs(iSub).name '-SurfRasters_A1-quad.mat']), ...
         'ROI', ...
         'All_X_sort', 'All_Profiles',...
         'All_X_sort_CrossSens_fCrossSens', 'All_Profiles_CrossSens_fCrossSens',...
