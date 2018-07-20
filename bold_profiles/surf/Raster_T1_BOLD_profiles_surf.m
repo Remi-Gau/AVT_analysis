@@ -148,7 +148,7 @@ for iSub =  1:NbSub
             BOLD_Data(ToRemove,:) = [];
             T1_Data(ToRemove,:) = [];
             
-            for iCdt = 1:numel(CondNames)     
+            for iCdt = 1:numel(CondNames)
                 RHO(iCdt,hs,iSub,iROI) = corr(T1_Data,BOLD_Data(:,iCdt));
                 %                 scatter(T1_Data,BOLD_Data(:,iCdt),'.')
             end
@@ -171,7 +171,36 @@ save(fullfile(StartDir, 'results','profiles','surf','T1_BOLD_cor.mat'), ...
 cd(StartDir)
 
 %%
+StartDir = 'D:\Dropbox\PhD\Experiments\AVT\derivatives\';
+addpath(genpath(fullfile(StartDir, 'code','subfun')))
+Get_dependencies('/home/rxg243/Dropbox/')
+Get_dependencies('D:\Dropbox/')
+
+load(fullfile(StartDir, 'results','profiles','surf','T1_BOLD_cor.mat'), ...
+    'RHO')
+
+%%
+clc
 close all
+
+FigureFolder = fullfile(StartDir, 'figures', 'T1');
+
+
+CondNames = {...
+    'AStimL','AStimR',...
+    'VStimL','VStimR',...
+    'TStimL','TStimR'...
+    %     'ATargL','ATargR';...
+    %     'VTargL','VTargR';...
+    %     'TTargL','TTargR';...
+    };
+
+FigDim = [50, 50, 1000, 800];
+
+FigName ='T1 to profile Cst correlation';
+figure('name', FigName, 'Position', FigDim, 'Color', [1 1 1]);
+
+
 for iSubplot=1:4
     switch iSubplot
         case 1
@@ -187,11 +216,40 @@ for iSubplot=1:4
             ROI = 2;
             hs = 2;
     end
+    
+    Data = atanh(squeeze(RHO(:,hs,:,ROI)));
+
     subplot(2,2,iSubplot)
     grid on
     hold on
-    plot( repmat((1:6)',1,10), squeeze(RHO(:,hs,:,ROI)), 'color', [.5 .5 .5] )
-    errorbar(1:6, mean(squeeze(RHO(:,hs,:,ROI)),2), nansem(squeeze(RHO(:,hs,:,ROI)),2), ...
-        '-k', 'linewidth', 2 )
-    axis([0 7 -0.3 0.3])
+    plot( repmat((1:6)',1,10), Data, 'color', [.5 .5 .5] )
+    errorbar(1:6, mean(Data,2), nansem(Data,2), ...
+        'o k', 'linewidth', 2 )
+    plot( [1 6], [0 0], '--k' )
+    axis([0.5 6.5 -0.28 0.28])
+    
+    set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', ...
+        CondNames, ...
+        'ticklength', [0.01 0], 'fontsize', 8)
+    
+    
+    switch iSubplot
+        case 1
+            t = title('left');
+            set(t,'fontsize', 12)
+            t = ylabel('A1');
+            set(t,'fontsize', 12)
+        case 2
+            t = title('right');
+            set(t,'fontsize', 12)
+        case 3
+            t = ylabel('PT');
+            set(t,'fontsize', 12)
+    end
+
 end
+
+mtit(sprintf([FigName '\nFisher transformed correlation coefficient']),...
+    'fontsize', 12, 'xoff',0,'yoff',.035)
+
+print(gcf, fullfile(FigureFolder, 'T1_BOLD_Correlation.tif'), '-dtiff')
