@@ -17,7 +17,8 @@ family_names={...
     'Idpdt',...
     'Scaled',...
     'Scaled_Idpdt'};
-CdtComb = ['AVT';'VAT';'TAV'];
+
+CdtComb = ['AV';'AT';'VT'];
 
 % These are the 12 models from the PCM
 % M{1}.name = 'all_scaled';
@@ -37,58 +38,35 @@ CdtComb = ['AVT';'VAT';'TAV'];
 % M{12}.name = 'V idpdt+scaled T - A idpdt';
 
 % Models to include for each modality for the family comparison
-A_Idpdt = [2 4 12];
-
+A_Idpdt_V = [2 4 5 11 12];
 A_Scaled_V = [1 6 8];
 A_Scaled_Idpdt_V = [3 7 8 10];
 
+Cdt{1} = [A_Idpdt_V A_Scaled_V A_Scaled_Idpdt_V];
+
+A_Idpdt_T = [2 4 6 10 12];
 A_Scaled_T = [1 5 8];
 A_Scaled_Idpdt_T = [3 7 9 11];
 
-Cdt{1} = {A_Idpdt, A_Scaled_V, A_Scaled_Idpdt_V, A_Scaled_T, A_Scaled_Idpdt_T};
+Cdt{2} = [A_Idpdt_T A_Scaled_T A_Scaled_Idpdt_T];
 
-
-V_Idpdt = [2 5 11];
-
-V_Scaled_A = [1 6 8];
-V_Scaled_Idpdt_A = [3 7 8 10];
-
+V_Idpdt_T = [2 5 6 10 11];
 V_Scaled_T = [1 4 7];
 V_Scaled_Idpdt_T = [3 8 9 12];
 
-Cdt{2} = {V_Idpdt V_Scaled_A, V_Scaled_Idpdt_A, V_Scaled_T, V_Scaled_Idpdt_T};
-
-
-T_Idpdt = [2 6 10];
-
-T_Scaled_A = [1 5 8];
-T_Scaled_Idpdt_A = [3 7 9 11];
-
-T_Scaled_V = [1 4 7];
-T_Scaled_Idpdt_V = [3 8 9 12];
-
-Cdt{3} = {T_Idpdt, T_Scaled_A, T_Scaled_Idpdt_A, T_Scaled_V, T_Scaled_Idpdt_V};
-
+Cdt{3} = [V_Idpdt_T V_Scaled_T V_Scaled_Idpdt_T];
 
 % create the families
 for iCdt1 = 1:3
-    ModelOrder = Cdt{iCdt1};
-    for iCdt2 = 2:3
-        Families{iCdt1,iCdt2-1} = ...
-            struct('names', [], 'partition', [1 1 1 2 2 2 3 3 3 3], ...
-            'modelorder', [], 'infer', 'RFX', 'Nsamp', 1e4, 'prior', 'F-unity');
-        for iFam=1:3
-            Families{iCdt1,iCdt2-1}.names{iFam} = [CdtComb(iCdt1,1) '_' family_names{iFam} '_' CdtComb(iCdt1,iCdt2)];
-        end
-        % The fied model order will be used to only extract the likelihood
-        % of the models of interest
-        switch iCdt2
-            case 2
-                Families{iCdt1,iCdt2-1}.modelorder = [ModelOrder{1} ModelOrder{2} ModelOrder{3}];
-            case 3
-                Families{iCdt1,iCdt2-1}.modelorder = [ModelOrder{1} ModelOrder{4} ModelOrder{5}];
-        end
+    Families{iCdt1} = ...
+        struct('names', [], 'partition', [1 1 1 1 1 2 2 2 3 3 3 3], ...
+        'modelorder', [], 'infer', 'RFX', 'Nsamp', 1e4, 'prior', 'F-unity');
+    for iFam = 1:3
+        Families{iCdt1}.names{iFam} = [CdtComb(iCdt1,1) '_' family_names{iFam} '_' CdtComb(iCdt1,2)];
     end
+    % The field model order will be used to only extract the likelihood
+    % of the models of interest
+    Families{iCdt1}.modelorder = Cdt{iCdt1};
 end
 
 
@@ -218,14 +196,12 @@ for iToPlot = 1 %:numel(ToPlot)
                 XP = [];
                 Comp = [];
                 for iCdt1 = 1:3
-                    for iCdt2 = 2:3
-                        family = Families{iCdt1,iCdt2-1};
-                        loglike = Likelihood{iROI,ihs}(:,family.modelorder+1,iComp);%-Likelihood{iROI,ihs}(:,1,iComp);
-                        family = spm_compare_families(loglike,family);
-                        Families{iCdt1,iCdt2-1} = family;
-                        XP(end+1,:) = family.xp;
-                        Comp(end+1,:) = [CdtComb(iCdt1,1) ' VS ' CdtComb(iCdt1,iCdt2) ];
-                    end
+                    family = Families{iCdt1};
+                    loglike = Likelihood{iROI,ihs}(:,family.modelorder+1,iComp);%-Likelihood{iROI,ihs}(:,1,iComp);
+                    family = spm_compare_families(loglike,family);
+                    Families{iCdt1} = family;
+                    XP(iCdt1,:) = family.xp;
+                    Comp(iCdt1,:) = [CdtComb(iCdt1,1) ' VS ' CdtComb(iCdt1,2) ];
                 end
                 
                 
@@ -245,18 +221,18 @@ for iToPlot = 1 %:numel(ToPlot)
                 set(hlabels(:),'fontsize',20)
                 
                 if iComp==1
-                    set(hter, 'color', 'r', 'MarkerFaceColor', 'r')
+                    set(hter, 'color', 'r')
                 elseif iComp==2
-                    set(hter, 'color', 'b', 'MarkerFaceColor', 'b')
+                    set(hter, 'color', 'b')
                 end
                 
-                set(hter([3 5 6]), 'MarkerFaceColor', 'none')
+                set(hter, 'MarkerFaceColor', 'none')
                 
-                set(hter([1 3]), 'marker', 'square')
-                set(hter([2 5]), 'marker', 'diamond')
-                set(hter([4 6]), 'marker', 'o')
+                set(hter(1), 'marker', '+')
+                set(hter(2), 'marker', 'diamond')
+                set(hter(3), 'marker', 'o')
                 
-                set(hter(:), 'MarkerSize', 10, 'linewidth', 1)
+                set(hter(:), 'MarkerSize', 20, 'linewidth', 3)
                 
                 p=mtit([ROI(iROI).name ' - Ex probability - ' ToPlot{iToPlot} ' - ' Comp_suffix{iComp}],...
                     'fontsize',14,...
@@ -270,28 +246,3 @@ for iToPlot = 1 %:numel(ToPlot)
 end
 
 
-%% Legend
-close all
-
-figure('name','legend_3X3_models')
-hold on
-Comp = {};
-hter = []
-for iCdt1 = 1:3
-    for iCdt2 = 2:3
-        Comp{end+1} = [CdtComb(iCdt1,1) ' VS ' CdtComb(iCdt1,iCdt2) ];   
-        hter(end+1) = plot(1,1, ' .');
-    end
-end
-set(hter, 'color', 'r', 'MarkerFaceColor', 'r')
-
-set(hter([3 5 6]), 'MarkerFaceColor', 'none')
-
-set(hter([1 3]), 'marker', 'square')
-set(hter([2 5]), 'marker', 'diamond')
-set(hter([4 6]), 'marker', 'o')
-
-legend(Comp)
-
-print(gcf, fullfile(PCM_dir, 'Cdt', '3X3_models', 'legend_3X3_models.tif'), '-dtiff')
-  
