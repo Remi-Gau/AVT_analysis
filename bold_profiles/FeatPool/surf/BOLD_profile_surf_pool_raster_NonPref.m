@@ -26,8 +26,8 @@ CondNames = {...
 NbLayers = 6;
 
 DesMat = (1:NbLayers)-mean(1:NbLayers);
-DesMat = [ones(NbLayers,1) DesMat'];
-% DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
+% DesMat = [ones(NbLayers,1) DesMat'];
+DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
 DesMat = spm_orth(DesMat);
 
 Folds = {...
@@ -169,7 +169,7 @@ for iSub = 1:NbSub
     %% Profiles Stim = f(Stim)
     fprintf('\n')
     
-    for iToPlot = 1:2 %:numel(ToPlot)
+    for iToPlot = 1:numel(ToPlot)
         
         fprintf('\n\n')
         
@@ -180,7 +180,7 @@ for iSub = 1:NbSub
                 fprintf('\n\n Rasters %s = f(%s)\n', CondNames{Cdt(iCdt,1)}, ...
                     CondNames{Cdt(iCdt,2)})
                 
-                % Sorting varibles
+                % Sorting variables
                 X_lh = nan(1,NbVertex(1));
                 X_lh(1,VertexWithDataHS{1}) = BetaCdt{1,iCV}(iToPlot,:,Cdt(iCdt,1));
                 X_rh = nan(1,NbVertex(2));
@@ -190,11 +190,11 @@ for iSub = 1:NbSub
                 Y_lh = nan(1,NbVertex(1));
                 Y_lh(1,VertexWithDataHS{1}) = mean([...
                     BetaCdt{1,Folds{iCV,2}(1)}(iToPlot,:,Cdt(iCdt,2));...
-                    BetaCdt{1,Folds{iCV,2}(1)}(iToPlot,:,Cdt(iCdt,2))]);
+                    BetaCdt{1,Folds{iCV,2}(2)}(iToPlot,:,Cdt(iCdt,2))]);
                 Y_rh = nan(1,NbVertex(2));
                 Y_rh(1,VertexWithDataHS{2}) = mean([...
                     BetaCdt{2,Folds{iCV,2}(1)}(iToPlot,:,Cdt(iCdt,2));...
-                    BetaCdt{2,Folds{iCV,2}(1)}(iToPlot,:,Cdt(iCdt,2))]);
+                    BetaCdt{2,Folds{iCV,2}(2)}(iToPlot,:,Cdt(iCdt,2))]);
                 
                 % Variables to sort : profile per vertex
                 Profiles_lh = nan(NbVertex(1),6);
