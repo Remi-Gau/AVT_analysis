@@ -50,7 +50,7 @@ clear A
 
 ToPlot={'Constant','Linear','Quad'};
 
-for iSub = 1:NbSub
+for iSub = 4:NbSub
     
     fprintf('\n\n\n')
     
