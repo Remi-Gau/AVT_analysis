@@ -1,5 +1,10 @@
+% Smooths the data. They will only be used to create an inclusive mask for 
+% the subject level GLM
+
 clear; clc
 
+% Set do to 0 if you want to run the script but not let SPM run the actual
+% job. Can be useful to check that data is unzipped...
 Do = 1;
 
 DateFormat = 'yyyy_mm_dd_HH_MM';
@@ -9,7 +14,7 @@ spm_jobman('initcfg')
 spm_get_defaults;
 global defaults %#ok<NUSED>
 
-
+% To speed things up and use parallel computing
 % NbWorkers = 3;
 % MatlabVer = version('-release');
 % if str2double(MatlabVer(1:4))>2013
@@ -29,7 +34,7 @@ global defaults %#ok<NUSED>
 
 StartDir = fullfile(pwd, '..','..');
 cd (StartDir)
-addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
+addpath(genpath(fullfile(StartDir, 'AVT-7T-code', 'subfun')))
 
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
@@ -59,8 +64,11 @@ for iSub = NbSub % for each subject
         % Gets all the runs for that session
         cd(fullfile(SubDir, SesLs(iSes).name, 'func'))
         
-        Runs = spm_select('FPList', fullfile(pwd),...
-            ['^auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-.*_bold.nii.gz$']);
+        % Identify all the EPI files of interest
+        
+        % If the file are zipped uncomment the following lines
+%         Runs = spm_select('FPList', fullfile(pwd),...
+%             ['^auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-.*_bold.nii.gz$']);
 %         fprintf(' Unzipping files\n')
 %         gunzip(cellstr(Runs))
         
@@ -79,6 +87,7 @@ for iSub = NbSub % for each subject
             
         end
         
+        % Just display to make sure that we got everything right
         disp(matlabbatch{1}.spm.spatial.smooth.data)
         
     end
@@ -97,16 +106,19 @@ for iSub = NbSub % for each subject
     fprintf(' Cleaning')
     for iSes = 1:NbSes
         cd(fullfile(SubDir, SesLs(iSes).name, 'func'))
+        % Uncomment if you want to remove the slice timed EPIs and only
+        % keep the compressed one. Be careful if you have no gunzipped
+        % version of the data this might just delete it.
 %         delete(['auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-*_bold.nii'])
     end
-        
-    
+            
     cd (StartDir)
     
 end
 
 diary off
 
+% uncomment if you use parallel computing
 % if str2double(MatlabVer(1:4))>2013
 %     delete(gcp);
 % else

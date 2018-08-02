@@ -1,9 +1,16 @@
+% Realign and unwarp the EPIs: can use the VDM created from the fieldmap
+
 clear; clc
 
 DateFormat = 'yyyy_mm_dd_HH_MM';
 diary(['diary_realign_' datestr(now, DateFormat) '.out'])
 
+% In case you want to run the realign and unwarp without the field map
+% correction
 UseVDM = 1;
+
+% Set do to 0 if you want to run the script but not let SPM run the actual
+% job. Can be useful to check that data is unzipped...
 Do = 1;
 
 spm_jobman('initcfg')
@@ -118,7 +125,7 @@ for iSub = NbSub % for each subject
     end
     
     % Saving
-    if UseVDM;
+    if UseVDM
         SaveMatLabBatch(strcat('RealignAndUnwarpVDM_', SubLs(iSub).name, '_', datestr(now, DateFormat), '_matlabbatch'),matlabbatch)
         try
             % in case SPM created a .ps file output we rename it so it is

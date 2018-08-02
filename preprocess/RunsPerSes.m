@@ -1,3 +1,6 @@
+% Quickly checks how many sessions (days) and run per session there was for
+% each subject store the results in mat file in the root folder
+
 clear; clc
 
 StartDir = fullfile(pwd, '..','..');
@@ -5,7 +8,6 @@ cd (StartDir)
 
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
-
 
 
 for iSub = 1:NbSub % for each subject

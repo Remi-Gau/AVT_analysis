@@ -1,5 +1,7 @@
 clear; clc
 
+% Set do to 0 if you want to run the script but not let SPM run the actual
+% job. Can be useful to check that data is unzipped...
 Do = 1;
 
 DateFormat = 'yyyy_mm_dd_HH_MM';

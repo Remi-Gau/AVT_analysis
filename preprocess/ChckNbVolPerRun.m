@@ -7,7 +7,7 @@ addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
-for iSub = [2 4] %1:NbSub % for each subject
+for iSub = 1:NbSub % for each subject
     
     fprintf('\n\nProcessing %s\n', SubLs(iSub).name)
     
