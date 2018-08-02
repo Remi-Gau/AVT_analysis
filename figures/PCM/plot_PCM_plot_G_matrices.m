@@ -17,20 +17,20 @@ else
     NbROI = 5;
 end
 
-Switch = 0;
+Switch = 1;
 if Switch
     
     DiagToExtract = [1 8 15 22 29 36];
     
     %     Ac Ai Vc Vi Tc Ti
-    PositionToFill = [1 7 6 9 8 3 2 5 4 10 14 13 12 11 15];
-    DiagToFill = [8 1 22 15 36 29];
-    ConditionOrder = [2 1 4 3 6 5];
+%     PositionToFill = [1 7 6 9 8 3 2 5 4 10 14 13 12 11 15];
+%     DiagToFill = [8 1 22 15 36 29];
+%     ConditionOrder = [2 1 4 3 6 5];
     
     %     Ac Vc Tc Ai Vi Ti
-    %     DiagToFill = [22 1 29 8 36 15];
-    %     PositionToFill = [3 13 7 14 10 4 1 5 2 8 15 11 9 6 12];
-    %     ConditionOrder = [2 4 6 1 3 5];
+        DiagToFill = [22 1 29 8 36 15];
+        PositionToFill = [3 13 7 14 10 4 1 5 2 8 15 11 9 6 12];
+        ConditionOrder = [2 4 6 1 3 5];
     
     
 else
@@ -93,7 +93,7 @@ else
     NbHS = 1;
 end
 
-for iToPlot = 1%:4 %numel(ToPlot)
+for iToPlot = 1:2 %numel(ToPlot)
     
     for Target = 1
         
@@ -138,7 +138,7 @@ for iToPlot = 1%:4 %numel(ToPlot)
             end
         end
         
-        for iROI = 2 %1:NbROI
+        for iROI = 1:NbROI
             
             for ihs=1:NbHS
                 
@@ -161,7 +161,7 @@ for iToPlot = 1%:4 %numel(ToPlot)
         %% G matrix recap figures
         close all
         
-        for iROI = 2 %1:numel(G_Mat_all_ROIs)
+        for iROI = 1:numel(G_Mat_all_ROIs)
             
             clc
             
@@ -220,8 +220,8 @@ for iToPlot = 1%:4 %numel(ToPlot)
                 
                 % Add white lines
                 if all(ConditionOrder == [2 4 6 1 3 5])
-                    plot([3.5 3.5],[0.52 6.52],'w','linewidth', 3)
-                    plot([0.52 6.52],[3.5 3.5],'w','linewidth', 3)
+                    plot([3.5 3.5],[0.52 6.52],'color',[.8 .8 .8],'linewidth', 3)
+                    plot([0.52 6.52],[3.5 3.5],'color',[.8 .8 .8],'linewidth', 3)
                 else
                     Pos = 2.5;
                     for  i=1:2
@@ -232,10 +232,10 @@ for iToPlot = 1%:4 %numel(ToPlot)
                 end
                 
                 % add black line contours
-                plot([0.5 0.5],[0.51 6.51],'k','linewidth', 1)
-                plot([6.5 6.5],[0.51 6.51],'k','linewidth', 1)
-                plot([0.51 6.51],[0.5 0.5],'k','linewidth', 1)
-                plot([0.51 6.51],[6.5 6.5],'k','linewidth', 1)
+                plot([0.5 0.5],[0.51 6.51],'k','linewidth', 3)
+                plot([6.5 6.5],[0.51 6.51],'k','linewidth', 3)
+                plot([0.51 6.51],[0.5 0.5],'k','linewidth', 3)
+                plot([0.51 6.51],[6.5 6.5],'k','linewidth', 3)
                 
                 %                 axis tight
                 axis square
