@@ -96,7 +96,7 @@ clear Profiles X_Sort
 clc
 close all
 
-DoReg = 0; % plot regression or correlation
+DoReg = 1; % plot regression or correlation
 
 A = repmat(1:6,6,1);
 Cdt = [A(:), repmat((1:6)',6,1)];
