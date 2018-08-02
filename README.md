@@ -1,18 +1,36 @@
 # Audio-visual-tactile 7 tesla
+---
 
-Data analysis work flows
 
-code/preprocess/
-	CreateVDM: creates the voxel displacement map using the fieldmap
-	RealignAndUwarp: uses the VDM to realign and unwarp the EPIs
-	SliceTime
+## Dependencies:
+- RSA toolbox
+- PCM toolbox
 
-code/ffx/
-	FFX_native: run on smoothed images first to get inclusive mask
-	FFX_RSA: whitens the beta from the first level GLM using the RSA toolbox machinery
+
+## Data analysis work flows
+
+I indicate here the different folders where the code is kept and in which order to run them.
+
+
+**code/preprocess/**
+
+1) CpFromSrc.m: gets the file from the BIDS and unzips some of them
+2) CreateVDM.m: creates the voxel displacement map using the fieldmap
+3) RealignAndUwarp.m: realign and unwarp the EPIs
+4) SliceTime.m: does the slice timing.
+5) SmoothNative.m: smooths the data. They will only be used to create an inclusive mask for the subject level GLM. See FFX_native.m.
+6) RunsPerSes.m: checks how many sessions (days) and run per session there was for each subject store the results in mat file in the root folder.
+
+**code/ffx/**
+
+1) FFX_native.m: runs the subject level GLM. It is run a first time to get on smoothed images to get an inclusive mask that will be used for a second pass.
+2) FFX_RSA.m: whitens the beta from the subject level GLM using the RSA toolbox machinery
 	
-code/cbs/ or sub-xx/code/cbs/
-	segment-layer.LayoutXML: high-res segmention and layering
+**code/cbs/ or sub-xx/code/cbs/**
+
+segment-layer.LayoutXML: high-res segmention and layering
+
+---
 
 What we have:
 	- beta images (SPM)
@@ -40,7 +58,7 @@ The layers level-sets were computed for the whole brain but they are mapped on t
 
 	Extract_mapped_target_betas: copies vtk files out of the folder structure created by the CBS tools. Renames them so that we know which vtk file corresponds to which beta image
 		Calls recursive function Extract_mapped_betas_VTK
-	ExtractFeatSurf: extracts data (i.e. beta values for vertex in a particular surface-layer) from all the VTK. Relies on parfor and brute force but fast ìtextscanî rather than the slower read_vtk. Requires to know how many vertices the VTK files have. Saves the data for the whole surface and for each beta dimension are [vertex,layer,beta]. Also saves the list of vertices that have data at each depth.
+	ExtractFeatSurf: extracts data (i.e. beta values for vertex in a particular surface-layer) from all the VTK. Relies on parfor and brute force but fast ‚Äútextscan‚Äù rather than the slower read_vtk. Requires to know how many vertices the VTK files have. Saves the data for the whole surface and for each beta dimension are [vertex,layer,beta]. Also saves the list of vertices that have data at each depth.
 
 code/roi
 	Extract_vert_of_interest_ROI: get the vertices of interest for each ROI (reads them from the surface binary mask)
