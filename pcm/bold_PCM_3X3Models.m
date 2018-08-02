@@ -10,7 +10,7 @@
 clc; clear; close all
 
 StartDir = fullfile(pwd, '..','..');
-addpath(genpath(fullfile(StartDir, 'code','subfun')))
+addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
 
 Get_dependencies('/home/rxg243/Dropbox/')
 Get_dependencies('D:\Dropbox\')
@@ -98,7 +98,7 @@ end
 %% Start
 fprintf('Get started\n')
 
-for iToPlot = 1%:numel(ToPlot)
+for iToPlot = 2%:numel(ToPlot)
     
     for Target = 1
         

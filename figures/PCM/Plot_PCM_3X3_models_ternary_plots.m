@@ -131,7 +131,7 @@ set(0,'defaultTextFontName','Arial')
 FigDim = [50, 50, 600, 600];
 
 
-for iToPlot = 1 %:numel(ToPlot)
+for iToPlot = 2 %:numel(ToPlot)
     
     for Target = 1
         

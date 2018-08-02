@@ -98,7 +98,7 @@ end
 Comp_suffix{1} = '3X3_Ipsi';
 Comp_suffix{end+1} = '3X3_Contra';
 
-for iToPlot = 1%:numel(ToPlot)
+for iToPlot = 2%:numel(ToPlot)
     
     for Target = 1
         

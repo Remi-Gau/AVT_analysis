@@ -49,7 +49,7 @@ end
 
 ColorMap = seismic(1000);
 visible = 'on';
-FigDim = [50, 50, 1200, 600];
+FigDim = [50, 50, 700, 700];
 
 PCM_dir = fullfile(StartDir, 'figures', 'PCM');
 Save_dir = fullfile(StartDir, 'results', 'PCM', Output_dir);
@@ -79,7 +79,7 @@ end
 Comp_suffix{1} = '3X3_Contra';
 Comp_suffix{end+1} = '3X3_Ipsi';
 
-for iToPlot = 1%:numel(ToPlot)
+for iToPlot = 1:2%:numel(ToPlot)
     
     for Target = 1
         
@@ -109,9 +109,9 @@ for iToPlot = 1%:numel(ToPlot)
                     };
             else
                 CondNames = {...
-                    'A ipsi','A contra',...
-                    'V ipsi','V contra',...
-                    'T ipsi','T contra'...
+                    'A_i','A_c',...
+                    'V_i','V_c',...
+                    'T_i','T_c'...
                     };
             end
         end
@@ -149,20 +149,24 @@ for iToPlot = 1%:numel(ToPlot)
                 
                 %% Plot G matrices
                 for iModel=1:2
-
+                    
+                    Mat2Plot = zeros(6);
                     for iComp = 1:numel(Comp_suffix)
                         
-                        G_hat = G_hat_all{iComp,1};
-                        G_pred_cr = G_pred_cr_all{iComp,1};
-                        
                         if iModel==1
-                            Mat2Plot(:,:,iComp) = H*mean(G_hat,3)*H';
+                            G = G_hat_all{iComp,1};
                         else
-                            Mat2Plot(:,:,iComp) = H*mean(G_pred_cr{end},3)*H';
+                            G = G_pred_cr_all{iComp,1}{end};
+                        end
+                        
+                        if iComp==1
+                            Mat2Plot(1:3,1:3) = H*mean(G,3)*H';
+                        else
+                            Mat2Plot(4:6,4:6) = H*mean(G,3)*H';
                         end
                         
                     end
-                                        
+                    
                     [ NewColorMap ] = Create_non_centered_diverging_colormap(Mat2Plot, ColorMap);
                     MIN = min(Mat2Plot(:));
                     MAX = max(Mat2Plot(:));
@@ -185,33 +189,38 @@ for iToPlot = 1%:numel(ToPlot)
                         strrep(Title, ' ',''), ...
                         hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
                     
+                                        
                     figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', visible);
                     colormap(NewColorMap)
                     
-                    for iComp = 1:numel(Comp_suffix)
-
-                        subplot(1,2,iComp)
-                        imagesc(Mat2Plot(:,:,iComp), CLIM);
-                        axis square
-                        colorbar
-                        
-                        switch iComp
-                            case 1
-                                CdtToSelect = 2:2:6;
-                            case 2
-                                CdtToSelect = 1:2:5;  
-                        end
-                        
-                        set(gca,'tickdir', 'out', 'xtick', 1:3,'xticklabel', {CondNames{CdtToSelect}}, ...
-                            'ytick', 1:3,'yticklabel', {CondNames{CdtToSelect}}, ...
-                            'ticklength', [0.01 0], 'fontsize', 16)
-                        
-                        t = title(Title);
-                        set(t, 'fontsize', 16);
-                        
-                    end
+                    hold on
                     
-                    print(gcf, fullfile(PCM_dir, 'Cdt', '3X3_models', [opt.FigName '.tif'] ), '-dtiff')
+                    imagesc(flipud(Mat2Plot), CLIM);
+                    
+                    colorbar
+                    
+                    % Add white lines
+                    Pos = 3.5;
+                    plot([Pos Pos],[0.52 6.52],'color',[.8 .8 .8],'linewidth', 3)
+                    plot([0.52 6.52],[Pos Pos],'color',[.8 .8 .8],'linewidth', 3)
+                    
+                    % add black line contours
+                    plot([0.5 0.5],[0.51 6.51],'k','linewidth', 3)
+                    plot([6.5 6.5],[0.51 6.51],'k','linewidth', 3)
+                    plot([0.51 6.51],[0.5 0.5],'k','linewidth', 3)
+                    plot([0.51 6.51],[6.5 6.5],'k','linewidth', 3)
+                    
+                    axis square
+                    axis ([.5 6.5 .5 6.5])
+                    
+                    set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', {CondNames{[2:2:6 1:2:6]}}, ...
+                        'ytick', 1:6,'yticklabel', {CondNames{[5:-2:1 6:-2:1]}}, ...
+                        'ticklength', [0.01 0], 'fontsize', 16, 'xaxislocation' ,'top')
+                    
+                    %                     t = title(Title);
+                    %                     set(t, 'fontsize', 16);
+                    
+                    print(gcf, fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot}, [opt.FigName '.tif'] ), '-dtiff')
                     
                 end
                 
