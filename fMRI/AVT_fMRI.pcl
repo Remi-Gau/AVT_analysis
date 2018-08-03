@@ -1,15 +1,15 @@
 # --------------------------------------------------- #
 #					           QUAERO							   #
 # --------------------------------------------------- #
-include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\stimlibrel.pcl"
-include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\subroutines_tactile.pcl"
+#include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\stimlibrel.pcl"
+#include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\subroutines_tactile.pcl"
 
 #include_once "U:\\A_V_T\\stimlibrel.pcl"
 
-loadLibrary();
+#loadLibrary();
 
 #Stimulator licence BHAM
-initStimulator("8DD8J3C662984KL65UZ3LHJEEF5OTP");	
+#initStimulator("8DD8J3C662984KL65UZ3LHJEEF5OTP");	
 int SlotL=2;
 int SlotR=3;
 
@@ -18,10 +18,10 @@ int SlotR=3;
 #int SlotL=3;
 #int SlotR=4;
 
-setProperty("local_buffer_size", 5000000);
+#setProperty("local_buffer_size", 5000000);
 
-setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
-setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
+#setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
+#setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
 
 
 # --------------------------------------------------- #
@@ -81,19 +81,9 @@ end;
 # --------------------------------------------------- #
 preset bool DEBUG = false;
 
-preset bool fMRI_Run = false;
-
-preset int RunType; #(1 for A only, 2 for AV, 3 for AVT, 4 for T only)
-
 preset int Stimulus_Duration = 50; # ms
 int Post_Stimulus_Duration = 250;
 int Pre_Stimulus_Duration = 500;
-
-Dots_Con.set_duration(Stimulus_Duration);
-Dots_Inc.set_duration(Stimulus_Duration);
-
-PostStimFix_Con.set_time(Pre_Stimulus_Duration+Stimulus_Duration);
-PostStimFix_Inc.set_time(Pre_Stimulus_Duration+Stimulus_Duration);
 
 Dots_V.set_duration(Stimulus_Duration);
 PostStimFix_V.set_time(Pre_Stimulus_Duration+Stimulus_Duration);
@@ -101,25 +91,21 @@ PostStimFix_V.set_time(Pre_Stimulus_Duration+Stimulus_Duration);
 PostStimFix_A.set_duration(Post_Stimulus_Duration+Stimulus_Duration);
 
 Dot_Target_1.set_duration(Stimulus_Duration);
-Inter_Dot.set_duration(Stimulus_Duration);
+Inter_Dot.set_duration(40);
 Inter_Dot.set_delta_time(Stimulus_Duration);
 Dot_Target_2.set_duration(Stimulus_Duration);
-Inter_Dot.set_delta_time(Stimulus_Duration);
-PostStimFix_V_Target.set_time(Pre_Stimulus_Duration+3*Stimulus_Duration);
+Dot_Target_2.set_delta_time(40);
+PostStimFix_V_Target.set_time(Pre_Stimulus_Duration+2*Stimulus_Duration+40);
+PostStimFix_V_Target.set_duration(Post_Stimulus_Duration+Stimulus_Duration);
 
-Sound_Target2.set_time(Pre_Stimulus_Duration+Stimulus_Duration*2);
+Sound_Target2.set_time(Pre_Stimulus_Duration+Stimulus_Duration+40);
 PostStimFix_A_Target.set_duration(3*Stimulus_Duration+Post_Stimulus_Duration);
-
-preset bool PresentFeedback = false;
-if DEBUG == true || fMRI_Run==true || RunType==2 || RunType==4 then
-	PresentFeedback = false;
-end;
 
 preset int SubjectNumber;
 
 preset int RunNumber;
 
-RunNumber = 1000*RunType + 100*int(PresentFeedback) + RunNumber;
+RunNumber = 3000 + RunNumber;
 
 # Tactile
 # tactile stim duration = 0.5*WaitTime*2*NumCycle [in ms]
@@ -165,11 +151,7 @@ end;
 # --------------------------------------------------- #
 string Text2Present = "This is ";
 
-if fMRI_Run == true then
-	Text2Present.append("an fMRI run ");
-else
-	Text2Present.append("a psychophysics run ");
-end;
+Text2Present.append("an fMRI run ");
 
 if DEBUG == true then
 	Text2Present.append("in DEBUG mode.\n\n");
@@ -177,28 +159,14 @@ else
 	Text2Present.append("not in DEBUG mode.\n\n");
 end;
 
-if RunType == 1 then
-	Text2Present.append("Audio only trials ");
-elseif RunType == 2 then
-	Text2Present.append("Audiovisual trials ");
-elseif RunType == 3 then
-	Text2Present.append("Audio or Visual or Tactile trials ");	
-else
-	Text2Present.append("Tactile only trials ");		
-end;
-
-if PresentFeedback == true then
-	Text2Present.append("with feedback.");
-else
-	Text2Present.append("without feedback.");	
-end;
+Text2Present.append("Audio or Visual or Tactile trials ");	
 
 ConfirmationTxt.set_caption(Text2Present);
 ConfirmationTxt.redraw();
 Confirmation.present();
 
 
-if fMRI_Run == false  || DEBUG == true || PresentFeedback == true then # Psychophysics run or debug
+if DEBUG == true then # Psychophysics run or debug
 	Final_Fixation.set_duration(1000);
 	Fixation.set_duration(3000);
 end;
@@ -218,48 +186,21 @@ if DEBUG == true then
 
 	# AudioOnly_Trial ; TrialType == 1
 	# VisualOnly_Trial ; TrialType == 2
-	# AudioVisual_Con_Trial ; TrialType == 3
-	# AudioVisual_Inc_Trial ; TrialType == 4
 	# Tactile_Trial ; TrialType == 5
 	
 	# AudioOnly_Target ; TrialType == 6
 	# VisualOnly_Target ; TrialType == 7
 	# Tactile_Target ; TrialType == 8
 	
-	
-	# AudioOnly
-	TrialList.assign ({1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1});
-	
-	# VisualOnly
-	# TrialList.assign ({2, 2, 2, 2, 2, 2, 2, 2, 2, 2});
-	
-	# AudioVisual CONGRUENT
-	# TrialList.assign ({3, 3, 3, 3, 3});
-	
-	# AudioVisual INCONGRUENT
-	# TrialList.assign ({4, 4, 4, 4, 4, 4});
-	
-	# Tactile
-	#TrialList.assign ({5, 5, 5, 5, 5});
-	
-	# AudioOnlyTarget
-	#TrialList.assign ({6, 6, 6, 6, 6, 6, 6, 6, 6, 6});
-	
-	# VisualOnlyTarget
-	# TrialList.assign ({7, 7, 7, 7, 7, 7, 7, 7, 7, 7});	
-	
-	# TactileTarget
-	# TrialList.assign ({8, 8, 8, 8, 8, 8});
-	
+	TrialList.assign ({1, 1, 1, 1, 2, 2, 2, 2, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8});
+	TrialList.assign ({2, 7, 2, 7, 2, 7, 2, 7, 2, 7, 2, 7});
 	
 	# LOCATION LIST
-	
-	#1  --> Left 10 degrees 
-	#2  --> Left 4 degrees
-	#3  --> Right 4 degrees
-	#4  --> Right 10 degrees 
-	
-	Locations.assign({1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4});
+	Locations.assign({5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11});
+
+	#TrialList.assign ({5, 8, 5, 8, 5, 8, 5, 8});
+	Locations.assign({5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11});
+
 
 	#logfile.set_filename("debug.log");
 	
@@ -311,7 +252,6 @@ else
 		
 	term.print(LogFileName);
 	term.print("\n");
-	
 	
 	
 	# Read trial and side list from files
@@ -376,11 +316,10 @@ end;
 # ------------------------------------------------------ #
 PictureBlueFixationCross.present();
 
-Start_Trial.set_mri_pulse(1);
-Start_Trial.present();
-
 EPI.present();
 
+Start_Trial.set_mri_pulse(1);
+Start_Trial.present();
 
 
 # ------------------------------------------------------ #
@@ -394,12 +333,6 @@ loop
 	#  Trial parameters
 	int Trial_Vis_Loc;
 	int Trial_Aud_Loc;
-	
-	# Feedback parameters
-	int FeedbackLocation;
-	int ExpRespCode;
-	int RespCount=0;
-	int RespCode;
 
 until TrialIndex > TrialList.count()
 
@@ -407,21 +340,12 @@ begin
 	
 	# AudioOnly_Trial ; TrialType == 1
 	# VisualOnly_Trial ; TrialType == 2
-	# AudioVisual_Con_Trial ; TrialType == 3
-	# AudioVisual_Inc_Trial ; TrialType == 4
 	# Tactile_Trial ; TrialType == 5
 	
 	# AudioOnly_Target ; TrialType == 6
 	# VisualOnly_Target ; TrialType == 7
 	# Tactile_Target ; TrialType == 8
-	if fMRI_Run == true || PresentFeedback == true || DEBUG == true then
-	else
-		if TrialIndex==TrialList.count()/2 then
-			Break.present();
-		end;
-	end;
 
-	
 	TrialType = TrialList[TrialIndex];
 	
 	# TRIAL IS A FIXATION
@@ -432,7 +356,7 @@ begin
 	else		
 		
 		# Audio
-		if TrialType==1 || TrialType==3 || TrialType==4 || TrialType==6 then
+		if TrialType==1 || TrialType==6 then
 			# Determine the location of this trial
 			Trial_Aud_Loc = Locations[TrialIndex]+15*random(0, 9);
 			
@@ -447,28 +371,6 @@ begin
 				else
 					SoundOnly.set_stimulus(SOUNDS200[Trial_Aud_Loc]);
 				end
-				
-			elseif TrialType==3 then
-				if Stimulus_Duration == 50 then
-					SoundWithDots_Con.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
-				elseif Stimulus_Duration == 80 then
-					SoundWithDots_Con.set_stimulus(SOUNDS80[Trial_Aud_Loc]);					
-				elseif Stimulus_Duration == 100 then
-					SoundWithDots_Con.set_stimulus(SOUNDS100[Trial_Aud_Loc]);
-				else
-					SoundWithDots_Con.set_stimulus(SOUNDS200[Trial_Aud_Loc]);
-				end
-				
-			elseif TrialType==4 then
-				if Stimulus_Duration == 50 then
-					SoundWithDots_Inc.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
-				elseif Stimulus_Duration == 80 then
-					SoundWithDots_Inc.set_stimulus(SOUNDS80[Trial_Aud_Loc]);					
-				elseif Stimulus_Duration == 100 then
-					SoundWithDots_Inc.set_stimulus(SOUNDS100[Trial_Aud_Loc]);
-				else
-					SoundWithDots_Inc.set_stimulus(SOUNDS200[Trial_Aud_Loc]);
-				end	
 				
 			elseif TrialType==6 then
 				if Stimulus_Duration == 50 then
@@ -488,7 +390,7 @@ begin
 		end;
 		
 		# Visual
-		if TrialType==2 || TrialType==3 || TrialType==4 || TrialType==7 then
+		if TrialType==2 || TrialType==7 then
 			# Determine the location of this trial
 			if TrialType==4 then
 				Trial_Vis_Loc = -1*PresentationLocationsPix[Locations[TrialIndex]];
@@ -503,19 +405,19 @@ begin
 		# Tactile
 		if TrialType==5 then
 			if Locations[TrialIndex]<8  then
-				vibrationLeft_Trial(SlotL, NumCycle, WaitTime);
+				#vibrationLeft_Trial(SlotL, NumCycle, WaitTime);
 			elseif Locations[TrialIndex]>8 then
-				vibrationRight_Trial(SlotR, NumCycle, WaitTime);
+				#vibrationRight_Trial(SlotR, NumCycle, WaitTime);
 			end;
 		elseif  TrialType==8 then
 			if Locations[TrialIndex]<8 then
-				vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
-				wait(1, IntervalTime);
-				vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+				#vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+				#wait(1, IntervalTime);
+				#vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
 			elseif Locations[TrialIndex]>8 then
-				vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
-				wait(1, IntervalTime);
-				vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+				#vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+				#wait(1, IntervalTime);
+				#vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
 			end;
 		end;
 		
@@ -525,15 +427,11 @@ begin
 			AudioOnly_Trial.present();
 		elseif TrialType == 2 then
 			VisualOnly_Trial.present();
-		elseif TrialType == 3 then
-			AudioVisual_Con_Trial.present();
-		elseif TrialType == 4 then
-			AudioVisual_Inc_Trial.present();	
 		elseif TrialType == 5 then
 			Tactile_Trial.present();
-			startStimulation();
+			#startStimulation();
 			wait_interval(int(Tactile_Stimulus_Duration));
-			stopStimulation();
+			#stopStimulation();
 			PictureBlueFixationCross.present();
 			wait_interval(Post_Stimulus_Duration);
 			
@@ -543,60 +441,14 @@ begin
 			VisualOnly_Target.present();			
 		elseif TrialType == 8 then
 			Tactile_Target.present();
-			startStimulation();
+			#startStimulation();
 			wait_interval(int(Tactile_Stimulus_Duration));
-			stopStimulation();
+			#stopStimulation();
 			PictureBlueFixationCross.present();
 			wait_interval(Post_Stimulus_Duration);
 		end;
 		
-		if fMRI_Run==false then
-			if TrialType==3 || TrialType==4 then
-				AuditoryLocation.present();
-				wait_interval(50);
-				SameDifferent.present();
-			end;
-		end;
-			
 		ISI.present();
-		
-		# FEEDBACK
-		if PresentFeedback == true then
-			
-			if RunType==1 then
-				if Locations[TrialIndex]<8 then
-					AudLocEvent.set_target_button(1);
-					ExpRespCode = 1;
-				else 
-					AudLocEvent.set_target_button(2);
-					ExpRespCode = 2;
-				end;
-				AuditoryLocation.present();
-			elseif TrialType>5 then
-				ExpRespCode=1;
-			end;
-			
-			if RunType==1 || TrialType>5 then
-				
-				if RespCount == response_manager.total_response_count() then # no new responses has been pressed
-						RespCode = 0;
-					else
-						RespCount = response_manager.total_response_count();
-						RespCode = response_manager.last_response_data().code();
-				end;
-				
-				FeedbackLocation = PresentationLocationsPix[Locations[TrialIndex]];
-				
-				if ExpRespCode == RespCode then
-					PicturePositiveFeedback.set_part_x( 1, FeedbackLocation);			
-					PositiveFeedback.present();
-				else
-					PictureNegativeFeedback.set_part_x( 1, FeedbackLocation);
-					NegativeFeedback.present();
-				end;			
-				
-			end;
-		end;
 		
 	end;
 
@@ -615,4 +467,4 @@ end;
 # FINAL FIXATION
 Final_Fixation.present();
 
-closeStimulator();
+#closeStimulator();

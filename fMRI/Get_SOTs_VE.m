@@ -1,7 +1,7 @@
 %%
 clc; clear all; close all;
 
-Subjects = [0];
+Subjects = [11];
 
 IndStart = 5;% first row of data points in txt file
 
@@ -11,12 +11,10 @@ for SubjInd = 1:length(Subjects)
 
     cd(fullfile(StartDirectory, strcat('Subject_', num2str(Subjects(SubjInd))), 'fMRI'))
 
-    LogFileList = dir(strcat('Logfile_Subject_', num2str(Subjects(SubjInd)), '_Run_4*.txt'));
-    TrialListFileList = dir(strcat('Trial_List_Subject_', num2str(Subjects(SubjInd)), '_Run_4*.txt'));
+    LogFileList = dir(strcat('Logfile_Subject_', num2str(Subjects(SubjInd)), '_Run_2*.txt'));
+    TrialListFileList = dir(strcat('Trial_List_Subject_', num2str(Subjects(SubjInd)), '_Run_2*.txt'));
 
-    SOT=cell(1,2,length(LogFileList));
-    
-    AllSOTs = cell(length(LogFileList),1);
+    SOT=cell(3,2,length(LogFileList));
 
     for iFile = 1:length(LogFileList)
 
@@ -29,11 +27,11 @@ for SubjInd = 1:length(Subjects)
             '_Run_' LogFileList(iFile).name(end-23:end-20) '.txt'])
 
         % Loads side order presented
-        SideList = load(['Side_List_Subject_', num2str(Subjects(SubjInd)), ...
+        SideList = load(['Audio_Side_List_Subject_', num2str(Subjects(SubjInd)), ...
             '_Run_' LogFileList(iFile).name(end-23:end-20) '.txt']);
         SideList(SideList==0) = [];
 
-        disp(['Side_List_Subject_', num2str(Subjects(SubjInd)), ...
+        disp(['Audio_Side_List_Subject_', num2str(Subjects(SubjInd)), ...
             '_Run_' LogFileList(iFile).name(end-23:end-20) '.txt'])
 
 
@@ -56,41 +54,41 @@ for SubjInd = 1:length(Subjects)
         StartTime =  str2num(Stim_Time{1,2}(find(strcmp('Start', Stim_Time{1,1})),:));
 
         Duration =  (str2num(Stim_Time{1,2}(end,:)) - StartTime)/600000
+        
+        S.Ns = Duration*60;
 
         TEMP = find(strcmp('30', Stim_Time{1,1}));
+        TEMP = [TEMP ; find(strcmp('AudioOnly_Trial_V', Stim_Time{1,1}))];
+        TEMP = [TEMP ; find(strcmp('AudioOnly_Target_V', Stim_Time{1,1}))];
+        TEMP = [TEMP ; find(strcmp('AudioVisual_Con_Trial_V', Stim_Time{1,1}))];
+        TEMP = [TEMP ; find(strcmp('AudioVisual_Inc_Trial_V', Stim_Time{1,1}))];
         TEMP = [TEMP ; find(strcmp('ISI', Stim_Time{1,1}))];
         TEMP = [TEMP ; find(strcmp('Fixation', Stim_Time{1,1}))];
         TEMP = [TEMP ; find(strcmp('Final_Fixation', Stim_Time{1,1}))];
+        TEMP = [TEMP ; find(strcmp('PositiveFeeback', Stim_Time{1,1}))];
+        TEMP = [TEMP ; find(strcmp('NegativeFeeback', Stim_Time{1,1}))];
         TEMP = [TEMP ; find(strcmp('Start', Stim_Time{1,1}))];
         TEMP = [TEMP ; find(strcmp('5', Stim_Time{1,1}))];
+        TEMP = [TEMP ; find(strcmp('BREAK', Stim_Time{1,1}))];
 
         Stim_Time{1,1}(TEMP,:) = [];
         Stim_Time{1,2}(TEMP,:) = [];
         clear TEMP
 
-        NbTTrial=sum(TrialList==5);
-        NbTTarget=sum(TrialList==8);
-        NbResp=sum(strcmp('1', Stim_Time{1,1}));
-
         iTrial = 1;
 
         for i=1:length(TrialList)
             
-            if SideList(i)<8
-                Side = 1;
+            Side = SideList(i)-1;
+            
+            if TrialList(i)>2
+                TrialType=TrialList(i)-1;
             else
-                Side = 2;
-            end
-          
-            if strcmp('1', Stim_Time{1,1}(iTrial,:))
-                SOT{1,Side,iFile}(end+1) = (str2double(Stim_Time{1,2}(iTrial,:)) - StartTime)/10000;
-                iTrial = iTrial+1;
+                TrialType=TrialList(i);
             end
 
-            SOT{1,Side,iFile}(end+1) = (str2double(Stim_Time{1,2}(iTrial,:)) - StartTime)/10000;
+            SOT{TrialType,Side,iFile}(end+1) = (str2double(Stim_Time{1,2}(iTrial,:)) - StartTime)/10000;
             iTrial = iTrial+1;
-            
-            AllSOTs{iFile,1}(end+1) = (str2double(Stim_Time{1,2}(iTrial,:)) - StartTime)/10000;
 
         end
         
@@ -99,19 +97,23 @@ for SubjInd = 1:length(Subjects)
         S.TR = 3;
         S.t0 = 3;
 
-        S.CM{1} = [1 0];
-        S.CM{2} = [0 1];
+        S.CM{1} = [1 0 0 0 0];
+        S.CM{2} = [0 1 0 0 0];
+        S.CM{3} = [0 0 1 0 0];
+        S.CM{4} = [0 0 0 1 0];
+        S.sots{1} = SOT{2,1,iFile}/S.TR;
+        S.sots{2} = SOT{2,2,iFile}/S.TR;
+        S.sots{3} = SOT{3,1,iFile}/S.TR;
+        S.sots{4} = SOT{3,2,iFile}/S.TR;
+        S.sots{5} = [SOT{1,1,iFile} SOT{1,2,iFile}]/S.TR;
 
-        S.sots{1} = abs(SOT{1,1,iFile}/S.TR);
-        S.sots{2} = abs(SOT{1,2,iFile}/S.TR);
-
-        S.Ns = ceil((Duration*60/S.TR));
+        S.Ns = ceil((S.Ns/S.TR)+10);
         
         cd(StartDirectory)
         [e, X] = fMRI_GLM_efficiency(S);
         
         close all
-        Colors = 'rgbcmky';
+        Colors = 'rgbcmk';
         figure('name', 'AV', 'position', [100 100 1200 550])
         subplot(2,2,1)
         hold on
@@ -119,8 +121,8 @@ for SubjInd = 1:length(Subjects)
             stem(S.sots{i},ones(1,length(S.sots{i})), Colors(i))
         end
         axis([0 10+S.Ns 0 1.2])
-        set(gca,'tickdir', 'out', 'xtick', 0:10:(10+S.Ns) ,...
-            'xticklabel', (0:10:(10+S.Ns))*S.TR, ...
+        set(gca,'tickdir', 'out', 'xtick', 0:5:(10+S.Ns) ,...
+            'xticklabel', (0:5:(10+S.Ns))*S.TR, ...
             'ticklength', [0.01 0.01], 'fontsize', 10)
         t=xlabel('Time (s)');
         set(t,'fontsize',10);
@@ -131,8 +133,8 @@ for SubjInd = 1:length(Subjects)
             plot(X(:,i), Colors(i))
         end
         axis([0 10+S.Ns min(X(:)) max(X(:))])
-        set(gca,'tickdir', 'out', 'xtick', 0:10:(10+S.Ns) ,...
-            'xticklabel', (0:10:(10+S.Ns))*S.TR, ...
+        set(gca,'tickdir', 'out', 'xtick', 0:5:(10+S.Ns) ,...
+            'xticklabel', (0:5:(10+S.Ns))*S.TR, ...
             'ticklength', [0.01 0.01], 'fontsize', 10)
         t=xlabel('Time (s)');
         set(t,'fontsize',10);
@@ -140,11 +142,6 @@ for SubjInd = 1:length(Subjects)
         subplot(2,2,[2 4])
         colormap(gray)
         imagesc(X)
-        
-        
-        tmp = diff(AllSOTs{iFile,1});
-        tmp(tmp>6) = [];
-        fprintf('%f +/- %f secs\n\n', mean(tmp), std(tmp))
 
     end
 

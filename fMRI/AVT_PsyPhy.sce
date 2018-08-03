@@ -1,17 +1,12 @@
 #-- scenario file --#
-scenario = "AVT at 7 tesla";
+scenario = "AVT psychophysics";
 
 # --------------------------------------------------- #
 # 								HEADER 								#
 # --------------------------------------------------- #
-pcl_file = "AVT_7T.pcl";
+pcl_file = "AVT_PsyPhy.pcl";
 
-#scenario_type = fMRI;
-scenario_type = fMRI_emulation;
-scan_period = 3000;
-
-pulse_code = 30;
-pulses_per_scan = 1;
+scenario_type = trials;
 
 
 default_text_color = 255,255,255; #white text by default
@@ -26,8 +21,8 @@ response_matching = simple_matching;
 response_logging = log_all;
 
 
-active_buttons = 6;
-button_codes = 1, 2, 3, 4, 5, 6;
+active_buttons = 2;
+button_codes = 1, 2;
 
 
 default_stimulus_time_in = 0;
@@ -88,7 +83,6 @@ $ISI = 1300;
 $Stimulus_Duration = 200; # ms
 $Pre_Stimulus_Duration = 500;
 $Post_Stimulus_Duration = 250;
-$Feedback_Duration = 500;
 
 # Fixation Cross
 $FixationCrossLineWidth = 2;
@@ -108,7 +102,6 @@ $NegativeFeedback_Color = $Red;
 
 # Fixation
 $FinalFixationDuration = 1000.0;
-$Fixation_Duration = 6000.0;
 
 
 #------------------#
@@ -137,23 +130,7 @@ array{
 ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_1;
 } DOTS_ARRAY;
 
-# Positive Feedback
-ellipse_graphic {
-	ellipse_width = $Feedback_Size_Pixel;
-	ellipse_height = $Feedback_Size_Pixel;
-	color = $PositiveFeedback_Color;
-}PositiveFeedbackDot;
-
-#Negative Feedback
-ellipse_graphic {
-	ellipse_width = $Feedback_Size_Pixel;
-	ellipse_height = $Feedback_Size_Pixel;
-	color = $NegativeFeedback_Color;
-}NegativeFeedbackDot;
-
-
 # AUDIO
-
 sound { 
 	wavefile { filename = "quiet sequence.wav"; };
 	loop_playback = true;
@@ -1402,36 +1379,9 @@ picture {
 } PictureBlueFixationCross;
 
 
-picture {
-	ellipse_graphic PositiveFeedbackDot;
-	x = $xpos; y = $ypos;
-	
-	line_graphic BlueFixationCross;
-	x = $xpos; y = $ypos;
-} PicturePositiveFeedback;
-
-
-picture {
-	ellipse_graphic NegativeFeedbackDot;
-	x = $xpos; y = $ypos;
-	
-	line_graphic BlueFixationCross;
-	x = $xpos; y = $ypos;
-} PictureNegativeFeedback;
-
-
-
 #--------#
 # TRIALS #
 #--------#
-#START
-trial {	
-	nothing {};
-	mri_pulse = 1;
-	picture PictureBlueFixationCross;
-	code = "Start";
-} Start_Trial;
-
 #ISI
 trial {
 	monitor_sounds = false;
@@ -1446,68 +1396,6 @@ trial {
 
 
 # TRIALS
-# AudioVisual_Con_Trial;
-trial {
-	monitor_sounds = false;
-	all_responses = true;
-	
-	picture PictureBlueFixationCross;
-	time = 0;
-	duration = $Pre_Stimulus_Duration;
-	
-	stimulus_event {
-		picture Dots;
-		time = $Pre_Stimulus_Duration;
-		duration = $Stimulus_Duration;
-		code = "AudioVisual_Con_Trial_V";
-	} Dots_Con;
-	
-	stimulus_event {
-      sound Target_50ms_Location_12_Deg_10_Rep;
-		time = $Pre_Stimulus_Duration;
-		code = "AudioVisual_Con_Trial_A";
-   } SoundWithDots_Con;
-
-	stimulus_event {
-	picture PictureBlueFixationCross;
-	time = '$Pre_Stimulus_Duration+$Stimulus_Duration';
-	duration = $Post_Stimulus_Duration;
-	} PostStimFix_Con;
-
-} AudioVisual_Con_Trial;
-
-
-# AudioVisual_Inc_Trial;
-trial {
-	monitor_sounds = false;
-	all_responses = true;
-	
-	picture PictureBlueFixationCross;
-	time = 0; 
-	duration = $Pre_Stimulus_Duration;
-
-	stimulus_event {
-		picture Dots;
-		time = $Pre_Stimulus_Duration;
-		duration = $Stimulus_Duration;
-		code = "AudioVisual_Inc_Trial_V";
-	} Dots_Inc;
-	
-	stimulus_event {
-      sound Target_50ms_Location_12_Deg_10_Rep;
-		time = $Pre_Stimulus_Duration;
-		code = "AudioVisual_Inc_Trial_A";
-   } SoundWithDots_Inc;
-
-	stimulus_event {
-	picture PictureBlueFixationCross;
-	time = '$Pre_Stimulus_Duration+$Stimulus_Duration';
-	duration = $Post_Stimulus_Duration;
-	} PostStimFix_Inc;
-
-} AudioVisual_Inc_Trial;
-
-
 # VisualOnly_Trial;
 trial {
 	monitor_sounds = false;
@@ -1532,7 +1420,6 @@ trial {
 
 } VisualOnly_Trial;
 
-
 # AudioOnly_Trial;
 trial {
 	monitor_sounds = false;
@@ -1555,22 +1442,6 @@ trial {
 	} PostStimFix_A;
 	
 } AudioOnly_Trial;
-
-
-# Tactile_Trial;
-trial {
-	monitor_sounds = false;
-	all_responses = true;
-	
-	picture PictureBlueFixationCross;
-	time = 0; 
-	duration = $Pre_Stimulus_Duration; 
-		
-	picture PictureBlueFixationCross;
-	code = "Tactile_Trial";
-	time = $Pre_Stimulus_Duration;
-} Tactile_Trial;
-
 
 
 #TARGETS
@@ -1611,7 +1482,6 @@ trial {
 
 } VisualOnly_Target;
 
-
 # AudioOnly_Target;
 trial {
 	monitor_sounds = false;
@@ -1642,108 +1512,12 @@ trial {
 } AudioOnly_Target;
 
 
-# Tactile_Target;
-trial {	
-	monitor_sounds = false;
-	all_responses = true;
-	
-	picture PictureBlueFixationCross;
-	time = 0; 
-	duration = $Pre_Stimulus_Duration;
-
-	stimulus_event {
-		picture PictureBlueFixationCross;
-		code = "Tactile_Target";
-		time = $Pre_Stimulus_Duration;
-		target_button = 1;
-	} Tactile_Target_Event;
-	
-} Tactile_Target;
-
-
-
-#RESPONSES
-# Auditory location
-trial {
-	monitor_sounds = false;
-	all_responses = true;
-   trial_duration = forever;
-   trial_type = specific_response;
-   terminator_button = 1, 2, 3; 
-
-	picture PictureBlueFixationCross;
-	time = 0; 
-	duration = $Pre_Stimulus_Duration;
-	
-	stimulus_event {
-	picture {
-		text {
-			caption = "Auditory location?\nLEFT  /  RIGHT";
-		};
-		x = 0; y = 0;
-	} AudLocPic;
-	time = $Pre_Stimulus_Duration;
-	code = "AuditoryLocation";
-	} AudLocEvent;
-	
-} AuditoryLocation;
-
-# Common source judgment
-trial {
-	monitor_sounds = false;
-	all_responses = true;
-   trial_duration = forever;
-   trial_type = specific_response;
-   terminator_button = 4, 5;  
-
-	picture PictureBlueFixationCross;
-	time = 0; 
-	duration = $Pre_Stimulus_Duration;
-	
-	picture {
-		text {
-			caption = "Source?\nSAME (S)  /  DIFFERENT (D)";
-		};
-		x = 0; y = 0;
-	} SameDifferentPic;
-	time = $Pre_Stimulus_Duration;
-	code = "CommonSource";
-	
-} SameDifferent;
-
-
-
-# FEEDBACK
-# Positive feedback;
-trial {
-	monitor_sounds = false;
-	all_responses = false;
-	trial_duration = $Feedback_Duration;
-	
-	picture PicturePositiveFeedback;
-	
-	code = "PositiveFeeback";
-} PositiveFeedback;
-
-# Negative feedback;
-trial {
-	monitor_sounds = false;
-	all_responses = false;
-	trial_duration = $Feedback_Duration;
-	
-	picture PictureNegativeFeedback;
-	
-	code = "NegativeFeeback";
-} NegativeFeedback;
-
-
-
 ##CONFIRMATION AT START
 trial {
 	all_responses = true;
    trial_duration = forever;
    trial_type = specific_response;
-   terminator_button = 6;   
+   terminator_button = 2;   
 	
 	picture {
 		text {
@@ -1754,47 +1528,7 @@ trial {
 } Confirmation;
 
 
-
-
-##BREAK
-trial {
-	monitor_sounds = false;
-	all_responses = true;
-   trial_duration = forever;
-   trial_type = specific_response;
-   terminator_button = 6;   
-	
-	stimulus_event {
-	picture {
-		text {
-			caption = "Take a break!\n\n\nPress ENTER to start the fun again.";
-		};
-		x = 0; y = 0;
-	} ;
-
-	code = "BREAK";
-	} BreakEvent;
-} Break;
-
-
-
 # FIXATIONS
-# Fixation
-trial {
-	monitor_sounds = false;
-	all_responses = true;
-	trial_duration = 'int($Fixation_Duration)';
-	
-	picture PictureBlueFixationCross;
-	
-	code = "Fixation";
-	
-	save_logfile {
-      filename = "temp.log"; # use temp.log in default logfile directory
-   };
-} Fixation;
-
-
 # Final Fixation
 trial {
 	all_responses = true;

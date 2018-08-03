@@ -1,32 +1,10 @@
 %%
 clc; clear all; close all;
 
-% Number	Name	ID
-% 1	Stefan Kraemer	19717.75
-% 2	Sissy Weiske	13565.7c
-% 3	Paul Bulano	19017.5e
-% 
-% 4	Jan Budesheim	26634.fc
-% 5	Max Winkler	18256.89
-% 6	Anja Guenther	9/14/55
-% 7	Stefan Kraemer	19717.75
-% 8	Konrad Didt	25997.23
-% 9	Ralf Junger	28031.51
-% 10	Elisabeth Sellenriek	28705.2b
-% 11	Paul Bulano	19017.5e
-% 12	Julia Heinz	19883.56
-% 13	Linda Knauerhase	26923.fd
-% 14	Sissy Weiske	13565.7c
-% 15	Anja Buettner-Janner	26140.f5
-% 16	Anja Luedtke	24533.8f
-% 17	Andre Diers	22768.81
-% 18	Paul Vogel	26635.27
-% 19	Stefanie Roetz	26821.88
+addpath(fullfile(pwd,'subfun'))
 
-addpath(genpath(fullfile(pwd,'subfun')))
-
-Subjects = [4:6 8:13 15:18];
-% Subjects = [7 14];
+% Subjects = [4:6 8:10 12:13 15:18];
+Subjects = [7 14];
 % Subjects = [1 2];
 
 FigDim = [100 100 1200 550];
@@ -51,11 +29,7 @@ ColorSubjects =   [...
     202,178,214;...
     106,61,154;...
     255,255,153;...
-    177,89,40;...
-    255,0,0;...
-    255,255,0;...
-    255,0,255;...
-    ];
+    177,89,40];
 ColorSubjects=ColorSubjects/255;
 
 h(1) = figure('name', 'Audio localization: Resp per loc - A', 'position', FigDim);
@@ -66,8 +40,7 @@ for SubjInd = 1:length(Subjects)
     
     cd(fullfile(StartDirectory, strcat('Subject_', num2str(Subjects(SubjInd))), 'PsyPhy'))
     
-    LogFileList = dir(strcat('Logfile_Subject_', num2str(Subjects(SubjInd)), '_Run_10*.txt'));
-    
+    LogFileList = dir(strcat('Logfile_Subject_', num2str(Subjects(SubjInd)), '_Run_11*.txt'));
     
     for iFile = 1:length(LogFileList)
         
@@ -105,15 +78,12 @@ for SubjInd = 1:length(Subjects)
         
         TEMP = find(strcmp('30', Stim_Time{1,1}));
         TEMP = [TEMP ; find(strcmp('ISI', Stim_Time{1,1}))];
-        TEMP = [TEMP ; find(strcmp('Fixation', Stim_Time{1,1}))];
         TEMP = [TEMP ; find(strcmp('Final_Fixation', Stim_Time{1,1}))];
         TEMP = [TEMP ; find(strcmp('PositiveFeeback', Stim_Time{1,1}))];
         TEMP = [TEMP ; find(strcmp('NegativeFeeback', Stim_Time{1,1}))];
-        TEMP = [TEMP ; find(strcmp('Start', Stim_Time{1,1}))];
         TEMP = [TEMP ; find(strcmp('4', Stim_Time{1,1}))];
         TEMP = [TEMP ; find(strcmp('BREAK', Stim_Time{1,1}))];
-        TEMP = [TEMP ; find(strcmp('AudioOnly_Trial_V', Stim_Time{1,1}))];
-        TEMP = [TEMP ; find(strcmp('AuditoryLocation', Stim_Time{1,1}))];
+        TEMP = [TEMP ; find(strcmp('AuditoryLocation', Stim_Time{1,1}))]; 
         
         Stim_Time{1,1}(TEMP,:) = [];
         Stim_Time{1,2}(TEMP,:) = [];
@@ -154,17 +124,12 @@ for SubjInd = 1:length(Subjects)
             error('We are missing some responses.')
         end
         
-        if Subjects(SubjInd)==13
-            AudLocResp(AudLocResp==1)=1;
-            AudLocResp(AudLocResp==2)=0;
-            AudLocResp(AudLocResp==3)=-1;
-        else
-            AudLocResp(AudLocResp==1)=-1;
-            AudLocResp(AudLocResp==2)=0;
-            AudLocResp(AudLocResp==3)=1;
-        end
+        AudLocResp(AudLocResp==1)=-1;
+        AudLocResp(AudLocResp==2)=0;
+        AudLocResp(AudLocResp==3)=1;
         
         Data{iFile} = [AudioSide(1:length(AudLocResp)) AudLocResp AudLocRT];
+        
         
         for i = -1:1
             tmp = Data{iFile}(Data{iFile}(:,1)==i,2);
@@ -184,9 +149,12 @@ for SubjInd = 1:length(Subjects)
         
     end
     
+     
     AccuracyAll(SubjInd,:) = [mean(Accuracy) mean(AccuracyLeft) mean(AccuracyCenter) mean(AccuracyRight)]
     
+    
     %%
+
     SmoothWinWidth = 20;
     figure('name', ['Subject ' num2str(Subjects(SubjInd)) ' - Smoothing Window: ' num2str(SmoothWinWidth)], ...
     'position', FigDim)
@@ -210,7 +178,7 @@ for SubjInd = 1:length(Subjects)
         ylabel(['Accuracy run ' num2str(iFile)]);
         xlabel('Trials');
     end
-
+    
     RespPerLoc = mean(RespPerLoc,3)
     RespPerLoc = RespPerLoc/sum(RespPerLoc(1,:));
     RespPerLocAll(:,:,SubjInd) = RespPerLoc;
@@ -222,16 +190,16 @@ for SubjInd = 1:length(Subjects)
     ylabel(sprintf(['Subject  ' num2str(Subjects(SubjInd))]));
     set(gca, 'ytick', 1:3, 'yticklabel', {}, ...
         'xtick', 1:3, 'xticklabel', {})
+
+    
     
     %%
     cd(StartDirectory)
     
-    clear Data
+    clear Data Accuracy AccuracyLeft AccuracyCenter AccuracyRight RespPerLoc
     
 end
 
-figure(h(1))
-print(gcf, 'A_Loc_RespPerLoc.tif', '-dtiff')
 
 figure('name', 'Audio localization', 'position', FigDim);
 hold on
@@ -246,7 +214,7 @@ axis([-0.5 5 0 1])
 set(gca, 'ytick', 0:.25:1, 'yticklabel', 0:.25:1, 'xtick', 0:4, ...
     'xticklabel', {'AccTot','','AccLeft','AccCenter','AccRight'})
 t=ylabel('Accuracy');
-print(gcf, 'A_Loc_Acc.tif', '-dtiff')
+
 
 figure('name', 'MEAN - Audio localization: Resp per loc - A', 'position', FigDim);
 colormap('hot')
@@ -256,4 +224,3 @@ ylabel(sprintf(['MEAN' '\nTrue A location']));
 xlabel('Responded A location');
 set(gca, 'ytick', 1:3, 'yticklabel', {'Left';'Center';'Right'}, ...
     'xtick', 1:3, 'xticklabel', {'Left';'Center';'Right'})
-print(gcf, 'A_Loc_MEAN_RespPerLoc.tif', '-dtiff')

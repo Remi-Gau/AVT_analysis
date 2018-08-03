@@ -1,15 +1,15 @@
 # --------------------------------------------------- #
 #					           QUAERO							   #
 # --------------------------------------------------- #
-include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\stimlibrel.pcl"
-include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\subroutines_tactile.pcl"
+#include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\stimlibrel.pcl"
+#include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\subroutines_tactile.pcl"
 
 #include_once "U:\\A_V_T\\stimlibrel.pcl"
 
-loadLibrary();
+#loadLibrary();
 
 #Stimulator licence BHAM
-initStimulator("8DD8J3C662984KL65UZ3LHJEEF5OTP");	
+#initStimulator("8DD8J3C662984KL65UZ3LHJEEF5OTP");	
 int SlotL=2;
 int SlotR=3;
 
@@ -18,10 +18,10 @@ int SlotR=3;
 #int SlotL=3;
 #int SlotR=4;
 
-setProperty("local_buffer_size", 5000000);
+#setProperty("local_buffer_size", 5000000);
 
-setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
-setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
+#setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
+#setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
 
 
 # --------------------------------------------------- #
@@ -33,7 +33,7 @@ string DATE = date_time( "yyyy_mm_dd_hhnn" );
 double RefreshRate = 60.0;
 
 #Compute the number of pixel per degree
-int MaxFOV = 34;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi; 
+int MaxFOV = 39;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi; 
 int Win_H = 768 ; 
 int Win_W = 1024 ; 
 int PPD = Win_W/MaxFOV;
@@ -48,6 +48,11 @@ int PPD = Win_W/MaxFOV;
 # for ViewDist = 50
 # MonWidth	MaxFOV
 # 48.0		51
+
+# for ViewDist = 54
+# MonWidth	MaxFOV
+# 51			50
+# 38			38.75
 
 # for ViewDist = 60
 # MonWidth	MaxFOV
@@ -75,51 +80,42 @@ end;
 
 
 
-
 # --------------------------------------------------- #
 #                USER INPUT REQUIRED                  #
 # --------------------------------------------------- #
 preset bool DEBUG = false;
-
-preset bool fMRI_Run = false;
-
-preset int RunType; #(1 for A only, 2 for AV, 3 for AVT, 4 for T only)
+if DEBUG == true then # Psychophysics run or debug
+	Final_Fixation.set_duration(1000);
+	Fixation.set_duration(3000);
+end;
 
 preset int Stimulus_Duration = 50; # ms
-int Post_Stimulus_Duration = 250;
-int Pre_Stimulus_Duration = 500;
+int Pre_Stimulus_Duration = 50;
+int Post_Stimulus_Duration = 700;
 
-Dots_Con.set_duration(Stimulus_Duration);
-Dots_Inc.set_duration(Stimulus_Duration);
-
-PostStimFix_Con.set_time(Pre_Stimulus_Duration+Stimulus_Duration);
-PostStimFix_Inc.set_time(Pre_Stimulus_Duration+Stimulus_Duration);
 
 Dots_V.set_duration(Stimulus_Duration);
-PostStimFix_V.set_time(Pre_Stimulus_Duration+Stimulus_Duration);
+PostStimFix_V.set_duration(Post_Stimulus_Duration);
+PostStimFix_V.set_delta_time(Stimulus_Duration);
 
 PostStimFix_A.set_duration(Post_Stimulus_Duration+Stimulus_Duration);
 
 Dot_Target_1.set_duration(Stimulus_Duration);
-Inter_Dot.set_duration(Stimulus_Duration);
+Inter_Dot.set_duration(40);
 Inter_Dot.set_delta_time(Stimulus_Duration);
 Dot_Target_2.set_duration(Stimulus_Duration);
-Inter_Dot.set_delta_time(Stimulus_Duration);
-PostStimFix_V_Target.set_time(Pre_Stimulus_Duration+3*Stimulus_Duration);
+Dot_Target_2.set_delta_time(40);
+PostStimFix_V_Target.set_delta_time(Stimulus_Duration);
+PostStimFix_V_Target.set_duration(Post_Stimulus_Duration);
 
-Sound_Target2.set_time(Pre_Stimulus_Duration+Stimulus_Duration*2);
+Sound_Target2.set_time(Pre_Stimulus_Duration+Stimulus_Duration+40);
 PostStimFix_A_Target.set_duration(3*Stimulus_Duration+Post_Stimulus_Duration);
-
-preset bool PresentFeedback = false;
-if DEBUG == true || fMRI_Run==true || RunType==2 || RunType==4 then
-	PresentFeedback = false;
-end;
 
 preset int SubjectNumber;
 
 preset int RunNumber;
+RunNumber = 3000 + RunNumber;
 
-RunNumber = 1000*RunType + 100*int(PresentFeedback) + RunNumber;
 
 # Tactile
 # tactile stim duration = 0.5*WaitTime*2*NumCycle [in ms]
@@ -160,48 +156,6 @@ else
 	
 end;
 
-# --------------------------------------------------- #
-#                USER INPUT REQUIRED                  #
-# --------------------------------------------------- #
-string Text2Present = "This is ";
-
-if fMRI_Run == true then
-	Text2Present.append("an fMRI run ");
-else
-	Text2Present.append("a psychophysics run ");
-end;
-
-if DEBUG == true then
-	Text2Present.append("in DEBUG mode.\n\n");
-else
-	Text2Present.append("not in DEBUG mode.\n\n");
-end;
-
-if RunType == 1 then
-	Text2Present.append("Audio only trials ");
-elseif RunType == 2 then
-	Text2Present.append("Audiovisual trials ");
-elseif RunType == 3 then
-	Text2Present.append("Audio or Visual or Tactile trials ");	
-else
-	Text2Present.append("Tactile only trials ");		
-end;
-
-if PresentFeedback == true then
-	Text2Present.append("with feedback.");
-else
-	Text2Present.append("without feedback.");	
-end;
-
-ConfirmationTxt.set_caption(Text2Present);
-ConfirmationTxt.redraw();
-Confirmation.present();
-
-
-if fMRI_Run == false  || DEBUG == true || PresentFeedback == true then # Psychophysics run or debug
-	Final_Fixation.set_duration(1000);
-	Fixation.set_duration(3000);
-end;
 
 
 # --------------------------------------------------- #
@@ -218,48 +172,21 @@ if DEBUG == true then
 
 	# AudioOnly_Trial ; TrialType == 1
 	# VisualOnly_Trial ; TrialType == 2
-	# AudioVisual_Con_Trial ; TrialType == 3
-	# AudioVisual_Inc_Trial ; TrialType == 4
 	# Tactile_Trial ; TrialType == 5
 	
 	# AudioOnly_Target ; TrialType == 6
 	# VisualOnly_Target ; TrialType == 7
 	# Tactile_Target ; TrialType == 8
 	
-	
-	# AudioOnly
-	TrialList.assign ({1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1});
-	
-	# VisualOnly
-	# TrialList.assign ({2, 2, 2, 2, 2, 2, 2, 2, 2, 2});
-	
-	# AudioVisual CONGRUENT
-	# TrialList.assign ({3, 3, 3, 3, 3});
-	
-	# AudioVisual INCONGRUENT
-	# TrialList.assign ({4, 4, 4, 4, 4, 4});
-	
-	# Tactile
-	#TrialList.assign ({5, 5, 5, 5, 5});
-	
-	# AudioOnlyTarget
-	#TrialList.assign ({6, 6, 6, 6, 6, 6, 6, 6, 6, 6});
-	
-	# VisualOnlyTarget
-	# TrialList.assign ({7, 7, 7, 7, 7, 7, 7, 7, 7, 7});	
-	
-	# TactileTarget
-	# TrialList.assign ({8, 8, 8, 8, 8, 8});
-	
+	TrialList.assign ({1, 1, 1, 1, 2, 2, 2, 2, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8});
+	TrialList.assign ({2, 7, 2, 7, 2, 7, 2, 7, 2, 7, 2, 7});
 	
 	# LOCATION LIST
-	
-	#1  --> Left 10 degrees 
-	#2  --> Left 4 degrees
-	#3  --> Right 4 degrees
-	#4  --> Right 10 degrees 
-	
-	Locations.assign({1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4});
+	Locations.assign({5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11});
+
+	#TrialList.assign ({5, 8, 5, 8, 5, 8, 5, 8});
+	Locations.assign({5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11});
+
 
 	#logfile.set_filename("debug.log");
 	
@@ -311,7 +238,6 @@ else
 		
 	term.print(LogFileName);
 	term.print("\n");
-	
 	
 	
 	# Read trial and side list from files
@@ -370,16 +296,181 @@ else
 end;
 
 
+# ------------------------------------------------------ #
+#                     EYE TRACKER                        #
+# ------------------------------------------------------ #
+string EyeTrackFileName;
+
+if DEBUG == true then
+	EyeTrackFileName = "GazeData.txt";
+else
+	# filename for storing gaze data information
+	EyeTrackFileName = logfile_directory;
+	EyeTrackFileName.append("GazeData_Subject_");
+	EyeTrackFileName.append(string(SubjectNumber));
+	EyeTrackFileName.append("_Run_");
+	EyeTrackFileName.append(string(RunNumber));
+	EyeTrackFileName.append("_");
+	EyeTrackFileName.append(DATE);
+	EyeTrackFileName.append(".txt");
+end;
+	
+term.print(EyeTrackFileName);
+term.print("\n");	
+
+
+# holds all markers for saving
+# markers are events that occur, i.e. image changes
+array <eye_position_data> markers[0];
+
+# get an instance of the eye tracker extension
+# @ param: name of the extension as registered
+eye_tracker Tobii = new eye_tracker( "tobiiws" );
+
+Tobii.set_max_buffer_size( dt_position, 100000 );
+Tobii.set_max_buffer_size( dt_pupil, 100000 );
+Tobii.set_max_buffer_size( dt_blink, 100000 );
+Tobii.set_max_buffer_size( dt_saccade , 100000 );
+
+# set the host ip address
+# where the Tet_Server is running on.
+# Default: localhost (127.0.0.1)
+#Tobii.send_command("host 169.254.65.130");
+Tobii.send_command("host 169.254.6.91");
+
+# set the port the Tet_Server sends the
+# gaze data to.
+# Default: 4455
+Tobii.send_command( "port 4455" );
+
+# set the screen resolution used by the Tobii eye tracker
+# Default: Screen Resolution settings
+Tobii.send_command( "width 1024" );
+Tobii.send_command( "height 768" );
+
+
+if DEBUG == false then
+	# start calibration
+	# At the moment the extension uses a very simple five point calibration
+	EyeTrackTxt.set_caption("Press ENTER to start the\n 1rst eye-tracker calibration:\n fixate the white cross at all times.");
+	EyeTrackTxt.redraw();
+	EyeTrackScreen.present();
+
+	Tobii.calibrate( et_calibrate_default, 0.0, 0.0, 0.0 );
+end;
+
+# start the tracker
+Tobii.start_tracking();
+
+# Start getting position data
+Tobii.start_data( dt_position, true );
+Tobii.start_data( dt_pupil, true );
+Tobii.start_data( dt_blink, true );
+
+# Wait a moment, because it takes some time 
+# that data collection starts.
+wait_interval(500);
+
+
+# ------------------------------------------------------ #
+#                  EYE TRACKER SUBROUTINE                #
+# ------------------------------------------------------ #
+/*
+ * return the smaller of two interger values
+ */
+sub
+	int min( int first, int second )
+begin
+	if (first < second) then
+		return first;
+	else 
+		return second;
+	end;
+	# needed to prevent error
+	return 0;
+end;
+
+
+/*
+ * add a marker to the marker array
+ */
+sub
+   add_marker( eye_tracker et )
+begin
+	eye_position_data eyePos;
+
+	int index = et.buffer_position( dt_position );
+	if (index != 0) then
+		eyePos = et.get_position_data( index );	
+		markers.add( eyePos );
+	end;	
+end;
+
+if DEBUG == false then
+	# ------------------------------------------------------ #
+	#                 EYE TRACKER  CALIBRATION               #
+	# ------------------------------------------------------ #
+	EyeTrackTxt.set_caption("Press ENTER to start the\n 2nd eye-tracker calibration:\n fixate the blue cross at all times.");
+	EyeTrackTxt.redraw();
+	EyeTrackScreen.present();
+
+	loop
+		int Y = -8;
+	until Y > 8
+	begin
+		
+		PictureBlueFixationCross.set_part_y( 1, Y * PPD);
+
+		loop
+			int X = -8;
+		until X > 8
+		begin
+			PictureBlueFixationCross.set_part_x( 1, X * PPD);
+			PictureBlueFixationCross.present();
+			wait_interval(250);
+			add_marker( Tobii );
+			wait_interval(3000);
+			add_marker( Tobii );
+			Default.present();
+			wait_interval(200);
+			X = X + 4;
+		end;
+		
+		Y = Y + 8;
+		
+	end;
+		
+	PictureBlueFixationCross.set_part_y( 1, 0);
+	PictureBlueFixationCross.set_part_x( 1, 0);
+
+end;
 
 # ------------------------------------------------------ #
 #					           START									#
 # ------------------------------------------------------ #
+string Text2Present = "This is an fMRI run ";
+
+if DEBUG == true then
+	Text2Present.append("in DEBUG mode.\n\n");
+else
+	Text2Present.append("not in DEBUG mode.\n\n");
+end;
+
+Text2Present.append("Audio or Visual or Tactile trials ");	
+
+ConfirmationTxt.set_caption(Text2Present);
+ConfirmationTxt.redraw();
+Confirmation.present();
+
 PictureBlueFixationCross.present();
+wait_interval(2000);
+
+ISI.present();
+
+EPI.present();
 
 Start_Trial.set_mri_pulse(1);
 Start_Trial.present();
-
-EPI.present();
 
 
 
@@ -394,12 +485,6 @@ loop
 	#  Trial parameters
 	int Trial_Vis_Loc;
 	int Trial_Aud_Loc;
-	
-	# Feedback parameters
-	int FeedbackLocation;
-	int ExpRespCode;
-	int RespCount=0;
-	int RespCode;
 
 until TrialIndex > TrialList.count()
 
@@ -407,21 +492,12 @@ begin
 	
 	# AudioOnly_Trial ; TrialType == 1
 	# VisualOnly_Trial ; TrialType == 2
-	# AudioVisual_Con_Trial ; TrialType == 3
-	# AudioVisual_Inc_Trial ; TrialType == 4
 	# Tactile_Trial ; TrialType == 5
 	
 	# AudioOnly_Target ; TrialType == 6
 	# VisualOnly_Target ; TrialType == 7
 	# Tactile_Target ; TrialType == 8
-	if fMRI_Run == true || PresentFeedback == true || DEBUG == true then
-	else
-		if TrialIndex==TrialList.count()/2 then
-			Break.present();
-		end;
-	end;
 
-	
 	TrialType = TrialList[TrialIndex];
 	
 	# TRIAL IS A FIXATION
@@ -432,7 +508,7 @@ begin
 	else		
 		
 		# Audio
-		if TrialType==1 || TrialType==3 || TrialType==4 || TrialType==6 then
+		if TrialType==1 || TrialType==6 then
 			# Determine the location of this trial
 			Trial_Aud_Loc = Locations[TrialIndex]+15*random(0, 9);
 			
@@ -447,28 +523,6 @@ begin
 				else
 					SoundOnly.set_stimulus(SOUNDS200[Trial_Aud_Loc]);
 				end
-				
-			elseif TrialType==3 then
-				if Stimulus_Duration == 50 then
-					SoundWithDots_Con.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
-				elseif Stimulus_Duration == 80 then
-					SoundWithDots_Con.set_stimulus(SOUNDS80[Trial_Aud_Loc]);					
-				elseif Stimulus_Duration == 100 then
-					SoundWithDots_Con.set_stimulus(SOUNDS100[Trial_Aud_Loc]);
-				else
-					SoundWithDots_Con.set_stimulus(SOUNDS200[Trial_Aud_Loc]);
-				end
-				
-			elseif TrialType==4 then
-				if Stimulus_Duration == 50 then
-					SoundWithDots_Inc.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
-				elseif Stimulus_Duration == 80 then
-					SoundWithDots_Inc.set_stimulus(SOUNDS80[Trial_Aud_Loc]);					
-				elseif Stimulus_Duration == 100 then
-					SoundWithDots_Inc.set_stimulus(SOUNDS100[Trial_Aud_Loc]);
-				else
-					SoundWithDots_Inc.set_stimulus(SOUNDS200[Trial_Aud_Loc]);
-				end	
 				
 			elseif TrialType==6 then
 				if Stimulus_Duration == 50 then
@@ -488,7 +542,7 @@ begin
 		end;
 		
 		# Visual
-		if TrialType==2 || TrialType==3 || TrialType==4 || TrialType==7 then
+		if TrialType==2 || TrialType==7 then
 			# Determine the location of this trial
 			if TrialType==4 then
 				Trial_Vis_Loc = -1*PresentationLocationsPix[Locations[TrialIndex]];
@@ -503,37 +557,35 @@ begin
 		# Tactile
 		if TrialType==5 then
 			if Locations[TrialIndex]<8  then
-				vibrationLeft_Trial(SlotL, NumCycle, WaitTime);
+				#vibrationLeft_Trial(SlotL, NumCycle, WaitTime);
 			elseif Locations[TrialIndex]>8 then
-				vibrationRight_Trial(SlotR, NumCycle, WaitTime);
+				#vibrationRight_Trial(SlotR, NumCycle, WaitTime);
 			end;
 		elseif  TrialType==8 then
 			if Locations[TrialIndex]<8 then
-				vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
-				wait(1, IntervalTime);
-				vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+				#vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+				#wait(1, IntervalTime);
+				#vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
 			elseif Locations[TrialIndex]>8 then
-				vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
-				wait(1, IntervalTime);
-				vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+				#vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+				#wait(1, IntervalTime);
+				#vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
 			end;
 		end;
 		
+		add_marker( Tobii );
+		ISI.present();		
 		
 		# Present trial
 		if TrialType == 1 then
 			AudioOnly_Trial.present();
 		elseif TrialType == 2 then
 			VisualOnly_Trial.present();
-		elseif TrialType == 3 then
-			AudioVisual_Con_Trial.present();
-		elseif TrialType == 4 then
-			AudioVisual_Inc_Trial.present();	
 		elseif TrialType == 5 then
 			Tactile_Trial.present();
-			startStimulation();
+			#startStimulation();
 			wait_interval(int(Tactile_Stimulus_Duration));
-			stopStimulation();
+			#stopStimulation();
 			PictureBlueFixationCross.present();
 			wait_interval(Post_Stimulus_Duration);
 			
@@ -543,59 +595,11 @@ begin
 			VisualOnly_Target.present();			
 		elseif TrialType == 8 then
 			Tactile_Target.present();
-			startStimulation();
+			#startStimulation();
 			wait_interval(int(Tactile_Stimulus_Duration));
-			stopStimulation();
+			#stopStimulation();
 			PictureBlueFixationCross.present();
 			wait_interval(Post_Stimulus_Duration);
-		end;
-		
-		if fMRI_Run==false then
-			if TrialType==3 || TrialType==4 then
-				AuditoryLocation.present();
-				wait_interval(50);
-				SameDifferent.present();
-			end;
-		end;
-			
-		ISI.present();
-		
-		# FEEDBACK
-		if PresentFeedback == true then
-			
-			if RunType==1 then
-				if Locations[TrialIndex]<8 then
-					AudLocEvent.set_target_button(1);
-					ExpRespCode = 1;
-				else 
-					AudLocEvent.set_target_button(2);
-					ExpRespCode = 2;
-				end;
-				AuditoryLocation.present();
-			elseif TrialType>5 then
-				ExpRespCode=1;
-			end;
-			
-			if RunType==1 || TrialType>5 then
-				
-				if RespCount == response_manager.total_response_count() then # no new responses has been pressed
-						RespCode = 0;
-					else
-						RespCount = response_manager.total_response_count();
-						RespCode = response_manager.last_response_data().code();
-				end;
-				
-				FeedbackLocation = PresentationLocationsPix[Locations[TrialIndex]];
-				
-				if ExpRespCode == RespCode then
-					PicturePositiveFeedback.set_part_x( 1, FeedbackLocation);			
-					PositiveFeedback.present();
-				else
-					PictureNegativeFeedback.set_part_x( 1, FeedbackLocation);
-					NegativeFeedback.present();
-				end;			
-				
-			end;
 		end;
 		
 	end;
@@ -615,4 +619,119 @@ end;
 # FINAL FIXATION
 Final_Fixation.present();
 
-closeStimulator();
+#closeStimulator();
+
+
+
+# ------------------------------------------------------ #
+#				     SAVING EYETRACKER DATA					   #
+# ------------------------------------------------------ #
+EyeTrackTxt.set_caption("SAVING EYETRACKER DATA");
+EyeTrackTxt.redraw();
+EyeTracPic.present();
+
+# stop data collection
+Tobii.stop_data(dt_position);   
+Tobii.stop_data(dt_pupil);
+Tobii.stop_data(dt_blink);
+
+# save all data to file
+output_file out = new output_file;
+out.open( EyeTrackFileName ); 
+
+int count = min( Tobii.buffer_position( dt_position ), Tobii.buffer_position( dt_pupil ) );
+
+eye_position_data eyePos;
+pupil_data pupilData;
+blink_event_data blinkData;
+
+#loop
+#	int blink = 1;
+#until blink > Tobii.buffer_position( dt_blink )
+#	begin
+#
+#	blinkData = Tobii.get_blink_event( blink );
+#
+#	term.print( blinkData.time() );
+#	term.print( " " );
+#	term.print( blinkData.type() );
+#	term.print( "\n" );
+#	
+#	blink=blink+1;
+#
+#end;
+
+
+out.print( "index\tpos_time\tpos_x\tpos_y\tpup_xdiameter\tpup_ydiameter\tblink_status\tmarker\n" );
+
+
+loop
+	int i = 1;
+	int blink = 1;
+	
+until
+	i > count
+begin
+	eyePos = Tobii.get_position_data( i );
+	pupilData = Tobii.get_pupil_data( i );
+	
+	if blink<=Tobii.buffer_position( dt_blink ) then
+		blinkData = Tobii.get_blink_event( blink );
+	end;
+
+	out.print( i );
+	out.print( "\t" );
+	out.print( eyePos.time() );
+	out.print( "\t" );
+	out.print( eyePos.x() );
+	out.print( "\t" );
+	out.print( eyePos.y() );
+	out.print( "\t" );
+	out.print( pupilData.x_diameter() );
+	out.print( "\t" );
+	out.print( pupilData.y_diameter() );
+	out.print( "\t" );
+	
+	
+	if eyePos.time()>=blinkData.time() && blink<=Tobii.buffer_position( dt_blink ) then
+		
+		out.print( blinkData.type() );
+		out.print( "\t" );	
+		
+		blink = blink+1;
+		
+	else
+		out.print( "-1\t" )
+	end;
+
+
+	int markerIndex = 0;
+	loop
+		int j = 1;
+	until
+		j > markers.count()
+	begin
+		if (markers[j].time() == eyePos.time()) then
+			markerIndex = j;		
+		end;
+
+		j = j + 1;
+	end;
+
+	out.print( markerIndex );
+
+	if (i != count) then
+		out.print( "\n" );
+	end; 
+
+	i = i + 1;
+end;
+
+out.close();
+
+# clear all buffers and stop tracking
+Tobii.clear_buffer(dt_position);
+Tobii.clear_buffer(dt_pupil);
+Tobii.clear_buffer(dt_blink);
+
+Tobii.stop_tracking();
