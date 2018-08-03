@@ -46,9 +46,7 @@ begin;
 $RefreshRate = 60.0;
 
 #Compute the number of pixel per degree
-$MonitorWidth = 37.0;
-$ViewDist = 30.0;
-$MaxFOV = 51.0;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi;
+$MaxFOV = 31.0;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi;
 $Win_W = 1024.0 ;
 $Win_H = 728.0 ; 
 $PPD = '$Win_W/$MaxFOV';
@@ -64,6 +62,14 @@ $PPD = '$Win_W/$MaxFOV';
 # MonWidth	MaxFOV
 # 48.0		51
 
+# for ViewDist = 60
+# MonWidth	MaxFOV
+# 33.0		31
+
+# for ViewDist = 160
+# MonWidth	MaxFOV
+# 39.0		40
+
 # Colors
 $Black = "0, 0, 0";
 $White = "255, 255, 255";
@@ -77,7 +83,7 @@ $xpos = 0;
 $ypos = 0;
 
 # Stimuli timing
-$ISI = 2000;
+$ISI = 1800;
 $AV_Stimulus_Duration = 50; # ms
 $Stimulus_Duration = 192; # ms
 $Pre_Stimulus_Duration = 500;
@@ -90,7 +96,7 @@ $FixationCrossHalfWidth = 8;
 $NegativeFixationCrossHalfWidth = '-($FixationCrossHalfWidth)';
 
 # Dots
-$Dot_Size = 0.43;
+$Dot_Size = 6.0;
 $Dot_Size_Pixel = '$Dot_Size * $PPD';
 $Dot_Color = $White;
 
@@ -101,7 +107,7 @@ $PositiveFeedback_Color = $Green;
 $NegativeFeedback_Color = $Red;
 
 # Fixation
-$FinalFixationDuration = 40000.0;
+$FinalFixationDuration = 30000.0;
 $Fixation_Duration = 6000.0;
 
 
@@ -129,25 +135,6 @@ ellipse_graphic {
 # Dots
 array{
 ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_1;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_2;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_3;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_4;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_5;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_6;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_7;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_8;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_9;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_10;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_11;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_12;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_13;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_14;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_15;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_16;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_17;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_18;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_19;
-ellipse_graphic {ellipse_width = $Dot_Size_Pixel; ellipse_height = $Dot_Size_Pixel; color = $Dot_Color; } Dot_20;
 } DOTS_ARRAY;
 
 # Positive Feedback
@@ -204,25 +191,6 @@ sound {wavefile { filename = "Target_200ms_Location_10_Deg.wav   "; } ; } Target
 #---------#
 picture {
 	ellipse_graphic Dot_1; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_2; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_3; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_4; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_5; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_6; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_7; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_8; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_9; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_10; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_11; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_12; 	x = $xpos; y = $ypos;	
-	ellipse_graphic Dot_13; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_14; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_15; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_16; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_17; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_18; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_19; 	x = $xpos; y = $ypos;
-	ellipse_graphic Dot_20; 	x = $xpos; y = $ypos;
 	
 	line_graphic BlueFixationCross;
 	x = $xpos; y = $ypos;
@@ -285,7 +253,8 @@ trial {
 	all_responses = true;
 	
 	picture PictureBlueFixationCross;
-	time = 0; 
+	time = 0;
+	duration = $Pre_Stimulus_Duration;
 	
 	stimulus_event {
 		picture Dots;
@@ -299,6 +268,13 @@ trial {
 		time = $Pre_Stimulus_Duration;
 		code = "AudioVisual_Con_Trial_A";
    } SoundWithDots_Con;
+
+	stimulus_event {
+	picture PictureBlueFixationCross;
+	time = '$Pre_Stimulus_Duration+$AV_Stimulus_Duration';
+	duration = $Post_Stimulus_Duration;
+	} PostStimFix_Con;
+
 } AudioVisual_Con_Trial;
 
 
@@ -309,7 +285,8 @@ trial {
 	
 	picture PictureBlueFixationCross;
 	time = 0; 
-		
+	duration = $Pre_Stimulus_Duration;
+
 	stimulus_event {
 		picture Dots;
 		time = $Pre_Stimulus_Duration;
@@ -322,6 +299,13 @@ trial {
 		time = $Pre_Stimulus_Duration;
 		code = "AudioVisual_Inc_Trial_A";
    } SoundWithDots_Inc;
+
+	stimulus_event {
+	picture PictureBlueFixationCross;
+	time = '$Pre_Stimulus_Duration+$AV_Stimulus_Duration';
+	duration = $Post_Stimulus_Duration;
+	} PostStimFix_Inc;
+
 } AudioVisual_Inc_Trial;
 
 
@@ -332,11 +316,17 @@ trial {
 	
 	picture PictureBlueFixationCross;
 	time = 0; 
-		
+	duration = $Pre_Stimulus_Duration;
+
 	picture Dots;
 	time = $Pre_Stimulus_Duration;
    duration = $Stimulus_Duration;
 	code = "VisualOnly_Trial";
+	
+	picture PictureBlueFixationCross;
+	time = '$Pre_Stimulus_Duration+$Stimulus_Duration';
+	duration = $Post_Stimulus_Duration;
+
 } VisualOnly_Trial;
 
 
@@ -347,6 +337,7 @@ trial {
 	
 	picture PictureBlueFixationCross;
 	time = 0; 
+	duration = $Pre_Stimulus_Duration;
 	
 	stimulus_event {
       sound Sound_50ms_Location_min10_Deg;
@@ -357,15 +348,23 @@ trial {
 	picture PictureBlueFixationCross;
 	time = $Pre_Stimulus_Duration;
    duration = $Stimulus_Duration;
-	code = "AudioOnly_Trial_V";	
+	code = "AudioOnly_Trial_V";
+
+	picture PictureBlueFixationCross;
+	time = '$Pre_Stimulus_Duration+$Stimulus_Duration';
+	duration = $Post_Stimulus_Duration;
+	
 } AudioOnly_Trial;
 
 
 # Tactile_Trial;
 trial {
+	monitor_sounds = false;
+	all_responses = true;
 	
 	picture PictureBlueFixationCross;
 	time = 0; 
+	duration = $Pre_Stimulus_Duration; 
 		
 	picture PictureBlueFixationCross;
 	code = "Tactile_Trial";
@@ -382,7 +381,8 @@ trial {
 	
 	picture PictureBlueFixationCross;
 	time = 0; 
-		
+	duration = $Pre_Stimulus_Duration;
+
 	picture Dots;
 	time = $Pre_Stimulus_Duration;
    duration = '$Stimulus_Duration/3';
@@ -398,6 +398,11 @@ trial {
 		duration = '$Stimulus_Duration/3';
 		target_button = 1;
 	} Dot_Target;
+	
+	picture PictureBlueFixationCross;
+	time = '$Pre_Stimulus_Duration+$Stimulus_Duration';
+	duration = $Post_Stimulus_Duration;
+
 } VisualOnly_Target;
 
 
@@ -405,10 +410,11 @@ trial {
 trial {
 	monitor_sounds = false;
 	all_responses = true;
-		
+
 	picture PictureBlueFixationCross;
 	time = 0; 
-		
+	duration = $Pre_Stimulus_Duration;
+
 	stimulus_event {
       sound Target_200ms_Location_min10_Deg;
 		time = $Pre_Stimulus_Duration;
@@ -419,16 +425,23 @@ trial {
 	picture PictureBlueFixationCross;
 	time = $Pre_Stimulus_Duration;
    duration = $Stimulus_Duration;
-	code = "AudioOnly_Target_V";	
+	code = "AudioOnly_Target_V";
+	
+	picture PictureBlueFixationCross;
+	time = '$Pre_Stimulus_Duration+$Stimulus_Duration';
+	duration = $Post_Stimulus_Duration;
+
 } AudioOnly_Target;
 
 
 # Tactile_Target;
 trial {	
-
+	monitor_sounds = false;
+	all_responses = true;
 	
 	picture PictureBlueFixationCross;
 	time = 0; 
+	duration = $Pre_Stimulus_Duration;
 
 	stimulus_event {
 		picture PictureBlueFixationCross;
@@ -436,6 +449,7 @@ trial {
 		time = $Pre_Stimulus_Duration;
 		target_button = 1;
 	} Tactile_Target_Event;
+	
 } Tactile_Target;
 
 
@@ -448,6 +462,10 @@ trial {
    trial_duration = forever;
    trial_type = specific_response;
    terminator_button = 1, 2; 
+
+	picture PictureBlueFixationCross;
+	time = 0; 
+	duration = $Pre_Stimulus_Duration;
 	
 	stimulus_event {
 	picture {
@@ -456,6 +474,7 @@ trial {
 		};
 		x = 0; y = 0;
 	} AudLocPic;
+	time = $Pre_Stimulus_Duration;
 	code = "AuditoryLocation";
 	} AudLocEvent;
 	
@@ -468,6 +487,10 @@ trial {
    trial_duration = forever;
    trial_type = specific_response;
    terminator_button = 3, 4;  
+
+	picture PictureBlueFixationCross;
+	time = 0; 
+	duration = $Pre_Stimulus_Duration;
 	
 	picture {
 		text {
@@ -475,6 +498,7 @@ trial {
 		};
 		x = 0; y = 0;
 	} SameDifferentPic;
+	time = $Pre_Stimulus_Duration;
 	code = "CommonSource";
 	
 } SameDifferent;
@@ -547,18 +571,6 @@ trial {
 
 
 # FIXATIONS
-# Post Stim Fixation
-trial {
-	monitor_sounds = false;
-	all_responses = true;
-
-	picture PictureBlueFixationCross;
-	time = 0;
-	duration = $Post_Stimulus_Duration;
-	code = "PostStim_Fixation";
-	
-} PostStim_Fixation;
-
 # Fixation
 trial {
 	monitor_sounds = false;

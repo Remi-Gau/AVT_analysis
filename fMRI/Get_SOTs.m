@@ -1,7 +1,7 @@
 %%
 clc; clear all; close all;
 
-Subjects = [11];
+Subjects = [10];
 
 IndStart = 5;% first row of data points in txt file
 
@@ -9,10 +9,12 @@ StartDirectory = pwd;
 
 for SubjInd = 1:length(Subjects)
 
-    cd(fullfile(StartDirectory, strcat('Subject_', num2str(Subjects(SubjInd))), 'fMRI'))
+    cd(fullfile(StartDirectory, 'Behavioral', strcat('Subject_', num2str(Subjects(SubjInd)))))
 
-    LogFileList = dir(strcat('Logfile_Subject_', num2str(Subjects(SubjInd)), '_Run_30*.txt'));
-    TrialListFileList = dir(strcat('Trial_List_Subject_', num2str(Subjects(SubjInd)), '_Run_30*.txt'));
+    LogFileList = dir(strcat('Logfile_Subject_', num2str(Subjects(SubjInd)), '_Run_3*.txt'));
+    TrialListFileList = dir(strcat('Trial_List_Subject_', num2str(Subjects(SubjInd)), '_Run_3*.txt'));
+
+    SOT=cell(7,2,length(LogFileList));
 
     for iFile = 1:length(LogFileList)
 
@@ -23,6 +25,15 @@ for SubjInd = 1:length(Subjects)
 
         disp(['Trial_List_Subject_', num2str(Subjects(SubjInd)), ...
             '_Run_' LogFileList(iFile).name(end-23:end-20) '.txt'])
+
+        % Loads side order presented
+        SideList = load(['Side_List_Subject_', num2str(Subjects(SubjInd)), ...
+            '_Run_' LogFileList(iFile).name(end-23:end-20) '.txt']);
+        SideList(SideList==0) = [];
+
+        disp(['Side_List_Subject_', num2str(Subjects(SubjInd)), ...
+            '_Run_' LogFileList(iFile).name(end-23:end-20) '.txt'])
+
 
         % Loads log file
         disp(LogFileList(iFile).name)
@@ -39,6 +50,10 @@ for SubjInd = 1:length(Subjects)
 
         Stim_Time{1,1} = FileContent{1,3}(1:EOF);
         Stim_Time{1,2} = char(FileContent{1,4}(1:EOF));
+
+        StartTime =  str2num(Stim_Time{1,2}(find(strcmp('Start', Stim_Time{1,1})),:));
+
+        Duration =  (str2num(Stim_Time{1,2}(end,:)) - StartTime)/600000
 
         TEMP = find(strcmp('30', Stim_Time{1,1}));
         TEMP = [TEMP ; find(strcmp('AudioOnly_Trial_V', Stim_Time{1,1}))];
@@ -62,75 +77,35 @@ for SubjInd = 1:length(Subjects)
         NbATarget=sum(TrialList==6);
         NbVTarget=sum(TrialList==7);
         NbTTarget=sum(TrialList==8);
-        NbResp=sum(strcmp('1', Stim_Time{1,1}))+sum(strcmp('3', Stim_Time{1,1}));
-
-        Hits(:,:,iFile) = zeros(1,3);
-        Miss(:,:,iFile) = zeros(1,3);
-        FalseAlarms(:,:,iFile) = zeros(1,3);
-        CorrectRejection(:,:,iFile) = zeros(1,3);
+        NbResp=sum(strcmp('1', Stim_Time{1,1}));
 
         iTrial = 1;
-        IsTarget = 0;
-        IsResp = 0;
-        j=0;
 
-        for i=1:length(Stim_Time{1,1})-1
-
-            if TrialList(iTrial)>5
-                IsTarget = 1;
-                if TrialList(iTrial)==6
-                    j=1;
-                elseif TrialList(iTrial)==7
-                    j=2;
-                elseif TrialList(iTrial)==8
-                    j=3;
-                end
+        for i=1:length(TrialList)
+            
+            if SideList(i)<3
+                Side = 1;
             else
-                IsTarget = 0;
+                Side = 2;
+            end
+            
+            if TrialList(i)>4
+                TrialType=TrialList(i)-2;
+            else
+                TrialType=TrialList(i);
             end
 
-            if strcmp('1', Stim_Time{1,1}(i+1,:))||strcmp('3', Stim_Time{1,1}(i+1,:))
-                if IsResp
-                else
-                    IsResp=1;
-                    if IsTarget
-
-                        Hits(1,j,iFile)=Hits(1,j,iFile)+1;
-                    else
-                        FalseAlarms(1,j,iFile)=FalseAlarms(1,j,iFile)+1;
-                    end
-                end
-            else
-                iTrial=iTrial+1;
-                IsResp=0;
+            if strcmp('1', Stim_Time{1,1}(iTrial,:))
+                SOT{7,1,iFile}(end+1) = (str2double(Stim_Time{1,2}(iTrial,:)) - StartTime)/10000;
+                iTrial = iTrial+1;
             end
+
+            SOT{TrialType,Side,iFile}(end+1) = (str2double(Stim_Time{1,2}(iTrial,:)) - StartTime)/10000;
+            iTrial = iTrial+1;
 
         end
 
-        Hits;
-        Miss(:,:,end) = [NbATarget NbVTarget NbTTarget] - Hits(:,:,iFile);
-        FalseAlarms;
-        CorrectRejection(:,:,end) =  [NbATrial NbVTrial NbTTrial] - FalseAlarms(:,:,iFile);
-
-        disp(NbResp==sum(FalseAlarms(:,:,iFile))+sum(Hits(:,:,iFile)))
-
     end
-
-    fprintf('Hits\n')
-    disp([sum(Hits,3) sum(Hits(:))])
-    fprintf('Misses\n')
-    disp([sum(Miss,3) sum(Miss(:))])
-    fprintf('False alarms\n')
-    disp([sum(FalseAlarms,3) sum(FalseAlarms(:))])
-    fprintf('Correct rejection\n')
-    disp([sum(CorrectRejection,3) sum(CorrectRejection(:))])
-
-    fprintf('\nAccuracy\n')
-    disp(round([sum(Hits,3)./(sum(Hits,3)+sum(Miss,3)) ...
-        sum(Hits(:))/(sum(Hits(:))+sum(Miss(:)))]*100))
-
-
-    cd(StartDirectory)
 
 end
 

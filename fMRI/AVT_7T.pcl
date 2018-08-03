@@ -1,19 +1,27 @@
 # --------------------------------------------------- #
 #					           QUAERO							   #
 # --------------------------------------------------- #
-include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\CrossModal_MVPA\\A_V_T\\stimlibrel.pcl"
+#include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\CrossModal_MVPA\\A_V_T\\stimlibrel.pcl"
+#include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\CrossModal_MVPA\\A_V_T\\subroutines_tactile.pcl"
+
 #include_once "U:\\A_V_T\\stimlibrel.pcl"
 
-include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\CrossModal_MVPA\\A_V_T\\subroutines_tactile.pcl"
+#loadLibrary();
 
-loadLibrary();
+#Stimulator licence BHAM
+#initStimulator("8DD8J3C662984KL65UZ3LHJEEF5OTP");	
+#int SlotL=0;
+#int SlotR=1;
 
-initStimulator("8DD8J3C662984KL65UZ3LHJEEF5OTP");	#Stimulator initialisieren
+#Stimulator licence MPI CBS
+#initStimulator("0348778LCCA6UL97STQMQNYFEAMIOU");	
+int SlotL=3;
+int SlotR=4;
 
-setProperty("local_buffer_size", 5000000);
+#setProperty("local_buffer_size", 5000000);
 
-setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
-setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
+#setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
+#setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
 
 
 # --------------------------------------------------- #
@@ -25,9 +33,7 @@ string DATE = date_time( "yyyy_mm_dd_hhnn" );
 double RefreshRate = 60.0;
 
 #Compute the number of pixel per degree
-int MonitorWidth = 37;
-int ViewDist = 30;
-int MaxFOV = 51;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi; 
+int MaxFOV = 31;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi; 
 int Win_H = 768 ; 
 int Win_W = 1024 ; 
 int PPD = Win_W/MaxFOV;
@@ -42,6 +48,14 @@ int PPD = Win_W/MaxFOV;
 # for ViewDist = 50
 # MonWidth	MaxFOV
 # 48.0		51
+
+# for ViewDist = 60
+# MonWidth	MaxFOV
+# 33.0		31
+
+# for ViewDist = 160
+# MonWidth	MaxFOV
+# 39.0		40
 
 
 # FIXATION
@@ -59,13 +73,6 @@ begin
 	PresentationLocationsPix.add( PresentationLocationsDeg[LocationIndex] * PPD);
 	LocationIndex = LocationIndex + 1;
 end;
-
-array<int> X_Pos[20] = {-10, -9, -8, -7, -6, -5, -4, -3,  -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-array<int> Y_Pos[20] = {-10, -9, -8, -7, -6, -5, -4, -3,  -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-
-# Visual reliability = STD of dots positions in deg * PPD / STD of dots positions in pix
-int VisRel = int(2.0 * double(PPD) / 6.2048);
-
 
 # Tactile
 double Stimulus_Duration = 192.0; # ms
@@ -90,6 +97,9 @@ preset int RunType; #(1 for A only, 2 for AV, 3 for AVT, 4 for T only)
 preset int AV_Stimulus_Duration = 50; # ms
 Dots_Con.set_duration(AV_Stimulus_Duration);
 Dots_Inc.set_duration(AV_Stimulus_Duration);
+int Pre_Stimulus_Duration = 500;
+PostStimFix_Con.set_time(Pre_Stimulus_Duration+AV_Stimulus_Duration);
+PostStimFix_Inc.set_time(Pre_Stimulus_Duration+AV_Stimulus_Duration);
 
 preset bool PresentFeedback = false;
 if DEBUG == true || fMRI_Run==true || RunType==2 || RunType==4 then
@@ -183,7 +193,7 @@ if DEBUG == true then
 	# TrialList.assign ({4, 4, 4, 4, 4, 4});
 	
 	# Tactile
-	# TrialList.assign ({5, 5, 5, 5, 5});
+	#TrialList.assign ({5, 5, 5, 5, 5});
 	
 	# AudioOnlyTarget
 	#TrialList.assign ({6, 6, 6, 6, 6, 6, 6, 6, 6, 6});
@@ -204,7 +214,7 @@ if DEBUG == true then
 	
 	Locations.assign({1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4});
 
-	logfile.set_filename("debug.log");
+	#logfile.set_filename("debug.log");
 	
 else
 	# Change directory where to save log files to and to read trial list from
@@ -318,7 +328,6 @@ end;
 #					           START									#
 # ------------------------------------------------------ #
 PictureBlueFixationCross.present();
-clearBuffers();
 
 Start_Trial.present();
 
@@ -419,36 +428,26 @@ begin
 				Trial_Vis_Loc = PresentationLocationsPix[Locations[TrialIndex]];
 			end;
 			
-			# Draws a new position for each dot
-			X_Pos.shuffle();
-			Y_Pos.shuffle();
+			Dots.set_part_x( 1, Trial_Vis_Loc);
 			
-			loop
-			int DotIndex = 1;
-			until DotIndex > X_Pos.count()
-			begin
-				Dots.set_part_x( DotIndex, X_Pos[DotIndex]*VisRel + Trial_Vis_Loc);
-				Dots.set_part_y( DotIndex, Y_Pos[DotIndex]*VisRel);
-				DotIndex = DotIndex + 1;
-			end;
 		end;
 		
 		# Tactile
 		if TrialType==5 then
 			if Locations[TrialIndex]==1 || Locations[TrialIndex]==2 then
-				vibrationLeft_Trial(NumCycle, WaitTime);
+				#vibrationLeft_Trial(SlotL, NumCycle, WaitTime);
 			elseif Locations[TrialIndex]==3 || Locations[TrialIndex]==4 then
-				vibrationRight_Trial(NumCycle, WaitTime);
+				#vibrationRight_Trial(SlotR, NumCycle, WaitTime);
 			end;
 		elseif  TrialType==8 then
 			if Locations[TrialIndex]==1 || Locations[TrialIndex]==2 then
-				vibrationLeft_Trial(NumCycleTarget, WaitTime);
-				wait(1, IntervalTime);
-				vibrationLeft_Trial(NumCycleTarget, WaitTime);
+				#vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+				#wait(1, IntervalTime);
+				#vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
 			elseif Locations[TrialIndex]==3 || Locations[TrialIndex]==4 then
-				vibrationRight_Trial(NumCycleTarget, WaitTime);
-				wait(1, IntervalTime);
-				vibrationRight_Trial(NumCycleTarget, WaitTime);
+				#vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+				#wait(1, IntervalTime);
+				#vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
 			end;
 		end;
 		
@@ -464,9 +463,11 @@ begin
 			AudioVisual_Inc_Trial.present();	
 		elseif TrialType == 5 then
 			Tactile_Trial.present();
-			startStimulation();
+			#startStimulation();
 			wait_interval(int(Stimulus_Duration));
-			stopStimulation();
+			#stopStimulation();
+			PictureBlueFixationCross.present();
+			wait_interval(Post_Stimulus_Duration);
 			
 		elseif TrialType == 6 then
 			AudioOnly_Target.present();	
@@ -474,12 +475,12 @@ begin
 			VisualOnly_Target.present();			
 		elseif TrialType == 8 then
 			Tactile_Target.present();
-			startStimulation();
+			#startStimulation();
 			wait_interval(int(Stimulus_Duration));
-			stopStimulation();
+			#stopStimulation();
+			PictureBlueFixationCross.present();
+			wait_interval(Post_Stimulus_Duration);
 		end;
-		
-		PostStim_Fixation.present();
 		
 		if fMRI_Run==false then
 			if TrialType==3 || TrialType==4 then
@@ -546,4 +547,4 @@ end;
 # FINAL FIXATION
 Final_Fixation.present();
 
-closeStimulator();
+#closeStimulator();
