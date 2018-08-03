@@ -1,0 +1,193 @@
+workspace piezo = new workspace("QSPiezostimulator");
+
+sub 
+  loadLibrary
+begin
+  piezo.initialize();
+end;
+
+sub 
+  initStimulator(string license)
+begin
+  piezo.run("initStimulator," + license);
+end;
+
+sub
+  closeStimulator
+begin
+  piezo.run("closeStimulator");
+end;
+
+sub
+  resetStimulator
+begin
+  piezo.run("resetStimulator");
+end;
+
+sub
+  startStimulation
+begin
+  piezo.run("startStimulation");
+end;
+
+sub
+  stopStimulation
+begin
+  piezo.run("stopStimulation");
+end;
+
+sub
+  setDAC(int dac, int value)
+begin
+  piezo.set_variable("0", dac);
+  piezo.set_variable("1", value);
+  piezo.run("setDAC");  
+end;
+
+sub
+  setPinBlock8(int slot, int int_trigger, int pin0, int pin1, int pin2, int pin3, int pin4, int pin5, int pin6, int pin7)
+begin
+  piezo.set_variable("0", slot);
+  piezo.set_variable("1", int_trigger);
+  piezo.set_variable("2", pin0);
+  piezo.set_variable("3", pin1);
+  piezo.set_variable("4", pin2);
+  piezo.set_variable("5", pin3);
+  piezo.set_variable("6", pin4);
+  piezo.set_variable("7", pin5);
+  piezo.set_variable("8", pin6);
+  piezo.set_variable("9", pin7);
+  piezo.run("setPinBlock8");
+end;
+
+sub
+  setPinBlock10(int slot, int int_trigger, int pin0, int pin1, int pin2, int pin3, int pin4, int pin5, int pin6, int pin7, int pin8, int pin9)
+begin
+  piezo.set_variable("0", slot);
+  piezo.set_variable("1", int_trigger);
+  piezo.set_variable("2", pin0);
+  piezo.set_variable("3", pin1);
+  piezo.set_variable("4", pin2);
+  piezo.set_variable("5", pin3);
+  piezo.set_variable("6", pin4);
+  piezo.set_variable("7", pin5);
+  piezo.set_variable("8", pin6);
+  piezo.set_variable("9", pin7);
+  piezo.set_variable("10", pin6);
+  piezo.set_variable("11", pin7);
+  piezo.run("setPinBlock10");
+end;
+
+sub
+  setPinBlock(int slot, int int_trigger, int pin0, int pin1, int pin2, int pin3, int pin4, int pin5, int pin6, int pin7)
+begin
+  setPinBlock8(slot, int_trigger, pin0, pin1, pin2, pin3, pin4, pin5, pin6, pin7);
+end;
+
+sub
+  wait(int int_trigger, int Anzahl)
+begin
+  piezo.set_variable("0", int_trigger);
+  piezo.set_variable("1", Anzahl);
+  piezo.run("wait");
+end;
+
+sub
+  setTriggerMode(int slot, int port, int mode)
+begin
+  piezo.set_variable("0", slot);
+  piezo.set_variable("1", port);
+  piezo.set_variable("2", mode);
+  piezo.run("setTriggerMode");
+end;
+
+sub
+  setTriggerLength(int slot, int port, int length)
+begin
+  piezo.set_variable("0", slot);
+  piezo.set_variable("1", port);
+  piezo.set_variable("2", length);
+  piezo.run("setTriggerLength");
+end;
+
+
+sub
+  waitForTrigger(int slot, int port)
+begin
+  piezo.set_variable("0", slot);
+  piezo.set_variable("1", port);
+  piezo.run("waitForTrigger"); 
+end;
+
+sub
+  triggerOut(int slot, int port)
+begin
+
+  piezo.set_variable("0", slot);
+  piezo.set_variable("1", port);
+  piezo.run("triggerOut"); 
+end;
+
+sub
+  setProperty(string property, int value)
+begin
+  piezo.set_variable(property, value);
+end;
+
+sub
+  set2PDProperties(int module, int slot, int subslot, int dac_x, int dac_z0, int dac_z1)
+begin
+  piezo.set_variable("0", module);
+  piezo.set_variable("1", slot);
+  piezo.set_variable("2", subslot);
+  piezo.set_variable("3", dac_x);
+  piezo.set_variable("4", dac_z0);
+  piezo.set_variable("5", dac_z1);
+  piezo.run("set2PDProperties");
+end;
+
+sub
+  set2PDCalibrationX(int module, int homeDACPos, double co0, double co1, double co2, double co3, double co4, double co5, double co6, double co7, double co8, double co9)
+begin
+  piezo.set_variable("0", module);
+  piezo.set_variable("1", homeDACPos);
+  piezo.set_variable("2", co0);
+  piezo.set_variable("3", co1);
+  piezo.set_variable("4", co2);
+  piezo.set_variable("5", co3);
+  piezo.set_variable("6", co4);
+  piezo.set_variable("7", co5);
+  piezo.set_variable("8", co6);
+  piezo.set_variable("9", co7);
+  piezo.set_variable("10", co8);
+  piezo.set_variable("11", co9);
+  piezo.run("set2PDCalibrationX");
+end;
+
+sub
+  set2PDCalibrationZ(int module, double Z0_co0, double Z0_co1, double Z1_co0, double Z1_co1)
+begin
+	piezo.set_variable("0", module);
+	piezo.set_variable("1", Z0_co0);
+	piezo.set_variable("2", Z0_co1);
+	piezo.set_variable("3", Z1_co0);
+	piezo.set_variable("4", Z1_co1);
+	piezo.run("set2PDCalibrationZ");
+end;
+
+sub
+  set2PDDistance(int module, double distance)
+begin
+  piezo.set_variable("0", module);
+  piezo.set_variable("1", distance);
+  piezo.run("set2PDDistance"); 
+end;
+
+sub
+  set2PDHeight(int module, int promille_Z0, int promille_Z1)
+begin
+  piezo.set_variable("0", module);
+  piezo.set_variable("1", promille_Z0);
+  piezo.set_variable("2", promille_Z1);
+  piezo.run("set2PDHeight"); 
+end;

@@ -1,0 +1,470 @@
+# --------------------------------------------------- #
+#					           QUAERO							   #
+# --------------------------------------------------- #
+include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\subfun\\stimlibrel.pcl"
+include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\subfun\\subroutines_tactile.pcl"
+
+loadLibrary();
+
+#Stimulator licence BHAM
+#initStimulator("8DD8J3C662984KL65UZ3LHJEEF5OTP");	
+#int SlotL=2;
+#int SlotR=3;
+
+#Stimulator licence MPI CBS
+initStimulator("0348778LCCA6UL97STQMQNYFEAMIOU");	
+int SlotL=3;
+int SlotR=4;
+
+setProperty("local_buffer_size", 5000000);
+
+setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
+setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
+
+
+# --------------------------------------------------- #
+#					           PCL									#
+# --------------------------------------------------- #
+string DATE = date_time( "yyyy_mm_dd_hhnn" );
+
+# DISPLAY
+double RefreshRate = 60.0;
+
+#Compute the number of pixel per degree
+int MaxFOV = 34;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi; 
+int Win_H = 768 ; 
+int Win_W = 1024 ; 
+int PPD = Win_W/MaxFOV;
+
+# for ViewDist = 30
+# MonWidth	MaxFOV
+# 48.0		77
+# 37			63
+# 29			52
+# 21.5		40
+
+# for ViewDist = 50
+# MonWidth	MaxFOV
+# 48.0		51
+
+# for ViewDist = 60
+# MonWidth	MaxFOV
+# 33.0		31
+# 37			34
+# 29			28
+
+# for ViewDist = 160
+# MonWidth	MaxFOV
+# 39.0		40
+
+
+# STIMULI & TRIALS
+array <int> PresentationLocationsDeg[15]= {-12, -10, -8, -5, -4, -3, -1, 0, 1, 3, 4, 5, 8, 10, 12};
+
+
+# Visual
+array <int> PresentationLocationsPix[0];
+loop
+int LocationIndex = 1;
+until LocationIndex > PresentationLocationsDeg.count()
+begin
+	PresentationLocationsPix.add( PresentationLocationsDeg[LocationIndex] * PPD);
+	LocationIndex = LocationIndex + 1;
+end;
+
+
+
+
+# --------------------------------------------------- #
+#                USER INPUT REQUIRED                  #
+# --------------------------------------------------- #
+preset bool DEBUG = false;
+
+int Stimulus_Duration = 50; # ms
+int Pre_Stimulus_Duration = 500;
+
+Dots_V.set_duration(Stimulus_Duration);
+
+Dot_Target_1.set_duration(Stimulus_Duration);
+Inter_Dot.set_duration(64);
+Inter_Dot.set_delta_time(Stimulus_Duration);
+Dot_Target_2.set_duration(Stimulus_Duration);
+Dot_Target_2.set_delta_time(64);
+
+Sound_Target2.set_time(Pre_Stimulus_Duration+Stimulus_Duration+20);
+
+preset int SubjectNumber;
+
+preset int RunNumber;
+
+RunNumber = 3000 + RunNumber;
+
+# Tactile
+# tactile stim duration = 0.5*WaitTime*2*NumCycle [in ms]
+# stim freq = 1/(0.5*WaitTime*2/1000)
+double Tactile_Stimulus_Duration = 50.0; # ms
+int NumCycle = 5;
+int WaitTime = 10;
+int NumCycleTarget=5; 
+int IntervalTime=64;
+
+
+# --------------------------------------------------- #
+#                USER INPUT REQUIRED                  #
+# --------------------------------------------------- #
+string Text2Present = "This is ";
+
+Text2Present.append("an fMRI run ");
+
+if DEBUG == true then
+	Text2Present.append("in DEBUG mode.\n\n");
+else
+	Text2Present.append("not in DEBUG mode.\n\n");
+end;
+
+Text2Present.append("Audio or Visual or Tactile trials ");	
+
+ConfirmationTxt.set_caption(Text2Present);
+ConfirmationTxt.redraw();
+Confirmation.present();
+
+
+if DEBUG == true then # Psychophysics run or debug
+	Final_Fixation.set_duration(1000);
+	Fixation.set_duration(3000);
+end;
+
+
+# --------------------------------------------------- #
+#                GETTING TRIALS LIST                  #
+# --------------------------------------------------- #
+array <int> TrialList[0];
+array<int> Locations[0];
+
+	# Change directory where to save log files to and to read trial list from
+	string SubjectDirectory = "\Subjects_Data\\Subject_";
+	SubjectDirectory.append(string(SubjectNumber));
+	SubjectDirectory.append("\\");
+	logfile_directory.append(SubjectDirectory);
+
+	term.print(logfile_directory);
+	term.print("\n");
+
+if DEBUG == true then
+	
+	# TRIAL LIST
+	
+	# Fixation ; TrialType == 0
+
+	# AudioOnly_Trial ; TrialType == 1
+	# VisualOnly_Trial ; TrialType == 2
+	# Tactile_Trial ; TrialType == 5
+	
+	# AudioOnly_Target ; TrialType == 6
+	# VisualOnly_Target ; TrialType == 7
+	# Tactile_Target ; TrialType == 8
+	
+	#TrialList.assign ({1, 1, 1, 1, 2, 2, 2, 2, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8});
+	TrialList.assign ({1, 1, 2, 2, 5, 5, 0, 6, 6, 7, 7, 8, 8});
+	# LOCATION LIST
+	#Locations.assign({5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11});
+	Locations.assign({5, 11, 5, 11, 5, 11, 0, 5, 11, 5, 11, 5, 11});
+
+	#logfile.set_filename("debug.log");
+	
+else
+	
+	# Set name for file containing the trial list
+	string TrialListFileName = logfile_directory;
+	TrialListFileName.append("Trial_List_Subject_");
+	TrialListFileName.append(string(SubjectNumber));
+	TrialListFileName.append("_Run_");
+	TrialListFileName.append(string(RunNumber));
+	TrialListFileName.append(".txt");
+	
+	term.print(TrialListFileName);
+	term.print("\n");
+	
+	
+	# Set name for file containing the side list
+	string SideListFileName = logfile_directory;
+	SideListFileName.append("Side_List_Subject_");
+	SideListFileName.append(string(SubjectNumber));
+	SideListFileName.append("_Run_");
+	SideListFileName.append(string(RunNumber));
+	SideListFileName.append(".txt");
+	
+	term.print(SideListFileName);
+	term.print("\n");
+	
+	
+	# Set name for logfile for this subject and run
+	string LogFileName = logfile_directory;
+	LogFileName.append("Logfile_Subject_");
+	LogFileName.append(string(SubjectNumber));
+	LogFileName.append("_Run_");
+	LogFileName.append(string(RunNumber));
+	LogFileName.append("_");
+	LogFileName.append(DATE);
+	LogFileName.append(".txt");
+	logfile.set_filename(LogFileName);
+		
+	term.print(LogFileName);
+	term.print("\n");
+	
+	
+	# Read trial and side list from files
+	input_file StimOrderFile = new input_file;
+	StimOrderFile.open( TrialListFileName );
+	
+	input_file SideOrderFile = new input_file;
+	SideOrderFile.open( SideListFileName );
+	
+	bool CouldRead1 = true;
+	bool EOF1 = false;
+	
+	bool CouldRead2 = true;
+	bool EOF2 = false;
+	
+	loop
+		
+		int Index=1;
+		
+		int CurrentTrial1;
+		double CurrentTargetParam1;
+		string TEMP1;
+		
+		int CurrentTrial2;
+		double CurrentTargetParam2;
+		string TEMP2;
+		
+	until EOF1==true || EOF2==true 
+	begin
+		TEMP1 = StimOrderFile.get_line( );
+		TEMP2 = SideOrderFile.get_line( );
+		
+		CurrentTrial1 = int(double(TEMP1));
+		TrialList.add(CurrentTrial1);
+		
+		CurrentTrial2 = int(double(TEMP2));
+		Locations.add(CurrentTrial2);
+		
+		CouldRead1 = StimOrderFile.last_succeeded( );
+		EOF1 = StimOrderFile.end_of_file( );
+		
+		CouldRead2 = SideOrderFile.last_succeeded( );
+		EOF2 = SideOrderFile.end_of_file( );
+		
+		if CouldRead1==false || CouldRead2==false then
+			exit( "There was a problem while reading the trial list." );
+		end;
+		
+		Index = Index + 1;
+		
+	end;
+	
+	StimOrderFile.close();
+	SideOrderFile.close();
+	
+end;
+
+
+# Created files to record event onset
+string OnsetsFileName = logfile_directory;
+OnsetsFileName.append("Onset_Events_Subject_");
+OnsetsFileName.append(string(SubjectNumber));
+OnsetsFileName.append("_Run_");
+OnsetsFileName.append(string(RunNumber));
+OnsetsFileName.append("_");
+OnsetsFileName.append(DATE);
+OnsetsFileName.append(".txt");
+
+term.print(OnsetsFileName);
+term.print("\n");
+
+output_file OnsetsListFile = new output_file; 
+OnsetsListFile.open(OnsetsFileName);
+
+OnsetsListFile.print("Subject : \t" + string(SubjectNumber) + "\n\n");
+OnsetsListFile.print("Run : \t" + string(RunNumber) + "\n\n");
+OnsetsListFile.print("Date : \t" + DATE + "\n\n");
+
+OnsetsListFile.print("Trial type \t Side \t Time");
+OnsetsListFile.print("\n\n");
+OnsetsListFile.print("START \t\t");
+
+
+# ------------------------------------------------------ #
+#					           START									#
+# ------------------------------------------------------ #
+PictureBlueFixationCross.present();
+EPI.present();
+
+
+Start_Trial.set_mri_pulse(1);
+Start_Trial.present();
+
+OnsetsListFile.print(clock.time());
+OnsetsListFile.print("\n");
+
+# ------------------------------------------------------ #
+#					          MAIN LOOP 							   #
+# ------------------------------------------------------ #
+loop 
+
+	int TrialIndex = 1;
+	int TrialType;
+	
+	#  Trial parameters
+	int Trial_Vis_Loc;
+	int Trial_Aud_Loc;
+	
+	# Timing variables
+	int TrialTime;
+
+until TrialIndex > TrialList.count()
+
+begin
+	
+	# AudioOnly_Trial ; TrialType == 1
+	# VisualOnly_Trial ; TrialType == 2
+	# Tactile_Trial ; TrialType == 5
+	
+	# AudioOnly_Target ; TrialType == 6
+	# VisualOnly_Target ; TrialType == 7
+	# Tactile_Target ; TrialType == 8
+
+	TrialType = TrialList[TrialIndex];
+	
+	# TRIAL IS A FIXATION
+	if TrialType == 0 then
+		TrialTime = clock.time();
+		Fixation.present();
+		# Write timing to file
+		OnsetsListFile.print(string(TrialType)+"\t\t"+string(TrialTime)+"\n");
+		
+	# TRIAL IS AN ACTUAL EVENT
+	else		
+		
+		# Audio
+		if TrialType==1 || TrialType==6 then
+			# Determine the location of this trial
+			Trial_Aud_Loc = Locations[TrialIndex]+15*random(0, 9);
+			
+			# Change the sound
+			if TrialType==1 then
+				SoundOnly.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
+				
+			elseif TrialType==6 then
+				Sound_Target1.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
+				Sound_Target2.set_stimulus(SOUNDS50[Trial_Aud_Loc]);						
+			end;
+		end;
+		
+		# Visual
+		if TrialType==2 || TrialType==7 then
+			# Determine the location of this trial
+			if TrialType==4 then
+				Trial_Vis_Loc = -1*PresentationLocationsPix[Locations[TrialIndex]];
+			else
+				Trial_Vis_Loc = PresentationLocationsPix[Locations[TrialIndex]];
+			end;
+			
+			Dots.set_part_x( 1, Trial_Vis_Loc);
+			
+		end;
+		
+		# Tactile
+		if TrialType==5 then
+			if Locations[TrialIndex]<8  then
+				vibrationLeft_Trial(SlotL, NumCycle, WaitTime);
+			elseif Locations[TrialIndex]>8 then
+				vibrationRight_Trial(SlotR, NumCycle, WaitTime);
+			end;
+		elseif  TrialType==8 then
+			if Locations[TrialIndex]<8 then
+				vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+				wait(1, IntervalTime);
+				vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+			elseif Locations[TrialIndex]>8 then
+				vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+				wait(1, IntervalTime);
+				vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+			end;
+		end;
+		
+		
+		# Present trial
+		TrialTime = clock.time();
+		if TrialType == 1 then
+			AudioOnly_Trial.present();
+		elseif TrialType == 2 then
+			VisualOnly_Trial.present();
+		elseif TrialType == 5 then
+			Tactile_Trial.present();
+			startStimulation();
+			wait_interval(int(Tactile_Stimulus_Duration));
+			stopStimulation();
+			
+		elseif TrialType == 6 then
+			AudioOnly_Target.present();	
+		elseif TrialType == 7 then
+			VisualOnly_Target.present();			
+		elseif TrialType == 8 then
+			Tactile_Target.present();
+			startStimulation();
+			wait_interval(int(Tactile_Stimulus_Duration));
+			stopStimulation();
+			
+		end;
+		
+		# Write timing to file
+		OnsetsListFile.print(string(TrialType)+"\t"+string(Locations[TrialIndex])+"\t"+string(TrialTime)+"\n");
+		
+		ISI.present();
+		
+		
+	end;
+	
+
+
+	# Update counter
+	# Check if this is the last trial
+	if TrialIndex == TrialList.count() then	
+		break;
+	end;
+	
+	# Check if this trial is coming with a target
+	TrialIndex = TrialIndex + 1;
+	
+end;
+
+
+# FINAL FIXATION
+OnsetsListFile.print("Final fixation\t\t");
+OnsetsListFile.print(clock.time());
+OnsetsListFile.print("\n");
+Final_Fixation.present();
+
+closeStimulator();
+
+
+OnsetsListFile.print("\n\n\nRESPONSE LOG\n");
+OnsetsListFile.print("Button \t Time\n");
+
+loop 
+
+	int RespCount=1;
+	int RespButton;
+	int RespTime;
+
+until RespCount > response_manager.total_response_count()
+
+begin
+	RespButton = response_manager.get_response_data(RespCount).button();
+	RespTime = response_manager.get_response_data(RespCount).time();
+	OnsetsListFile.print(string(RespButton)+"\t"+string(RespTime)+"\n");
+	RespCount = RespCount + 1 ;
+end;
+
+OnsetsListFile.close();

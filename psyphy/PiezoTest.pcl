@@ -1,0 +1,54 @@
+output_file DebugFile = new output_file;
+
+include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\subfun\\stimlibrel.pcl"
+
+loadLibrary();
+
+#initStimulator("8DD8J3C662984KL65UZ3LHJEEF5OTP");	#Stimulator initialisieren
+initStimulator("0348778LCCA6UL97STQMQNYFEAMIOU");	#Stimulator licence MPI CBS
+
+setProperty("local_buffer_size", 5000000);
+
+setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
+setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
+
+int SlotL = 3;
+int SlotR = 4;
+
+
+loop
+  int j = 0;
+until
+  j == 200
+begin 
+  
+  setPinBlock8(SlotL, 1, 1, 1, 1, 1, 1, 1, 1, 1);		# Alle Pins der ersten Karte auf DAC 0
+  wait(1, 10);														# 20 * 0,5ms = 10ms warten
+  
+  setPinBlock8(SlotL, 1, 0, 0, 0, 0, 0, 0, 0, 0);		# Alle Pins der ersten Karte auf DAC 0
+  wait(1, 10);														# 20 * 0,5ms = 10ms warten
+  
+  j = j + 1;
+end;
+
+
+
+loop
+  int j = 0;
+until
+  j == 200
+begin 
+  
+  setPinBlock8(SlotR, 1, 1, 1, 1, 1, 1, 1, 1, 1);		# Alle Pins der ersten Karte auf DAC 1
+  wait(1, 10);														# 20 * 0,5ms = 10ms warten
+  
+  setPinBlock8(SlotR, 1, 0, 0, 0, 0, 0, 0, 0, 0);		# Alle Pins der ersten Karte auf DAC 1
+  wait(1, 10);
+  
+  j = j + 1;
+end;
+
+
+startStimulation();
+stopStimulation();
+closeStimulator();										# Verbindung zum Stimulator schließen

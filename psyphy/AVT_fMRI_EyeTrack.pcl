@@ -1,0 +1,686 @@
+# --------------------------------------------------- #
+#					           QUAERO							   #
+# --------------------------------------------------- #
+include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\subfun\\stimlibrel.pcl"
+include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\subfun\\subroutines_tactile.pcl"
+
+loadLibrary();
+
+#Stimulator licence BHAM
+#initStimulator("8DD8J3C662984KL65UZ3LHJEEF5OTP");	
+#int SlotL=2;
+#int SlotR=3;
+
+#Stimulator licence MPI CBS
+initStimulator("0348778LCCA6UL97STQMQNYFEAMIOU");	
+int SlotL=3;
+int SlotR=4;
+
+setProperty("local_buffer_size", 5000000);
+
+setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
+setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
+
+
+# --------------------------------------------------- #
+#					           PCL									#
+# --------------------------------------------------- #
+string DATE = date_time( "yyyy_mm_dd_hhnn" );
+
+# DISPLAY
+double RefreshRate = 60.0;
+
+#Compute the number of pixel per degree
+int MaxFOV = 34;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi; 
+int Win_H = 768 ; 
+int Win_W = 1024 ; 
+int PPD = Win_W/MaxFOV;
+
+# for ViewDist = 30
+# MonWidth	MaxFOV
+# 48.0		77
+# 37			63
+# 29			52
+# 21.5		40
+
+# for ViewDist = 50
+# MonWidth	MaxFOV
+# 48.0		51
+
+# for ViewDist = 54
+# MonWidth	MaxFOV
+# 51			50
+# 38			38.75
+
+# for ViewDist = 60
+# MonWidth	MaxFOV
+# 33.0		31
+# 37			34
+# 29			28
+
+# for ViewDist = 160
+# MonWidth	MaxFOV
+# 39.0		40
+
+
+# STIMULI & TRIALS
+array <int> PresentationLocationsDeg[15]= {-12, -10, -8, -5, -4, -3, -1, 0, 1, 3, 4, 5, 8, 10, 12};
+
+
+# Visual
+array <int> PresentationLocationsPix[0];
+loop
+int LocationIndex = 1;
+until LocationIndex > PresentationLocationsDeg.count()
+begin
+	PresentationLocationsPix.add( PresentationLocationsDeg[LocationIndex] * PPD);
+	LocationIndex = LocationIndex + 1;
+end;
+
+
+
+# --------------------------------------------------- #
+#                USER INPUT REQUIRED                  #
+# --------------------------------------------------- #
+preset bool DEBUG = false;
+if DEBUG == true then # Psychophysics run or debug
+	Final_Fixation.set_duration(1000);
+	Fixation.set_duration(3000);
+end;
+
+int Stimulus_Duration = 50; # ms
+int Pre_Stimulus_Duration = 500;
+
+Dots_V.set_duration(Stimulus_Duration);
+
+Dot_Target_1.set_duration(Stimulus_Duration);
+Inter_Dot.set_duration(64);
+Inter_Dot.set_delta_time(Stimulus_Duration);
+Dot_Target_2.set_duration(Stimulus_Duration);
+Dot_Target_2.set_delta_time(64);
+
+Sound_Target2.set_time(Pre_Stimulus_Duration+Stimulus_Duration+20);
+
+preset int SubjectNumber;
+
+preset int RunNumber;
+RunNumber = 3000 + RunNumber;
+
+
+# Tactile
+# tactile stim duration = 0.5*WaitTime*2*NumCycle [in ms]
+# stim freq = 1/(0.5*WaitTime*2/1000)
+double Tactile_Stimulus_Duration = 50.0; # ms
+int NumCycle = 5;
+int WaitTime = 10;
+int NumCycleTarget=5; 
+int IntervalTime=64;
+
+
+# --------------------------------------------------- #
+#                GETTING TRIALS LIST                  #
+# --------------------------------------------------- #
+array <int> TrialList[0];
+array<int> Locations[0];
+
+if DEBUG == true then
+	
+	# TRIAL LIST
+	
+	# Fixation ; TrialType == 0
+
+	# AudioOnly_Trial ; TrialType == 1
+	# VisualOnly_Trial ; TrialType == 2
+	# Tactile_Trial ; TrialType == 5
+	
+	# AudioOnly_Target ; TrialType == 6
+	# VisualOnly_Target ; TrialType == 7
+	# Tactile_Target ; TrialType == 8
+	
+	TrialList.assign ({1, 1, 1, 1, 2, 2, 2, 2, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8});
+	TrialList.assign ({2, 7, 2, 7, 2, 7, 2, 7, 2, 7, 2, 7});
+	
+	# LOCATION LIST
+	Locations.assign({5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11});
+
+	#TrialList.assign ({5, 8, 5, 8, 5, 8, 5, 8});
+	Locations.assign({5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11});
+
+
+	#logfile.set_filename("debug.log");
+	
+else
+	# Change directory where to save log files to and to read trial list from
+	string SubjectDirectory = "\Subjects_Data\\Subject_";
+	SubjectDirectory.append(string(SubjectNumber));
+	SubjectDirectory.append("\\");
+	logfile_directory.append(SubjectDirectory);
+
+	term.print(logfile_directory);
+	term.print("\n");
+	
+	
+	# Set name for file containing the trial list
+	string TrialListFileName = logfile_directory;
+	TrialListFileName.append("Trial_List_Subject_");
+	TrialListFileName.append(string(SubjectNumber));
+	TrialListFileName.append("_Run_");
+	TrialListFileName.append(string(RunNumber));
+	TrialListFileName.append(".txt");
+	
+	term.print(TrialListFileName);
+	term.print("\n");
+	
+	
+	# Set name for file containing the side list
+	string SideListFileName = logfile_directory;
+	SideListFileName.append("Side_List_Subject_");
+	SideListFileName.append(string(SubjectNumber));
+	SideListFileName.append("_Run_");
+	SideListFileName.append(string(RunNumber));
+	SideListFileName.append(".txt");
+	
+	term.print(SideListFileName);
+	term.print("\n");
+	
+	
+	# Set name for logfile for this subject and run
+	string LogFileName = logfile_directory;
+	LogFileName.append("Logfile_Subject_");
+	LogFileName.append(string(SubjectNumber));
+	LogFileName.append("_Run_");
+	LogFileName.append(string(RunNumber));
+	LogFileName.append("_");
+	LogFileName.append(DATE);
+	LogFileName.append(".txt");
+	logfile.set_filename(LogFileName);
+		
+	term.print(LogFileName);
+	term.print("\n");
+	
+	
+	# Read trial and side list from files
+	input_file StimOrderFile = new input_file;
+	StimOrderFile.open( TrialListFileName );
+	
+	input_file SideOrderFile = new input_file;
+	SideOrderFile.open( SideListFileName );
+	
+	bool CouldRead1 = true;
+	bool EOF1 = false;
+	
+	bool CouldRead2 = true;
+	bool EOF2 = false;
+	
+	loop
+		
+		int Index=1;
+		
+		int CurrentTrial1;
+		double CurrentTargetParam1;
+		string TEMP1;
+		
+		int CurrentTrial2;
+		double CurrentTargetParam2;
+		string TEMP2;
+		
+	until EOF1==true || EOF2==true 
+	begin
+		TEMP1 = StimOrderFile.get_line( );
+		TEMP2 = SideOrderFile.get_line( );
+		
+		CurrentTrial1 = int(double(TEMP1));
+		TrialList.add(CurrentTrial1);
+		
+		CurrentTrial2 = int(double(TEMP2));
+		Locations.add(CurrentTrial2);
+		
+		CouldRead1 = StimOrderFile.last_succeeded( );
+		EOF1 = StimOrderFile.end_of_file( );
+		
+		CouldRead2 = SideOrderFile.last_succeeded( );
+		EOF2 = SideOrderFile.end_of_file( );
+		
+		if CouldRead1==false || CouldRead2==false then
+			exit( "There was a problem while reading the trial list." );
+		end;
+		
+		Index = Index + 1;
+		
+	end;
+	
+	StimOrderFile.close();
+	SideOrderFile.close();
+	
+end;
+
+
+# ------------------------------------------------------ #
+#                     EYE TRACKER                        #
+# ------------------------------------------------------ #
+string EyeTrackFileName;
+
+if DEBUG == true then
+	EyeTrackFileName = "GazeData.txt";
+else
+	# filename for storing gaze data information
+	EyeTrackFileName = logfile_directory;
+	EyeTrackFileName.append("GazeData_Subject_");
+	EyeTrackFileName.append(string(SubjectNumber));
+	EyeTrackFileName.append("_Run_");
+	EyeTrackFileName.append(string(RunNumber));
+	EyeTrackFileName.append("_");
+	EyeTrackFileName.append(DATE);
+	EyeTrackFileName.append(".txt");
+end;
+	
+term.print(EyeTrackFileName);
+term.print("\n");	
+
+
+# holds all markers for saving
+# markers are events that occur, i.e. image changes
+array <eye_position_data> markers[0];
+
+# get an instance of the eye tracker extension
+# @ param: name of the extension as registered
+eye_tracker Tobii = new eye_tracker( "tobiiws" );
+#eye_tracker Tobii = new eye_tracker( "{FD854674-CF93-4A10-AF39-BE237E620921}" );
+
+Tobii.set_max_buffer_size( dt_position, 100000 );
+Tobii.set_max_buffer_size( dt_pupil, 100000 );
+Tobii.set_max_buffer_size( dt_blink, 100000 );
+Tobii.set_max_buffer_size( dt_saccade , 100000 );
+
+# set the host ip address
+# where the Tet_Server is running on.
+# Default: localhost (127.0.0.1)
+#Tobii.send_command("host 169.254.6.91");
+Tobii.send_command("host TX120-204-04400425.local");
+#Tobii.send_command("host 169.254.219.149");
+#Tobii.send_command("host 169.254.217.211");
+#Tobii.send_command("host 169.254.247.197");
+#Tobii.send_command("host 169.254.155.60"); #"host 127.0.0.1" "port 4455";
+
+# set the port the Tet_Server sends the
+# gaze data to.
+# Default: 4455
+Tobii.send_command( "port 4455" );
+
+# set the screen resolution used by the Tobii eye tracker
+# Default: Screen Resolution settings
+Tobii.send_command( "width 1024" );
+Tobii.send_command( "height 768" );
+
+#Tobii.set_parameter( "ScreenWidth", "1024" );
+#Tobii.set_parameter( "ScreenHeight", "768" );
+
+
+if DEBUG == false then
+	# start calibration
+	# At the moment the extension uses a very simple five point calibration
+	EyeTrackTxt.set_caption("Press ENTER to start the\n 1rst eye-tracker calibration:\n fixate the white cross at all times.");
+	EyeTrackTxt.redraw();
+	EyeTrackScreen.present();
+
+	Tobii.calibrate( et_calibrate_default, 0.0, 0.0, 0.0 );
+	#Tobii.calibrate( et_calibrate_default, 9.0, 0.0, 0.0 );
+end;
+
+# start the tracker
+Tobii.start_tracking();
+
+# Start getting position data
+Tobii.start_data( dt_position, true );
+Tobii.start_data( dt_pupil, true );
+Tobii.start_data( dt_blink, true );
+
+# Wait a moment, because it takes some time 
+# that data collection starts.
+wait_interval(500);
+
+
+# ------------------------------------------------------ #
+#                  EYE TRACKER SUBROUTINE                #
+# ------------------------------------------------------ #
+/*
+ * return the smaller of two interger values
+ */
+sub
+	int min( int first, int second )
+begin
+	if (first < second) then
+		return first;
+	else 
+		return second;
+	end;
+	# needed to prevent error
+	return 0;
+end;
+
+
+/*
+ * add a marker to the marker array
+ */
+sub
+   add_marker( eye_tracker et )
+begin
+	eye_position_data eyePos;
+
+	int index = et.buffer_position( dt_position );
+	if (index != 0) then
+		eyePos = et.get_position_data( index );	
+		markers.add( eyePos );
+	end;	
+end;
+
+if DEBUG == false then
+	# ------------------------------------------------------ #
+	#                 EYE TRACKER  CALIBRATION               #
+	# ------------------------------------------------------ #
+	EyeTrackTxt.set_caption("Press ENTER to start the\n 2nd eye-tracker calibration:\n fixate the blue cross at all times.");
+	EyeTrackTxt.redraw();
+	EyeTrackScreen.present();
+
+	loop
+		int Y = -8;
+	until Y > 8
+	begin
+		
+		PictureBlueFixationCross.set_part_y( 1, Y * PPD);
+
+		loop
+			int X = -8;
+		until X > 8
+		begin
+			PictureBlueFixationCross.set_part_x( 1, X * PPD);
+			PictureBlueFixationCross.present();
+			wait_interval(250);
+			add_marker( Tobii );
+			wait_interval(3000);
+			add_marker( Tobii );
+			Default.present();
+			wait_interval(200);
+			X = X + 4;
+		end;
+		
+		Y = Y + 8;
+		
+	end;
+		
+	PictureBlueFixationCross.set_part_y( 1, 0);
+	PictureBlueFixationCross.set_part_x( 1, 0);
+
+end;
+
+# ------------------------------------------------------ #
+#					           START									#
+# ------------------------------------------------------ #
+string Text2Present = "This is an fMRI run ";
+
+if DEBUG == true then
+	Text2Present.append("in DEBUG mode.\n\n");
+else
+	Text2Present.append("not in DEBUG mode.\n\n");
+end;
+
+Text2Present.append("Audio or Visual or Tactile trials ");	
+
+ConfirmationTxt.set_caption(Text2Present);
+ConfirmationTxt.redraw();
+Confirmation.present();
+
+wait_interval(2000);
+
+ISI.present();
+
+EPI.present();
+
+Start_Trial.set_mri_pulse(1);
+Start_Trial.present();
+
+
+
+# ------------------------------------------------------ #
+#					          MAIN LOOP 							   #
+# ------------------------------------------------------ #
+loop 
+
+	int TrialIndex = 1;
+	int TrialType;
+	
+	#  Trial parameters
+	int Trial_Vis_Loc;
+	int Trial_Aud_Loc;
+
+until TrialIndex > TrialList.count()
+
+begin
+	
+	# AudioOnly_Trial ; TrialType == 1
+	# VisualOnly_Trial ; TrialType == 2
+	# Tactile_Trial ; TrialType == 5
+	
+	# AudioOnly_Target ; TrialType == 6
+	# VisualOnly_Target ; TrialType == 7
+	# Tactile_Target ; TrialType == 8
+
+	TrialType = TrialList[TrialIndex];
+	
+	# TRIAL IS A FIXATION
+	if TrialType == 0 then
+		Fixation.present();
+		
+	# TRIAL IS AN ACTUAL EVENT
+	else		
+		
+		# Audio
+		if TrialType==1 || TrialType==6 then
+			# Determine the location of this trial
+			Trial_Aud_Loc = Locations[TrialIndex]+15*random(0, 9);
+			
+			# Change the sound
+			if TrialType==1 then
+				SoundOnly.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
+			elseif TrialType==6 then
+				Sound_Target1.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
+				Sound_Target2.set_stimulus(SOUNDS50[Trial_Aud_Loc]);									
+			end;
+		end;
+		
+		# Visual
+		if TrialType==2 || TrialType==7 then
+			# Determine the location of this trial
+			if TrialType==4 then
+				Trial_Vis_Loc = -1*PresentationLocationsPix[Locations[TrialIndex]];
+			else
+				Trial_Vis_Loc = PresentationLocationsPix[Locations[TrialIndex]];
+			end;
+			
+			Dots.set_part_x( 1, Trial_Vis_Loc);
+			
+		end;
+		
+		# Tactile
+		if TrialType==5 then
+			if Locations[TrialIndex]<8  then
+				vibrationLeft_Trial(SlotL, NumCycle, WaitTime);
+			elseif Locations[TrialIndex]>8 then
+				vibrationRight_Trial(SlotR, NumCycle, WaitTime);
+			end;
+		elseif  TrialType==8 then
+			if Locations[TrialIndex]<8 then
+				vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+				wait(1, IntervalTime);
+				vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+			elseif Locations[TrialIndex]>8 then
+				vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+				wait(1, IntervalTime);
+				vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+			end;
+		end;
+		
+		ISI.present();		
+		add_marker( Tobii );
+		
+		# Present trial
+		if TrialType == 1 then
+			AudioOnly_Trial.present();
+			wait_interval(70);
+		elseif TrialType == 2 then
+			VisualOnly_Trial.present();
+		elseif TrialType == 5 then
+			Tactile_Trial.present();
+			startStimulation();
+			wait_interval(int(Tactile_Stimulus_Duration));
+			stopStimulation();
+			
+		elseif TrialType == 6 then
+			AudioOnly_Target.present();	
+		elseif TrialType == 7 then
+			VisualOnly_Target.present();			
+		elseif TrialType == 8 then
+			Tactile_Target.present();
+			startStimulation();
+			wait_interval(int(Tactile_Stimulus_Duration*2+64));
+			stopStimulation();
+			wait_interval(100);
+			
+		end;
+		
+	end;
+
+	# Update counter
+	# Check if this is the last trial
+	if TrialIndex == TrialList.count() then	
+		break;
+	end;
+	
+	# Check if this trial is coming with a target
+	TrialIndex = TrialIndex + 1;
+	
+end;
+
+
+# FINAL FIXATION
+Final_Fixation.present();
+
+closeStimulator();
+
+
+
+# ------------------------------------------------------ #
+#				     SAVING EYETRACKER DATA					   #
+# ------------------------------------------------------ #
+EyeTrackTxt.set_caption("SAVING EYETRACKER DATA");
+EyeTrackTxt.redraw();
+EyeTracPic.present();
+
+# stop data collection
+Tobii.stop_data(dt_position);   
+Tobii.stop_data(dt_pupil);
+Tobii.stop_data(dt_blink);
+
+Tobii.stop_tracking();
+
+# save all data to file
+output_file out = new output_file;
+out.open( EyeTrackFileName ); 
+
+int count = min( Tobii.buffer_position( dt_position ), Tobii.buffer_position( dt_pupil ) );
+#int count = Tobii.buffer_position( dt_position );
+
+eye_position_data eyePos;
+pupil_data pupilData;
+blink_event_data blinkData;
+
+loop
+	int blink = 1;
+until blink > Tobii.buffer_position( dt_blink )
+	begin
+
+	blinkData = Tobii.get_blink_event( blink );
+
+	#term.print( blinkData.time() );
+	#term.print( " " );
+	#term.print( blinkData.type() );
+	#term.print( "\n" );
+	
+	blink=blink+1;
+
+end;
+
+
+out.print( "index\tpos_time\tpos_x\tpos_y\tpup_xdiameter\tpup_ydiameter\tblink_status\tmarker\n" );
+#out.print( "index\tpos_time\tpos_x\tpos_y\tmarker\n" );
+
+loop
+	int i = 1;
+	int blink = 1;
+	
+until
+	i > count
+begin
+	eyePos = Tobii.get_position_data( i );
+	pupilData = Tobii.get_pupil_data( i );
+	
+	if blink<=Tobii.buffer_position( dt_blink ) then
+		blinkData = Tobii.get_blink_event( blink );
+	end;
+
+	out.print( i );
+	out.print( "\t" );
+	out.print( eyePos.time() );
+	out.print( "\t" );
+	out.print( eyePos.x() );
+	out.print( "\t" );
+	out.print( eyePos.y() );
+	out.print( "\t" );
+	out.print( pupilData.x_diameter() );
+	out.print( "\t" );
+	out.print( pupilData.y_diameter() );
+	out.print( "\t" );
+	
+	
+	if eyePos.time()>=blinkData.time() && blink<=Tobii.buffer_position( dt_blink ) then
+		
+		out.print( blinkData.type() );
+		out.print( "\t" );	
+		
+		blink = blink+1;
+		
+	else
+		out.print( "-1\t" )
+	end;
+
+
+	int markerIndex = 0;
+	loop
+		int j = 1;
+	until
+		j > markers.count()
+	begin
+		if (markers[j].time() == eyePos.time()) then
+			markerIndex = j;		
+		end;
+
+		j = j + 1;
+	end;
+
+	out.print( markerIndex );
+
+	if (i != count) then
+		out.print( "\n" );
+	end; 
+
+	i = i + 1;
+end;
+
+out.close();
+
+# clear all buffers and stop tracking
+Tobii.clear_buffer(dt_position);
+Tobii.clear_buffer(dt_pupil);
+Tobii.clear_buffer(dt_blink);
+
+

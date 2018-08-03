@@ -3,7 +3,15 @@
 
 
 
-## Dependencies:
+## Dependencies for the fMRI and psychophysics experiment:
+- Presentation
+- HRTF
+- piezzo stimulator
+- palamedes to analyze
+- nansuite
+- herrorbar
+
+## Dependencies for analysis:
 
 You will need the following softwares or matlab functions to run those analysis. More function might be needed and are listed with their source URL in the function code/subfun/Get_dependencies: be sure to check it.
 - [RSA toolbox](https://github.com/rsagroup/rsatoolbox)

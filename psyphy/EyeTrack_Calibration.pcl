@@ -1,0 +1,344 @@
+# This the PCL to run for a calibration of the tobii eye tracker.
+#
+# This has been hard coded as a 3 (elevation) by 5 (azimuth) calibration grid. Adapt to your needs.
+#
+# Most of this is a shameless copy-pasta of the other eye-tracking scripts with a few addenda here and there
+#
+# Created by Remi Gau - February 2016
+
+# You might need to adjust some of the variables below.
+
+# Eye tracker variables
+string IP_Ad = "EPU01-010104524053.local";#;"169.254.6.91";
+string Port = "4455";
+int FixDur = 3000; # duration of a fixation trial in ms - 2 seconds gave me pretty reliable results
+
+#Screen resolution
+int Win_H = 768 ; 
+int Win_W = 1024 ; 
+
+# Maximum field of view in degrees of visual angle
+#MaxFOV = 2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ pi; 
+int MaxFOV = 34;  
+
+# List of rounded common max FOV I have used in the past.
+# for ViewDist = 30 cm
+# MonWidth	MaxFOV
+# 48 cm		77
+# 37 cm	   63
+# 29 cm		52
+# 21.5		40
+
+# for ViewDist = 50 cm
+# MonWidth	MaxFOV
+# 48 cm		51
+
+# for ViewDist = 54 cm
+# MonWidth	MaxFOV
+# 51 cm			50
+# 38 cm			38.75
+
+# for ViewDist = 60 cm
+# MonWidth	MaxFOV
+# 33 cm		   31
+# 37 cm			34
+# 51 cm			46
+
+# for ViewDist = 160 cm
+# MonWidth	MaxFOV
+# 39 cm		 40
+
+
+#Compute the number of pixel per degree
+# In theory presentation should be able to work directly with  degrees of visual angle if you set the default parameters for monitor width and ditance to screen
+# but I would rather get outputs in pixels and do the conversion myself.
+int PPD = Win_W/MaxFOV;
+
+
+# --------------------------------------------------- #
+#                USER INPUT REQUIRED                  #
+# --------------------------------------------------- #
+preset int SubjectNumber;
+
+preset int RunNumber;
+
+# --------------------------------------------------- #
+#                    EYE TRACKER                      #
+# --------------------------------------------------- #
+string EyeTrackFileName;
+string DATE = date_time( "yyyy_mm_dd_hhnn" );
+
+# filename for storing gaze data information
+EyeTrackFileName = logfile_directory;
+EyeTrackFileName.append("GazeData_Subject_");
+EyeTrackFileName.append(string(SubjectNumber));
+EyeTrackFileName.append("_Run_");
+EyeTrackFileName.append(string(RunNumber));
+EyeTrackFileName.append("_");
+EyeTrackFileName.append(DATE);
+EyeTrackFileName.append(".txt");
+
+term.print(EyeTrackFileName);
+term.print("\n");	
+
+
+# holds all markers for saving
+# markers are events that occur, i.e. image changes
+array <eye_position_data> markers[0];
+
+# Get an instance of the eye tracker extension
+# @param: name of the extension as registered or GUID
+# Note: The GUID given here represents the Version 2 extension
+eye_tracker Tobii = new eye_tracker( "tobiiws" );
+#eye_tracker Tobii = new eye_tracker( "TobiiEyeX" );
+#eye_tracker Tobii = new eye_tracker( "{FD854674-CF93-4A10-AF39-BE237E620921}" );
+
+Tobii.set_max_buffer_size( dt_position, 100000 );
+Tobii.set_max_buffer_size( dt_pupil, 100000 );
+Tobii.set_max_buffer_size( dt_blink, 100000 );
+Tobii.set_max_buffer_size( dt_saccade , 100000 );
+
+# set the host ip address
+# where the Tet_Server is running on.
+string Command2Send = "host "; #"host 127.0.0.1" "port 4455";
+Command2Send.append(IP_Ad);
+Tobii.send_command(Command2Send);
+
+# set the port the Tet_Server sends the
+# gaze data to.
+Command2Send = "port ";
+Command2Send.append(Port);
+Tobii.send_command(Command2Send);
+
+# set the screen resolution used by the Tobii eye tracker
+# Default: Screen Resolution settings
+Command2Send = "width ";
+Command2Send.append(string(Win_W));
+Tobii.send_command(Command2Send);
+Command2Send = "height ";
+Command2Send.append(string(Win_H));
+Tobii.send_command(Command2Send);
+
+#Tobii.set_parameter( "ScreenWidth", string(Win_W) );
+#Tobii.set_parameter( "ScreenHeight", string(Win_H) );
+
+# start internal calibration
+# At the moment the extension uses a very simple five point calibration
+# THIS WILL USUALLY CRASH THE FIRST TIME YOU RUN IT. IT IS "NORMAL". RUN IT AGAIN AND IT SHOULD WORK.
+EyeTrackTxt.set_caption("Press ENTER to start the\n1rst eye-tracker calibration:\n\nfixate the white cross at all times.");
+EyeTrackTxt.redraw();
+EyeTrackScreen.present();
+
+Tobii.calibrate( et_calibrate_default, 0.0, 0.0, 0.0 );
+#Tobii.calibrate( et_calibrate_default, 5.0, 0.0, 0.0 );
+
+
+# ------------------------------------------------------ #
+#                  EYE TRACKER SUBROUTINE                #
+# ------------------------------------------------------ #
+/*
+ * return the smaller of two interger values
+ */
+sub
+	int min( int first, int second )
+begin
+	if (first < second) then
+		return first;
+	else 
+		return second;
+	end;
+	# needed to prevent error
+	return 0;
+end;
+
+
+/*
+ * add a marker to the marker array
+ */
+sub
+   add_marker( eye_tracker et )
+begin
+	eye_position_data eyePos;
+
+	int index = et.buffer_position( dt_position );
+	if (index != 0) then
+		eyePos = et.get_position_data( index );	
+		markers.add( eyePos );
+	end;	
+end;
+
+
+# ------------------------------------------------------ #
+#                 EYE TRACKER  CALIBRATION               #
+# ------------------------------------------------------ #
+EyeTrackTxt.set_caption("Press ENTER to start the\n2nd eye-tracker calibration:\n\nfixate the blue cross at all times.");
+EyeTrackTxt.redraw();
+EyeTrackScreen.present();
+
+# start the tracker
+Tobii.start_tracking();
+
+# Start getting position data
+Tobii.start_data( dt_position, true );
+Tobii.start_data( dt_pupil, true );
+Tobii.start_data( dt_blink, true );
+
+# Wait a moment, because it takes some time 
+# that data collection starts.
+wait_interval(1000);
+
+
+# 2 nested lops to go to a mapping of a calibration grid
+loop
+
+	int Y = -8; # we go from -8 degress ogf visual angle in elevation
+	
+until Y > 8 # to 8 degress of visual angle in elevation (Y=0 is the the middle of the screen)
+
+begin
+	
+	# Compute the Y position in pixel
+	PictureBlueFixationCross.set_part_y( 1, Y * PPD);
+
+	loop
+	
+		int X = -8; # we go from -8 degress ogf visual angle in azimuth
+		
+	until X > 8 # to 8 degress of visual angle in azimuth (X=0 is the the middle of the screen)
+	
+	begin
+		# Compute the X position in pixel
+		PictureBlueFixationCross.set_part_x( 1, X * PPD);
+		
+		# Present the corss
+		PictureBlueFixationCross.present();
+		
+		# wait a whimle to allow for saccade
+		wait_interval(250);
+		
+		# add a marker to the output to know we have started a new fixation trial
+		add_marker( Tobii );
+		wait_interval(FixDur);
+		# Add another marker at the end of the fixation trial
+		add_marker( Tobii );
+		
+		# Make cross disappear
+		Default.present();
+		wait_interval(200);
+		
+		# We increment the X positon by 4 degrees of visual angle
+		X = X + 4;
+		
+	end;
+	
+	# We increment the Y positon by 8 degrees of visual angle
+	Y = Y + 8;
+
+end;
+
+
+
+# ------------------------------------------------------ #
+#				     SAVING EYETRACKER DATA					   #
+# ------------------------------------------------------ #
+
+# THIS IS FINE AND QUICK HERE BUT CAN TAKE AGES IF YOU HAVE LONG RUNS!!!!
+# THINK TO OPTIMIZE TO MAKE SURE YOU ARE NOT SAVING DATA TILL THE COWS COME HOME!!!
+
+EyeTrackTxt.set_caption("SAVING EYETRACKER DATA");
+EyeTrackTxt.redraw();
+EyeTracPic.present();
+
+# stop data collection
+Tobii.stop_data(dt_position);   
+Tobii.stop_data(dt_pupil);
+Tobii.stop_data(dt_blink);
+
+# Stop tracking
+Tobii.stop_tracking();
+
+
+# save all data to file
+output_file out = new output_file;
+out.open( EyeTrackFileName ); 
+
+int count = min( Tobii.buffer_position( dt_position ), Tobii.buffer_position( dt_pupil ) );
+#int count = Tobii.buffer_position( dt_position );
+
+
+eye_position_data eyePos;
+pupil_data pupilData;
+blink_event_data blinkData;
+
+out.print( "index\tpos_time\tpos_x\tpos_y\tpup_xdiameter\tpup_ydiameter\tblink_status\tmarker\n" );
+#out.print( "index\tpos_time\tpos_x\tpos_y\tmarker\n" );
+
+loop
+	int i = 1;
+	int blink = 1;
+	
+until
+	i > count
+begin
+	eyePos = Tobii.get_position_data( i );
+	pupilData = Tobii.get_pupil_data( i );
+	
+	if blink<=Tobii.buffer_position( dt_blink ) then
+		blinkData = Tobii.get_blink_event( blink );
+	end;
+
+	out.print( i );
+	out.print( "\t" );
+	out.print( eyePos.time() );
+	out.print( "\t" );
+	out.print( eyePos.x() );
+	out.print( "\t" );
+	out.print( eyePos.y() );
+	out.print( "\t" );
+	out.print( pupilData.x_diameter() );
+	out.print( "\t" );
+	out.print( pupilData.y_diameter() );
+	out.print( "\t" );
+	
+	
+	if eyePos.time()>=blinkData.time() && blink<=Tobii.buffer_position( dt_blink ) then
+		
+		out.print( blinkData.type() );
+		out.print( "\t" );	
+		
+		blink = blink+1;
+		
+	else
+		out.print( "-1\t" )
+	end;
+
+
+	int markerIndex = 0;
+	loop
+		int j = 1;
+	until
+		j > markers.count()
+	begin
+		if (markers[j].time() == eyePos.time()) then
+			markerIndex = j;		
+		end;
+
+		j = j + 1;
+	end;
+
+	out.print( markerIndex );
+
+	if (i != count) then
+		out.print( "\n" );
+	end; 
+
+	i = i + 1;
+end;
+
+out.close();
+
+# clear all buffers and stop tracking
+Tobii.clear_buffer(dt_position);
+Tobii.clear_buffer(dt_pupil);
+Tobii.clear_buffer(dt_blink);
+

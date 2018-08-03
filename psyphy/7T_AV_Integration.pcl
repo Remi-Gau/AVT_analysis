@@ -1,0 +1,660 @@
+# --------------------------------------------------- #
+#					           PCL									#
+# --------------------------------------------------- #
+preset bool DEBUG;
+preset int SubjectNumber;
+preset int RunNumber;
+
+string DATE = date_time( "yyyy_mm_dd_hhnn" );
+
+
+# TARGETS
+# Visual
+array <double> List_Target_Size[3] = {1.5, 1.5, 1.5};
+# Auditory
+array <double> List_Target_Attenuation[3] = {10.0, 10.0, 10.0};
+
+
+# --------------------------------------------------- #
+#                    PCL VARIABLES                    #
+# --------------------------------------------------- #
+
+# DISPLAY
+double RefreshRate = 60.0;
+
+#Compute the number of pixel per degree
+double MonitorWidth = 21.5;
+double ViewDist = 30.0;
+double MaxFOV = 48.0;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi;
+double Win_H = 768.0 ; 
+double Win_W = 1024.0 ; 
+double PPD = Win_W/MaxFOV;
+
+# for ViewDist = 30
+# MonWidth	MaxFOV
+# 48.0		77.0
+# 21.5		40.0
+
+
+# STIMULI
+# Visual
+double AnnuliWidth = 5.0*PPD; # min = 1.0 ; max = 7.0 ;
+
+double CircleWidthMinDeg = 0.0; # in degrees
+double CircleWidthMaxDeg = Win_H/PPD - 4.0; # in degrees (to make sure that stim stops when it reaches the screen height)
+
+double Stimulus_Duration = 500.0;
+double Stimulus_Duration_Frames = Stimulus_Duration*RefreshRate/1000.0;
+
+double AnnuliIncrement = (CircleWidthMaxDeg*PPD - CircleWidthMinDeg*PPD) / Stimulus_Duration_Frames;
+
+
+# TARGET
+array <double> TargetParamList[0]; # only for psychometric runs
+int Audio_Target_Duration = 100;
+int Audio_Target_Duration_Frames = int(double(Audio_Target_Duration)/1000.0*RefreshRate);
+int Target_Duration = 50;
+int Target_Duration_Frames = int(double(Target_Duration)/1000.0*RefreshRate);
+
+rgb_color TargetColor = rgb_color(127,127,127);
+Ellipse.set_color( TargetColor );
+
+
+# FIXATION
+if RunNumber>100 then 
+	Final_Fixation.set_duration(5000);
+	Long_Fixation.set_duration(5000);
+end;
+
+# Creating trial list
+array <int> TrialList[0];
+
+if DEBUG == true then
+	
+	# Attend2Audio_Fixation ; TrialType == 1
+	# Attend2Visual_Fixation ; TrialType == 2
+	# Long_Fixation ; TrialType == 0
+		
+	# Auditory_Target ; TrialType == 10
+	# Visual_Target ; TrialType == 11
+
+	# AudioOnly_Trial ; TrialType == 100
+	# VisualOnly_Trial ; TrialType == 200
+	# AudioVisual_Trial ; TrialType == 300
+	
+	
+	# AudioOnly
+	# TrialList.assign ({100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100});
+	# VisualOnly
+	# TrialList.assign ({200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200,200, 200, 200, 200, 200,200, 200, 200, 200, 200});
+	# AudioVisual
+	#TrialList.assign ({300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300});
+	
+	# Visual targets
+   #TrialList.assign ({300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11});
+	
+	# Audio targets
+	#TrialList.assign ({200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10});
+	
+	# All types
+	TrialList.assign ({100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 200, 10, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11, 300, 11});
+
+	logfile.set_filename("debug.log");
+	
+else
+	# Change directory where to save log files to and to read trial list from
+	string SubjectDirectory = "\Subject_";
+	SubjectDirectory.append(string(SubjectNumber));
+	SubjectDirectory.append("\\");
+	logfile_directory.append(SubjectDirectory);
+
+	term.print(logfile_directory);
+	term.print("\n");
+	
+	# Set name for file containing the trial list
+	string TrialListFileName = logfile_directory;
+	TrialListFileName.append("Trial_List_Subject_");
+	TrialListFileName.append(string(SubjectNumber));
+	TrialListFileName.append("_Run_");
+	TrialListFileName.append(string(RunNumber));
+	TrialListFileName.append(".txt");
+	
+	term.print(TrialListFileName);
+	term.print("\n");
+	
+	# Set name for logfile for this subject and run
+	string LogFileName = logfile_directory;
+	LogFileName.append("Logfile_Subject_");
+	LogFileName.append(string(SubjectNumber));
+	LogFileName.append("_Run_");
+	LogFileName.append(string(RunNumber));
+	LogFileName.append("_");
+	LogFileName.append(DATE);
+	LogFileName.append(".txt");
+	logfile.set_filename(LogFileName);
+	
+	term.print(LogFileName);
+	term.print("\n");
+		
+	# Read trial list from file
+	input_file StimOrderFile = new input_file;
+	StimOrderFile.open( TrialListFileName );
+	
+	int CouldRead_Int;
+	bool CouldRead_Bool = true;
+	int EOF_Int;
+	bool EOF_Bool = false;
+	
+	loop
+		
+		int CurrentTrial;
+		double CurrentTargetParam;
+		int Index=1;
+		string TEMP;
+		string TEMP1;
+		
+	until EOF_Int == 1
+	begin
+		
+		if RunNumber < 100 then
+			TEMP = StimOrderFile.get_line( );
+		else
+			
+			TEMP = StimOrderFile.get_string( );
+			TEMP1 = StimOrderFile.get_string( );
+			
+			CurrentTargetParam = double(TEMP1);
+			TargetParamList.add(CurrentTargetParam);
+			
+		end;
+		
+		CurrentTrial = int(double(TEMP));
+		TrialList.add(CurrentTrial);
+		
+		CouldRead_Bool = StimOrderFile.last_succeeded( );
+		CouldRead_Int = int(CouldRead_Bool);
+		
+		EOF_Bool = StimOrderFile.end_of_file( );
+		EOF_Int = int(EOF_Bool);
+		
+		if CouldRead_Int == 0 && EOF_Int == 0 then
+			exit( "There was a problem while reading the trial list." );
+		end;
+		
+		Index = Index + 1;
+		
+	end;
+	
+	StimOrderFile.close( );
+	
+end;
+
+# Created files to record event onset
+string OnsetsFileName = logfile_directory;
+OnsetsFileName.append("Onset_Events_Subject_");
+OnsetsFileName.append(string(SubjectNumber));
+OnsetsFileName.append("_Run_");
+OnsetsFileName.append(string(RunNumber));
+OnsetsFileName.append("_");
+OnsetsFileName.append(DATE);
+OnsetsFileName.append(".txt");
+
+output_file OnsetsListFile = new output_file; 
+OnsetsListFile.open(OnsetsFileName);
+
+OnsetsListFile.print("Subject : \t" + string(SubjectNumber) + "\n\n");
+OnsetsListFile.print("Run : \t" + string(RunNumber) + "\n\n");
+OnsetsListFile.print("Date : \t" + DATE + "\n\n");
+
+
+# ------------------------------------------------------ #
+#					           START									#
+# ------------------------------------------------------ #
+
+OnsetsListFile.print("Trial type \t Time \t Frame \t Visual Target Size \t Audio Target Index \t Audio Target attenuation");
+OnsetsListFile.print("\n\n");
+OnsetsListFile.print("START \t");
+
+Start_Trial.set_mri_pulse(1);
+Start_Trial.present();
+
+OnsetsListFile.print(clock.time());
+OnsetsListFile.print("\n");
+
+# ------------------------------------------------------ #
+#					          MAIN LOOP 							   #
+# ------------------------------------------------------ #
+loop 
+
+	int TrialIndex = 1;
+	int TrialType;
+	
+	#  Target parameters
+	int TargetPresent;
+	int TargetType;
+	int x_pos_target;
+	int y_pos_target;
+	int TargetFrame;
+	int TargetFrameEnd;
+	int Target_Attenuation;
+	double Target_Size;
+	double Target_Size_Pixel;
+	double TargetParam;
+	int AudioTargetIndex;
+	
+	
+	# Timing variables
+	int TrialTime;
+	int TargetTime;
+	int OffsetTime;
+
+until TrialIndex > TrialList.count()
+
+begin
+	
+	# Attend2Audio_Fixation ; TrialType == 1
+	# Attend2Visual_Fixation ; TrialType == 2
+	# Long_Fixation ; TrialType == 0
+	
+	# Auditory_Target ; TrialType == 10
+	# Visual_Target ; TrialType == 11
+
+	# AudioOnly_Trial ; TrialType == 100
+	# VisualOnly_Trial ; TrialType == 200
+	# AudioVisual_Trial ; TrialType == 300
+	TrialType = TrialList[TrialIndex];
+	
+	# TRIAL IS A FIXATION
+	if TrialType < 100 then
+		
+		# ATTEND TO AUDITORY FIXATION
+		if TrialType == 1 then
+			Temp_Save.present();
+			OnsetsListFile.print(TrialType);
+			OnsetsListFile.print("\t");
+			OnsetsListFile.print(clock.time());
+			OnsetsListFile.print("\n");
+			
+			Attend2Audio_Fixation.present();
+			Stimulus_Offset.present();		
+		# ATTEND TO VISUAL FIXATION
+		elseif TrialType == 2 then
+			Temp_Save.present();
+			OnsetsListFile.print(TrialType);
+			OnsetsListFile.print("\t");
+			OnsetsListFile.print(clock.time());
+			OnsetsListFile.print("\n");
+			
+			Attend2Visual_Fixation.present();			
+		# INTERBLOCK FIXATION
+		elseif TrialType == 0 then
+			Temp_Save.present();
+			OnsetsListFile.print(TrialType);
+			OnsetsListFile.print("\t");
+			OnsetsListFile.print(clock.time());
+			OnsetsListFile.print("\n");			
+			
+			Long_Fixation.present();	
+		end;
+		
+		
+	# TRIAL IS AN ACTUAL EVENT
+	else
+		# Check if this is the last trial
+		if TrialIndex == TrialList.count() then
+			TargetPresent = 0;
+			
+		# Check if this trial is coming with a target
+		elseif TrialList[TrialIndex+1] == 10 || TrialList[TrialIndex+1] == 11 then
+			
+			TargetPresent = 1;
+			TargetType = TrialList[TrialIndex+1];
+			
+			if TargetType == 10 then
+				# Determine the first and last frame when the target will be present during the stimulus
+				TargetFrame = random(1, int(Stimulus_Duration_Frames)-Audio_Target_Duration_Frames);
+				AudioTargetIndex = int(ceil(double(TargetFrame)/RefreshRate*1000.0/(double(Audio_Target_Duration)/2.0)));
+				
+				if RunNumber == 111 then
+					TargetParam = TargetParamList[TrialIndex+1];
+				else
+					TargetParam = List_Target_Attenuation[TrialType/100];
+				end;
+				
+				Target_Attenuation = int(TargetParam);
+				
+				#term.print(string(Target_Attenuation));
+				#term.print("\n");
+				
+			elseif TargetType == 11 then
+				# Determine the first and last frame when the target will be present during the stimulus
+				TargetFrame = random(1, int(Stimulus_Duration_Frames)-Target_Duration_Frames-1);
+				TargetFrameEnd = TargetFrame + Target_Duration_Frames;
+				
+				x_pos_target = int(((random()*2.0)-1.0) * ((CircleWidthMinDeg*PPD) + double(TargetFrame) * AnnuliIncrement)/2.0);
+				TargetEllipse.set_part_x( 6, x_pos_target );
+				y_pos_target = int(((random()*2.0)-1.0) * ((CircleWidthMinDeg*PPD) + double(TargetFrame) * AnnuliIncrement)/2.0);
+				TargetEllipse.set_part_y( 6, y_pos_target );
+				
+				if RunNumber == 222 then
+					TargetParam = TargetParamList[TrialIndex+1];
+				else
+					TargetParam = List_Target_Size[TrialType/100];
+				end;
+				
+				Target_Size = TargetParam;
+				Target_Size_Pixel = PPD * Target_Size;
+				Ellipse.set_dimensions( Target_Size_Pixel, Target_Size_Pixel );
+				Ellipse.redraw();
+			end;
+			
+		# Otherwise this is a trial with no target
+		else		
+			TargetPresent = 0;
+		end;	
+		
+		# ISI and pre-trial fixation
+		OnsetsListFile.print("Fixation onset\t");
+		OnsetsListFile.print(clock.time());
+		OnsetsListFile.print("\n");
+		
+		SOA_Fix.present();
+		
+		# Animate the trial with a frame by frame loop
+		loop 
+			
+			double FrameCounter = 1.0; 
+			
+			# Variables for the size of the annuli that might be drawn
+			double inner_width_1 = CircleWidthMinDeg*PPD;
+			double inner_height_1 = CircleWidthMinDeg*PPD;
+			double outer_width_1 = CircleWidthMinDeg*PPD+AnnuliWidth;
+			double outer_height_1 = CircleWidthMinDeg*PPD+AnnuliWidth;
+			
+			double inner_width_2 = CircleWidthMinDeg*PPD;
+			double inner_height_2 = CircleWidthMinDeg*PPD;
+			double outer_width_2 = CircleWidthMinDeg*PPD+AnnuliWidth;
+			double outer_height_2 = CircleWidthMinDeg*PPD+AnnuliWidth;
+			
+			double inner_width_3 = CircleWidthMinDeg*PPD;
+			double inner_height_3 = CircleWidthMinDeg*PPD;
+			double outer_width_3 = CircleWidthMinDeg*PPD+AnnuliWidth;
+			double outer_height_3 = CircleWidthMinDeg*PPD+AnnuliWidth;
+			
+			double inner_width_4 = CircleWidthMinDeg*PPD;
+			double inner_height_4 = CircleWidthMinDeg*PPD;
+			double outer_width_4 = CircleWidthMinDeg*PPD+AnnuliWidth;
+			double outer_height_4 = CircleWidthMinDeg*PPD+AnnuliWidth;
+			
+		until FrameCounter > Stimulus_Duration_Frames
+		
+		begin
+			
+			# If this trial is visual or audiovisual we increment the size of the different annuli at different time during the trial
+			if TrialList[TrialIndex] > 100 then
+				
+				if (FrameCounter > Stimulus_Duration_Frames/4.0) then	
+					inner_width_2 = inner_width_2 + AnnuliIncrement;
+					inner_height_2 = inner_height_2 + AnnuliIncrement;
+					outer_width_2 = outer_width_2 + AnnuliIncrement;
+					outer_height_2 = outer_height_2 + AnnuliIncrement;
+					
+					circle2.set_dimensions( inner_width_2, inner_height_2, outer_width_2, outer_height_2 );
+					circle2.redraw();
+				end;
+				
+				if (FrameCounter > Stimulus_Duration_Frames/2.0) then
+					inner_width_3 = inner_width_3 + AnnuliIncrement;
+					inner_height_3 = inner_height_3 + AnnuliIncrement;
+					outer_width_3 = outer_width_3 + AnnuliIncrement;
+					outer_height_3 = outer_height_3 + AnnuliIncrement;
+					
+					circle3.set_dimensions( inner_width_3, inner_height_3, outer_width_3, outer_height_3 ) ; 
+					circle3.redraw();
+				end;
+				
+				if (FrameCounter > Stimulus_Duration_Frames*3.0/4.0) then
+					inner_width_4 = inner_width_4 + AnnuliIncrement;
+					inner_height_4 = inner_height_4 + AnnuliIncrement;
+					outer_width_4 = outer_width_4 + AnnuliIncrement;
+					outer_height_4 = outer_height_4 + AnnuliIncrement;
+					
+					circle4.set_dimensions( inner_width_4, inner_height_4, outer_width_4, outer_height_4 ) ; 
+					circle4.redraw();
+				end;
+				
+				inner_width_1 = inner_width_1 + AnnuliIncrement;
+				inner_height_1 = inner_height_1 + AnnuliIncrement;
+				outer_width_1 = outer_width_1 + AnnuliIncrement;
+				outer_height_1 = outer_height_1 + AnnuliIncrement;
+				
+				circle1.set_dimensions( inner_width_1, inner_height_1, outer_width_1, outer_height_1 ) ; 
+				circle1.redraw();
+			end;
+			
+			# If this is the first frame of the loop, present the correct stimulus.
+			if FrameCounter==1.0 then
+				
+				TrialTime = clock.time();
+				
+				if TrialType == 100 then
+					AudioOnly_Trial.present();
+					if TargetPresent==0 then
+						Looming_Sound.present();
+					elseif TargetPresent==1 then
+						if TargetType==10 then
+							SOUNDS_AND_TARGETS[AudioTargetIndex*10+Target_Attenuation].present();
+						elseif TargetType==11 then
+							Looming_Sound.present();
+							PictureFixationCross.present();
+						end;
+					end;
+					
+				elseif TrialType == 200 then
+					VisualOnly_Trial.present();
+					if TargetPresent==0 then
+						# DO NOTHING
+					elseif TargetPresent==1 then
+						if TargetType==10 then
+							TARGET_SOUNDS[AudioTargetIndex*10+Target_Attenuation].present();
+						elseif TargetType==11 then
+							# DO NOTHING
+						end;
+					end;
+					
+				elseif TrialType == 300 then
+					AudioVisual_Trial.present();
+					if TargetPresent==0 then
+						Looming_Sound.present();
+					elseif TargetPresent==1 then
+						if TargetType==10 then
+							SOUNDS_AND_TARGETS[AudioTargetIndex*10+Target_Attenuation].present();
+						elseif TargetType==11 then
+							Looming_Sound.present();
+						end;						
+					end;
+				end;	
+				
+			# This not the first frame of the loop	
+			elseif FrameCounter>1.0 then
+				
+				# This trial does not contain a target
+				if TargetPresent==0 then
+					if TrialType > 100 then
+						Circles.present();
+					end;
+					
+				# This trial contains a target
+				elseif TargetPresent==1 then
+					
+					if TrialType == 100 then
+						if TargetType==10 then
+							# Before the target : display circles for trials with visual
+							#if int(FrameCounter)<TargetFrame then
+								# DO NOTHING
+							# This is the first frame during which the target should be present
+							#elseif int(FrameCounter)==TargetFrame then
+							if int(FrameCounter)==TargetFrame then
+								TargetTime = clock.time();
+								Auditory_Target.present();
+							# This is another frame during which the visual target should be present
+							#elseif int(FrameCounter)>TargetFrame && int(FrameCounter)<TargetFrameEnd then
+								# DO NOTHING
+							# After the target : display circles for trials with visual
+							#elseif int(FrameCounter)>=TargetFrameEnd then
+								# DO NOTHING
+							end;	
+						elseif TargetType==11 then
+							# Before the target : display circles for trials with visual
+							#if int(FrameCounter)<TargetFrame then
+								# DO NOTHING
+							# This is the first frame during which the target should be present
+							#elseif int(FrameCounter)==TargetFrame then
+							if int(FrameCounter)==TargetFrame then
+								TargetTime = clock.time();								
+								Visual_Target.present();
+								TargetEllipse.present();
+							# This is another frame during which the visual target should be present
+							elseif int(FrameCounter)>TargetFrame && int(FrameCounter)<TargetFrameEnd then
+								TargetEllipse.present();
+							# After the target : display circles for trials with visual
+							#elseif int(FrameCounter)>=TargetFrameEnd then
+								# DO NOTHING
+							end;
+						end;
+						
+					elseif TrialType == 200 then
+						if TargetType==10 then
+							Circles.present();
+							# Before the target : display circles for trials with visual
+							#if int(FrameCounter)<TargetFrame then
+							# This is the first frame during which the target should be present
+							# DO NOTHING
+							#elseif int(FrameCounter)==TargetFrame then
+							if int(FrameCounter)==TargetFrame then
+								TargetTime = clock.time();								
+								Auditory_Target.present();
+							# This is another frame during which the visual target should be present
+							#elseif int(FrameCounter)>TargetFrame && int(FrameCounter)<TargetFrameEnd then
+							# After the target : display circles for trials with visual
+							# DO NOTHING
+							#elseif int(FrameCounter)>=TargetFrameEnd then
+							# DO NOTHING
+							end;
+						elseif TargetType==11 then
+							# Before the target : display circles for trials with visual
+							if int(FrameCounter)<TargetFrame then
+								Circles.present();
+							# This is the first frame during which the target should be present
+						elseif int(FrameCounter)==TargetFrame then
+								TargetTime = clock.time();							
+								Visual_Target.present();
+								TargetEllipse.present();
+							# This is another frame during which the visual target should be present
+							elseif int(FrameCounter)>TargetFrame && int(FrameCounter)<TargetFrameEnd then
+								TargetEllipse.present();
+							# After the target : display circles for trials with visual
+							elseif int(FrameCounter)>=TargetFrameEnd then
+								Circles.present();
+							end;
+						end;
+						
+					elseif TrialType == 300 then
+						if TargetType==10 then
+							Circles.present();
+							# Before the target : display circles for trials with visual
+							#if int(FrameCounter)<TargetFrame then
+							# DO NOTHING
+							# This is the first frame during which the target should be present
+							#elseif int(FrameCounter)==TargetFrame then
+							if int(FrameCounter)==TargetFrame then
+								TargetTime = clock.time();								
+								Auditory_Target.present();
+							# This is another frame during which the visual target should be present
+							#elseif int(FrameCounter)>TargetFrame && int(FrameCounter)<TargetFrameEnd then
+							# After the target : display circles for trials with visual
+							# DO NOTHING
+							#elseif int(FrameCounter)>=TargetFrameEnd then
+							# DO NOTHING
+							end;
+						elseif TargetType==11 then
+							# Before the target : display circles for trials with visual
+							if int(FrameCounter)<TargetFrame then
+								Circles.present();
+							# This is the first frame during which the target should be present
+						elseif int(FrameCounter)==TargetFrame then
+								TargetTime = clock.time();							
+								Visual_Target.present();
+								TargetEllipse.present();
+							# This is another frame during which the visual target should be present
+							elseif int(FrameCounter)>TargetFrame && int(FrameCounter)<TargetFrameEnd then
+								TargetEllipse.present();
+							# After the target : display circles for trials with visual
+							elseif int(FrameCounter)>=TargetFrameEnd then
+								Circles.present();
+							end;
+						end;
+						
+					end;
+					
+				end;
+				
+			end;
+			
+			FrameCounter = FrameCounter + 1.0;
+			
+		end;
+		
+		circle1.set_dimensions( 0.0, 0.0, 0.0, 0.0 );
+		circle2.set_dimensions( 0.0, 0.0, 0.0, 0.0 );
+		circle3.set_dimensions( 0.0, 0.0, 0.0, 0.0 );
+		circle4.set_dimensions( 0.0, 0.0, 0.0, 0.0 );
+		
+		circle1.redraw();
+		circle2.redraw();
+		circle3.redraw();
+		circle4.redraw();
+		
+	end;
+	
+	# Stim offset
+	OffsetTime = clock.time();
+	Stimulus_Offset.present();
+	
+	# Write timing to file
+	OnsetsListFile.print(string(TrialType)+"\t"+string(TrialTime)+"\n");
+	if TargetPresent==1 then
+		OnsetsListFile.print(string(TargetType)+"\t"+string(TargetTime)+"\t"+string(TargetFrame)+"\t"+string(Target_Size)+"\t"+string(AudioTargetIndex)+"\t"+string(Target_Attenuation)+"\n");
+	end;
+	OnsetsListFile.print("Offset\t"+string(OffsetTime)+"\n");
+	
+	# Upadate counter
+	# Check if this is the last trial
+	if TrialIndex == TrialList.count() then	
+		break;
+	end;
+	
+	# Check if this trial is coming with a target
+	if TrialList[TrialIndex+1] == 10 || TrialList[TrialIndex+1] == 11 then
+		# Update trial counter by two to skip the target
+		TrialIndex = TrialIndex + 2;
+	# Otherwise this is a trial with no target
+	else
+		TrialIndex = TrialIndex + 1;
+	end;
+	
+end;
+
+
+# FINAL FIXATION
+OnsetsListFile.print("Final fixation\t");
+OnsetsListFile.print(clock.time());
+OnsetsListFile.print("\n");
+Final_Fixation.present();
+
+OnsetsListFile.print("Final offset\t");
+OnsetsListFile.print(clock.time());
+OnsetsListFile.print("\n");
+Stimulus_Offset.present();
+
+OnsetsListFile.close();

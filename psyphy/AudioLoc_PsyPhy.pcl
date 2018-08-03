@@ -1,0 +1,311 @@
+# --------------------------------------------------- #
+#					           PCL									#
+# --------------------------------------------------- #
+string DATE = date_time( "yyyy_mm_dd_hhnn" );
+
+# DISPLAY
+double RefreshRate = 60.0;
+
+#Compute the number of pixel per degree
+int MaxFOV = 39;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi; 
+int Win_H = 768 ; 
+int Win_W = 1024 ; 
+int PPD = Win_W/MaxFOV;
+
+# for ViewDist = 30
+# MonWidth	MaxFOV
+# 48.0		77
+# 37			63
+# 29			52
+# 21.5		40
+
+# for ViewDist = 50
+# MonWidth	MaxFOV
+# 48.0		51
+
+# for ViewDist = 54
+# MonWidth	MaxFOV
+# 51			50
+# 38			38.75
+
+# for ViewDist = 60
+# MonWidth	MaxFOV
+# 33.0		31
+# 37			34
+# 51			46
+
+# STIMULI & TRIALS
+array <int> PresentationLocationsDeg[15]= {-12, -10, -8, -5, -4, -3, -1, 0, 1, 3, 4, 5, 8, 10, 12};
+
+
+# Visual
+array <int> PresentationLocationsPix[0];
+loop
+int LocationIndex = 1;
+until LocationIndex > PresentationLocationsDeg.count()
+begin
+	PresentationLocationsPix.add( PresentationLocationsDeg[LocationIndex] * PPD);
+	LocationIndex = LocationIndex + 1;
+end;
+
+# --------------------------------------------------- #
+#                USER INPUT REQUIRED                  #
+# --------------------------------------------------- #
+preset bool DEBUG = false;
+
+int Stimulus_Duration = 50;
+int Post_Stimulus_Duration = 250;
+
+PostStimFix_A.set_duration(Post_Stimulus_Duration+Stimulus_Duration);
+
+preset bool PresentFeedback = false;
+if DEBUG == true || PresentFeedback == true then
+	Final_Fixation.set_duration(1000);
+end;
+
+preset int SubjectNumber;
+
+preset int RunNumber;
+
+RunNumber = 1000 + 100*int(PresentFeedback) + RunNumber;
+
+double Attenuation=0.0;
+
+# --------------------------------------------------- #
+#                GETTING TRIALS LIST                  #
+# --------------------------------------------------- #
+array <int> TrialList[0];
+array<int> Locations[0];
+
+if DEBUG == true then
+	
+	# TRIAL LIST
+	
+	# Fixation ; TrialType == 0
+
+	# AudioOnly_Trial ; TrialType == 1
+	
+	# AudioOnly
+	TrialList.assign ({1, 1, 1, 1, 1, 1});
+	
+	# LOCATION LIST
+	Locations.assign({5, 8, 11, 5, 8, 11});
+
+	#logfile.set_filename("debug.log");
+	
+else
+	# Change directory where to save log files to and to read trial list from
+	string SubjectDirectory = "\Subjects_Data\\Subject_";
+	SubjectDirectory.append(string(SubjectNumber));
+	SubjectDirectory.append("\\");
+	logfile_directory.append(SubjectDirectory);
+
+	term.print(logfile_directory);
+	term.print("\n");
+	
+	
+	# Set name for file containing the trial list
+	string TrialListFileName = logfile_directory;
+	TrialListFileName.append("Trial_List_Subject_");
+	TrialListFileName.append(string(SubjectNumber));
+	TrialListFileName.append("_Run_");
+	TrialListFileName.append(string(RunNumber));
+	TrialListFileName.append(".txt");
+	
+	term.print(TrialListFileName);
+	term.print("\n");
+	
+	
+	# Set name for file containing the side list
+	string SideListFileName = logfile_directory;
+	SideListFileName.append("Side_List_Subject_");
+	SideListFileName.append(string(SubjectNumber));
+	SideListFileName.append("_Run_");
+	SideListFileName.append(string(RunNumber));
+	SideListFileName.append(".txt");
+	
+	term.print(SideListFileName);
+	term.print("\n");
+	
+	
+	# Set name for logfile for this subject and run
+	string LogFileName = logfile_directory;
+	LogFileName.append("Logfile_Subject_");
+	LogFileName.append(string(SubjectNumber));
+	LogFileName.append("_Run_");
+	LogFileName.append(string(RunNumber));
+	LogFileName.append("_");
+	LogFileName.append(DATE);
+	LogFileName.append(".txt");
+	logfile.set_filename(LogFileName);
+		
+	term.print(LogFileName);
+	term.print("\n");
+	
+	
+	
+	# Read trial and side list from files
+	input_file StimOrderFile = new input_file;
+	StimOrderFile.open( TrialListFileName );
+	
+	input_file SideOrderFile = new input_file;
+	SideOrderFile.open( SideListFileName );
+	
+	bool CouldRead1 = true;
+	bool EOF1 = false;
+	
+	bool CouldRead2 = true;
+	bool EOF2 = false;
+	
+	loop
+		
+		int Index=1;
+		
+		int CurrentTrial1;
+		double CurrentTargetParam1;
+		string TEMP1;
+		
+		int CurrentTrial2;
+		double CurrentTargetParam2;
+		string TEMP2;
+		
+	until EOF1==true || EOF2==true 
+	begin
+		TEMP1 = StimOrderFile.get_line( );
+		TEMP2 = SideOrderFile.get_line( );
+		
+		CurrentTrial1 = int(double(TEMP1));
+		TrialList.add(CurrentTrial1);
+		
+		CurrentTrial2 = int(double(TEMP2));
+		Locations.add(CurrentTrial2);
+		
+		CouldRead1 = StimOrderFile.last_succeeded( );
+		EOF1 = StimOrderFile.end_of_file( );
+		
+		CouldRead2 = SideOrderFile.last_succeeded( );
+		EOF2 = SideOrderFile.end_of_file( );
+		
+		if CouldRead1==false || CouldRead2==false then
+			exit( "There was a problem while reading the trial list." );
+		end;
+		
+		Index = Index + 1;
+		
+	end;
+	
+	StimOrderFile.close();
+	SideOrderFile.close();
+	
+end;
+
+
+
+# ------------------------------------------------------ #
+#					           START									#
+# ------------------------------------------------------ #
+string Text2Present = "This is ";
+
+Text2Present.append("a psychophysics run ");
+
+if DEBUG == true then
+	Text2Present.append("in DEBUG mode.\n\n");
+else
+	Text2Present.append("not in DEBUG mode.\n\n");
+end;
+
+Text2Present.append("Audio only trials ");
+
+if PresentFeedback == true then
+	Text2Present.append("with feedback.");
+else
+	Text2Present.append("without feedback.");	
+end;
+
+ConfirmationTxt.set_caption(Text2Present);
+ConfirmationTxt.redraw();
+Confirmation.present();
+
+EPI.present();
+
+# ------------------------------------------------------ #
+#					          MAIN LOOP 							   #
+# ------------------------------------------------------ #
+loop 
+
+	int TrialIndex = 1;
+	int TrialType;
+	
+	#  Trial parameters
+	int Trial_Aud_Loc;
+	
+	# Feedback parameters
+	int FeedbackLocation;
+	int ExpRespCode;
+	int RespCount=0;
+	int RespCode;
+
+until TrialIndex > TrialList.count()
+
+begin
+
+	TrialType = TrialList[TrialIndex];
+	
+	# Determine the location of this trial
+	Trial_Aud_Loc = Locations[TrialIndex]+15*random(0, 9);
+	
+	SOUNDS50[Trial_Aud_Loc].set_attenuation( Attenuation );
+	SoundOnly.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
+	
+	# Present trial
+	AudioOnly_Trial.present();
+	
+	# FEEDBACK
+	if PresentFeedback == true then
+		
+		if Locations[TrialIndex]==4 then
+			AudLocEvent.set_target_button(1);
+			ExpRespCode = 1;
+		elseif Locations[TrialIndex]==12 then
+			AudLocEvent.set_target_button(2);
+			ExpRespCode = 2;		
+		end;
+		
+		AuditoryLocation.present();
+		
+		if RespCount == response_manager.total_response_count() then # no new responses has been pressed
+				RespCode = 0;
+			else
+				RespCount = response_manager.total_response_count();
+				RespCode = response_manager.last_response_data().code();
+		end;
+			
+		FeedbackLocation = PresentationLocationsPix[Locations[TrialIndex]];
+		
+		if ExpRespCode == RespCode then
+			PicturePositiveFeedback.set_part_x( 1, FeedbackLocation);			
+			PositiveFeedback.present();
+		else
+			PictureNegativeFeedback.set_part_x( 1, FeedbackLocation);
+			NegativeFeedback.present();
+		end;	
+		
+	end;
+	
+	ISI.present();	
+
+
+	# Update counter
+	# Check if this is the last trial
+	if TrialIndex == TrialList.count() then	
+		break;
+	end;
+	
+	# Check if this trial is coming with a target
+	TrialIndex = TrialIndex + 1;
+	
+end;
+
+
+# FINAL FIXATION
+Final_Fixation.present();
