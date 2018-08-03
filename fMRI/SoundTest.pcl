@@ -1,0 +1,31 @@
+# STIMULI & TRIALS
+array <int> PresentationLocationsDeg[15]= {-12, -10, -8, -5, -4, -3, -1, 0, 1, 3, 4, 5, 8, 10, 12};
+
+# ------------------------------------------------------ #
+#					          MAIN LOOP 							   #
+# ------------------------------------------------------ #
+loop 
+
+	int TrialIndex = 1;
+	
+	int Trial_Aud_Loc;
+
+until TrialIndex > PresentationLocationsDeg.count()
+
+begin
+	
+	# AudioOnly_Trial ; TrialType == 1
+	Trial_Aud_Loc = TrialIndex+15*random(0, 9);
+
+	SOUNDS50[Trial_Aud_Loc].set_attenuation(0.35);
+	SOUNDS50[Trial_Aud_Loc].present();
+	wait_interval(600);
+	
+	# Check if this trial is coming with a target
+	TrialIndex = TrialIndex + 1;
+	
+	if TrialIndex > PresentationLocationsDeg.count() then
+		TrialIndex=1;
+	end;
+	
+end;

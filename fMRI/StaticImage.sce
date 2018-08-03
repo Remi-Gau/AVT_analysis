@@ -1,8 +1,9 @@
 scenario = "Static image";
 scenario_type = trials;
 
-active_buttons = 5;
-button_codes = 1, 2, 3, 4, 5;
+active_buttons = 1;
+button_codes = 1;
+
 
 default_text_color = 255,255,255; #white text by default
 default_background_color = 128,128,128; #grey background

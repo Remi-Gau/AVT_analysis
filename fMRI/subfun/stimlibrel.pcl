@@ -135,7 +135,7 @@ begin
 end;
 
 sub
-  set2PDiscriminationProperties(int module, int slot, int subslot, int dac_x, int dac_z0, int dac_z1)
+  set2PDProperties(int module, int slot, int subslot, int dac_x, int dac_z0, int dac_z1)
 begin
   piezo.set_variable("0", module);
   piezo.set_variable("1", slot);
@@ -143,11 +143,11 @@ begin
   piezo.set_variable("3", dac_x);
   piezo.set_variable("4", dac_z0);
   piezo.set_variable("5", dac_z1);
-  piezo.run("set2PDiscriminationProperties");
+  piezo.run("set2PDProperties");
 end;
 
 sub
-  set2PDiscriminationCalibration(int module, int homeDACPos, double co0, double co1, double co2, double co3, double co4, double co5, double co6, double co7, double co8, double co9)
+  set2PDCalibrationX(int module, int homeDACPos, double co0, double co1, double co2, double co3, double co4, double co5, double co6, double co7, double co8, double co9)
 begin
   piezo.set_variable("0", module);
   piezo.set_variable("1", homeDACPos);
@@ -161,14 +161,33 @@ begin
   piezo.set_variable("9", co7);
   piezo.set_variable("10", co8);
   piezo.set_variable("11", co9);
-  piezo.run("set2PDiscriminationCalibration");
+  piezo.run("set2PDCalibrationX");
 end;
 
 sub
-  set2PDiscriminationDistance(int module, double distance)
+  set2PDCalibrationZ(int module, double Z0_co0, double Z0_co1, double Z1_co0, double Z1_co1)
 begin
+	piezo.set_variable("0", module);
+	piezo.set_variable("1", Z0_co0);
+	piezo.set_variable("2", Z0_co1);
+	piezo.set_variable("3", Z1_co0);
+	piezo.set_variable("4", Z1_co1);
+	piezo.run("set2PDCalibrationZ");
+end;
 
+sub
+  set2PDDistance(int module, double distance)
+begin
   piezo.set_variable("0", module);
   piezo.set_variable("1", distance);
-  piezo.run("set2PDiscriminationDistance"); 
+  piezo.run("set2PDDistance"); 
+end;
+
+sub
+  set2PDHeight(int module, int promille_Z0, int promille_Z1)
+begin
+  piezo.set_variable("0", module);
+  piezo.set_variable("1", promille_Z0);
+  piezo.set_variable("2", promille_Z1);
+  piezo.run("set2PDHeight"); 
 end;

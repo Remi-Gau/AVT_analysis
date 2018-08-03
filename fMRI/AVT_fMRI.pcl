@@ -1,27 +1,20 @@
 # --------------------------------------------------- #
 #					           QUAERO							   #
 # --------------------------------------------------- #
-#include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\stimlibrel.pcl"
-#include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\subroutines_tactile.pcl"
-
-#include_once "U:\\A_V_T\\stimlibrel.pcl"
+include_once "E:\\Remi\\AVT_2\\subfun\\stimlibrel.pcl"
+include_once "E:\\Remi\\AVT_2\\subfun\\subroutines_tactile.pcl"
 
 #loadLibrary();
 
-#Stimulator licence BHAM
-#initStimulator("8DD8J3C662984KL65UZ3LHJEEF5OTP");	
-int SlotL=2;
-int SlotR=3;
-
 #Stimulator licence MPI CBS
-#initStimulator("0348778LCCA6UL97STQMQNYFEAMIOU");	
-#int SlotL=3;
-#int SlotR=4;
+initStimulator("0348778LCCA6UL97STQMQNYFEAMIOU");	
+int SlotL=3;
+int SlotR=4;
 
-#setProperty("local_buffer_size", 5000000);
+setProperty("local_buffer_size", 5000000);
 
-#setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
-#setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
+setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
+setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
 
 
 # --------------------------------------------------- #
@@ -33,7 +26,7 @@ string DATE = date_time( "yyyy_mm_dd_hhnn" );
 double RefreshRate = 60.0;
 
 #Compute the number of pixel per degree
-int MaxFOV = 34;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi; 
+int MaxFOV = 10;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi; 
 int Win_H = 768 ; 
 int Win_W = 1024 ; 
 int PPD = Win_W/MaxFOV;
@@ -53,10 +46,12 @@ int PPD = Win_W/MaxFOV;
 # MonWidth	MaxFOV
 # 33.0		31
 # 37			34
+# 29			28
 
 # for ViewDist = 160
 # MonWidth	MaxFOV
 # 39.0		40
+# 28.5		10,2
 
 
 # STIMULI & TRIALS
@@ -81,25 +76,18 @@ end;
 # --------------------------------------------------- #
 preset bool DEBUG = false;
 
-preset int Stimulus_Duration = 50; # ms
-int Post_Stimulus_Duration = 250;
+int Stimulus_Duration = 50; # ms
 int Pre_Stimulus_Duration = 500;
 
 Dots_V.set_duration(Stimulus_Duration);
-PostStimFix_V.set_time(Pre_Stimulus_Duration+Stimulus_Duration);
-
-PostStimFix_A.set_duration(Post_Stimulus_Duration+Stimulus_Duration);
 
 Dot_Target_1.set_duration(Stimulus_Duration);
-Inter_Dot.set_duration(40);
+Inter_Dot.set_duration(64);
 Inter_Dot.set_delta_time(Stimulus_Duration);
 Dot_Target_2.set_duration(Stimulus_Duration);
-Dot_Target_2.set_delta_time(40);
-PostStimFix_V_Target.set_time(Pre_Stimulus_Duration+2*Stimulus_Duration+40);
-PostStimFix_V_Target.set_duration(Post_Stimulus_Duration+Stimulus_Duration);
+Dot_Target_2.set_delta_time(64);
 
-Sound_Target2.set_time(Pre_Stimulus_Duration+Stimulus_Duration+40);
-PostStimFix_A_Target.set_duration(3*Stimulus_Duration+Post_Stimulus_Duration);
+Sound_Target2.set_time(Pre_Stimulus_Duration+Stimulus_Duration+20);
 
 preset int SubjectNumber;
 
@@ -114,37 +102,8 @@ double Tactile_Stimulus_Duration = 50.0; # ms
 int NumCycle = 5;
 int WaitTime = 10;
 int NumCycleTarget=5; 
-int IntervalTime=50;
+int IntervalTime=64;
 
-if Stimulus_Duration == 50 then
-	Tactile_Stimulus_Duration = 50.0; # ms
-	NumCycle = 5;
-	WaitTime = 10;
-	NumCycleTarget=5; 
-	IntervalTime=50;
-
-elseif Stimulus_Duration == 80 then
-	Tactile_Stimulus_Duration = 80.0; # ms
-	NumCycle = 8;
-	WaitTime = 10;
-	NumCycleTarget=8; 
-	IntervalTime=80;		
-	
-elseif Stimulus_Duration == 100 then
-	Tactile_Stimulus_Duration = 100.0; # ms
-	NumCycle = 10;
-	WaitTime = 10;
-	NumCycleTarget=10; 
-	IntervalTime=100;
-	
-else
-	Tactile_Stimulus_Duration = 200.0; # ms
-	NumCycle = 20;
-	WaitTime = 10;
-	NumCycleTarget=20; 
-	IntervalTime=200;
-	
-end;
 
 # --------------------------------------------------- #
 #                USER INPUT REQUIRED                  #
@@ -193,20 +152,16 @@ if DEBUG == true then
 	# Tactile_Target ; TrialType == 8
 	
 	TrialList.assign ({1, 1, 1, 1, 2, 2, 2, 2, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8});
-	TrialList.assign ({2, 7, 2, 7, 2, 7, 2, 7, 2, 7, 2, 7});
 	
 	# LOCATION LIST
-	Locations.assign({5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11});
-
-	#TrialList.assign ({5, 8, 5, 8, 5, 8, 5, 8});
-	Locations.assign({5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11, 5, 11});
+	Locations.assign({4, 12, 4, 12, 4, 12, 4, 12, 4, 12, 4, 12, 4, 12, 4, 12, 4, 12, 4, 12, 4, 12, 4, 12});
 
 
 	#logfile.set_filename("debug.log");
 	
 else
 	# Change directory where to save log files to and to read trial list from
-	string SubjectDirectory = "\Subject_";
+	string SubjectDirectory = "\Subjects_Data\\Subject_";
 	SubjectDirectory.append(string(SubjectNumber));
 	SubjectDirectory.append("\\");
 	logfile_directory.append(SubjectDirectory);
@@ -310,14 +265,10 @@ else
 end;
 
 
-
 # ------------------------------------------------------ #
 #					           START									#
 # ------------------------------------------------------ #
 PictureBlueFixationCross.present();
-
-EPI.present();
-
 Start_Trial.set_mri_pulse(1);
 Start_Trial.present();
 
@@ -362,30 +313,11 @@ begin
 			
 			# Change the sound
 			if TrialType==1 then
-				if Stimulus_Duration == 50 then
-					SoundOnly.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
-				elseif Stimulus_Duration == 80 then
-					SoundOnly.set_stimulus(SOUNDS80[Trial_Aud_Loc]);					
-				elseif Stimulus_Duration == 100 then
-					SoundOnly.set_stimulus(SOUNDS100[Trial_Aud_Loc]);
-				else
-					SoundOnly.set_stimulus(SOUNDS200[Trial_Aud_Loc]);
-				end
+				SoundOnly.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
 				
 			elseif TrialType==6 then
-				if Stimulus_Duration == 50 then
-					Sound_Target1.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
-					Sound_Target2.set_stimulus(SOUNDS50[Trial_Aud_Loc]);					
-				elseif Stimulus_Duration == 80 then
-					Sound_Target1.set_stimulus(SOUNDS80[Trial_Aud_Loc]);		
-					Sound_Target2.set_stimulus(SOUNDS80[Trial_Aud_Loc]);	
-				elseif Stimulus_Duration == 100 then
-					Sound_Target1.set_stimulus(SOUNDS100[Trial_Aud_Loc]);
-					Sound_Target2.set_stimulus(SOUNDS100[Trial_Aud_Loc]);					
-				else
-					Sound_Target1.set_stimulus(SOUNDS200[Trial_Aud_Loc]);
-					Sound_Target2.set_stimulus(SOUNDS200[Trial_Aud_Loc]);					
-				end	
+				Sound_Target1.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
+				Sound_Target2.set_stimulus(SOUNDS50[Trial_Aud_Loc]);						
 			end;
 		end;
 		
@@ -405,19 +337,19 @@ begin
 		# Tactile
 		if TrialType==5 then
 			if Locations[TrialIndex]<8  then
-				#vibrationLeft_Trial(SlotL, NumCycle, WaitTime);
+				vibrationLeft_Trial(SlotL, NumCycle, WaitTime);
 			elseif Locations[TrialIndex]>8 then
-				#vibrationRight_Trial(SlotR, NumCycle, WaitTime);
+				vibrationRight_Trial(SlotR, NumCycle, WaitTime);
 			end;
 		elseif  TrialType==8 then
 			if Locations[TrialIndex]<8 then
-				#vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
-				#wait(1, IntervalTime);
-				#vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+				vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+				wait(1, IntervalTime);
+				vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
 			elseif Locations[TrialIndex]>8 then
-				#vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
-				#wait(1, IntervalTime);
-				#vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+				vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+				wait(1, IntervalTime);
+				vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
 			end;
 		end;
 		
@@ -429,11 +361,9 @@ begin
 			VisualOnly_Trial.present();
 		elseif TrialType == 5 then
 			Tactile_Trial.present();
-			#startStimulation();
+			startStimulation();
 			wait_interval(int(Tactile_Stimulus_Duration));
-			#stopStimulation();
-			PictureBlueFixationCross.present();
-			wait_interval(Post_Stimulus_Duration);
+			stopStimulation();
 			
 		elseif TrialType == 6 then
 			AudioOnly_Target.present();	
@@ -441,11 +371,10 @@ begin
 			VisualOnly_Target.present();			
 		elseif TrialType == 8 then
 			Tactile_Target.present();
-			#startStimulation();
+			startStimulation();
 			wait_interval(int(Tactile_Stimulus_Duration));
-			#stopStimulation();
-			PictureBlueFixationCross.present();
-			wait_interval(Post_Stimulus_Duration);
+			stopStimulation();
+			
 		end;
 		
 		ISI.present();
@@ -467,4 +396,4 @@ end;
 # FINAL FIXATION
 Final_Fixation.present();
 
-#closeStimulator();
+closeStimulator();

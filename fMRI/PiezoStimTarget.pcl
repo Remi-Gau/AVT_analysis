@@ -1,29 +1,29 @@
 output_file DebugFile = new output_file;
 
-include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\stimlibrel.pcl"
-include_once "C:\\Users\\Rémi\\Dropbox\\PhD\\Experiments\\MVPA_A_V_T\\subroutines_tactile.pcl"
+include_once "E:\\Remi\\AVT_2\\subfun\\stimlibrel.pcl"
+include_once "E:\\Remi\\AVT_2\\subfun\\subroutines_tactile.pcl"
 
 loadLibrary();
 
-initStimulator("8DD8J3C662984KL65UZ3LHJEEF5OTP");	#Stimulator initialisieren
-#initStimulator("0348778LCCA6UL97STQMQNYFEAMIOU");	#Stimulator licence MPI CBS
+#Stimulator initialisieren
+initStimulator("0348778LCCA6UL97STQMQNYFEAMIOU");	#Stimulator licence MPI CBS
 
 setProperty("local_buffer_size", 5000000);
 
 setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
 setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
 
-int SlotL = 2;
-int SlotR = 3;
+int SlotL = 3;
+int SlotR = 4;
 
 # Tactile
 # tactile stim duration = 0.5*WaitTime*2*NumCycle [in ms]
 # stim freq = 1/(0.5*WaitTime*2/1000)
-int NumCycle = 19;
+int NumCycle = 5;
 int WaitTime = 10;
 
-int NumCycleTarget=6; 
-int IntervalTime=70;
+int NumCycleTarget=5; 
+int IntervalTime=64;
 
 
 vibrationLeft_Trial(SlotL, NumCycle, WaitTime);

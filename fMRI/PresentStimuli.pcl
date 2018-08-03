@@ -1,0 +1,254 @@
+# --------------------------------------------------- #
+#					           QUAERO							   #
+# --------------------------------------------------- #
+include_once "E:\\Remi\\AVT_2\\subfun\\stimlibrel.pcl"
+include_once "E:\\Remi\\AVT_2\\subfun\\subroutines_tactile.pcl"
+
+loadLibrary();
+
+#Stimulator licence MPI CBS
+initStimulator("0348778LCCA6UL97STQMQNYFEAMIOU");	
+int SlotL=3;
+int SlotR=4;
+
+setProperty("local_buffer_size", 5000000);
+
+setDAC(0, 0);												# DAC 0 auf Pins "eingefahren" setzen
+setDAC(1, 4095);											# DAC 1 auf Pins "ausgefahren" setzen
+
+
+# --------------------------------------------------- #
+#					           PCL									#
+# --------------------------------------------------- #
+string DATE = date_time( "yyyy_mm_dd_hhnn" );
+
+# DISPLAY
+double RefreshRate = 60.0;
+
+#Compute the number of pixel per degree
+int MaxFOV = 13;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi; 
+int Win_H = 768 ; 
+int Win_W = 1024 ; 
+int PPD = Win_W/MaxFOV;
+
+# for ViewDist = 30
+# MonWidth	MaxFOV
+# 48.0		77
+# 37			63
+# 29			52
+# 21.5		40
+
+# for ViewDist = 50
+# MonWidth	MaxFOV
+# 48.0		51
+
+# for ViewDist = 60
+# MonWidth	MaxFOV
+# 33.0		31
+# 37			34
+# 29			28
+
+# for ViewDist = 160
+# MonWidth	MaxFOV
+# 39.0		40
+
+
+# STIMULI & TRIALS
+array <int> PresentationLocationsDeg[15]= {-12, -10, -8, -5, -4, -3, -1, 0, 1, 3, 4, 5, 8, 10, 12};
+
+# Visual
+array <int> PresentationLocationsPix[0];
+loop
+int LocationIndex = 1;
+until LocationIndex > PresentationLocationsDeg.count()
+begin
+	PresentationLocationsPix.add( PresentationLocationsDeg[LocationIndex] * PPD);
+	LocationIndex = LocationIndex + 1;
+end;
+
+
+int Stimulus_Duration = 50; # ms
+int Pre_Stimulus_Duration = 100;
+
+Dots_V.set_duration(Stimulus_Duration);
+
+Dot_Target_1.set_duration(Stimulus_Duration);
+Inter_Dot.set_duration(64);
+Inter_Dot.set_delta_time(Stimulus_Duration);
+Dot_Target_2.set_duration(Stimulus_Duration);
+Dot_Target_2.set_delta_time(64);
+
+Sound_Target2.set_time(Pre_Stimulus_Duration+Stimulus_Duration+20);
+
+
+# Tactile
+# tactile stim duration = 0.5*WaitTime*2*NumCycle [in ms]
+# stim freq = 1/(0.5*WaitTime*2/1000)
+double Tactile_Stimulus_Duration = 50.0; # ms
+int NumCycle = 5;
+int WaitTime = 10;
+int NumCycleTarget=5; 
+int IntervalTime=64;
+
+
+string Text2Present = "This is will present the\n\nAudio or Visual or Tactile trials.";
+ConfirmationTxt.set_caption(Text2Present);
+ConfirmationTxt.redraw();
+Confirmation.present();
+
+# --------------------------------------------------- #
+#                GETTING TRIALS LIST                  #
+# --------------------------------------------------- #
+# TRIAL LIST
+array <int> TrialList[0];
+array<int> Locations[0];
+
+# AudioOnly_Trial ; TrialType == 1
+# VisualOnly_Trial ; TrialType == 2
+# Tactile_Trial ; TrialType == 5
+
+# AudioOnly_Target ; TrialType == 6
+# VisualOnly_Target ; TrialType == 7
+# Tactile_Target ; TrialType == 8
+
+#TrialList.assign ({1, 1, 2, 2, 5, 5, 6, 6, 7, 7, 8, 8});
+TrialList.assign ({2,2,7,7});
+
+# LOCATION LIST
+#Locations.assign({4, 12, 4, 12, 4, 12, 4, 12, 4, 12, 4, 12});
+Locations.assign({4, 12, 4, 12});
+
+
+#array<int> Counter[12] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+array<int> Counter[4] = {1, 2, 3, 4};
+Counter.shuffle();
+
+logfile.set_filename("debug.log");
+
+
+# ------------------------------------------------------ #
+#					           START									#
+# ------------------------------------------------------ #
+PictureBlueFixationCross.present();
+
+
+# ------------------------------------------------------ #
+#					          MAIN LOOP 							   #
+# ------------------------------------------------------ #
+loop 
+
+	int TrialIndex = 1;
+	int TrialType;
+	
+	#  Trial parameters
+	int Trial_Vis_Loc;
+	int Trial_Aud_Loc;
+
+until TrialIndex > 15
+
+begin
+	
+	# AudioOnly_Trial ; TrialType == 1
+	# VisualOnly_Trial ; TrialType == 2
+	# Tactile_Trial ; TrialType == 5
+	
+	# AudioOnly_Target ; TrialType == 6
+	# VisualOnly_Target ; TrialType == 7
+	# Tactile_Target ; TrialType == 8
+
+	TrialType = TrialList[Counter[TrialIndex]];
+
+	# Audio
+	if TrialType==1 || TrialType==6 then
+		# Determine the location of this trial
+		Trial_Aud_Loc = Locations[Counter[TrialIndex]]+15*random(0, 9);
+		
+		# Change the sound
+		if TrialType==1 then
+			SoundOnly.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
+			
+		elseif TrialType==6 then
+			Sound_Target1.set_stimulus(SOUNDS50[Trial_Aud_Loc]);
+			Sound_Target2.set_stimulus(SOUNDS50[Trial_Aud_Loc]);						
+		end;
+	end;
+	
+	# Visual
+	if TrialType==2 || TrialType==7 then
+		# Determine the location of this trial
+		if TrialType==4 then
+			Trial_Vis_Loc = -1*PresentationLocationsPix[Locations[TrialIndex]];
+		else
+			Trial_Vis_Loc = PresentationLocationsPix[Locations[TrialIndex]];
+		end;
+		
+		Dots.set_part_x( 1, Trial_Vis_Loc);
+		
+	end;
+	
+	# Tactile
+	if TrialType==5 then
+		if Locations[TrialIndex]<8  then
+			vibrationLeft_Trial(SlotL, NumCycle, WaitTime);
+		elseif Locations[TrialIndex]>8 then
+			vibrationRight_Trial(SlotR, NumCycle, WaitTime);
+		end;
+	elseif  TrialType==8 then
+		if Locations[TrialIndex]<8 then
+			vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+			wait(1, IntervalTime);
+			vibrationLeft_Trial(SlotL, NumCycleTarget, WaitTime);
+		elseif Locations[TrialIndex]>8 then
+			vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+			wait(1, IntervalTime);
+			vibrationRight_Trial(SlotR, NumCycleTarget, WaitTime);
+		end;
+	end;
+	
+	# Present trial
+	if TrialType == 1 then
+		AudioOnly_Trial.present();
+		Text2Present = "This was an \n\n auditory stimulus.";
+	elseif TrialType == 2 then
+		VisualOnly_Trial.present();
+		Text2Present = "This was a \n\n visual stimulus.";
+	elseif TrialType == 5 then
+		Tactile_Trial.present();
+		startStimulation();
+		wait_interval(int(Tactile_Stimulus_Duration));
+		stopStimulation();
+		Text2Present = "This was a \n\n tactile stimulus.";
+		
+	elseif TrialType == 6 then
+		AudioOnly_Target.present();
+		Text2Present = "This was a \n\n auditory TARGET.";	
+	elseif TrialType == 7 then
+		VisualOnly_Target.present();	
+		Text2Present = "This was a \n\n visual TARGET.";		
+	elseif TrialType == 8 then
+		Tactile_Target.present();
+		startStimulation();
+		wait_interval(int(Tactile_Stimulus_Duration));
+		stopStimulation();
+		Text2Present = "This was a \n\n tactile TARGET.";	
+		
+	end;
+
+	wait_interval(1000);
+	StimNatureText.set_caption(Text2Present);
+	StimNatureText.redraw();
+	#StimNature.present();
+	#wait_interval(3000);
+
+	TrialIndex = TrialIndex + 1;
+	
+	# Update counter
+	# Check if this is the last trial
+	if TrialIndex > TrialList.count() then	
+		TrialIndex = 1;
+		Counter.shuffle();
+	end;
+	
+end;
+
+closeStimulator();

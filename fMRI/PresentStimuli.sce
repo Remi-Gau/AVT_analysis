@@ -4,10 +4,9 @@ scenario = "AVT at 7 tesla";
 # --------------------------------------------------- #
 # 								HEADER 								#
 # --------------------------------------------------- #
-pcl_file = "AVT_fMRI.pcl";
+pcl_file = "PresentStimuli.pcl";
 
-scenario_type = fMRI;
-#scenario_type = fMRI_emulation;
+scenario_type = trials;
 
 scan_period = 3000;
 
@@ -27,8 +26,8 @@ response_matching = simple_matching;
 response_logging = log_all;
 
 
-active_buttons = 5;
-button_codes = 1,2,3,4,5;
+active_buttons = 1;
+button_codes = 1;
 
 
 default_stimulus_time_in = 0;
@@ -47,9 +46,9 @@ begin;
 $RefreshRate = 60.0;
 
 #Compute the number of pixel per degree
-$MaxFOV = 10.0;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi;
+$MaxFOV = 13.0;  #2.0 * 180.0 * arctan(MonitorWidth/2.0/ViewDist)/ Pi;
 $Win_W = 1024.0 ;
-$Win_H = 728.0 ; 
+$Win_H = 768.0 ; 
 $PPD = '$Win_W/$MaxFOV';
 
 # for ViewDist = 30
@@ -85,9 +84,8 @@ $xpos = 0;
 $ypos = 0;
 
 # Stimuli timing
-$ISI = 1650;
 $Stimulus_Duration = 50; # ms
-$Pre_Stimulus_Duration = 500;
+$Pre_Stimulus_Duration = 100;
 
 # Fixation Cross
 $FixationCrossLineWidth = 2;
@@ -98,10 +96,6 @@ $NegativeFixationCrossHalfWidth = '-($FixationCrossHalfWidth)';
 $Dot_Size = 3.0;
 $Dot_Size_Pixel = '$Dot_Size * $PPD';
 $Dot_Color = $White;
-
-# Fixation
-$FinalFixationDuration = 1000.0;
-$Fixation_Duration = 7000.0;
 
 #------------------#
 # STIMULI ELEMENTS #
@@ -318,18 +312,6 @@ trial {
 	code = "Start";
 } Start_Trial;
 
-#ISI
-trial {
-	monitor_sounds = false;
-	all_responses = true;
-	trial_duration = $ISI;
-	
-	picture PictureBlueFixationCross;
-	time = 0;
-	
-	code = "ISI";
-} ISI;
-
 
 # TRIALS
 # VisualOnly_Trial;
@@ -466,7 +448,7 @@ trial {
 	all_responses = true;
    trial_duration = forever;
    trial_type = specific_response;
-   terminator_button = 5;   
+   terminator_button = 1;   
 	
 	picture {
 		text {
@@ -476,30 +458,17 @@ trial {
 	};
 } Confirmation;
 
-
-# FIXATIONS
-# Fixation
+#Trial description
 trial {
+	all_responses = true;
 	monitor_sounds = false;
-	all_responses = true;
-	trial_duration = 'int($Fixation_Duration)';
-	
-	picture PictureBlueFixationCross;
-	
-	code = "Fixation";
-	
-	save_logfile {
-      filename = "temp.log"; # use temp.log in default logfile directory
-   };
-} Fixation;
 
-
-# Final Fixation
-trial {
-	all_responses = true;
-   trial_duration = 'int($FinalFixationDuration)';
+	picture {
+		text {
+			caption = "Press ENTER to start.";
+		}StimNatureText;
+		x = 0; y = 0;
+	};
+	duration = 1500;
 	
-	picture PictureBlueFixationCross;
-	
-	code = "Final_Fixation";
-} Final_Fixation;
+} StimNature;
