@@ -37,10 +37,9 @@ ROIs = {
     'A1'
     'PT'
     'V1'
-    'V2'
-    'V3'};
-ROI_order_BOLD = [1 7 2:4];
-ROI_order_MVPA = [6 7 1:3];
+    'V2'};
+ROI_order_BOLD = [1 7 2:3];
+ROI_order_MVPA = [6 7 1:2];
 
 ROIs_to_get = 1:7;
 
@@ -60,14 +59,14 @@ opt.permutation.test = 0;
 opt.session.curve = 0;
 opt.scaling.idpdt = 1;
 opt.session.loro = 0;
-opt.MVNN = 1;
+opt.MVNN = 0;
 opt.vol = 0;
 
 if opt.MVNN
     ParamToPlot={'Cst','Lin','Avg','ROI'};
     opt.toplot = ParamToPlot{4};
-    ROI_order_MVPA = 1:5;
-    ROIs_to_get = 1:5;
+    ROI_order_MVPA = 1:4;
+    ROIs_to_get = 1:4;
     SubSVM = [1:3;4:6;7:9;10:12;13:15;16:18];
     suffix = 'Wht_Betas';
 end
@@ -83,6 +82,8 @@ opt.scaling.feat.range = 0;
 opt.scaling.feat.sessmean = 0;
 
 SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
+
+IsStim = 1;
 
 % load BOLD and MVPA
 if IsStim

@@ -87,7 +87,7 @@ on_merged_ROI = 0;
 
 Split_suffix = '';
 
-NbROI = 5;
+NbROI = 4;
 
 
 if surf
@@ -248,8 +248,8 @@ for iToPlot = 1:2 %:numel(ToPlot)
             
             imagesc(flipud(Mat2Plot), [0 1])
             
-            plot([.5 5.5], [1.5 1.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            plot([.5 5.5], [2.5 2.5], 'color', [.2 .2 .2], 'linewidth', 1)
+            plot([.5 NbROI+.5], [1.5 1.5], 'color', [.2 .2 .2], 'linewidth', 1)
+            plot([.5 NbROI+.5], [2.5 2.5], 'color', [.2 .2 .2], 'linewidth', 1)
             plot([1.5 1.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
             plot([2.5 2.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
             plot([3.5 3.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
@@ -258,9 +258,9 @@ for iToPlot = 1:2 %:numel(ToPlot)
             patch([2.44 2.56 2.56 2.44], [.5 .5 3.5 3.5], 'w', 'linewidth', 2)
             
             plot([.5 .5], [.5 3.5], 'k', 'linewidth', 2)
-            plot([5.5 5.5], [.5 3.5], 'k', 'linewidth', 2)
-            plot([.5 5.5], [.5 .5], 'k', 'linewidth', 2)
-            plot([.5 5.5], [3.5 3.5], 'k', 'linewidth', 2)
+            plot([NbROI+.5 NbROI+.5], [.5 3.5], 'k', 'linewidth', 2)
+            plot([.5 NbROI+.5], [.5 .5], 'k', 'linewidth', 2)
+            plot([.5 NbROI+.5], [3.5 3.5], 'k', 'linewidth', 2)
             
             title('Ipsi')
             set(gca,'fontsize', 22, ...
@@ -270,7 +270,7 @@ for iToPlot = 1:2 %:numel(ToPlot)
                 'xticklabel', {ROI(1:NbROI).name}, 'Xcolor', 'k')
             colorbar
             
-            axis([.5 5.5 .5 3.5])
+            axis([.5 NbROI+.5 .5 3.5])
             
             
             
@@ -282,8 +282,8 @@ for iToPlot = 1:2 %:numel(ToPlot)
             
             imagesc(flipud(Mat2Plot), [0 1])
             
-            plot([.5 5.5], [1.5 1.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            plot([.5 5.5], [2.5 2.5], 'color', [.2 .2 .2], 'linewidth', 1)
+            plot([.5 NbROI+.5], [1.5 1.5], 'color', [.2 .2 .2], 'linewidth', 1)
+            plot([.5 NbROI+.5], [2.5 2.5], 'color', [.2 .2 .2], 'linewidth', 1)
             plot([1.5 1.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
             plot([2.5 2.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
             plot([3.5 3.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
@@ -292,9 +292,9 @@ for iToPlot = 1:2 %:numel(ToPlot)
             patch([2.44 2.56 2.56 2.44], [.5 .5 3.5 3.5], 'w', 'linewidth', 2)
             
             plot([.5 .5], [.5 3.5], 'k', 'linewidth', 2)
-            plot([5.5 5.5], [.5 3.5], 'k', 'linewidth', 2)
-            plot([.5 5.5], [.5 .5], 'k', 'linewidth', 2)
-            plot([.5 5.5], [3.5 3.5], 'k', 'linewidth', 2)
+            plot([NbROI+.5 NbROI+.5], [.5 3.5], 'k', 'linewidth', 2)
+            plot([.5 NbROI+.5], [.5 .5], 'k', 'linewidth', 2)
+            plot([.5 NbROI+.5], [3.5 3.5], 'k', 'linewidth', 2)
             
             title(Comp_suffix{2})
             title('Contra')
@@ -305,7 +305,7 @@ for iToPlot = 1:2 %:numel(ToPlot)
                 'xticklabel', {ROI(1:NbROI).name}, 'Xcolor', 'k')
             colorbar
             
-            axis([.5 5.5 .5 3.5])
+            axis([.5 NbROI+.5 .5 3.5])
             
             
             

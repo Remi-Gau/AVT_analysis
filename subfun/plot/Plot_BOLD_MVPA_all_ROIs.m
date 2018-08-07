@@ -164,7 +164,7 @@ end
 
 function plot_betas(tmp,ToPlot,fontsize)
 
-Alpha = 0.05/5;
+Alpha = 0.05/numel(ToPlot.ROIs_name);
 
 Xpos = [1 3 6:2:14];
 Xpos = Xpos(1:numel(ToPlot.ROIs_name));
