@@ -246,7 +246,7 @@ for iToPlot = 1:2%:numel(ToPlot)
                     
                     set(gca,'tickdir', 'out', 'xtick', 1:6,'xticklabel', CondNames([2 1 4 3 6 5]), ...
                         'ytick', 1:6,'yticklabel', CondNames([5 6 3 4 1 2]), ...
-                        'ticklength', [0.01 0], 'fontsize', 16, 'xaxislocation', 'top')
+                        'ticklength', [0.01 0], 'fontsize', 22, 'xaxislocation', 'top')
                     
                     %                     t = title(Title);
                     %                     set(t, 'fontsize', 16);

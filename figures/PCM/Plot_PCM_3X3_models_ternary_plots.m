@@ -131,7 +131,7 @@ set(0,'defaultTextFontName','Arial')
 FigDim = [50, 50, 600, 600];
 
 
-for iToPlot = 2 %:numel(ToPlot)
+for iToPlot = 1 %:numel(ToPlot)
     
     for Target = 1
         
@@ -234,11 +234,11 @@ for iToPlot = 2 %:numel(ToPlot)
                 
                 set(hter(:), 'MarkerSize', 20, 'linewidth', 3)
                 
-                p=mtit([ROI(iROI).name ' - Ex probability - ' ToPlot{iToPlot} ' - ' Comp_suffix{iComp}],...
-                    'fontsize',14,...
-                    'xoff',0,'yoff',.025);
+%                 p=mtit([ROI(iROI).name ' - Ex probability - ' ToPlot{iToPlot} ' - ' Comp_suffix{iComp}],...
+%                     'fontsize',14,...
+%                     'xoff',0,'yoff',.025);
                 
-                print(gcf, fullfile(PCM_dir, 'Cdt', '3X3_models', [opt.FigName  '.tif'] ), '-dtiff')
+                print(gcf, fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot}, 'Ternary', [opt.FigName  '.tif'] ), '-dtiff')
   
             end
         end

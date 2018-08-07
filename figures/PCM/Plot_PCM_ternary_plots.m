@@ -85,7 +85,7 @@ set(0,'defaultTextFontName','Arial')
 FigDim = [50, 50, 600, 600];
 
 
-for iToPlot = 1 %:numel(ToPlot)
+for iToPlot = 1:2 %:numel(ToPlot)
     
     for Target = 1
         
@@ -170,7 +170,7 @@ for iToPlot = 1 %:numel(ToPlot)
                 'infer', 'RFX', 'Nsamp', 1e4, 'prior', 'F-unity', 'alpha0', []); %#ok<*SAGROW>
             Families.names{1}='Scaled';
             Families.names{2}='Scaled+Idpdt and Idpdt';
-            for iComp = 1:numel(M_all)
+            for iComp = 1:3 %numel(M_all)
                 family = Families;
                 loglike = Likelihood{iROI,ihs}(:,2:end-1,iComp);
                 family = spm_compare_families(loglike,family);
@@ -179,7 +179,7 @@ for iToPlot = 1 %:numel(ToPlot)
             
             
             %% Plot
-            for iSubplot = 1:3
+            for iSubplot = 1%:3
                 
                 switch iSubplot
                     case 1
@@ -268,16 +268,12 @@ for iToPlot = 1 %:numel(ToPlot)
                 %
                 %                 set(hter(:), 'MarkerSize', 20, 'linewidth', 3)
                 %
-                %                 p=mtit([ROI(iROI).name ' - Ex probability - ' ToPlot{iToPlot} suffix],...
-                %                     'fontsize',14,...
-                %                     'xoff',0,'yoff',.025);
+                %                 %                                 p=mtit([ROI(iROI).name ' - Ex probability - ' ToPlot{iToPlot} suffix],...
+                %                 %                                     'fontsize',14,...
+                %                 %                                     'xoff',0,'yoff',.025);
                 %
-                % %                                 p=mtit(' ',...
-                % %                                     'fontsize',14,...
-                % %                                     'xoff',0,'yoff',.025);
-                %
-                %                 print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '_ternary_plot.tif'] ), '-dtiff')
-                %                 print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName suffix '_ternary_plot.svg'] ), '-dsvg')
+                %                 print(gcf, fullfile(PCM_dir, 'Cdt', '2x2', ToPlot{iToPlot}, 'Ternary', [opt.FigName suffix '_ternary_plot.tif'] ), '-dtiff')
+                %                 print(gcf, fullfile(PCM_dir, 'Cdt', '2x2', ToPlot{iToPlot}, 'Ternary', [opt.FigName suffix '_ternary_plot.svg'] ), '-dsvg')
                 
                 
                 
@@ -326,7 +322,7 @@ for iToPlot = 1 %:numel(ToPlot)
             plot([.5 5.5], [3.5 3.5], 'k', 'linewidth', 2)
             
             title('Contra VS Ipsi')
-            set(gca,'fontsize', 12, ...
+            set(gca,'fontsize', 22, ...
                 'ytick', 1:3,...
                 'yticklabel', flipud(['A_i VS A_c';'V_i VS V_c';'T_i VS T_c']),...
                 'xtick', 1:NbROI,...
@@ -335,9 +331,9 @@ for iToPlot = 1 %:numel(ToPlot)
             
             axis([.5 5.5 .5 3.5])
             
-            p=mtit(['Exc probability Idpt + Scaled & Idpdt - ' ToPlot{iToPlot}],...
-                'fontsize',14,...
-                'xoff',0,'yoff',.025);
+            %             p=mtit(['Exc probability Idpt + Scaled & Idpdt - ' ToPlot{iToPlot}],...
+            %                 'fontsize',14,...
+            %                 'xoff',0,'yoff',.025);
             
             print(gcf, fullfile(PCM_dir, 'Cdt', '2x2', ToPlot{iToPlot}, [opt.FigName  '.tif'] ), '-dtiff')
             pause(2)
@@ -345,7 +341,7 @@ for iToPlot = 1 %:numel(ToPlot)
             ColorMap = brain_colour_maps('hot_increasing');
             colormap(ColorMap)
             print(gcf, fullfile(PCM_dir, 'Cdt', '2x2', ToPlot{iToPlot}, [opt.FigName  '_hot.tif'] ), '-dtiff')
-
+            
         end
         
     end
