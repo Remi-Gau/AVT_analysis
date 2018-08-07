@@ -5,7 +5,7 @@
 
 ## Dependencies for the fMRI and psychophysics experiment:
 - Presentation
-- HRTF
+- HRTF (MIT and HPC...)
 - piezzo stimulator
 - palamedes to analyze
 - nansuite
