@@ -301,6 +301,7 @@ for iToPlot = 1:2 %:numel(ToPlot)
             
             figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
             
+            subplot(2,1,1)
             hold on
             
             colormap('gray')

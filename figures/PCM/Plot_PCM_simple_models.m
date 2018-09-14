@@ -123,7 +123,7 @@ for iToPlot = 2 %numel(ToPlot)
             end
         end
         
-        for iROI = 1:5%numel(ROI)
+        for iROI = 1:4%numel(ROI)
             
             for ihs=1:NbHS
                 
