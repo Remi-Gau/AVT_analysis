@@ -1,8 +1,8 @@
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..','..');
-addpath(genpath(fullfile(StartDir, 'code','subfun')))
-Get_dependencies('/home/rxg243/Dropbox')
+StartDir = fullfile(pwd, '..','..', '..');
+addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
+Get_dependencies('D:\Dropbox/')
 
 cd(StartDir)
 SubLs = dir('sub*');
@@ -60,7 +60,7 @@ for iSub = 1:NbSub
             num2str(NbLayers) '_surf.mat']);
         
         InfSurfFile=spm_select('FPList', fullfile(Sub_dir, 'anat', 'cbs'), ...
-            ['^' SubLs(iSub).name '.*' HsSufix 'cr_gm_avg_inf.vtk$']);
+            ['^' SubLs(iSub).name '.*' HsSufix 'cr_gm_avg_inf_qT1.vtk$']);
         [inf_vertex,inf_faces,~] = read_vtk(InfSurfFile, 0, 1);
         
         NbVertices(hs)=size(inf_vertex,2);
@@ -97,7 +97,7 @@ for iSub = 1:NbSub
     %%
     fprintf(' Averaging for ROI:\n')
     
-    for iROI = 1:numel(ROI)
+    for iROI = 5:7%numel(ROI)
         
         clear Data_ROI
         
@@ -122,7 +122,7 @@ for iSub = 1:NbSub
         Cdt_ROI_rhs = [2 4 6];
         
         Data_ROI.Ispi.WholeROI.MEAN = nan(Nb_sess, size(Cdt_ROI_lhs,1),2);
-        Data_ROI.Ispi.WholeROI.MEDIAN = nan(Nb_sess, size(Cdt_ROI_lhs,2));
+        Data_ROI.Ispi.WholeROI.MEDIAN = nan(Nb_sess, size(Cdt_ROI_lhs,1),2);
         
         Data_ROI.Ispi.LayerMean = nan(NbLayers, Nb_sess, size(Cdt_ROI_lhs,1),2);
         Data_ROI.Ispi.LayerMedian = nan(NbLayers, Nb_sess, size(Cdt_ROI_lhs,1),2);

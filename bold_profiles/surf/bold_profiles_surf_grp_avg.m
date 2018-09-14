@@ -1,12 +1,14 @@
 function bold_profiles_surf_grp_avg
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..','..');
-cd (StartDir)
+StartDir = fullfile(pwd, '..','..', '..');
+addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
+Get_dependencies('D:\Dropbox/')
 
 ResultsDir = fullfile(StartDir, 'results', 'profiles', 'surf');
 [~,~,~] = mkdir(ResultsDir);
 
+cd(StartDir)
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
@@ -26,12 +28,10 @@ CondNames = {...
 
 ROIs= {...
     'A1',...
+    'PT'
     'V1',...
     'V2',...
-    'V3',...
-    'V4',...
-    'V5',...
-    'PT'};
+    };
 
 DesMat = (1:NbLayers)-mean(1:NbLayers);
 DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
@@ -39,7 +39,7 @@ DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
 DesMat = spm_orth(DesMat);
 
 
-for iROI = 1:length(ROIs)
+for iROI = 1:4 %length(ROIs)
     AllSubjects_Data(iROI) = struct(...
         'name', ROIs{iROI}); %#ok<*AGROW>
 end
@@ -54,7 +54,7 @@ for iSub = 1:NbSub
     SubDir = fullfile(StartDir, SubLs(iSub).name);
     SaveDir = fullfile(SubDir, 'results', 'profiles', 'surf');
     
-    for iROI=1:numel(ROIs)
+    for iROI=1:4 %numel(ROIs)
         
         File2Load = fullfile(SaveDir, strcat('Data_Surf_', AllSubjects_Data(iROI).name, '_l-', ...
             num2str(NbLayers), '.mat'));
@@ -231,7 +231,7 @@ for iROI=1:length(AllSubjects_Data)
                 
                 if ~all(isnan(Blocks(:))) || ~isempty(Blocks)
                     
-                    for iCond = 1:size(Blocks,3);
+                    for iCond = 1:size(Blocks,3)
                         
                         Y = flipud(Blocks(:,:,iCond));
                         [B] = ProfileGLM(DesMat, Y);
@@ -285,26 +285,7 @@ for iROI=1:length(AllSubjects_Data)
                     AllSubjects_Data(iROI).ContSensModContra.Beta.STD(:,:,ihs)=nanstd(tmp, 3);
                     AllSubjects_Data(iROI).ContSensModContra.Beta.SEM(:,:,ihs)=nansem(tmp, 3);
             end
-            
-            % T-Test
-            for iCond = 1:size(tmp,2)
-                for BetaInd=1:size(tmp,1)
-                    [~,P] = ttest(tmp(BetaInd,iCond,:));
-                    switch i
-                        case 1
-                            AllSubjects_Data(iROI).Ispi.Beta.P(BetaInd,iCond,ihs)=P;
-                        case 2
-                            AllSubjects_Data(iROI).Contra.Beta.P(BetaInd,iCond,ihs)=P;
-                        case 3
-                            AllSubjects_Data(iROI).Contra_VS_Ipsi.Beta.P(BetaInd,iCond,ihs)=P;
-                        case 4
-                            AllSubjects_Data(iROI).ContSensModIpsi.Beta.P(BetaInd,iCond,ihs)=P;
-                        case 5
-                            AllSubjects_Data(iROI).ContSensModContra.Beta.P(BetaInd,iCond,ihs)=P;
-                    end
-                end
-            end
-            
+
             clear tmp P
         end
     end

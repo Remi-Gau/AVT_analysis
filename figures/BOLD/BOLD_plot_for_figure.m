@@ -1,23 +1,36 @@
 clc; clear;
 
 StartDir = fullfile(pwd, '..','..', '..');
+addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
+Get_dependencies('D:\Dropbox/')
 cd (StartDir)
-
-addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 
 ResultsDir = fullfile(StartDir, 'results', 'profiles');
 FigureFolder = fullfile(StartDir, 'figures', 'profiles');
 [~,~,~] = mkdir(FigureFolder);
 
-for NbLayers=6
-    for WithQuad= 1
-        for WithPerm = 0
+for NbLayers = 6
+    for WithQuad = 1
+        for WithPerm = 1
             
             if WithQuad
                 load(fullfile(ResultsDir, strcat('ResultsVolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
             else
                 load(fullfile(ResultsDir, strcat('ResultsVolNoQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
             end
+            
+            if  WithPerm
+                sets = {};
+                for iSub=1:10
+                    sets{iSub} = [-1 1]; %#ok<*AGROW>
+                end
+                [a, b, c, d, e, f, g, h, i, j] = ndgrid(sets{:}); clear sets
+                ToPermute = [a(:), b(:), c(:), d(:), e(:), f(:), g(:), h(:), i(:), j(:)];
+            else
+                ToPermute = [];
+            end
+        
+            ToPlot.ToPermute = ToPermute;
             
             
             %% Plots
