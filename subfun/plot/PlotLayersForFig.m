@@ -83,8 +83,8 @@ else
     suffix = '_perm';
 end
 
-WithQuad = DATA.WithQuad;
-Scatter = linspace(0,.4,NbSubjects);
+% WithQuad = DATA.WithQuad;
+% Scatter = linspace(0,.4,NbSubjects);
 
 if DATA.PlotSub
     MAX = max(Subjects(:));
@@ -152,14 +152,13 @@ for iCdt = 1:NbCdts
     hold on; grid on;
     
     
-    
     shadedErrorBar(1:NbLayers, Mean(:,SubPlotOrder(iCdt)),ErrorBar(:,SubPlotOrder(iCdt)), ...
         {'Marker', Marker, 'MarkerSize', MarkerSize, 'LineStyle', LineStyle, 'LineWidth', 3, 'Color', 'k'}, Transparent)
     for SubjInd = 1:NbSubjects
-        plot(1:NbLayers, Subjects(:,SubPlotOrder(iCdt),SubjInd), '-', ...
-            'LineWidth', 1, 'Color', COLOR_Subject(SubjInd,:));
         %         plot(1:NbLayers, Subjects(:,SubPlotOrder(iCdt),SubjInd), '-', ...
-        %             'LineWidth', 1, 'Color', [.7 .7 .7]);
+        %             'LineWidth', 1, 'Color', COLOR_Subject(SubjInd,:));
+        plot(1:NbLayers, Subjects(:,SubPlotOrder(iCdt),SubjInd), '-', ...
+            'LineWidth', 1, 'Color', [.7 .7 .7]);
     end
     shadedErrorBar(1:NbLayers, Mean(:,SubPlotOrder(iCdt)),ErrorBar(:,SubPlotOrder(iCdt)), ...
         {'Marker', Marker, 'MarkerSize', MarkerSize, 'LineStyle', LineStyle, 'LineWidth', 3, 'Color', 'k'}, Transparent)
@@ -167,7 +166,7 @@ for iCdt = 1:NbCdts
     if DATA.MVPA
         plot([1 NbLayers], [0.5 0.5], '--k', 'LineWidth', 1.5)
     else
-        plot([1 NbLayers], [0 0], '-k', 'LineWidth', 1.5)
+        plot([1 NbLayers], [0 0], '--k', 'LineWidth', 1.5)
     end
     
     
@@ -181,125 +180,128 @@ for iCdt = 1:NbCdts
     t=title(Legend{SubPlotOrder(iCdt)}{2});
     set(t,'fontsize',Fontsize);
     
+    axis tight
     tmp = axis;
     axis([0.5 NbLayers+.5 tmp(3) tmp(4)])
     %     axis([0.5 NbLayers+.5 MIN MAX])
     
-    
-    %% Inset with betas
-    tmp = squeeze(Beta(:,SubPlotOrder(iCdt),:));
-    
-    if ~DATA.MVPA
-        tmp(2,:) = tmp(2,:)*-1;
-    end
-    
-    if ~isempty(ToPermute)
-        for iPerm = 1:size(ToPermute,1)
-            tmp2 = ToPermute(iPerm,:);
-            Perms(:,iPerm) = mean(tmp.*repmat(tmp2,size(tmp,1),1),2); %#ok<*SAGROW>
-        end
-    end
-    
-    BetaMax = max(max(abs(Beta),[],3),[],2);
-    
-    for i=1:size(tmp,1)
+    if DATA.PlotBeta
         
-        Lim = round(BetaMax(i)+.1*BetaMax(i),2);
+        %% Inset with betas
+        tmp = squeeze(Beta(:,SubPlotOrder(iCdt),:));
         
-        switch NbCdts
-            case 6
-                XY = XYs(iCdt,:);
-                axes('Position',[XY(1)+0.13*(i-1) XY(2) .075 .05])
-            case 3
-                XY = XYs(iCdt,:);
-                axes('Position',[XY(1)+0.09*(i-1) XY(2) .05 .2])
+        if ~DATA.MVPA
+            tmp(2,:) = tmp(2,:)*-1;
         end
         
+        if ~isempty(ToPermute)
+            for iPerm = 1:size(ToPermute,1)
+                tmp2 = ToPermute(iPerm,:);
+                Perms(:,iPerm) = mean(tmp.*repmat(tmp2,size(tmp,1),1),2); %#ok<*SAGROW>
+            end
+        end
         
-        box off; hold on;
+        BetaMax = max(max(abs(Beta),[],3),[],2);
         
-        
-        if isfield(DATA, 'OneSideTTest')
+        for i=1:size(tmp,1)
             
-            if ~isempty(ToPermute)
+            Lim = round(BetaMax(i)+.1*BetaMax(i),2);
+            
+            switch NbCdts
+                case 6
+                    XY = XYs(iCdt,:);
+                    axes('Position',[XY(1)+0.13*(i-1) XY(2) .075 .05])
+                case 3
+                    XY = XYs(iCdt,:);
+                    axes('Position',[XY(1)+0.09*(i-1) XY(2) .05 .2])
+            end
+            
+            
+            box off; hold on;
+            
+            
+            if isfield(DATA, 'OneSideTTest')
                 
-                if strcmp(DATA.OneSideTTest{i},'left')
-                    P(i) = sum(Perms(i,:)<mean(tmp(i,:)))/numel(Perms(i,:));
-                elseif strcmp(DATA.OneSideTTest{i},'right')
-                    P(i) = sum(Perms(i,:)>mean(tmp(i,:)))/numel(Perms(i,:));
-                elseif strcmp(DATA.OneSideTTest{i},'both')
-                    P(i) = sum( abs((Perms(i,:)-mean(Perms(i,:)))) > abs((mean(tmp(i,:))-mean(Perms(i,:)))) ) / numel(Perms(i,:)) ;
+                if ~isempty(ToPermute)
+                    
+                    if strcmp(DATA.OneSideTTest{i},'left')
+                        P(i) = sum(Perms(i,:)<mean(tmp(i,:)))/numel(Perms(i,:));
+                    elseif strcmp(DATA.OneSideTTest{i},'right')
+                        P(i) = sum(Perms(i,:)>mean(tmp(i,:)))/numel(Perms(i,:));
+                    elseif strcmp(DATA.OneSideTTest{i},'both')
+                        P(i) = sum( abs((Perms(i,:)-mean(Perms(i,:)))) > abs((mean(tmp(i,:))-mean(Perms(i,:)))) ) / numel(Perms(i,:)) ;
+                    end
+                    
+                else
+                    
+                    [~,P(i)] = ttest(tmp(i,:), 0, 'alpha', 0.05, 'tail', DATA.OneSideTTest{i});
+                    
                 end
                 
             else
                 
-                [~,P(i)] = ttest(tmp(i,:), 0, 'alpha', 0.05, 'tail', DATA.OneSideTTest{i});
+                if ~isempty(ToPermute)
+                    P(i) = sum( abs((Perms(i,:)-mean(Perms(i,:)))) > abs((mean(tmp(i,:))-mean(Perms(i,:)))) ) / numel(Perms(i,:)) ;
+                else
+                    [~,P(i)] = ttest(tmp(i,:), 0, 'alpha', 0.05);
+                end
                 
             end
             
-        else
+            distributionPlot({tmp(i,:)}, 'xValues', 1.3, 'color', [0.8 0.8 0.8], ...
+                'distWidth', 0.4, 'showMM', 0, ...
+                'globalNorm', 2)
             
-            if ~isempty(ToPermute)
-                P(i) = sum( abs((Perms(i,:)-mean(Perms(i,:)))) > abs((mean(tmp(i,:))-mean(Perms(i,:)))) ) / numel(Perms(i,:)) ;
+            h = plotSpread(tmp(i,:), 'distributionIdx', ones(size(tmp(i,:))), ...
+                'distributionMarkers',{'o'},'distributionColors',{'w'}, ...
+                'xValues', 1.3, 'binWidth', .05, 'spreadWidth', 1.5);
+            set(h{1}, 'MarkerSize', 5, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1)
+            
+            plot([0 1.55], [0 0], ':k', 'LineWidth', .5)
+            
+            errorbar(1,nanmean(tmp(i,:),2),nansem(tmp(i,:),2), '.k');
+            
+            Sig = []; %#ok<NASGU>
+            if P(i)<0.001
+                %             Sig = sprintf('ES=%.2f \np<0.001 ',...
+                %                 abs(nanmean(tmp(i,:))/nanstd(tmp(i,:))));
+                Sig = sprintf('p<0.001 ');
             else
-                [~,P(i)] = ttest(tmp(i,:), 0, 'alpha', 0.05);
+                %             Sig = sprintf('ES=%.2f \np=%.3f ',...
+                %                 abs(nanmean(tmp(i,:))/nanstd(tmp(i,:))), P(i));
+                Sig = sprintf('p=%.3f ', P(i));
             end
             
+            t = text(1.15,Lim*-1+Lim*.1,sprintf(Sig));
+            set(t,'fontsize',Fontsize-4.5);
+            
+            if P(i)<0.05
+                set(t,'color','r');
+            end
+            
+            clear Sig
+            
+            switch i
+                case 1
+                    xTickLabel = 'C';
+                case 2
+                    xTickLabel = 'L';
+                case 3
+                    xTickLabel = 'Q';
+            end
+            
+            
+            set(gca,'tickdir', 'in', 'xtick', 1.3 , 'xticklabel', xTickLabel, ...
+                'ytick', linspace(Lim*-1, Lim, 5) , 'yticklabel', linspace(Lim*-1, Lim, 5), ...
+                'ticklength', [0.03 0.03], 'fontsize', Fontsize-4)
+            if i==1
+                t=ylabel('Param. est. [a u]');
+                set(t,'fontsize',Fontsize-3);
+            end
+            
+            axis([0.9 1.8 Lim*-1 Lim])
+            
         end
-        
-        distributionPlot({tmp(i,:)}, 'xValues', 1.3, 'color', [0.8 0.8 0.8], ...
-            'distWidth', 0.4, 'showMM', 0, ...
-            'globalNorm', 2)
-        
-        h = plotSpread(tmp(i,:), 'distributionIdx', ones(size(tmp(i,:))), ...
-            'distributionMarkers',{'o'},'distributionColors',{'w'}, ...
-            'xValues', 1.3, 'binWidth', .05, 'spreadWidth', 1.5);
-        set(h{1}, 'MarkerSize', 5, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1)
-        
-        plot([0 1.55], [0 0], ':k', 'LineWidth', .5)
-        
-        errorbar(1,nanmean(tmp(i,:),2),nansem(tmp(i,:),2), '.k');
-        
-        Sig = []; %#ok<NASGU>
-        if P(i)<0.001
-            %             Sig = sprintf('ES=%.2f \np<0.001 ',...
-            %                 abs(nanmean(tmp(i,:))/nanstd(tmp(i,:))));
-            Sig = sprintf('p<0.001 ');
-        else
-            %             Sig = sprintf('ES=%.2f \np=%.3f ',...
-            %                 abs(nanmean(tmp(i,:))/nanstd(tmp(i,:))), P(i));
-            Sig = sprintf('p=%.3f ', P(i));
-        end
-        
-        t = text(1.15,Lim*-1+Lim*.1,sprintf(Sig));
-        set(t,'fontsize',Fontsize-4.5);
-        
-        if P(i)<0.05
-            set(t,'color','r');
-        end
-        
-        clear Sig
-        
-        switch i
-            case 1
-                xTickLabel = 'C';
-            case 2
-                xTickLabel = 'L';
-            case 3
-                xTickLabel = 'Q';
-        end
-        
-        
-        set(gca,'tickdir', 'in', 'xtick', 1.3 , 'xticklabel', xTickLabel, ...
-            'ytick', linspace(Lim*-1, Lim, 5) , 'yticklabel', linspace(Lim*-1, Lim, 5), ...
-            'ticklength', [0.03 0.03], 'fontsize', Fontsize-4)
-        if i==1
-            t=ylabel('Param. est. [a u]');
-            set(t,'fontsize',Fontsize-3);
-        end
-        
-        axis([0.9 1.8 Lim*-1 Lim])
-        
     end
     
 end
