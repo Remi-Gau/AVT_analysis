@@ -35,6 +35,7 @@ Folds = {...
     2,[1 3];...
     3,1:2};
 
+% Why is the feature pooling not implmented ????
 Cdt_ROI_lhs = 1:6;
 Cdt_ROI_rhs = [2 1 4 3 6 5];
 
@@ -50,7 +51,7 @@ clear A
 
 ToPlot={'Constant','Linear','Quad'};
 
-for iSub = 4:NbSub
+for iSub = 1:NbSub
     
     fprintf('\n\n\n')
     

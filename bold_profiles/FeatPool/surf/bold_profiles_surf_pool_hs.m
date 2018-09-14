@@ -1,7 +1,8 @@
 clc; clear;
 
 StartDir = fullfile(pwd, '..','..','..','..');
-addpath(genpath(fullfile(StartDir, 'code','subfun')))
+addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
+Get_dependencies('D:\Dropbox/')
 
 cd(StartDir)
 SubLs = dir('sub*');
