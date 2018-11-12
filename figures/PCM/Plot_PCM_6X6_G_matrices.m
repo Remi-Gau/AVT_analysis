@@ -1,3 +1,5 @@
+% Plot the results of the 6x6 empirical G matrices
+
 clc; clear; close all
 
 StartDir = fullfile(pwd, '..', '..', '..');

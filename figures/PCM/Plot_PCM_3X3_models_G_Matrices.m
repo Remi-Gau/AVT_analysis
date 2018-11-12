@@ -1,10 +1,10 @@
+% Plot the results of the 3X3 empirical G matrices for both ipsi and contra in one matrix
 clc; clear; close all
 
 StartDir = fullfile(pwd, '..', '..', '..');
 addpath(genpath(fullfile(StartDir, 'code','subfun')))
 
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/')
+Get_dependencies('D:\Dropbox/', 'D:\github/')
 
 surf = 1; % run of volumne whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened

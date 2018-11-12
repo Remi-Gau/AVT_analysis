@@ -1,3 +1,7 @@
+% Plot the results of the 2X2 PCM
+% First plots all the G matrices in one figure: empirical, free model and then all the fitted of all the models
+% Then gives the bar plot of the likelihoods of the different models
+
 clc; clear; close all
 
 StartDir = fullfile(pwd, '..', '..', '..');

@@ -1,3 +1,10 @@
+% for 2X2 models
+% computes likelihood of each model
+% computes exceedance probabilities by performing bayesian model selection using spm_BMS
+% computes exceedance probabilities by performing 2 family comparison with spm_compare_families
+%           a) Families.names{1}='Scaled';
+%           b) Families.names{2}='Scaled+Idpdt and Idpdt';
+
 clc; clear; close all
 
 StartDir = fullfile(pwd, '..', '..', '..');
@@ -176,25 +183,7 @@ for iToPlot = 1:2 %:numel(ToPlot)
                 family = spm_compare_families(loglike,family);
                 XP2(iComp,:,iROI) = family.xp;
             end
-            
-            
-            %% Plot
-            for iSubplot = 1%:3
-                
-                switch iSubplot
-                    case 1
-                        CdtToPlot = 1:3;
-                        suffix = ' - CvsI';
-                    case 2
-                        CdtToPlot = 4:6;
-                        suffix = ' - I';
-                    case 3
-                        CdtToPlot = 7:9;
-                        suffix = ' - C';
-                end
-                
-            end
-               
+   
         end
         
         %% Matrices plot for exceedance probability of I + (S & I)

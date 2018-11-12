@@ -1,3 +1,14 @@
+% for 3X3 models
+% - computes likelihood of each model
+% - computes exceedance probabilities by performing 2 family comparison with spm_compare_families
+%           a) Families.names{1}='Scaled';
+%           b) Families.names{2}='Scaled+Idpdt and Idpdt';
+% or 
+%           a) Families.names{1}='Scaled';
+%           b) Families.names{2}='Scaled+Idpdt'
+%           c) Families.names{3}='Idpdt'
+% - plot the exceedance probabilities for both cases as a matrix
+
 clc; clear; close all
 
 StartDir = fullfile(pwd, '..', '..', '..');
@@ -309,59 +320,19 @@ for iToPlot = 1:2 %:numel(ToPlot)
             
             
             
-%             p=mtit(['Exc probability Idpt + Scaled & Idpdt - ' ToPlot{iToPlot}],...
-%                 'fontsize',14,...
-%                 'xoff',0,'yoff',.025);
+            %             p=mtit(['Exc probability Idpt + Scaled & Idpdt - ' ToPlot{iToPlot}],...
+            %                 'fontsize',14,...
+            %                 'xoff',0,'yoff',.025);
             
-            print(gcf, fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot}, [opt.FigName  '.tif'] ), '-dtiff')
+%             print(gcf, fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot}, [opt.FigName  '.tif'] ), '-dtiff')
             pause(2)
             
             ColorMap = brain_colour_maps('hot_increasing');
             colormap(ColorMap)
-            print(gcf, fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot}, [opt.FigName  '_hot.tif'] ), '-dtiff')
+%             print(gcf, fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot}, [opt.FigName  '_hot.tif'] ), '-dtiff')
             
         end
-        
-        %% Scatter plot of the likelihoods
-        %         close all
-        %
-        %         opt.FigName = sprintf('Likelihoods-3X3Models-%s-PCM_{grp}-%s-%s-%s', ...
-        %             hs_suffix{ihs}, ...
-        %             Stim_suffix, Beta_suffix, ToPlot{iToPlot});
-        %
-        %         figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
-        %
-        %         iSubplot=1;
-        %         for iROI = 1:NbROI
-        %             for iComp = 1:numel(M_all)
-        %                 subplot(5,2,iSubplot)
-        %
-        %                 hold on
-        %                 Ceiling = [mean(Likelihood_norm{iROI,ihs}(:,end,iComp)) mean(Likelihood{iROI,ihs}(:,end,iComp))];
-        %                 Likelihood2Plot = Likelihood_norm{iROI,ihs}(:,2:13,iComp);
-        %
-        %                 distributionPlot(mat2cell(Likelihood2Plot,10,ones(1,12)), 'xValues', 1:12, 'color', [0.8 0.8 0.8], ...
-        %                     'distWidth', 0.4, 'showMM', 0, ...
-        %                     'globalNorm', 2)
-        %
-        %                 h = plotSpread(Likelihood2Plot, ...
-        %                     'distributionMarkers',{'.'},'distributionColors',{'w'}, ...
-        %                     'xValues', 1:12, 'binWidth', .5, 'spreadWidth', 0.5);
-        %
-        %                 set(h{1}, 'MarkerSize', 5, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w', 'LineWidth', 1)
-        %
-        %                 errorbar(0.9:11.9,mean(Likelihood2Plot),nansem(Likelihood2Plot), '.k');
-        %
-        %                 plot([.8 12.2], [Ceiling(2),Ceiling(2)], '-k','LineWidth', 1)
-        %                 plot([.8 12.2], [Ceiling(1),Ceiling(1)], '--k','LineWidth', 1)
-        %
-        %                 axis([.8 12.2 0 max(Likelihood2Plot(:))])
-        % %                 plot([0.8 12.2], [0 0], '-k', 'LineWidth', .5)
-        %
-        %                 iSubplot = iSubplot + 1;
-        %             end
-        %         end
-        %
+               
     end
 end
 

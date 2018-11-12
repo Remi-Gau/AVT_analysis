@@ -1,3 +1,10 @@
+% - Plot the results of the 2X2 empirical G matrices for A/V/T_{ipsi VS contra} in one matrix
+% - Plot G matrices one per figure (empirical, free model, then fitted from each model)
+% - Recombine variances of the same condition (e.g V_ipsi) coming from the
+% free models of different 2X2 comparisons that contain it ...
+% (V_ipsi VS A_ipsi, V_ipsi VS T_ipsi, V_ipsi VS V_contra) and compared to
+% the variance in the in the 6X6 free models
+
 clc; clear; close all
 
 StartDir = fullfile(pwd, '..', '..', '..');
@@ -250,7 +257,7 @@ for iToPlot = 1:2%:numel(ToPlot)
                     %                     t = title(Title);
                     %                     set(t, 'fontsize', 16);
                     
-                    %                     print(gcf, fullfile(PCM_dir, 'Cdt', '2X2', ToPlot{iToPlot}, [opt.FigName '.tif'] ), '-dtiff')
+                    print(gcf, fullfile(PCM_dir, 'Cdt', '2X2', ToPlot{iToPlot}, [opt.FigName '.tif'] ), '-dtiff')
                     
                 end
                 
@@ -346,7 +353,7 @@ for iToPlot = 1:2%:numel(ToPlot)
                         t = title(Title);
                         set(t, 'fontsize', 16);
                         
-                        %                                         print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
+                        print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
                         
                     end
                     
