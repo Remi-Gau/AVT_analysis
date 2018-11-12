@@ -1,12 +1,13 @@
 % Plot the results of the 3X3 PCM
+% First plots the G matrices: empirical, free model and then all the fitted of all the models
+% Then gives the bar plot of the likelihoods of the different models
 
 clc; clear; close all
 
 StartDir = fullfile(pwd, '..', '..', '..');
 addpath(genpath(fullfile(StartDir, 'code','subfun')))
 
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/')
+Get_dependencies('D:\Dropbox/', 'D:\github/')
 
 % These are the 12 models from the PCM
 % M{1}.name = 'all_scaled';
@@ -262,7 +263,7 @@ for iToPlot = 2%:numel(ToPlot)
                     
                     mtit(opt.FigName, 'fontsize', 12, 'xoff',0,'yoff',.035)
 
-                    print(gcf, fullfile(PCM_dir, 'Cdt', '3X3_models', [opt.FigName '.tif'] ), '-dtiff')
+%                     print(gcf, fullfile(PCM_dir, 'Cdt', '3X3_models', [opt.FigName '.tif'] ), '-dtiff')
           
                 end
 

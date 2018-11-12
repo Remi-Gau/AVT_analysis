@@ -3,8 +3,7 @@ clc; clear; close all
 StartDir = fullfile(pwd, '..', '..', '..');
 addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
 
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/')
+Get_dependencies('D:\Dropbox/', 'D:\github/')
 
 surf = 1; % run of volumne whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
@@ -251,218 +250,218 @@ for iToPlot = 1:2%:numel(ToPlot)
                     %                     t = title(Title);
                     %                     set(t, 'fontsize', 16);
                     
-                    print(gcf, fullfile(PCM_dir, 'Cdt', '2X2', ToPlot{iToPlot}, [opt.FigName '.tif'] ), '-dtiff')
+                    %                     print(gcf, fullfile(PCM_dir, 'Cdt', '2X2', ToPlot{iToPlot}, [opt.FigName '.tif'] ), '-dtiff')
                     
                 end
                 
                 
                 
                 %% Plot G matrices
-                %                 for iComp = 1:numel(M_all)
-                %
-                %                     switch iComp
-                %                         case 1
-                %                             CdtToSelect = 1:2;
-                %                         case 2
-                %                             CdtToSelect = 3:4;
-                %                         case 3
-                %                             CdtToSelect = 5:6;
-                %                         case 4
-                %                             CdtToSelect = [1 3];
-                %                         case 5
-                %                             CdtToSelect = [1 5];
-                %                         case 6
-                %                             CdtToSelect = [3 5];
-                %                         case 7
-                %                             CdtToSelect = [2 4];
-                %                         case 8
-                %                             CdtToSelect = [2 6];
-                %                         case 9
-                %                             CdtToSelect = [4 6];
-                %                     end
-                %
-                %                     G_hat = G_hat_all{iComp,1};
-                %                     G_pred_cr = G_pred_cr_all{iComp,1};
-                %                     M = M_all{iComp,1};
-                %
-                %                     % plot pred G mat from each model
-                %                     for iModel=[1 5 2:4]
-                %
-                %                         Title = strrep(ROI(iROI).name, '_thresh','');
-                %
-                %                         switch iModel
-                %                             case 1
-                %                                 Title = [Title ' - G_{emp}'];
-                %                             case 5
-                %                                 Title = [Title ' - G_{pred}-free'];
-                %                             otherwise
-                %                                 Title = [Title ' - ' M{iModel}.name];
-                %                         end
-                %
-                %                         Title = [Title ' - ' CondNames{CdtToSelect(1)} ' VS ' CondNames{CdtToSelect(2)}];
-                %
-                %
-                %                         opt.FigName = sprintf('%s-%s-PCM_{grp}-%s-%s-%s', ...
-                %                             strrep(Title, ' ',''), ...
-                %                             hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
-                %
-                %                         figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', visible);
-                %
-                %
-                %                         if iModel==1
-                %                             Mat2Plot = H*mean(G_hat,3)*H';
-                %                         else
-                %                             Mat2Plot = H*mean(G_pred_cr{iModel},3)*H';
-                %                         end
-                %
-                %                         [ NewColorMap ] = Create_non_centered_diverging_colormap(Mat2Plot, ColorMap);
-                %
-                %                         colormap(NewColorMap)
-                %
-                %                         MIN = min(Mat2Plot(:));
-                %                         MAX = max(Mat2Plot(:));
-                %                         if MIN>0
-                %                             MIN=0;
-                %                         end
-                %                         if MAX<0
-                %                             MAX=0;
-                %                         end
-                %                         CLIM = [MIN MAX];
-                %
-                %                         imagesc(Mat2Plot, CLIM);
-                %
-                %                         %                         try
-                %                         %                             imagesc(Mat2Plot);
-                %                         %                         catch
-                %                         %                             warning('model %i has an imaginary G_pred_CV', iModel)
-                %                         %                             imagesc(H*mean(real(G_pred_cr{iModel}),3)*H');
-                %                         %                         end
-                %                         colorbar
-                %
-                %                         set(gca,'tickdir', 'out', 'xtick', 1:2,'xticklabel', [], ...
-                %                             'ytick', 1:2,'yticklabel', {CondNames{CdtToSelect}}, ...
-                %                             'ticklength', [0.01 0], 'fontsize', 16)
-                %
-                %
-                %                         t = title(Title);
-                %                         set(t, 'fontsize', 16);
-                %
-                %                         print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
-                %
-                %                     end
-                %
-                %                 end
+                for iComp = 1:numel(M_all)
+                    
+                    switch iComp
+                        case 1
+                            CdtToSelect = 1:2;
+                        case 2
+                            CdtToSelect = 3:4;
+                        case 3
+                            CdtToSelect = 5:6;
+                        case 4
+                            CdtToSelect = [1 3];
+                        case 5
+                            CdtToSelect = [1 5];
+                        case 6
+                            CdtToSelect = [3 5];
+                        case 7
+                            CdtToSelect = [2 4];
+                        case 8
+                            CdtToSelect = [2 6];
+                        case 9
+                            CdtToSelect = [4 6];
+                    end
+                    
+                    G_hat = G_hat_all{iComp,1};
+                    G_pred_cr = G_pred_cr_all{iComp,1};
+                    M = M_all{iComp,1};
+                    
+                    % plot pred G mat from each model
+                    for iModel=[1 5 2:4]
+                        
+                        Title = strrep(ROI(iROI).name, '_thresh','');
+                        
+                        switch iModel
+                            case 1
+                                Title = [Title ' - G_{emp}'];
+                            case 5
+                                Title = [Title ' - G_{pred}-free'];
+                            otherwise
+                                Title = [Title ' - ' M{iModel}.name];
+                        end
+                        
+                        Title = [Title ' - ' CondNames{CdtToSelect(1)} ' VS ' CondNames{CdtToSelect(2)}];
+                        
+                        
+                        opt.FigName = sprintf('%s-%s-PCM_{grp}-%s-%s-%s', ...
+                            strrep(Title, ' ',''), ...
+                            hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+                        
+                        figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', visible);
+                        
+                        
+                        if iModel==1
+                            Mat2Plot = H*mean(G_hat,3)*H';
+                        else
+                            Mat2Plot = H*mean(G_pred_cr{iModel},3)*H';
+                        end
+                        
+                        [ NewColorMap ] = Create_non_centered_diverging_colormap(Mat2Plot, ColorMap);
+                        
+                        colormap(NewColorMap)
+                        
+                        MIN = min(Mat2Plot(:));
+                        MAX = max(Mat2Plot(:));
+                        if MIN>0
+                            MIN=0;
+                        end
+                        if MAX<0
+                            MAX=0;
+                        end
+                        CLIM = [MIN MAX];
+                        
+                        imagesc(Mat2Plot, CLIM);
+                        
+                        %                         try
+                        %                             imagesc(Mat2Plot);
+                        %                         catch
+                        %                             warning('model %i has an imaginary G_pred_CV', iModel)
+                        %                             imagesc(H*mean(real(G_pred_cr{iModel}),3)*H');
+                        %                         end
+                        colorbar
+                        
+                        set(gca,'tickdir', 'out', 'xtick', 1:2,'xticklabel', [], ...
+                            'ytick', 1:2,'yticklabel', {CondNames{CdtToSelect}}, ...
+                            'ticklength', [0.01 0], 'fontsize', 16)
+                        
+                        
+                        t = title(Title);
+                        set(t, 'fontsize', 16);
+                        
+                        %                                         print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
+                        
+                    end
+                    
+                end
                 
                 
                 %% Recombine variances of the same condition coming from the free models of different comparison
-                %                 close all
-                %
-                %                 FigDim = [50, 50, 1400, 750];
-                %                 [ color_map ] = brain_colour_maps('hot_increasing');
-                %
-                %                 switch iROI
-                %                     case 1
-                %                         CLIM = [0 .02];
-                %                     case 2
-                %                         CLIM = [0 .035];
-                %                     case 3
-                %                         CLIM = [0 .006];
-                %                     case 4
-                %                         CLIM = [0 .009];
-                %                     case 5
-                %                         CLIM = [0 .01];
-                %                 end
-                %
-                %                 Comp_name{1} = 'Ai vs Ac';
-                %                 Comp_name{end+1} = 'Vi vs Vc';
-                %                 Comp_name{end+1} = 'Ti vs Tc';
-                %                 Comp_name{end+1} = 'Ai vs Vi';
-                %                 Comp_name{end+1} = 'Ai vs Ti';
-                %                 Comp_name{end+1} = 'Vi vs Ti';
-                %                 Comp_name{end+1} = 'Ac vs Vc';
-                %                 Comp_name{end+1} = 'Ac vs Tc';
-                %                 Comp_name{end+1} = 'Vc vs Tc';
-                %
-                %
-                %                 opt.FigName = sprintf('%s-PCM_{grp}-Variances-of-Free-Models', ...
-                %                     strrep(strrep(ROI(iROI).name, '_thresh',''), ' ',''));
-                %
-                %                 figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', visible);
-                %
-                %
-                %                 colormap(color_map);
-                %
-                %                 iSubplot = 1;
-                %
-                %                 for iCdt = 1:numel(CondNames)
-                %
-                %                     % For exah condition we identify in which comparison it
-                %                     % is involve and if it is the first or the second
-                %                     % condition
-                %                     switch iCdt
-                %                         case 1
-                %                             Comp2Sel = [1 4 5];
-                %                             Val2Sel = [1 1 1];
-                %                         case 2
-                %                             Comp2Sel = [1 7 8];
-                %                             Val2Sel = [2 1 1];
-                %                         case 3
-                %                             Comp2Sel = [2 4 6];
-                %                             Val2Sel = [1 2 1];
-                %                         case 4
-                %                             Comp2Sel = [2 7 9];
-                %                             Val2Sel = [2 2 1];
-                %                         case 5
-                %                             Comp2Sel = [3 5 6];
-                %                             Val2Sel = [1 2 2];
-                %                         case 6
-                %                             Comp2Sel = [3 8 9];
-                %                             Val2Sel = [2 2 2];
-                %                     end
-                %
-                %                     Mat2Plot = [];
-                %                     for iComp=1:numel(Comp2Sel)
-                %                         G_pred_cr = G_pred_cr_all{Comp2Sel(iComp),1};
-                %                         G_pred_free = G_pred_cr{5};% only take the cross validated G matrix of the Free model
-                %                         Mat2Plot(iComp,:) = G_pred_free(Val2Sel(iComp),Val2Sel(iComp),:);
-                %                     end
-                %
-                %                     Mat2Plot(end+1,:) = G_pred_cr_free(iCdt,iCdt,:);
-                %
-                %                     %                     Mat2Plot = [mean(Mat2Plot,2) Mat2Plot];
-                %                     MinMax(end+1,:) = [min(Mat2Plot(:)) max(Mat2Plot(:))];
-                %
-                %                     subplot(3,2,iSubplot)
-                %                     imagesc(Mat2Plot, CLIM)
-                %
-                %                     for i=1:size(Mat2Plot,1)
-                %                         for j=1:size(Mat2Plot,2)
-                %                             t=text(j-.4,i,sprintf('%.4f', Mat2Plot(i,j)));
-                %                             set(t, 'fontsize', 8, 'color', [0.5 0.5 0.5]);
-                %                         end
-                %                     end
-                %
-                %                     XTickLabel = cell2mat({SubLs(:).name}');
-                %                     XTickLabel = XTickLabel(:,end-1:end);
-                %                     XTickLabel = mat2cell(XTickLabel,ones(10,1),2);
-                %
-                %                     title(CondNames(iCdt))
-                %
-                %                     YTickLabel = Comp_name(Comp2Sel);
-                %                     YTickLabel{end+1} = '6X6';
-                %
-                %                     set(gca,'tickdir', 'out', 'xtick', 1:11,'xticklabel', XTickLabel, ...
-                %                         'ytick', 1:4,'yticklabel', YTickLabel, ...
-                %                         'ticklength', [0.01 0], 'fontsize', 12)
-                %
-                %                     iSubplot = iSubplot + 1;
-                %
-                %                 end
-                %
-                %                 mtit(opt.FigName, 'fontsize', 12, 'xoff',0,'yoff',.035)
-                %
-                %                 print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
-                %
+                close all
+                
+                FigDim = [50, 50, 1400, 750];
+                [ color_map ] = brain_colour_maps('hot_increasing');
+                
+                switch iROI
+                    case 1
+                        CLIM = [0 .02];
+                    case 2
+                        CLIM = [0 .035];
+                    case 3
+                        CLIM = [0 .006];
+                    case 4
+                        CLIM = [0 .009];
+                    case 5
+                        CLIM = [0 .01];
+                end
+                
+                Comp_name{1} = 'Ai vs Ac';
+                Comp_name{end+1} = 'Vi vs Vc';
+                Comp_name{end+1} = 'Ti vs Tc';
+                Comp_name{end+1} = 'Ai vs Vi';
+                Comp_name{end+1} = 'Ai vs Ti';
+                Comp_name{end+1} = 'Vi vs Ti';
+                Comp_name{end+1} = 'Ac vs Vc';
+                Comp_name{end+1} = 'Ac vs Tc';
+                Comp_name{end+1} = 'Vc vs Tc';
+                
+                
+                opt.FigName = sprintf('%s-PCM_{grp}-Variances-of-Free-Models', ...
+                    strrep(strrep(ROI(iROI).name, '_thresh',''), ' ',''));
+                
+                figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', visible);
+                
+                
+                colormap(color_map);
+                
+                iSubplot = 1;
+                
+                for iCdt = 1:numel(CondNames)
+                    
+                    % For each condition we identify in which comparison it
+                    % is involve and if it is the first or the second
+                    % condition
+                    switch iCdt
+                        case 1
+                            Comp2Sel = [1 4 5];
+                            Val2Sel = [1 1 1];
+                        case 2
+                            Comp2Sel = [1 7 8];
+                            Val2Sel = [2 1 1];
+                        case 3
+                            Comp2Sel = [2 4 6];
+                            Val2Sel = [1 2 1];
+                        case 4
+                            Comp2Sel = [2 7 9];
+                            Val2Sel = [2 2 1];
+                        case 5
+                            Comp2Sel = [3 5 6];
+                            Val2Sel = [1 2 2];
+                        case 6
+                            Comp2Sel = [3 8 9];
+                            Val2Sel = [2 2 2];
+                    end
+                    
+                    Mat2Plot = [];
+                    for iComp=1:numel(Comp2Sel)
+                        G_pred_cr = G_pred_cr_all{Comp2Sel(iComp),1};
+                        G_pred_free = G_pred_cr{5};% only take the cross validated G matrix of the Free model
+                        Mat2Plot(iComp,:) = G_pred_free(Val2Sel(iComp),Val2Sel(iComp),:);
+                    end
+                    
+                    Mat2Plot(end+1,:) = G_pred_cr_free(iCdt,iCdt,:);
+                    
+                    %                     Mat2Plot = [mean(Mat2Plot,2) Mat2Plot];
+                    MinMax(end+1,:) = [min(Mat2Plot(:)) max(Mat2Plot(:))];
+                    
+                    subplot(3,2,iSubplot)
+                    imagesc(Mat2Plot, CLIM)
+                    
+                    for i=1:size(Mat2Plot,1)
+                        for j=1:size(Mat2Plot,2)
+                            t=text(j-.4,i,sprintf('%.4f', Mat2Plot(i,j)));
+                            set(t, 'fontsize', 8, 'color', [0.5 0.5 0.5]);
+                        end
+                    end
+                    
+                    XTickLabel = cell2mat({SubLs(:).name}');
+                    XTickLabel = XTickLabel(:,end-1:end);
+                    XTickLabel = mat2cell(XTickLabel,ones(10,1),2);
+                    
+                    title(CondNames(iCdt))
+                    
+                    YTickLabel = Comp_name(Comp2Sel);
+                    YTickLabel{end+1} = '6X6';
+                    
+                    set(gca,'tickdir', 'out', 'xtick', 1:11,'xticklabel', XTickLabel, ...
+                        'ytick', 1:4,'yticklabel', YTickLabel, ...
+                        'ticklength', [0.01 0], 'fontsize', 12)
+                    
+                    iSubplot = iSubplot + 1;
+                    
+                end
+                
+                mtit(opt.FigName, 'fontsize', 12, 'xoff',0,'yoff',.035)
+                
+                print(gcf, fullfile(PCM_dir, 'Cdt', [opt.FigName '.tif'] ), '-dtiff')
+                
                 
             end
         end
