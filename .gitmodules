@@ -1,0 +1,3 @@
+[submodule "subfun/spmup"]
+	path = subfun/spmup
+	url = https://github.com/Remi-Gau/spmup

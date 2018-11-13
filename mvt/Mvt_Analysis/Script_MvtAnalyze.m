@@ -1,4 +1,3 @@
-%
 % min translation
 % max translation
 % min TR-to-TR translation
