@@ -4,9 +4,8 @@ clc; clear;
 StartDir = fullfile(pwd, '..','..','..');
 cd (StartDir)
 
-addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/')
+addpath(genpath(fullfile(StartDir, 'AVT-7T-code', 'subfun')))
+Get_dependencies('D:\Dropbox/', 'D:\github/')
 
 FigureFolder = fullfile(StartDir, 'figures');
 
@@ -35,9 +34,8 @@ ROIs = {
     'A1'
     'PT'
     'V1'
-    'V2'
-    'V3'};
-ROI_order_BOLD = [1 7 2:4];
+    'V2'};
+ROI_order_BOLD = [1 7 2:3];
 
 ROIs_to_get = 1:7;
 
@@ -47,6 +45,7 @@ TitSuf = {
     'Contra_&_Ipsi';...
     'Targets-Stim'};
 
+Test_side = [];
 
 opt.vol = 0;
 
@@ -55,7 +54,7 @@ if opt.vol
     BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles');
 end
 
-% load BOLD 
+% load BOLD
 Stim_prefix = 'Target';
 load(fullfile(BOLD_resultsDir, strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
 AllSubjects_Data_BOLD = AllSubjects_Data;
@@ -67,14 +66,14 @@ clear AllSubjects_Data
 
 close all
 
-for iAnalysis= 4 %1:numel(TitSuf)
+for iAnalysis= 1:numel(TitSuf)
     
     clear ToPlot ToPlot2
     ToPlot.TitSuf = TitSuf{iAnalysis};
     ToPlot.ROIs_name = ROIs;
     ToPlot.Visible= 'on';
     ToPlot.FigureFolder=FigureFolder;
-    ToPlot.OneSideTTest = {'both' 'both'};
+    ToPlot.OneSideTTest = Test_side;
     
     ToPlot.profile.MEAN=[];
     ToPlot.profile.SEM=[];
@@ -158,15 +157,15 @@ for iAnalysis= 4 %1:numel(TitSuf)
             ToPlot.MinMax{1,1} = [-0.3 8;-0.3 8];
             ToPlot.MinMax{2,1} = [-2 7;-2 7];
             ToPlot.MinMax{3,1} = [-0.5 2;-0.5 2];
-
+            
             ToPlot.MinMax{1,2}=[-1.5 3.5;-1.5 3.5];
             ToPlot.MinMax{2,2}=[-2 3.5;-2 3.5];
             ToPlot.MinMax{3,2}=[-1 1.5;-1 1.5];
-
+            
             
             ToPlot.Titles{1,1} = '[A - T]';
             ToPlot.Titles{2,1} = '[V - T]';
-
+            
             
             
             
@@ -186,6 +185,16 @@ for iAnalysis= 4 %1:numel(TitSuf)
                 0 0;...
                 0 0;...
                 0 0];
+            
+            ToPlot.OneSideTTest = ...
+                cat(3, ...
+                [3 3 2 2;
+                2 2 3 3;
+                3 3 2 2],...
+                2*ones(3,4),...
+                [3 3 2 2;
+                1 1 3 3;
+                3 3 2 2]);
             
             ToPlot.m=4;
             ToPlot.n=2;
@@ -213,10 +222,10 @@ for iAnalysis= 4 %1:numel(TitSuf)
                 repmat([-.1 9.5],2,1) , repmat([-1 4.5],2,1) , repmat([-.4 3],2,1);...
                 repmat([-1 7.5],2,1) , repmat([-2 5],2,1) , repmat([-2 4],2,1);...
                 repmat([-0.8 2.4],2,1) , repmat([-.8 1.6],2,1) , repmat([-.75 1.3],2,1);...
-                };  
+                };
             
             
-            case 4
+        case 4
             % Get BOLD data for Target-Stim Contra
             Data = cat(1,AllSubjects_Data_BOLD_StimTarget(:).StimTargContra);
             ToPlot.Col = 1;

@@ -4,9 +4,8 @@ clc; clear;
 StartDir = fullfile(pwd, '..','..','..');
 cd (StartDir)
 
-addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/')
+addpath(genpath(fullfile(StartDir, 'AVT-7T-code', 'subfun')))
+Get_dependencies('D:\Dropbox/', 'D:\github/')
 
 FigureFolder = fullfile(StartDir, 'figures');
 
@@ -49,6 +48,8 @@ TitSuf = {
     'Contra_&_Ipsi'};
 
 SubSVM = [1:3;4:6;7:9];
+
+Test_side = [];
 
 
 opt.svm.log2c = 1;
@@ -122,7 +123,7 @@ for iAnalysis= 1:numel(TitSuf)
     ToPlot.ROIs_name = ROIs;
     ToPlot.Visible= 'on';
     ToPlot.FigureFolder=FigureFolder;
-    ToPlot.OneSideTTest = {'both' 'both'};
+    ToPlot.OneSideTTest = Test_side;
     
     ToPlot.profile.MEAN=[];
     ToPlot.profile.SEM=[];
@@ -142,7 +143,7 @@ for iAnalysis= 1:numel(TitSuf)
             Data = cat(1,AllSubjects_Data_BOLD(:).Contra_VS_Ipsi);
             
             % which conditions goes into which column and row
-            ToPlot.Col = [1 2 3]; 
+            ToPlot.Col = [1 2 3];
             ToPlot.Row = 1;
             ToPlot.Cdt = 1:3;
             ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
@@ -188,7 +189,7 @@ for iAnalysis= 1:numel(TitSuf)
                 2 2;... % Skip 1 so to not plot the contrast and SVC or [A vs V]
                 3 3;...
                 2 2;...
-                3 3]; 
+                3 3];
             ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
             
             % Get BOLD data for between senses contrasts (ipsi)
@@ -262,10 +263,21 @@ for iAnalysis= 1:numel(TitSuf)
             ToPlot.Titles{2,1} = '[V - T]';
             ToPlot.Titles{3,1} = '[A VS T]';
             ToPlot.Titles{4,1} = '[V VS T]';
-             
+            
             
             
         case 3
+            
+            ToPlot.OneSideTTest = ...
+                cat(3, ...
+                    [3 3 1 1;
+                     1 1 3 3;
+                     3 3 1 1],...
+                    2*ones(3,4),...
+                    [3 3 1 1;
+                     1 1 3 3;
+                     3 3 1 1]);
+            
             % Get BOLD data for Cdt-Fix Contra
             Data = cat(1,AllSubjects_Data_BOLD(:).Contra);
             ToPlot.Col = 1;
@@ -304,7 +316,7 @@ for iAnalysis= 1:numel(TitSuf)
             
             % set maximum and minimum for B parameters profiles (row 1) and
             % for S param (row 2: Cst; row 3: Lin)
-            ToPlot.MinMax={... 
+            ToPlot.MinMax={...
                 repmat([-1 4.2],2,1) , repmat([-1.2 2.2],2,1) , repmat([-1.4 0.1],2,1);...
                 repmat([-1.2 4],2,1) , repmat([-1.5 2.5],2,1) , repmat([-1.5 1],2,1);...
                 repmat([-0.4 1.3],2,1) , repmat([-0.4 0.65],2,1) , repmat([-0.5 0.35],2,1);...
@@ -315,7 +327,7 @@ for iAnalysis= 1:numel(TitSuf)
             end
             
     end
-   
+    
     
     %% Plot
     for WithPerm = 1
@@ -336,10 +348,10 @@ for iAnalysis= 1:numel(TitSuf)
         if opt.vol
             ToPlot.Name = ['BOLD_vol-MVPA-' Stim_prefix '\n' SaveSufix(15:end-12)];
         else
-             ToPlot.Name = ['BOLD-MVPA-' Stim_prefix '\n' SaveSufix(15:end-12)];
+            ToPlot.Name = ['BOLD-MVPA-' Stim_prefix '\n' SaveSufix(15:end-12)];
         end
-
-
+        
+        
         Plot_BOLD_MVPA_all_ROIs(ToPlot)
         
         
@@ -380,20 +392,20 @@ end
 
 
 function Data = Get_data_MVPA(ROIs,SubSVM,iSubSVM,SVM)
-        for iROI = 1:numel(ROIs)
-            
-            for iSVM = SubSVM(iSubSVM,:)
-                
-                Data(iROI).whole_roi_grp(:,iSVM+1-SubSVM(iSubSVM,1)) = SVM(iSVM).ROI(iROI).grp;
-                
-                Data(iROI).MEAN(:,iSVM+1-SubSVM(iSubSVM,1)) = ...
-                    flipud(SVM(iSVM).ROI(iROI).layers.MEAN(1:end)');
-                Data(iROI).SEM(:,iSVM+1-SubSVM(iSubSVM,1)) = ...
-                    flipud(SVM(iSVM).ROI(iROI).layers.SEM(1:end)');
-                Data(iROI).Beta.DATA(:,iSVM+1-SubSVM(iSubSVM,1),:) = ...
-                    reshape(SVM(iSVM).ROI(iROI).layers.Beta.DATA, [3,1,size(SVM(iSVM).ROI(iROI).layers.Beta.DATA,2)]);
-                
-            end
-            
-        end
+for iROI = 1:numel(ROIs)
+    
+    for iSVM = SubSVM(iSubSVM,:)
+        
+        Data(iROI).whole_roi_grp(:,iSVM+1-SubSVM(iSubSVM,1)) = SVM(iSVM).ROI(iROI).grp;
+        
+        Data(iROI).MEAN(:,iSVM+1-SubSVM(iSubSVM,1)) = ...
+            flipud(SVM(iSVM).ROI(iROI).layers.MEAN(1:end)');
+        Data(iROI).SEM(:,iSVM+1-SubSVM(iSubSVM,1)) = ...
+            flipud(SVM(iSVM).ROI(iROI).layers.SEM(1:end)');
+        Data(iROI).Beta.DATA(:,iSVM+1-SubSVM(iSubSVM,1),:) = ...
+            reshape(SVM(iSVM).ROI(iROI).layers.Beta.DATA, [3,1,size(SVM(iSVM).ROI(iROI).layers.Beta.DATA,2)]);
+        
+    end
+    
+end
 end

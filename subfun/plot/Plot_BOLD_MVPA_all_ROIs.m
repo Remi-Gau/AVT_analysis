@@ -116,13 +116,13 @@ for iRow = 1:size(ToPlot.Legend,1)
         
         hold on
         
-        tmp = ToPlot.profile(iRow,iColumn).beta(:,:,1);
+        Data = ToPlot.profile(iRow,iColumn).beta(:,:,1);
         
         if isfield(ToPlot,'MinMax')
             ToPlot.MIN = ToPlot.MinMax{2,iRow}(iColumn,1);
             ToPlot.MAX = ToPlot.MinMax{2,iRow}(iColumn,2);
         end
-        plot_betas(tmp,ToPlot,fontsize)
+        plot_betas(Data,ToPlot,fontsize,iRow,1)
         
         t=ylabel(sprintf('constant\nS Param. est. [a u]'));
         set(t,'fontsize',fontsize);
@@ -134,16 +134,16 @@ for iRow = 1:size(ToPlot.Legend,1)
         
         hold on
         
-        tmp = ToPlot.profile(iRow,iColumn).beta(:,:,2);
+        Data = ToPlot.profile(iRow,iColumn).beta(:,:,2);
         if MVPA_BOLD==1
-            tmp=tmp*-1;
+            Data=Data*-1;
         end
         
         if isfield(ToPlot,'MinMax')
             ToPlot.MIN = ToPlot.MinMax{3,iRow}(iColumn,1);
             ToPlot.MAX = ToPlot.MinMax{3,iRow}(iColumn,2);
         end
-        plot_betas(tmp,ToPlot,fontsize)
+        plot_betas(Data,ToPlot,fontsize,iRow,2)
         
         t=ylabel(sprintf('linear\nS Param. est. [a u]'));
         set(t,'fontsize',fontsize);
@@ -162,7 +162,7 @@ end
 end
 
 
-function plot_betas(tmp,ToPlot,fontsize)
+function plot_betas(Data, ToPlot, fontsize, iCdt, S_param)
 
 Alpha = 0.05/numel(ToPlot.ROIs_name);
 
@@ -177,7 +177,7 @@ else
 end
 
 % plot spead
-tmp_cell = mat2cell(tmp,size(tmp,1),ones(1,size(tmp,2)));
+tmp_cell = mat2cell(Data,size(Data,1),ones(1,size(Data,2)));
 for i=1:numel(Xpos)
     distributionPlot(tmp_cell{i}, 'xValues', Xpos(i), 'color', ToPlot.line_colors(i,:), ...
         'distWidth', 1.2, 'showMM', 0, ...
@@ -189,10 +189,10 @@ for i=1:numel(Xpos)
 end
 
 % plot mean+SEM
-plot(Xpos-.8, nanmean(tmp), 'k. ', 'MarkerSize', 7)
+plot(Xpos-.8, nanmean(Data), 'k. ', 'MarkerSize', 7)
 for i=1:numel(Xpos)
     plot([Xpos(i)-.8;Xpos(i)-.8], ...
-        [nanmean(tmp(:,i))+nansem(tmp(:,i));nanmean(tmp(:,i))-nansem(tmp(:,i))], ' k','LineWidth', 1.2 )
+        [nanmean(Data(:,i))+nansem(Data(:,i));nanmean(Data(:,i))-nansem(Data(:,i))], ' k','LineWidth', 1.2 )
 end
 
 
@@ -207,63 +207,28 @@ else
 end
 
 if ToPlot.MVPA_BOLD==2 && ToPlot.Cst
-    tmp=tmp-.5;
+    Data=Data-.5;
 end
 
-% now compute p values and print them
-if ~isempty(ToPlot.ToPermute)
-    for iPerm = 1:size(ToPlot.ToPermute,1)
-        tmp2 = ToPlot.ToPermute(iPerm,:);
-        tmp2 = repmat(tmp2',1,size(tmp,2));
-        Perms(iPerm,:) = mean(tmp.*tmp2);  %#ok<*AGROW>
-    end
-end
 
-if isfield(ToPlot, 'OneSideTTest')
+for iROI = 1:size(Data,2)
     
-    if ~isempty(ToPlot.ToPermute)
-        if strcmp(ToPlot.OneSideTTest,'left')
-            %             P = sum(Perms<mean(tmp))/numel(Perms);
-        elseif strcmp(ToPlot.OneSideTTest,'right')
-            %             P = sum(Perms>mean(tmp))/numel(Perms);
-        elseif strcmp(ToPlot.OneSideTTest,'both')
-            
-            P = sum( ...
-                abs( Perms ) > ...
-                repmat( abs(mean(tmp)), size(Perms,1),1)  ) ...
-                / size(Perms,1) ;
-        end
-    else
-        [~,P] = ttest(tmp, 0, 'alpha', 0.05, 'tail', ToPlot.OneSideTTest);
-    end
-else
+    [~, P, ~] = run_t_perm_test(ToPlot, iCdt, iROI, S_param, Data(:,iROI));
     
-    if ~isempty(ToPlot.ToPermute)
-        P = sum( ...
-            abs( Perms ) > ...
-            repmat( abs(mean(tmp)), size(Perms,1),1)  ) ...
-            / size(Perms,1) ;
-    else
-        [~,P] = ttest(tmp, 0, 'alpha', 0.05);
-    end
-    
-end
-
-for iP = 1:numel(P)
     Sig = []; %#ok<NASGU>
-    if P(iP)<0.001
+    if P<0.001
         Sig = sprintf('p<0.001 ');
     else
-        Sig = sprintf('p=%.3f ',P(iP));
+        Sig = sprintf('p=%.3f ',P);
     end
     
     t = text(...
-        Xpos(iP)-.8,...
+        Xpos(iROI)-.8,...
         MAX,...
         sprintf(Sig));
     set(t,'fontsize',fontsize-2);
     
-    if P(iP)<Alpha
+    if P<Alpha
         set(t,'fontweight','bold','fontsize',fontsize-1.5);
         %         set(t,'color','r','fontweight','bold');
     end

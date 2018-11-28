@@ -5,8 +5,7 @@ StartDir = fullfile(pwd, '..','..','..','..','..');
 cd (StartDir)
 
 addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/')
+Get_dependencies('D:\Dropbox/', 'D:\github/')
 
 
 ResultsDir = fullfile(StartDir, 'results', 'profiles','surf');
@@ -50,6 +49,50 @@ for WithPerm = 1
     end
     
     
+    %% plot contrast against baseline only
+    close all
+    ToPlot.Visible='on';
+    ToPlot.FigureFolder=FigureFolder;
+    
+    f = figure('Name', 'StimVsTargets', 'Position', [50, 50, 1400, 700], 'Color', [1 1 1], 'Visible', ToPlot.Visible);
+    
+    set(gca,'units','centimeters')
+    pos = get(gca,'Position');
+    ti = get(gca,'TightInset');
+    
+    set(f, 'PaperUnits','centimeters');
+    set(f, 'PaperSize', [pos(3)+ti(1)+ti(3) pos(4)+ti(2)+ti(4)]);
+    set(f, 'PaperPositionMode', 'manual');
+    set(f, 'PaperPosition',[0 0 pos(3)+ti(1)+ti(3) pos(4)+ti(2)+ti(4)]);
+    
+    set(f, 'Visible', ToPlot.Visible)
+    
+    %% Contra
+    ToPlot.Legend = {'Audio_{contra}', 'Visual_{contra}','Tactile_{contra}'};
+    ToPlot.SubplotNumber = 1:3;
+    Data_stim = cat(1,Stimuli_data(:).Contra);
+    Data_target = cat(1,Target_data(:).Contra);
+    ToPlot = GetData(ToPlot,Data_stim,Data_target,ROI_order);
+    ToPlot.Xlabel = 1;
+    
+    get(f)
+    Plot_interaction_XY(ToPlot)
+    
+    %% Ipsi
+%     ToPlot.Legend = {'Audio_{ipsi}', 'Visual_{ipsi}','Tactile_{ipsi}'};
+%     ToPlot.SubplotNumber = 4:6;
+%     Data_stim = cat(1,Stimuli_data(:).Ispi);
+%     Data_target = cat(1,Target_data(:).Ispi);
+%     ToPlot = GetData(ToPlot,Data_stim,Data_target,ROI_order);
+%     ToPlot.Xlabel = 1;
+%     
+%     get(f)
+%     Plot_interaction_XY(ToPlot)
+    
+    mtit('Stim VS targets','xoff', 0, 'yoff', +0.05, 'fontsize', 12)
+    print(f, fullfile(ToPlot.FigureFolder, 'All_ROIs_stim_VS_targets.tif'), '-dtiff')
+    
+    
     %%
     close all
     
@@ -69,7 +112,10 @@ for WithPerm = 1
     set(f, 'PaperPosition',[0 0 pos(3)+ti(1)+ti(3) pos(4)+ti(2)+ti(4)]);
     
     set(f, 'Visible', ToPlot.Visible)
-
+    
+    
+    
+    
     
     %% Contra-Ipsi
     ToPlot.Legend = {'(Contra-Ipsi)_A', '(Contra-Ipsi)_V','(Contra-Ipsi)_T'};
@@ -80,7 +126,7 @@ for WithPerm = 1
     
     get(f)
     Plot_interaction(ToPlot)
-%     Plot_interaction_XY(ToPlot)
+    %     Plot_interaction_XY(ToPlot)
     
     
     %% Contrast between sensory modalities Ispi
@@ -89,10 +135,10 @@ for WithPerm = 1
     Data_stim = cat(1,Stimuli_data(:).ContSensModIpsi);
     Data_target = cat(1,Target_data(:).ContSensModIpsi);
     ToPlot = GetData(ToPlot,Data_stim,Data_target,ROI_order);
-       
-    get(f) 
+    
+    get(f)
     Plot_interaction(ToPlot)
-%     Plot_interaction_XY(ToPlot)
+    %     Plot_interaction_XY(ToPlot)
     
     %% Contrast between sensory modalities Contra
     ToPlot.Legend = {'(Audio-Visual)_{contra}', '(Audio-Tactile)_{contra}','(Visual-Tactile)_{contra}'};
@@ -101,16 +147,16 @@ for WithPerm = 1
     Data_target = cat(1,Target_data(:).ContSensModContra);
     ToPlot = GetData(ToPlot,Data_stim,Data_target,ROI_order);
     ToPlot.Xlabel = 1;
-        
+    
     get(f)
     Plot_interaction(ToPlot)
-%     Plot_interaction_XY(ToPlot)
+    %     Plot_interaction_XY(ToPlot)
     
     %%
     get(f)
     mtit('Interactions','xoff', 0, 'yoff', +0.05, 'fontsize', 12)
     print(f, fullfile(ToPlot.FigureFolder, 'All_ROIs_interactions.tif'), '-dtiff')
-
+    
 end
 cd(StartDir)
 
@@ -145,7 +191,7 @@ for iCdt = 1:size(ToPlot.ROI.grp,3)
         plot([Xpos(iROI)-.25;Xpos(iROI)+0.25],mean(A,2), '.-k', ...
             'linewidth', 1.5, 'markersize', 8)
     end
-
+    
     plot([-20 20], [0 0], '--k')
     
     set(gca, 'tickdir', 'out', 'xtick', Xpos,'xticklabel',ToPlot.ROIs_name, ...
@@ -210,7 +256,7 @@ line_colors = [...
 
 for iCdt = 1:size(ToPlot.ROI.grp,3)
     
-    subplot(3,3,ToPlot.SubplotNumber(iCdt))
+    subplot(1,3,ToPlot.SubplotNumber(iCdt))
     hold on
     
     for iROI=1:size(ToPlot.ROI.grp,4)
@@ -223,13 +269,25 @@ for iCdt = 1:size(ToPlot.ROI.grp,3)
     
     axis tight
     ax = axis;
+    if ax(1)>0
+        ax(1) = -0.15;
+    end
+    if ax(2)<0
+        ax(2) = 0.15;
+    end
+    if ax(3)>0
+        ax(3) = -0.15;
+    end
+    if ax(4)<0
+        ax(4) = 0.15;
+    end
     
     plot([-10 10], [-10 10], '--k')
     plot([0 0], [-10 10], '-k')
     plot([-10 10], [0 0], '-k')
     
     axis(ax*1.2);
-
+    
     t=title(ToPlot.Legend{iCdt});
     set(t,'fontsize',10);
     
@@ -244,7 +302,7 @@ for iCdt = 1:size(ToPlot.ROI.grp,3)
         t=ylabel(sprintf('Target\nParam. est. [a u]'));
         set(t,'fontsize',10);
     end
-
+    
 end
 
 end

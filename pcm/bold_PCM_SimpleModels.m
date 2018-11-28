@@ -1,10 +1,10 @@
 clc; clear; close all
 
-StartDir = fullfile(pwd, '..','..');
-addpath(genpath(fullfile(StartDir, 'code','subfun')))
+StartDir = fullfile(pwd, '..', '..');
+addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
 
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox\')
+% Get_dependencies('/home/rxg243/Dropbox/')
+Get_dependencies('D:\Dropbox\', 'D:\github')
 
 surf = 1; % run of volumne whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
@@ -104,6 +104,13 @@ M_ori{end}.name       = 'noiseceiling';
 M_ori{end}           = pcm_prepFreeModel(M_ori{end});
 M_ori{end}.fitAlgorithm = 'minimize';
 
+
+fig_h = Plot_PCM_models_feature(M_ori);
+for iFig = 1:numel(fig_h)
+    print(fig_h(iFig), fullfile('D:\Dropbox\PhD\Experiments\AVT\derivatives\figures\PCM\Cdt\2X2\models', ...
+        ['Model-' num2str(iFig) '-' strrep(strrep(fig_h(iFig).Name ,',',''),' ','') '.tif']),...
+        '-dtiff');
+end
 
 %% Define ROI
 fprintf('Define ROI\n')

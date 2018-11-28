@@ -4,9 +4,8 @@ clc; clear;
 StartDir = fullfile(pwd, '..','..','..');
 cd (StartDir)
 
-addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/')
+addpath(genpath(fullfile(StartDir, 'AVT-7T-code', 'subfun')))
+Get_dependencies('D:\Dropbox/', 'D:\github/')
 
 FigureFolder = fullfile(StartDir, 'figures');
 
@@ -44,9 +43,8 @@ ROIs = {
     'A1'
     'PT'
     'V1'
-    'V2'
-    'V3'};
-ROI_order_BOLD = [1 7 2:4];
+    'V2'};
+ROI_order_BOLD = [1 7 2:3];
 
 TitSuf = {
     'Contra_&_Ipsi'
@@ -54,8 +52,10 @@ TitSuf = {
     'Between_Senses';...
     };
 
+Test_side = [];
 
-% load BOLD 
+
+% load BOLD
 load(fullfile(BOLD_resultsDir, strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
 AllSubjects_Data_BOLD = AllSubjects_Data;
 clear AllSubjects_Data
@@ -77,9 +77,9 @@ fid = fopen (SavedTxt, 'w');
 for iAnalysis= 1:numel(TitSuf)
     
     clear ToPrint
-%     ToPrint.TitSuf = TitSuf{iAnalysis};
+    %     ToPrint.TitSuf = TitSuf{iAnalysis};
     ToPrint.ROIs_name = ROIs;
-    ToPrint.OneSideTTest = {'both' 'both' 'both'};
+    ToPrint.OneSideTTest = Test_side;
     
     ToPrint.profile.beta=[];
     ToPrint.ROI.grp=[];
@@ -100,7 +100,17 @@ for iAnalysis= 1:numel(TitSuf)
             ToPrint.Legend{1} = '[A-Fix]_{contra}';
             ToPrint.Legend{2} = '[V-Fix]_{contra}';
             ToPrint.Legend{3} = '[T-Fix]_{contra}';
-
+            
+            ToPrint.OneSideTTest = ...
+                cat(3, ...
+                    [3 3 2 2;
+                     2 2 3 3;
+                     2 2 2 2],...
+                    2*ones(3,4),...
+                    [3 3 2 2;
+                     2 2 3 3;
+                     2 2 2 2]);
+            
             Print2TableROI(fid, ROIs, ToPrint)
             
             
@@ -114,7 +124,7 @@ for iAnalysis= 1:numel(TitSuf)
             ToPrint.Legend{3} = '[T-Fix]_{ipsi}';
             
             Print2TableROI(fid, ROIs, ToPrint)
-        
+            
             
             
         case 3
@@ -130,7 +140,7 @@ for iAnalysis= 1:numel(TitSuf)
             ToPrint.Legend{3} = '[Contra-Ipsi]_T';
             
             Print2TableROI(fid, ROIs, ToPrint)
-
+            
             
             
         case 2
@@ -147,7 +157,7 @@ for iAnalysis= 1:numel(TitSuf)
             ToPrint.Legend{3} = '[V-T]_{contra}';
             
             Print2TableROI(fid, ROIs, ToPrint)
-
+            
             % Get BOLD data for between senses contrasts (ipsi)
             Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModIpsi);
             ToPrint = Get_data(ToPrint,Data,ROI_order_BOLD);
@@ -251,79 +261,33 @@ for iCdt = 1:size(ToPrint.profile.beta,4)
             fprintf (fid, '),,');
             
             % compute p value
-            Alpha = 0.05;
-            tmp = Data;
             if ToPrint.IsMVPA && S_param==3
-                tmp = tmp-.5; % for the whole ROI accuracy, center it around .5
-            end
-            % now compute p values and print them
-            % run permutation if needed
-            if ~isempty(ToPrint.ToPermute)
-                for iPerm = 1:size(ToPrint.ToPermute,1)
-                    tmp2 = ToPrint.ToPermute(iPerm,:);
-                    tmp2 = repmat(tmp2',1,size(tmp,2));
-                    Perms(iPerm,:) = mean(tmp.*tmp2);  %#ok<*AGROW>
-                end
+                Data = Data-.5; % for the whole ROI accuracy, center it around .5
             end
             
-            % actual computation with one sided or not
-            if isfield(ToPrint, 'OneSideTTest')
-                
-                % with sign permutation test
-                if ~isempty(ToPrint.ToPermute)
-                    if strcmp(ToPrint.OneSideTTest,'left')
-                        %             P = sum(Perms<mean(tmp))/numel(Perms);
-                        error('Not implemented')
-                    elseif strcmp(ToPrint.OneSideTTest,'right')
-                        %             P = sum(Perms>mean(tmp))/numel(Perms);
-                        error('Not implemented')
-                    elseif strcmp(ToPrint.OneSideTTest,'both')  
-                        P = sum( ...
-                            abs( Perms ) > ...
-                            repmat( abs(mean(tmp)), size(Perms,1),1)  ) ...
-                            / size(Perms,1) ;
-                    end
-                    
-                else
-                    % or ttest
-                    [~,P,~,STATS] = ttest(tmp, 0, 'alpha', Alpha, 'tail', ToPrint.OneSideTTest{S_param});
-                end
-                
-            else
-                
-                % If nothing is specified run a two sided test
-                if ~isempty(ToPrint.ToPermute)
-                    P = sum( ...
-                        abs( Perms ) > ...
-                        repmat( abs(mean(tmp)), size(Perms,1),1)  ) ...
-                        / size(Perms,1) ;
-                else
-                    [~,P,~,STATS] = ttest(tmp, 0, 'alpha', Alpha);
-                end
-                
-            end
-            
+            [TestSide, P, STATS] = run_t_perm_test(ToPrint, iCdt, iROI, S_param, Data);
+             
             % print t value if t test
             if ~isempty(ToPrint.ToPermute)
             else
                 fprintf (fid, '%f,,',STATS.tstat);
             end
-
-             % print p value if t test
+            
+            % print p value if t test
             if P<0.001
                 fprintf (fid, '<.001,');
             else
                 fprintf (fid, '%f,',P);
             end
             % Add a note in table to identify one sided tests
-            if (isfield(ToPrint, 'OneSideTTest') && ~strcmp(ToPrint.OneSideTTest{S_param},'both'))
+            if (isfield(ToPrint, 'OneSideTTest') && ~strcmp(TestSide,'both'))
                 fprintf (fid, '^a,');
             else
                 fprintf (fid, ',');
             end
             
             % Print effect size
-            CI = bootci(1000,{@(x) Unbiased_ES(x), tmp},'alpha',0.05,'type','bca');
+            CI = bootci(1000,{@(x) Unbiased_ES(x), Data},'alpha',0.05,'type','bca');
             fprintf (fid, '[,%f,-,%f,]',CI(1),CI(2));
             fprintf (fid, ',');
             

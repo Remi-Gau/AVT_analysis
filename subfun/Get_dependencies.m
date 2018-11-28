@@ -22,7 +22,7 @@ addpath(genpath(fullfile(Dir, 'Code','MATLAB','From_Web', 'plotSpread')))
 addpath(genpath(fullfile(Dir, 'Code','MATLAB','From_Web', 'shadedErrorBar')))
 
 %[Horizontal error bar](https://fr.mathworks.com/matlabcentral/fileexchange/3963-herrorbar)
-addpath(genpath(fullfile(Dir, 'Code','MATLAB','From_Web', 'herrorbar')))
+% addpath(genpath(fullfile(Dir, 'Code','MATLAB','From_Web', 'herrorbar')))
 
 %[ternary plots for
 %matlab](https://fr.mathworks.com/matlabcentral/fileexchange/7210-ternary-plots)
