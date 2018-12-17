@@ -65,7 +65,7 @@ Legends = {...
 
 save(OutputMat, 'Legends', 'MovementRecap', 'SubLs')
 
-fid = fopen (OutputFile, 'w');
+fid = fopen (OutputTSV, 'w');
 
 for i=1:length(Legends)
     fprintf (fid, '%s,', Legends{i});

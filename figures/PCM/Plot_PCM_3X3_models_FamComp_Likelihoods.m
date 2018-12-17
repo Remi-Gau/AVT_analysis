@@ -16,8 +16,8 @@ addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
 
 PCM_dir = fullfile(StartDir, 'figures', 'PCM');
 
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/')
+% Get_dependencies('/home/rxg243/Dropbox/')
+Get_dependencies('D:\Dropbox/', 'D:\github/')
 
 Comp_suffix{1} = '3X3_Ipsi';
 Comp_suffix{end+1} = '3X3_Contra';
@@ -53,7 +53,7 @@ CdtComb = ['AV';'AT';'VT'];
 
 % Models to include for each modality for the family comparison
 A_Idpdt_V = [2 4 5 11 12];
-A_Scaled_V = [1 6 8];
+A_Scaled_V = [1 6 9];
 A_Scaled_Idpdt_V = [3 7 8 10];
 
 Cdt{1} = [A_Idpdt_V A_Scaled_V A_Scaled_Idpdt_V];
@@ -148,7 +148,7 @@ end
 set(0,'defaultAxesFontName','Arial')
 set(0,'defaultTextFontName','Arial')
 
-FigDim = [50, 50, 600, 600];
+FigDim = [50, 50, 480, 600];
 
 
 for iToPlot = 1:2 %:numel(ToPlot)
@@ -274,7 +274,7 @@ for iToPlot = 1:2 %:numel(ToPlot)
             plot([.5 NbROI+.5], [3.5 3.5], 'k', 'linewidth', 2)
             
             title('Ipsi')
-            set(gca,'fontsize', 22, ...
+            set(gca,'fontsize', 10, ...
                 'ytick', 1:3,...
                 'yticklabel', ['V_i VS T_i';'A_i VS T_i';'A_i VS V_i'],...
                 'xtick', 1:NbROI,...
@@ -309,7 +309,7 @@ for iToPlot = 1:2 %:numel(ToPlot)
             
             title(Comp_suffix{2})
             title('Contra')
-            set(gca,'fontsize', 22, ...
+            set(gca,'fontsize', 10, ...
                 'ytick', 1:3,...
                 'yticklabel', ['V_c VS T_c';'A_c VS T_c';'A_c VS V_c'],...
                 'xtick', 1:NbROI,...
@@ -324,12 +324,21 @@ for iToPlot = 1:2 %:numel(ToPlot)
             %                 'fontsize',14,...
             %                 'xoff',0,'yoff',.025);
             
-%             print(gcf, fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot}, [opt.FigName  '.tif'] ), '-dtiff')
+            print(gcf, fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot}, [opt.FigName  '.tif'] ), '-dtiff')
             pause(2)
             
             ColorMap = brain_colour_maps('hot_increasing');
             colormap(ColorMap)
-%             print(gcf, fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot}, [opt.FigName  '_hot.tif'] ), '-dtiff')
+            print(gcf, fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot}, [opt.FigName  '_hot.tif'] ), '-dtiff')
+            
+            subplot(2,1,1)
+            axis off
+            title ' '
+            
+            subplot(2,1,2)
+            axis off
+            title ' '
+            
             
         end
                

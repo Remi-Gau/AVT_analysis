@@ -12,9 +12,7 @@ addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
 
 PCM_dir = fullfile(StartDir, 'figures', 'PCM');
 
-
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/')
+Get_dependencies('D:\Dropbox/','D:\github/')
 
 Comp_suffix{1} = 'A_stim';
 Comp_suffix{end+1} = 'V_stim';
@@ -89,10 +87,10 @@ end
 set(0,'defaultAxesFontName','Arial')
 set(0,'defaultTextFontName','Arial')
 
-FigDim = [50, 50, 600, 600];
+FigDim = [50, 50, 480, 600];
 
 
-for iToPlot = 1:2 %:numel(ToPlot)
+for iToPlot = 1 %:2 %:numel(ToPlot)
     
     for Target = 1
         
@@ -227,7 +225,7 @@ for iToPlot = 1:2 %:numel(ToPlot)
             plot([.5 NbROI+.5], [3.5 3.5], 'k', 'linewidth', 2)
             
             title('Contra VS Ipsi')
-            set(gca,'fontsize', 22, ...
+            set(gca,'fontsize', 10, ...
                 'ytick', 1:3,...
                 'yticklabel', flipud(['A_i VS A_c';'V_i VS V_c';'T_i VS T_c']),...
                 'xtick', 1:NbROI,...
@@ -246,6 +244,8 @@ for iToPlot = 1:2 %:numel(ToPlot)
             ColorMap = brain_colour_maps('hot_increasing');
             colormap(ColorMap)
             print(gcf, fullfile(PCM_dir, 'Cdt', '2x2', ToPlot{iToPlot}, [opt.FigName  '_hot.tif'] ), '-dtiff')
+                        axis off
+            title ' '
             
         end
         
