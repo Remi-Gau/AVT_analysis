@@ -233,19 +233,33 @@ for iToPlot = 1:2 %:numel(ToPlot)
         %% Matrices plot for exceedance probability of I + (S & I)
         close all
         
+        save_dir = fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot});
+        
         for iFam = 1:2
             
+            Mat2Save_struct = struct(...
+                'comp',{{'Ai VS Vi', 'Ai VS Ti', 'Vi VS Ti', ...
+                         'Ac VS Vc', 'Ac VS Tc', 'Vc VS Tc'}}, ...
+                'p_s',[ ],...
+                'p_si',[ ],...
+                'p_i',[ ]);
+
             if iFam==1
                 NbFam = '3';
                 Mat2Plot = squeeze(XP(:,3,:,1)+XP(:,1,:,1));
+                Mat2Save = cat(1, XP([2 1 3],:,:,1), XP([2 1 3],:,:,2));
             else
                 NbFam = '2';
                 Mat2Plot = squeeze(XP2(:,1,:,1));
+                Mat2Save = zeros(6,3,NbROI);
             end
-            
+
             opt.FigName = sprintf('ExcProba-%sFam-3X3Models-%s-PCM_{grp}-%s-%s-%s', ...
                 NbFam, hs_suffix{ihs}, ...
                 Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+            
+            print_PCM_table(Mat2Save, Mat2Save_struct, ROI, NbROI, save_dir, opt)
+            
             
             figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
             
@@ -254,9 +268,7 @@ for iToPlot = 1:2 %:numel(ToPlot)
             subplot(2,1,2)
             hold on
             box off
-            
-            
-            
+
             imagesc(flipud(Mat2Plot), [0 1])
             
             plot([.5 NbROI+.5], [1.5 1.5], 'color', [.2 .2 .2], 'linewidth', 1)
@@ -289,8 +301,12 @@ for iToPlot = 1:2 %:numel(ToPlot)
             hold on
             box off
             
-            Mat2Plot = squeeze(XP(:,3,:,2)+XP(:,1,:,2));
-            
+            if iFam==1
+                Mat2Plot = squeeze(XP(:,3,:,2)+XP(:,1,:,2));
+            else
+                Mat2Plot = squeeze(XP2(:,1,:,2));
+            end
+
             imagesc(flipud(Mat2Plot), [0 1])
             
             plot([.5 NbROI+.5], [1.5 1.5], 'color', [.2 .2 .2], 'linewidth', 1)
@@ -317,19 +333,17 @@ for iToPlot = 1:2 %:numel(ToPlot)
             colorbar
             
             axis([.5 NbROI+.5 .5 3.5])
-            
-            
-            
+
             %             p=mtit(['Exc probability Idpt + Scaled & Idpdt - ' ToPlot{iToPlot}],...
             %                 'fontsize',14,...
             %                 'xoff',0,'yoff',.025);
             
-            print(gcf, fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot}, [opt.FigName  '.tif'] ), '-dtiff')
+            print(gcf, fullfile(save_dir, [opt.FigName  '.tif'] ), '-dtiff')
             pause(2)
             
             ColorMap = brain_colour_maps('hot_increasing');
             colormap(ColorMap)
-            print(gcf, fullfile(PCM_dir, 'Cdt', '3X3', ToPlot{iToPlot}, [opt.FigName  '_hot.tif'] ), '-dtiff')
+            print(gcf, fullfile(save_dir, [opt.FigName  '_hot.tif'] ), '-dtiff')
             
             subplot(2,1,1)
             axis off
@@ -338,11 +352,8 @@ for iToPlot = 1:2 %:numel(ToPlot)
             subplot(2,1,2)
             axis off
             title ' '
-            
-            
+
         end
                
     end
 end
-
-

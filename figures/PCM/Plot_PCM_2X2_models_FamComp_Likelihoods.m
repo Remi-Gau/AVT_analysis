@@ -187,19 +187,32 @@ for iToPlot = 1 %:2 %:numel(ToPlot)
         %% Matrices plot for exceedance probability of I + (S & I)
         close all
         
+        save_dir = fullfile(PCM_dir, 'Cdt', '2x2', ToPlot{iToPlot});
+        
         for iFam = 1:2
+
+            Mat2Save_struct = struct(...
+                'comp',{{'Ai VS Ac', 'Vi VS Vc', 'Ti VS Tc',}}, ...
+                'p_s',[ ],...
+                'p_si',[ ],...
+                'p_i',[ ]);
             
             if iFam==1
                 NbFam = '3';
                 Mat2Plot = squeeze(XP(1:3,2,:)+XP(1:3,3,:));
+                Mat2Save = XP([1 3 2],:,:);
             else
                 NbFam = '2';
                 Mat2Plot = squeeze(XP2(:,2,:));
+                Mat2Save = nan(3,3,NbROI);
             end
             
             opt.FigName = sprintf('ExcProba-%sFam--I_VS_C-%s-PCM_{grp}-%s-%s-%s', ...
                 NbFam, hs_suffix{ihs}, ...
                 Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+            
+            print_PCM_table(Mat2Save, Mat2Save_struct, ROI, NbROI, save_dir, opt)
+
             
             figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
             
@@ -238,15 +251,15 @@ for iToPlot = 1 %:2 %:numel(ToPlot)
             %                 'fontsize',14,...
             %                 'xoff',0,'yoff',.025);
             
-            print(gcf, fullfile(PCM_dir, 'Cdt', '2x2', ToPlot{iToPlot}, [opt.FigName  '.tif'] ), '-dtiff')
+            print(gcf, fullfile(save_dir, [opt.FigName  '.tif'] ), '-dtiff')
             pause(2)
             
             ColorMap = brain_colour_maps('hot_increasing');
             colormap(ColorMap)
-            print(gcf, fullfile(PCM_dir, 'Cdt', '2x2', ToPlot{iToPlot}, [opt.FigName  '_hot.tif'] ), '-dtiff')
+            print(gcf, fullfile(save_dir, [opt.FigName  '_hot.tif'] ), '-dtiff')
                         axis off
             title ' '
-            
+
         end
         
     end
