@@ -11,13 +11,13 @@ function M = Set_PCM_3X3_models
 % scaled version of A, then how can T be independent from A?
 % - similarly some models can have 2 possible interpretations: e.g the 2 following can be
 % described by the same model
-% - V is a scaled to A
-% - T is scaled to and independent from A
-% - T is scaled to V.
+% - V is scaled to A
+% - T is scaled and independent from A
+% - T is scaled to V
 % 
-% - V is a scaled to A
+% - V is scaled to A
 % - T is scaled to A
-% - T is scaled to and independent from V.
+% - T is scaled and independent from V
 
 
 CondNames = {...
