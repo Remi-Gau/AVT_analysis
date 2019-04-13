@@ -1,18 +1,14 @@
 function All_effects_surf_pool_hs_plot
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..','..');
-cd (StartDir)
-
-addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
-Get_dependencies('/home/rxg243/Dropbox/')
-
-
+CodeDir = '/home/remi/github/AVT_analysis';
+StartDir = '/home/remi/Dropbox/PhD/Experiments/AVT/derivatives';
 
 FigureFolder = fullfile(StartDir, 'figures');
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+Get_dependencies('/home/remi/')
 
-
-SubLs = dir('sub*');
+SubLs = dir(fullfile(StartDir,'sub*'));
 NbSub = numel(SubLs);
 
 NbLayers=6;
@@ -22,6 +18,7 @@ NbROI = 7;
 ROI_order_BOLD = [1 NbROI 2:NbROI-1];
 ROI_order_MVPA = [NbROI-1 NbROI 1:NbROI-2];
 
+opt.MVNN = 0;
 
 opt.svm.log2c = 1;
 opt.svm.dargs = '-s 0';
@@ -29,7 +26,9 @@ opt.fs.do = 0;
 opt.rfe.do = 0;
 opt.permutation.test = 0;
 opt.session.curve = 0;
+opt.session.loro = 0;
 opt.scaling.idpdt = 1;
+
 
 opt.scaling.img.eucledian = 0;
 opt.scaling.img.zscore = 1;

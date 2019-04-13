@@ -7,12 +7,15 @@
 
 clc; clear; close all
 
-StartDir = fullfile(pwd, '..', '..', '..');
-addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
+CodeDir = '/home/remi/github/AVT_analysis';
+StartDir = '/home/remi/Dropbox/PhD/Experiments/AVT/derivatives';
+
+FigureFolder = fullfile(StartDir, 'figures');
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+Get_dependencies('/home/remi/')
 
 PCM_dir = fullfile(StartDir, 'figures', 'PCM');
 
-Get_dependencies('D:\Dropbox/','D:\github/')
 
 Comp_suffix{1} = 'A_stim';
 Comp_suffix{end+1} = 'V_stim';
@@ -187,7 +190,8 @@ for iToPlot = 1 %:2 %:numel(ToPlot)
         %% Matrices plot for exceedance probability of I + (S & I)
         close all
         
-        save_dir = fullfile(PCM_dir, 'Cdt', '2x2', ToPlot{iToPlot});
+        save_dir = fullfile(PCM_dir, 'Cdt', '2X2', ToPlot{iToPlot});
+        mkdir(save_dir)
         
         for iFam = 1:2
 

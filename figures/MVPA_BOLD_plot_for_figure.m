@@ -2,16 +2,16 @@ clc; clear;
 
 close all
 
-StartDir = fullfile(pwd, '..','..');
-cd (StartDir)
-
-addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
+CodeDir = '/home/remi/github/AVT_analysis';
+StartDir = '/home/remi/Dropbox/PhD/Experiments/AVT/derivatives';
 
 FigureFolder = fullfile(StartDir, 'figures');
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+Get_dependencies('/home/remi/')
 
 NbLayers = 6;
 WithQuad = 1;
-WithPerm = 0;
+WithPerm = 1;
 
 Visible = 'on';
 
@@ -257,15 +257,4 @@ for iROI = 1:numel(ROIs)
     clear ToPlot
     
 end
-
-
-
-
-
-
-
-
-cd(StartDir)
-
-
 

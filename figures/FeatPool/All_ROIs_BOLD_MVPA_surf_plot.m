@@ -1,13 +1,16 @@
 function All_ROIs_BOLD_MVPA_surf_plot
+
+% plots 
+
+
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..','..');
-cd (StartDir)
-
-addpath(genpath(fullfile(StartDir, 'AVT-7T-code', 'subfun')))
-Get_dependencies('D:\Dropbox/', 'D:\github/')
+CodeDir = '/home/remi/github/AVT_analysis';
+StartDir = '/home/remi/Dropbox/PhD/Experiments/AVT/derivatives';
 
 FigureFolder = fullfile(StartDir, 'figures');
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+Get_dependencies('/home/remi/')
 
 MVPA_resultsDir = fullfile(StartDir, 'results', 'SVM');
 BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles','surf');
@@ -15,7 +18,7 @@ BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles','surf');
 set(0,'defaultAxesFontName','Arial')
 set(0,'defaultTextFontName','Arial')
 
-SubLs = dir('sub*');
+SubLs = dir(fullfile(StartDir,'sub*'));
 NbSub = numel(SubLs);
 
 NbLayers=6;
