@@ -39,12 +39,6 @@ ROIs= {...
     'V5',...
     'PT'};
 
-DesMat = (1:NbLayers)-mean(1:NbLayers);
-DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
-% DesMat = [DesMat' ones(NbLayers,1)];
-DesMat = spm_orth(DesMat);
-
-
 for iROI = 1:length(ROIs)
     AllSubjects_Data(iROI) = struct(...
         'name', ROIs{iROI}); %#ok<*AGROW>
@@ -211,6 +205,9 @@ end
 %% Betas from profile fits
 fprintf('\n')
 
+NbLayers = 6;
+DesMat = set_design_mat_lam_GLM(NbLayers);
+
 for iROI=1:length(AllSubjects_Data)
     
     Name=AllSubjects_Data(iROI).name;
@@ -237,10 +234,10 @@ for iROI=1:length(AllSubjects_Data)
             
             if ~all(isnan(Blocks(:))) || ~isempty(Blocks)
                 
-                for iCond = 1:size(Blocks,3);
+                for iCond = 1:size(Blocks,3)
                     
-                    Y = flipud(Blocks(:,:,iCond));
-                    [B] = ProfileGLM(DesMat, Y);
+                    Y = Blocks(:,:,iCond);
+                    [B] = laminar_glm(DesMat, Y);
                     
                     switch i
                         case 1
@@ -333,24 +330,5 @@ else
 end
 
 cd(StartDir)
-
-end
-
-function [B] = ProfileGLM(X, Y)
-
-if any(isnan(Y(:)))
-    [~,y]=find(isnan(Y));
-    y=unique(y);
-    Y(:,y)=[];
-    clear y
-end
-
-if isempty(Y)
-    B=nan(1,size(X,2));
-else
-    X=repmat(X,size(Y,2),1);
-    Y=Y(:);
-    [B,~,~] = glmfit(X, Y, 'normal', 'constant', 'off');
-end
 
 end
