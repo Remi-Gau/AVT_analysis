@@ -17,7 +17,7 @@ line_colors = [...
     ]/255;
 ToPlot.line_colors=line_colors;
 
-NbROI = numel(ToPlot.ROIs_name);
+
 
 if isempty(ToPlot.ToPermute)
     suffix = '_ttest';
@@ -52,6 +52,8 @@ for iRow = 1:size(ToPlot.Legend,1)
     
     for iColumn = 1:size(SubPlots,2)
         
+        [ROIs_to_plot, NbROI] = find_rois(ToPlot.profile(iRow,iColumn));
+        
         MVPA_BOLD = 1+ToPlot.IsMVPA(iRow,iColumn);
         ToPlot.Cst = 0;
         ToPlot.MVPA_BOLD = MVPA_BOLD;
@@ -72,14 +74,14 @@ for iRow = 1:size(ToPlot.Legend,1)
         
         l=errorbar(...
             repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,NbROI),6,1),...
-            ToPlot.profile(iRow,iColumn).MEAN,...
-            ToPlot.profile(iRow,iColumn).SEM);
+            ToPlot.profile(iRow,iColumn).MEAN(:,ROIs_to_plot),...
+            ToPlot.profile(iRow,iColumn).SEM(:,ROIs_to_plot));
         l2=plot(...
             repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,NbROI),6,1),...
-            ToPlot.profile(iRow,iColumn).MEAN);
+            ToPlot.profile(iRow,iColumn).MEAN(:,ROIs_to_plot));
         for iLine=1:numel(l)
-            set(l(iLine),'color', line_colors(iLine,:))
-            set(l2(iLine),'color', line_colors(iLine,:),'linewidth',2)
+            set(l(iLine),'color', line_colors(ROIs_to_plot(iLine),:))
+            set(l2(iLine),'color', line_colors(ROIs_to_plot(iLine),:),'linewidth',2)
         end
         
         axis tight
@@ -91,8 +93,6 @@ for iRow = 1:size(ToPlot.Legend,1)
             MIN = ax(3)-0.02;
             MAX = ax(4)+0.02;
         end
-%         MIN = ax(3)-0.02;
-%         MAX = ax(4)+0.02;
         axis([0.4 6.6 MIN MAX])
         
         t = title(ToPlot.Legend{iRow,iColumn});
@@ -116,13 +116,13 @@ for iRow = 1:size(ToPlot.Legend,1)
         
         hold on
         
-        Data = ToPlot.profile(iRow,iColumn).beta(:,:,1);
+        Data = ToPlot.profile(iRow,iColumn).beta(:,ROIs_to_plot,1);
         
         if isfield(ToPlot,'MinMax')
             ToPlot.MIN = ToPlot.MinMax{2,iRow}(iColumn,1);
             ToPlot.MAX = ToPlot.MinMax{2,iRow}(iColumn,2);
         end
-        plot_betas(Data,ToPlot,fontsize,iRow,1)
+        plot_betas(Data, ToPlot, fontsize, iRow, iColumn, 1)
         
         t=ylabel(sprintf('constant\nS Param. est. [a u]'));
         set(t,'fontsize',fontsize);
@@ -133,8 +133,9 @@ for iRow = 1:size(ToPlot.Legend,1)
         subplot(m,n,SubPlots{3,iColumn})
         
         hold on
+
+        Data = ToPlot.profile(iRow,iColumn).beta(:,ROIs_to_plot,2);
         
-        Data = ToPlot.profile(iRow,iColumn).beta(:,:,2);
         if MVPA_BOLD==1
             Data=Data*-1;
         end
@@ -143,16 +144,23 @@ for iRow = 1:size(ToPlot.Legend,1)
             ToPlot.MIN = ToPlot.MinMax{3,iRow}(iColumn,1);
             ToPlot.MAX = ToPlot.MinMax{3,iRow}(iColumn,2);
         end
-        plot_betas(Data,ToPlot,fontsize,iRow,2)
+        plot_betas(Data, ToPlot, fontsize, iRow, iColumn, 2)
         
         t=ylabel(sprintf('linear\nS Param. est. [a u]'));
         set(t,'fontsize',fontsize);
+        
         
     end
     
     mtit(ToPlot.Titles{iRow,1},'xoff', 0, 'yoff', +0.04, 'fontsize', fontsize+4)
     
-    print(fig, fullfile(ToPlot.FigureFolder, ['All_ROIs_' strrep(fig.Name,'\n','-'), suffix, '.tif']), '-dtiff')
+    if isfield(ToPlot.profile, 'main')
+        print(fig, fullfile(ToPlot.FigureFolder, ...
+            ['All_main_ROIs_' strrep(fig.Name,'\n','-'), suffix, '.tif']), '-dtiff')
+    else
+        print(fig, fullfile(ToPlot.FigureFolder, ...
+            ['All_ROIs_' strrep(fig.Name,'\n','-'), suffix, '.tif']), '-dtiff')
+    end
     
     
 end
@@ -162,12 +170,14 @@ end
 end
 
 
-function plot_betas(Data, ToPlot, fontsize, iCdt, S_param)
+function plot_betas(Data, ToPlot, fontsize, iCdt, iColumn, S_param)
 
-Alpha = 0.05/numel(ToPlot.ROIs_name);
+[ROIs_to_plot, NbROI] = find_rois(ToPlot.profile(iCdt, iColumn));
+
+Alpha = 0.05/NbROI;
 
 Xpos = [1 3 6:2:14];
-Xpos = Xpos(1:numel(ToPlot.ROIs_name));
+Xpos = Xpos(1:NbROI);
 
 % plot zero line
 if ToPlot.Cst
@@ -179,12 +189,13 @@ end
 % plot spead
 tmp_cell = mat2cell(Data,size(Data,1),ones(1,size(Data,2)));
 for i=1:numel(Xpos)
-    distributionPlot(tmp_cell{i}, 'xValues', Xpos(i), 'color', ToPlot.line_colors(i,:), ...
+    distributionPlot(tmp_cell{i}, 'xValues', Xpos(i), ...
+        'color', ToPlot.line_colors(ROIs_to_plot(i),:), ...
         'distWidth', 1.2, 'showMM', 0, ...
         'globalNorm', 2)
     h = plotSpread(tmp_cell{i}, 'distributionMarkers',{'.'},...
         'xValues', (Xpos(i)), 'binWidth', 1, 'spreadWidth', 1);
-    set(h{1}, 'MarkerSize', 7, 'MarkerEdgeColor', 'k', ...
+    set(h{1}, 'MarkerSize', 10, 'MarkerEdgeColor', 'k', ...
         'MarkerFaceColor', 'k', 'LineWidth', 1)
 end
 
@@ -192,7 +203,8 @@ end
 plot(Xpos-.8, nanmean(Data), 'k. ', 'MarkerSize', 7)
 for i=1:numel(Xpos)
     plot([Xpos(i)-.8;Xpos(i)-.8], ...
-        [nanmean(Data(:,i))+nansem(Data(:,i));nanmean(Data(:,i))-nansem(Data(:,i))], ' k','LineWidth', 1.2 )
+        [nanmean(Data(:,i))+nansem(Data(:,i)); ...
+        nanmean(Data(:,i))-nansem(Data(:,i))], ' k','LineWidth', 1.2 )
 end
 
 
@@ -213,7 +225,7 @@ end
 
 for iROI = 1:size(Data,2)
     
-    [~, P, ~] = run_t_perm_test(ToPlot, iCdt, iROI, S_param, Data(:,iROI));
+    [~, P, ~] = run_t_perm_test(ToPlot, iCdt, ROIs_to_plot(iROI), S_param, Data(:,iROI));
     
     Sig = []; %#ok<NASGU>
     if P<0.001
@@ -239,7 +251,17 @@ axis([-.4 Xpos(end)+.8 MIN MAX])
 
 
 
-set(gca, 'tickdir', 'out', 'xtick', Xpos,'xticklabel',ToPlot.ROIs_name, ...
+set(gca, 'tickdir', 'out', 'xtick', Xpos,'xticklabel',ToPlot.ROIs_name(ROIs_to_plot), ...
     'ticklength', [0.01 0.01], 'fontsize', fontsize-1, 'FontName','Arial')
 
+end
+
+
+function [ROIs_to_plot, NbROI] = find_rois(profile)
+        if isfield(profile, 'main')
+            ROIs_to_plot = profile.main;
+        else
+            ROIs_to_plot = 1:size(profile.MEAN, 2);
+        end
+        NbROI = numel(ROIs_to_plot);
 end

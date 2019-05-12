@@ -1,16 +1,27 @@
 function All_ROIs_BOLD_MVPA_surf_plot
 
-% plots 
-
-
 clc; clear;
 
-CodeDir = '/home/remi/github/AVT_analysis';
-StartDir = '/home/remi/Dropbox/PhD/Experiments/AVT/derivatives';
+% plot only main results
+% only deactivations
+% only A_contra - A_ipsi in V1 and V2
+% only V_contra - V_ipsi in A1 and PT
+% only differences between non-preferred modalities of a ROI
+plot_main = 1;
+
+CodeDir = 'D:\github\AVT-7T-code';
+StartDir = 'D:\';
+
+% CodeDir = '/home/remi/github/AVT_analysis';
+% StartDir = '/home/remi';
+
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+Get_dependencies(StartDir)
+
+StartDir = fullfile(StartDir, 'Dropbox', 'PhD', 'Experiments', 'AVT', 'derivatives');
 
 FigureFolder = fullfile(StartDir, 'figures');
-addpath(genpath(fullfile(CodeDir, 'subfun')))
-Get_dependencies('/home/remi/')
+
 
 MVPA_resultsDir = fullfile(StartDir, 'results', 'SVM');
 BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles','surf');
@@ -119,7 +130,7 @@ end
 
 close all
 
-for iAnalysis= 1:numel(TitSuf)
+for iAnalysis= 2 %1:numel(TitSuf)
     
     clear ToPlot ToPlot2
     ToPlot.TitSuf = TitSuf{iAnalysis};
@@ -181,6 +192,15 @@ for iAnalysis= 1:numel(TitSuf)
             ToPlot.Titles{1,1} = '[Contra - Ipsi]';
             ToPlot.Titles{2,1} = '[Contra VS Ipsi]';
             
+            if plot_main
+                ToPlot.profile(1,1).main = 3:4;
+                ToPlot.profile(1,2).main = 1:2;
+                ToPlot.profile(1,3).main = 1:4;
+                ToPlot.profile(2,1).main = 3:4;
+                ToPlot.profile(2,2).main = 1:2;
+                ToPlot.profile(2,3).main = 1:4;
+            end
+            
             
             
         case 2
@@ -212,6 +232,17 @@ for iAnalysis= 1:numel(TitSuf)
             Data = Get_data_MVPA(ROIs_to_get,SubSVM,2,SVM);
             ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             
+            if plot_main
+                ToPlot.profile(1,1).main = 3:4;
+                ToPlot.profile(2,1).main = 1:2;
+                ToPlot.profile(3,1).main = 3:4;
+                ToPlot.profile(4,1).main = 1:2;
+                ToPlot.profile(1,2).main = 3:4;
+                ToPlot.profile(2,2).main = 1:2;
+                ToPlot.profile(3,2).main = 3:4;
+                ToPlot.profile(4,2).main = 1:2;
+            end
+            
             % To know which type of data we are plotting every time
             ToPlot.IsMVPA = [...
                 0 0; ...
@@ -238,23 +269,49 @@ for iAnalysis= 1:numel(TitSuf)
             Legend{4,2} = 'ipsi';
             Legend{4,1} = 'contra';
             
-            tmp={...
-                [-0.3 4.5;-0.3 4.5] , [.42 1;.42 1];...
-                [-1 4;-1 4] , [-.15 .62;-.15 .62];...
-                [-0.2 1.3;-0.2 1.3] , [-.1 .2;-.1 .2];...
-                };
             
-            for i=1:2
-                for j = 1:3
-                    ToPlot.MinMax{j,i}=tmp{j,1};
+            % set MIN and MAX for plotting
+            if plot_main
+                tmp={...
+                    [-.5 .7;-.5 .7] , [.4 .6;.4 .6];...
+                    [-1 1;-1 1] , [-.15 .62;-.15 .62];...
+                    [-.35 .35;-.35 .35] , [-.1 .2;-.1 .2];...
+                    };
+                
+                for i=1:2
+                    for j = 1:3
+                        ToPlot.MinMax{j,i}=tmp{j,1};
+                    end
                 end
-            end
-            ToPlot.MinMax{1,2}=[-0.5 2.3;-0.5 2.3];
-            ToPlot.MinMax{2,2}=[-.8 3.1;-.8 3.1];
-            ToPlot.MinMax{3,2}=[-0.3 .8;-0.3 .8];
-            for i=3:4
-                for j = 1:3
-                    ToPlot.MinMax{j,i}=tmp{j,2};
+                tmp={...
+                    [.4 .9;.4 .9] , [.4 .6;.4 .6];...
+                    [-.15 .5;-.15 .5] , [-.15 .62;-.15 .62];...
+                    [-0.1 .2;-0.1 .2] , [-.1 .2;-.1 .2];...
+                    };
+                for i=3:4
+                    for j = 1:3
+                        ToPlot.MinMax{j,i}=tmp{j,1};
+                    end
+                end
+            else
+                tmp={...
+                    [-0.3 4.5;-0.3 4.5] , [.42 1;.42 1];...
+                    [-1 4;-1 4] , [-.15 .62;-.15 .62];...
+                    [-0.2 1.3;-0.2 1.3] , [-.1 .2;-.1 .2];...
+                    };
+                
+                for i=1:2
+                    for j = 1:3
+                        ToPlot.MinMax{j,i}=tmp{j,1};
+                    end
+                end
+                ToPlot.MinMax{1,2}=[-0.5 2.3;-0.5 2.3];
+                ToPlot.MinMax{2,2}=[-.8 3.1;-.8 3.1];
+                ToPlot.MinMax{3,2}=[-0.3 .8;-0.3 .8];
+                for i=3:4
+                    for j = 1:3
+                        ToPlot.MinMax{j,i}=tmp{j,2};
+                    end
                 end
             end
             
@@ -273,13 +330,13 @@ for iAnalysis= 1:numel(TitSuf)
             
             ToPlot.OneSideTTest = ...
                 cat(3, ...
-                    [3 3 1 1;
-                     1 1 3 3;
-                     3 3 1 1],...
-                    2*ones(3,4),...
-                    [3 3 1 1;
-                     1 1 3 3;
-                     3 3 1 1]);
+                [3 3 1 1;
+                1 1 3 3;
+                3 3 1 1],...
+                2*ones(3,4),...
+                [3 3 1 1;
+                1 1 3 3;
+                3 3 1 1]);
             
             % Get BOLD data for Cdt-Fix Contra
             Data = cat(1,AllSubjects_Data_BOLD(:).Contra);
@@ -291,6 +348,15 @@ for iAnalysis= 1:numel(TitSuf)
             Data = cat(1,AllSubjects_Data_BOLD(:).Ispi);
             ToPlot.Col = 2;
             ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+            
+            if plot_main
+                ToPlot.profile(1,1).main = 3:4;
+                ToPlot.profile(2,1).main = 1:2;
+                ToPlot.profile(3,1).main = 1:4;
+                ToPlot.profile(1,2).main = 3:4;
+                ToPlot.profile(2,2).main = 1:2;
+                ToPlot.profile(3,2).main = 1:4;
+            end
             
             ToPlot.IsMVPA = [...
                 0 0;...
@@ -319,11 +385,19 @@ for iAnalysis= 1:numel(TitSuf)
             
             % set maximum and minimum for B parameters profiles (row 1) and
             % for S param (row 2: Cst; row 3: Lin)
-            ToPlot.MinMax={...
-                repmat([-1 4.2],2,1) , repmat([-1.2 2.2],2,1) , repmat([-1.4 0.1],2,1);...
-                repmat([-1.2 4],2,1) , repmat([-1.5 2.5],2,1) , repmat([-1.5 1],2,1);...
-                repmat([-0.4 1.3],2,1) , repmat([-0.4 0.65],2,1) , repmat([-0.5 0.35],2,1);...
-                };
+            if plot_main
+                ToPlot.MinMax={...
+                    repmat([-1.4 0.35],2,1) , repmat([-1.4 0.35],2,1) , repmat([-1.4 0.35],2,1);...
+                    repmat([-1.5 1],2,1) , repmat([-1.5 1],2,1) , repmat([-1.5 1],2,1);...
+                    repmat([-0.5 0.35],2,1) , repmat([-0.5 0.35],2,1) , repmat([-0.5 0.35],2,1);...
+                    };
+            else
+                ToPlot.MinMax={...
+                    repmat([-1 4.2],2,1) , repmat([-1.2 2.2],2,1) , repmat([-1.4 0.1],2,1);...
+                    repmat([-1.2 4],2,1) , repmat([-1.5 2.5],2,1) , repmat([-1.5 1],2,1);...
+                    repmat([-0.4 1.3],2,1) , repmat([-0.4 0.65],2,1) , repmat([-0.5 0.35],2,1);...
+                    };
+            end
             
             if opt.MVNN
                 ToPlot = rmfield(ToPlot,'MinMax');
@@ -374,11 +448,14 @@ for iROI = ROI_order
     for iRow = 1:numel(ToPlot.Row)
         for iCol = 1:numel(ToPlot.Col)
             
-            ToPlot.profile(ToPlot.Row(iRow),ToPlot.Col(iCol)).MEAN(:,ROI_idx) = Data(iROI).MEAN(:,ToPlot.Cdt(iRow,iCol));
-            ToPlot.profile(ToPlot.Row(iRow),ToPlot.Col(iCol)).SEM(:,ROI_idx) = Data(iROI).SEM(:,ToPlot.Cdt(iRow,iCol));
+            ToPlot.profile(ToPlot.Row(iRow),ToPlot.Col(iCol)).MEAN(:,ROI_idx) = ...
+                Data(iROI).MEAN(:,ToPlot.Cdt(iRow,iCol));
+            ToPlot.profile(ToPlot.Row(iRow),ToPlot.Col(iCol)).SEM(:,ROI_idx) = ...
+                Data(iROI).SEM(:,ToPlot.Cdt(iRow,iCol));
             
             if isfield(Data, 'whole_roi_grp')
-                ToPlot.ROI(ToPlot.Row(iRow),ToPlot.Col(iCol)).grp(:,ROI_idx,:) = Data(iROI).whole_roi_grp(:,ToPlot.Cdt(iRow,iCol));
+                ToPlot.ROI(ToPlot.Row(iRow),ToPlot.Col(iCol)).grp(:,ROI_idx,:) = ...
+                    Data(iROI).whole_roi_grp(:,ToPlot.Cdt(iRow,iCol));
             end
             
             % Do not plot quadratic
@@ -386,7 +463,8 @@ for iROI = ROI_order
             % 2nd dimension: ROI
             % 3rd dimension: Cst, Lin
             % 4th dimension : different conditions (e.g A, V, T)
-            ToPlot.profile(ToPlot.Row(iRow),ToPlot.Col(iCol)).beta(:,ROI_idx,:,:) = shiftdim(Data(iROI).Beta.DATA(1:2,ToPlot.Cdt(iRow,iCol),:),2);
+            ToPlot.profile(ToPlot.Row(iRow),ToPlot.Col(iCol)).beta(:,ROI_idx,:,:) = ...
+                shiftdim(Data(iROI).Beta.DATA(1:2,ToPlot.Cdt(iRow,iCol),:),2);
         end
     end
     ROI_idx = ROI_idx + 1;
