@@ -9,6 +9,9 @@ clc; clear;
 % only differences between non-preferred modalities of a ROI
 plot_main = 1;
 
+% average results over ipsi and contra
+avg_hs = 1;
+
 CodeDir = 'D:\github\AVT-7T-code';
 StartDir = 'D:\';
 
@@ -149,6 +152,18 @@ for iAnalysis= 2 %1:numel(TitSuf)
     ToPlot.MVPA.beta=[];
     ToPlot.MVPA.grp=[];
     
+    if plot_main
+        ToPlot.plot_main = 'main';
+    else
+        ToPlot.plot_main = '';
+    end
+    
+    if avg_hs
+        ToPlot.avg_hs = 'avg-hs';
+    else
+        ToPlot.avg_hs = '';
+    end
+    
     
     %% Get BOLD
     switch iAnalysis
@@ -204,8 +219,7 @@ for iAnalysis= 2 %1:numel(TitSuf)
             
             
         case 2
-            % Get BOLD data for between senses contrasts (contra)
-            Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModContra);
+            
             ToPlot.Col = 1;
             ToPlot.Row = 1:2;
             ToPlot.Cdt = [...
@@ -213,63 +227,112 @@ for iAnalysis= 2 %1:numel(TitSuf)
                 3 3;...
                 2 2;...
                 3 3];
-            ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
             
-            % Get BOLD data for between senses contrasts (ipsi)
-            Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModIpsi);
-            ToPlot.Col = 2;
-            ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+            if avg_hs 
+                % we average the data from each hemisphere
+                Data_contra = cat(1,AllSubjects_Data_BOLD(:).ContSensModContra);
+                Data_ipsi = cat(1,AllSubjects_Data_BOLD(:).ContSensModIpsi);
+                
+                Data = average_hs(Data_contra, Data_ipsi);
+                
+                ToPlot = Get_data(ToPlot, Data, ROI_order_BOLD);
+                
+            else
+                % Get BOLD data for between senses contrasts (contra)
+                Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModContra);
+                ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+                
+                % Get BOLD data for between senses contrasts (ipsi)
+                Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModIpsi);
+                ToPlot.Col = 2;
+                ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+            end
             
             % Same for the MVPA data (contra)
             ToPlot.Col = 1;
             ToPlot.Row = 3:4;
-            Data = Get_data_MVPA(ROIs_to_get,SubSVM,3,SVM);
-            ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             
-            % Same for the MVPA data (ipsi)
-            ToPlot.Col = 2;
-            ToPlot.Row = 3:4;
-            Data = Get_data_MVPA(ROIs_to_get,SubSVM,2,SVM);
-            ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+            if avg_hs
+                Data_contra = Get_data_MVPA(ROIs_to_get,SubSVM,3,SVM);
+                Data_ipsi = Get_data_MVPA(ROIs_to_get,SubSVM,2,SVM);
+                
+                Data = average_hs(Data_contra, Data_ipsi, 1);
+                
+                ToPlot = Get_data(ToPlot, Data, ROI_order_MVPA);
+                
+            else
+                % contra
+                Data = Get_data_MVPA(ROIs_to_get,SubSVM,3,SVM);
+                ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+                
+                % ipsi
+                ToPlot.Col = 2;
+                Data = Get_data_MVPA(ROIs_to_get,SubSVM,2,SVM);
+                ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+            end
             
             if plot_main
                 ToPlot.profile(1,1).main = 3:4;
                 ToPlot.profile(2,1).main = 1:2;
                 ToPlot.profile(3,1).main = 3:4;
                 ToPlot.profile(4,1).main = 1:2;
-                ToPlot.profile(1,2).main = 3:4;
-                ToPlot.profile(2,2).main = 1:2;
-                ToPlot.profile(3,2).main = 3:4;
-                ToPlot.profile(4,2).main = 1:2;
+                if ~avg_hs
+                    ToPlot.profile(1,2).main = 3:4;
+                    ToPlot.profile(2,2).main = 1:2;
+                    ToPlot.profile(3,2).main = 3:4;
+                    ToPlot.profile(4,2).main = 1:2;
+                end
             end
-            
-            % To know which type of data we are plotting every time
-            ToPlot.IsMVPA = [...
-                0 0; ...
-                0 0; ...
-                1 1; ...
-                1 1];
-            
+
             % Defines the number of subplots on each figure
+            % m lines
+            % n columns
             ToPlot.m=4;
-            ToPlot.n=2;
-            ToPlot.SubPlots = {...
-                [1 3] [2 4];...
-                5, 6;...
-                7, 8;...
-                9, 10;...
-                };
             
-            Legend{1,2} = 'ipsi';
-            Legend{1,1} = 'contra';
-            Legend{2,2} = 'ipsi';
-            Legend{2,1} = 'contra';
-            Legend{3,2} = 'ipsi';
-            Legend{3,1} = 'contra';
-            Legend{4,2} = 'ipsi';
-            Legend{4,1} = 'contra';
-            
-            
+            if ~avg_hs
+                % To know which type of data we are plotting every time
+                ToPlot.IsMVPA = [...
+                    0 0; ...
+                    0 0; ...
+                    1 1; ...
+                    1 1];
+                
+                Legend{1,2} = 'ipsi';
+                Legend{1,1} = 'contra';
+                Legend{2,2} = 'ipsi';
+                Legend{2,1} = 'contra';
+                Legend{3,2} = 'ipsi';
+                Legend{3,1} = 'contra';
+                Legend{4,2} = 'ipsi';
+                Legend{4,1} = 'contra';
+                
+                ToPlot.n=2;
+                ToPlot.SubPlots = {...
+                    [1 3] [2 4];...
+                    5, 6;...
+                    7, 8;...
+                    9, 10;...
+                    };
+            else
+                ToPlot.IsMVPA = [...
+                    0; ...
+                    0; ...
+                    1; ...
+                    1];
+                
+                Legend{1,1} = 'contra, ipsi';
+                Legend{2,1} = 'contra, ipsi';
+                Legend{3,1} = 'contra, ipsi';
+                Legend{4,1} = 'contra, ipsi';
+                
+                ToPlot.n=1;
+                ToPlot.SubPlots = {...
+                    [1 2];...
+                    3;...
+                    4;...
+                    5};
+            end
+              
             % set MIN and MAX for plotting
             if plot_main
                 tmp={...
@@ -286,13 +349,14 @@ for iAnalysis= 2 %1:numel(TitSuf)
                 tmp={...
                     [.4 .9;.4 .9] , [.4 .6;.4 .6];...
                     [-.15 .5;-.15 .5] , [-.15 .62;-.15 .62];...
-                    [-0.1 .2;-0.1 .2] , [-.1 .2;-.1 .2];...
+                    [-0.15 .2;-0.15 .2] , [-.15 .2;-.15 .2];...
                     };
                 for i=3:4
                     for j = 1:3
                         ToPlot.MinMax{j,i}=tmp{j,1};
                     end
                 end
+                
             else
                 tmp={...
                     [-0.3 4.5;-0.3 4.5] , [.42 1;.42 1];...
@@ -332,7 +396,7 @@ for iAnalysis= 2 %1:numel(TitSuf)
                 cat(3, ...
                 [3 3 1 1;
                 1 1 3 3;
-                3 3 1 1],...
+                1 1 1 1],...
                 2*ones(3,4),...
                 [3 3 1 1;
                 1 1 3 3;
@@ -475,7 +539,11 @@ end
 function Data = Get_data_MVPA(ROIs,SubSVM,iSubSVM,SVM)
 for iROI = 1:numel(ROIs)
     
+    tmp_grp = [];
+    
     for iSVM = SubSVM(iSubSVM,:)
+
+        tmp_grp{end+1} = SVM(iSVM).ROI(iROI).layers.DATA;
         
         Data(iROI).whole_roi_grp(:,iSVM+1-SubSVM(iSubSVM,1)) = SVM(iSVM).ROI(iROI).grp;
         
@@ -488,5 +556,37 @@ for iROI = 1:numel(ROIs)
         
     end
     
+    for i_subj = 1:numel(tmp_grp{1})
+        tmp_subj = [];
+        for iSVM = 1:numel(tmp_grp)
+             tmp_subj = cat(3, tmp_subj, ...
+                flipud(tmp_grp{iSVM}{i_subj}));
+        end
+        Data(iROI).DATA{i_subj} = tmp_subj;
+    end
 end
+end
+
+
+function data = average_hs(data_contra, data_ipsi, isMVPA)
+% we average the data from each hemisphere
+
+if nargin<3 || isempty(isMVPA)
+    isMVPA = false;
+end
+
+for iROI = 1:numel(data_contra)
+    for isubj = 1:numel(data_contra(iROI).DATA)
+        data(iROI).DATA{isubj} = ...
+            mean(...
+            cat(4, ...
+            data_contra(iROI).DATA{isubj}, ...
+            data_ipsi(iROI).DATA{isubj}), ...
+            4);
+    end
+end
+
+% we recompute all the descriptive stats
+data = grp_stats(data, isMVPA);
+
 end

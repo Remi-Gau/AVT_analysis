@@ -28,10 +28,13 @@ end
 Name = strrep([ToPlot.TitSuf '--' ToPlot.Name], ' ', '_');
 Name = strrep(Name, '_', '-');
 
-if size(SubPlots,2)==3
+switch size(SubPlots,2)
+    case 3
     figdim = [50, 50, 1800, 800];
-elseif size(SubPlots,2)==2
+	case 2
     figdim = [50, 50, 1200, 600];
+    case 1
+    figdim = [50, 50, 600, 600];
 end
 
 for iRow = 1:size(ToPlot.Legend,1)
@@ -154,15 +157,11 @@ for iRow = 1:size(ToPlot.Legend,1)
     
     mtit(ToPlot.Titles{iRow,1},'xoff', 0, 'yoff', +0.04, 'fontsize', fontsize+4)
     
-    if isfield(ToPlot.profile, 'main')
-        print(fig, fullfile(ToPlot.FigureFolder, ...
-            ['All_main_ROIs_' strrep(fig.Name,'\n','-'), suffix, '.tif']), '-dtiff')
-    else
-        print(fig, fullfile(ToPlot.FigureFolder, ...
-            ['All_ROIs_' strrep(fig.Name,'\n','-'), suffix, '.tif']), '-dtiff')
-    end
-    
-    
+
+    print(fig, fullfile(ToPlot.FigureFolder, ...
+            ['All_ROIs_' ToPlot.avg_hs '_' ToPlot.plot_main '_'...
+            strrep(fig.Name,'\n','-'), suffix, '.tif']), '-dtiff')
+
 end
 
 
