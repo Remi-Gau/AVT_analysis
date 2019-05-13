@@ -1,6 +1,13 @@
 # Audio-visual-tactile 7 tesla
 ---
 
+## Replotting figures
+Can be done with this function for the BOLD and MVPA profiles:
+`code/figures/FeatPool/All_ROIs_BOLD_MVPA_surf_plot.m`
+
+Can be done with this function for the PCM:
+`code/figures/PCM/All_ROIs_BOLD_MVPA_surf_plot.m`
+
 ## Dependencies for the fMRI and psychophysics experiment:
 - Presentation (?????)
 - HRTF (MIT and HPC...)
@@ -237,8 +244,8 @@ SPM first level GLM analysis for that subject:
 `derivative/sub-xx/ffx-xxx/betas/6_surf`
 - each beta (for the stimuli) mapped onto 6 cortical surfaces
 - mean effect of each condition for each layer
-- sub-xx_features_xhs_6_surf.mat contains all the data extracted from valid vertices
-- sub-xx_features_yhs_6_surf.mat contains all the data extracted from one hemisphere y and from valid vertices across all 6 layers.
+- `sub-xx_features_xhs_6_surf.mat` contains all the data extracted from valid vertices
+- `sub-xx_features_yhs_6_surf.mat` contains all the data extracted from one hemisphere y and from valid vertices across all 6 layers.
 
 `derivative/sub-xx/ffx-xxx/betas/6_surf/targets`
 Same as above but for targets
@@ -309,10 +316,10 @@ same for targets
 
 `derivative/surfreg/*/[LR]H`
 data for the left and right hemisphere
-- GrpSurf_xstimy_layer_z_yh.vtk : VTK surfaces with data for all subjects for stimulus X in layer Z of hemisphere Y.
-- mean\*.vtk : files contain averages performed across subjects but within layers.
-- \*mask\*.vtk : files indicate the number of subject with valid data for each vertex.
-- \*smoothdata.vtk : refers to vtk files surface smoothed with FWHM=1.5 mm
+- `GrpSurf_xstimy_layer_z_yh.vtk` : VTK surfaces with data for all subjects for stimulus X in layer Z of hemisphere Y.
+- `mean*.vtk` : files contain averages performed across subjects but within layers.
+- `*mask*.vtk` : files indicate the number of subject with valid data for each vertex.
+- `*smoothdata.vtk` : refers to vtk files surface smoothed with FWHM=1.5 mm
 
 `derivative/surfreg/*/[LR]H/NoGLM`
 Data average across subjects and layers
