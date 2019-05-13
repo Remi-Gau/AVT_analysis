@@ -1,4 +1,7 @@
 function All_ROIs_BOLD_MVPA_surf_plot
+% gets the BOLD laminar and MVPA decoding accuracy profile of the analysis on the 
+% surface DATA of the AVT experimnet and plots them.
+
 
 clc; clear;
 
@@ -9,7 +12,7 @@ clc; clear;
 % only differences between non-preferred modalities of a ROI
 plot_main = 1;
 
-% average results over ipsi and contra
+% average results over ipsi and contra (only for cross sensory comparisons)
 avg_hs = 1;
 
 CodeDir = 'D:\github\AVT-7T-code';
@@ -18,14 +21,13 @@ StartDir = 'D:\';
 % CodeDir = '/home/remi/github/AVT_analysis';
 % StartDir = '/home/remi';
 
+
 addpath(genpath(fullfile(CodeDir, 'subfun')))
 Get_dependencies(StartDir)
 
 StartDir = fullfile(StartDir, 'Dropbox', 'PhD', 'Experiments', 'AVT', 'derivatives');
 
 FigureFolder = fullfile(StartDir, 'figures');
-
-
 MVPA_resultsDir = fullfile(StartDir, 'results', 'SVM');
 BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles','surf');
 
@@ -36,18 +38,6 @@ SubLs = dir(fullfile(StartDir,'sub*'));
 NbSub = numel(SubLs);
 
 NbLayers=6;
-
-% ROIs = {
-%     'A1'
-%     'PT'
-%     'V1'
-%     'V2'
-%     'V3'
-%     'V4'
-%     'V5'};
-% NbROI = numel(ROIs);
-% ROI_order_BOLD = [1 NbROI 2:NbROI-1];
-% ROI_order_MVPA = [NbROI-1 NbROI 1:NbROI-2];
 
 ROIs = {
     'A1'
@@ -66,9 +56,9 @@ TitSuf = {
 
 SubSVM = [1:3;4:6;7:9];
 
-Test_side = [];
+Test_side = []; % default side of the test to use
 
-
+% list of option to specify which MVPA results to use
 opt.svm.log2c = 1;
 opt.svm.dargs = '-s 0';
 opt.fs.do = 0;
@@ -80,6 +70,7 @@ opt.session.loro = 0;
 opt.MVNN = 0;
 opt.vol = 0;
 
+% multivariate noise normalisation
 if opt.MVNN
     ParamToPlot={'Cst','Lin','Avg','ROI'};
     opt.toplot = ParamToPlot{4};
@@ -108,18 +99,24 @@ if IsStim
     Stim_prefix = 'Stimuli';
     if opt.MVNN
         if opt.vol
-            load( fullfile(BOLD_resultsDir, strcat('ResultsVolWhtBetasPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
+            load( fullfile(BOLD_resultsDir, ...
+                strcat('ResultsVolWhtBetasPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
         else
-            load( fullfile(BOLD_resultsDir, strcat('ResultsSurfPoolQuadGLM',suffix,'_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
+            load( fullfile(BOLD_resultsDir, ...
+                strcat('ResultsSurfPoolQuadGLM',suffix,'_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
         end
     else
-        load( fullfile(BOLD_resultsDir, strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
+        load( fullfile(BOLD_resultsDir, ...
+            strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
     end
-    File2Load = fullfile(MVPA_resultsDir, strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
+    File2Load = fullfile(MVPA_resultsDir, ...
+        strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
 else
     Stim_prefix = 'Target';
-    load(fullfile(BOLD_resultsDir, strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
-    File2Load = fullfile(MVPA_resultsDir, strcat('GrpTargetsPoolQuadGLM', SaveSufix)); %#ok<*UNRCH>
+    load(fullfile(BOLD_resultsDir, ...
+        strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
+    File2Load = fullfile(MVPA_resultsDir, ...
+        strcat('GrpTargetsPoolQuadGLM', SaveSufix)); %#ok<*UNRCH>
 end
 
 AllSubjects_Data_BOLD = AllSubjects_Data;
@@ -133,8 +130,9 @@ end
 
 close all
 
-for iAnalysis= 2 %1:numel(TitSuf)
+for iAnalysis= 1:numel(TitSuf)
     
+    % init
     clear ToPlot ToPlot2
     ToPlot.TitSuf = TitSuf{iAnalysis};
     ToPlot.ROIs_name = ROIs;
@@ -243,13 +241,13 @@ for iAnalysis= 2 %1:numel(TitSuf)
                 ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
                 
                 % Get BOLD data for between senses contrasts (ipsi)
-                Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModIpsi);
                 ToPlot.Col = 2;
+                Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModIpsi);
+                
                 ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
             end
             
             % Same for the MVPA data (contra)
-            ToPlot.Col = 1;
             ToPlot.Row = 3:4;
             
             if avg_hs
@@ -271,8 +269,9 @@ for iAnalysis= 2 %1:numel(TitSuf)
                 ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             end
             
+            % To specify which ROIs to plot for each figure 
             if plot_main
-                ToPlot.profile(1,1).main = 3:4;
+                ToPlot.profile(1,1).main = 3:4; 
                 ToPlot.profile(2,1).main = 1:2;
                 ToPlot.profile(3,1).main = 3:4;
                 ToPlot.profile(4,1).main = 1:2;
@@ -398,9 +397,7 @@ for iAnalysis= 2 %1:numel(TitSuf)
                 1 1 3 3;
                 1 1 1 1],...
                 2*ones(3,4),...
-                [3 3 1 1;
-                1 1 3 3;
-                3 3 1 1]);
+                2*ones(3,4));
             
             % Get BOLD data for Cdt-Fix Contra
             Data = cat(1,AllSubjects_Data_BOLD(:).Contra);
@@ -507,6 +504,7 @@ end
 
 
 function ToPlot = Get_data(ToPlot,Data,ROI_order)
+% extracts data and rearranges is for plotting.
 ROI_idx = 1;
 for iROI = ROI_order
     for iRow = 1:numel(ToPlot.Row)
@@ -537,6 +535,8 @@ end
 
 
 function Data = Get_data_MVPA(ROIs,SubSVM,iSubSVM,SVM)
+% extract data and rearanges it so it is in the same format as the BOLD
+% profile data so it can be passed to Get_data
 for iROI = 1:numel(ROIs)
     
     tmp_grp = [];
