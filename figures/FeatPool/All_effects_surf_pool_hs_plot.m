@@ -1,12 +1,21 @@
 function All_effects_surf_pool_hs_plot
 clc; clear;
 
-CodeDir = '/home/remi/github/AVT_analysis';
-StartDir = '/home/remi/Dropbox/PhD/Experiments/AVT/derivatives';
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
 
-FigureFolder = fullfile(StartDir, 'figures');
 addpath(genpath(fullfile(CodeDir, 'subfun')))
-Get_dependencies('/home/remi/')
+
+[Dirs] = set_dir();
+
+Get_dependencies()
 
 SubLs = dir(fullfile(StartDir,'sub*'));
 NbSub = numel(SubLs);

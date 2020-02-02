@@ -2,20 +2,25 @@ function All_ROIs_BOLD_MVPA_surf_tables
 % clc;
 clear;
 
-StartDir = fullfile(pwd, '..','..','..');
-cd (StartDir)
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
 
-addpath(genpath(fullfile(StartDir, 'AVT-7T-code', 'subfun')))
-Get_dependencies('D:\Dropbox/', 'D:\github/')
+addpath(genpath(fullfile(CodeDir, 'subfun')))
 
-FigureFolder = fullfile(StartDir, 'figures');
+[Dirs] = set_dir();
 
-MVPA_resultsDir = fullfile(StartDir, 'results', 'SVM');
-BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles','surf');
+Get_dependencies()
 
 IsStim = 1;
 
-SubLs = dir('sub*');
+SubLs = dir(fullfile(Dirs.DerDir,'sub*'));
 NbSub = numel(SubLs);
 
 NbLayers=6;
@@ -93,12 +98,12 @@ SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
 % load BOLD and MVPA
 if IsStim
     Stim_prefix = 'Stimuli';
-    load(fullfile(BOLD_resultsDir, strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
-    File2Load = fullfile(MVPA_resultsDir, strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
+    load(fullfile(Dirs.BOLD_resultsDir, strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
+    File2Load = fullfile(Dirs.MVPA_resultsDir, strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
 else
     Stim_prefix = 'Target';
-    load(fullfile(BOLD_resultsDir, strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
-    File2Load = fullfile(MVPA_resultsDir, strcat('GrpTargetsPoolQuadGLM', SaveSufix)); %#ok<*UNRCH>
+    load(fullfile(Dirs.BOLD_resultsDir, strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
+    File2Load = fullfile(Dirs.MVPA_resultsDir, strcat('GrpTargetsPoolQuadGLM', SaveSufix)); %#ok<*UNRCH>
 end
 
 AllSubjects_Data_BOLD = AllSubjects_Data;
@@ -110,7 +115,7 @@ else
     warning('This file %s does not exist', File2Load)
 end
 
-SavedTxt = fullfile(FigureFolder, 'BOLD_and_MVPA_results');
+SavedTxt = fullfile(Dirs.FigureFolder, 'BOLD_and_MVPA_results');
 if WithPerm
     SavedTxt = [SavedTxt '_perm.csv'];
 else

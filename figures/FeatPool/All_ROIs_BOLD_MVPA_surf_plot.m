@@ -5,6 +5,22 @@ function All_ROIs_BOLD_MVPA_surf_plot
 
 clc; clear;
 
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
+
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+
+[Dirs] = set_dir();
+
+Get_dependencies()
+
 % plot only main results
 % only deactivations
 % only A_contra - A_ipsi in V1 and V2
@@ -15,26 +31,8 @@ plot_main = 1;
 % average results over ipsi and contra (only for cross sensory comparisons)
 avg_hs = 1;
 
-CodeDir = 'D:\github\AVT-7T-code';
-StartDir = 'D:\';
 
-% CodeDir = '/home/remi/github/AVT_analysis';
-% StartDir = '/home/remi';
-
-
-addpath(genpath(fullfile(CodeDir, 'subfun')))
-Get_dependencies(StartDir)
-
-StartDir = fullfile(StartDir, 'Dropbox', 'PhD', 'Experiments', 'AVT', 'derivatives');
-
-FigureFolder = fullfile(StartDir, 'figures');
-MVPA_resultsDir = fullfile(StartDir, 'results', 'SVM');
-BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles','surf');
-
-set(0,'defaultAxesFontName','Arial')
-set(0,'defaultTextFontName','Arial')
-
-SubLs = dir(fullfile(StartDir,'sub*'));
+SubLs = dir(fullfile(Dirs.DerDir,'sub*'));
 NbSub = numel(SubLs);
 
 NbLayers=6;
@@ -81,7 +79,7 @@ if opt.MVNN
 end
 
 if opt.vol
-    BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles');
+    Dirs.BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles');
 end
 
 opt.scaling.img.eucledian = 0;
@@ -99,23 +97,23 @@ if IsStim
     Stim_prefix = 'Stimuli';
     if opt.MVNN
         if opt.vol
-            load( fullfile(BOLD_resultsDir, ...
+            load( fullfile(Dirs.BOLD_resultsDir, ...
                 strcat('ResultsVolWhtBetasPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
         else
-            load( fullfile(BOLD_resultsDir, ...
+            load( fullfile(Dirs.BOLD_resultsDir, ...
                 strcat('ResultsSurfPoolQuadGLM',suffix,'_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
         end
     else
-        load( fullfile(BOLD_resultsDir, ...
+        load( fullfile(Dirs.BOLD_resultsDir, ...
             strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
     end
-    File2Load = fullfile(MVPA_resultsDir, ...
+    File2Load = fullfile(Dirs.MVPA_resultsDir, ...
         strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
 else
     Stim_prefix = 'Target';
-    load(fullfile(BOLD_resultsDir, ...
+    load(fullfile(Dirs.BOLD_resultsDir, ...
         strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
-    File2Load = fullfile(MVPA_resultsDir, ...
+    File2Load = fullfile(Dirs.MVPA_resultsDir, ...
         strcat('GrpTargetsPoolQuadGLM', SaveSufix)); %#ok<*UNRCH>
 end
 
@@ -137,7 +135,7 @@ for iAnalysis= 1:numel(TitSuf)
     ToPlot.TitSuf = TitSuf{iAnalysis};
     ToPlot.ROIs_name = ROIs;
     ToPlot.Visible= 'on';
-    ToPlot.FigureFolder=FigureFolder;
+    ToPlot.FigureFolder=Dirs.FigureFolder;
     ToPlot.OneSideTTest = Test_side;
     
     ToPlot.profile.MEAN=[];
