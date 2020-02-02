@@ -224,30 +224,31 @@ if ToPlot.MVPA_BOLD==2 && ToPlot.Cst
     Data=Data-.5;
 end
 
-
-for iROI = 1:size(Data,2)
+if ToPlot.plot_pvalue
     
-    [~, P, ~] = run_t_perm_test(ToPlot, iCdt, ROIs_to_plot(iROI), S_param, Data(:,iROI));
-    
-    Sig = []; %#ok<NASGU>
-    if P<0.001
-        Sig = sprintf('p<0.001 ');
-    else
-        Sig = sprintf('p=%.3f ',P);
+    for iROI = 1:size(Data,2)
+        
+        [~, P, ~] = run_t_perm_test(ToPlot, iCdt, ROIs_to_plot(iROI), S_param, Data(:,iROI));
+        
+        Sig = []; %#ok<NASGU>
+        if P<0.001
+            Sig = sprintf('p<0.001 ');
+        else
+            Sig = sprintf('p=%.3f ',P);
+        end
+        
+        t = text(...
+            Xpos(iROI)-.8,...
+            MAX,...
+            sprintf(Sig));
+        set(t,'fontsize',fontsize-2);
+        
+        if P<Alpha
+            set(t,'fontweight','bold','fontsize',fontsize-1.5);
+        end
     end
     
-    t = text(...
-        Xpos(iROI)-.8,...
-        MAX,...
-        sprintf(Sig));
-    set(t,'fontsize',fontsize-2);
-    
-    if P<Alpha
-        set(t,'fontweight','bold','fontsize',fontsize-1.5);
-        %         set(t,'color','r','fontweight','bold');
-    end
 end
-
 
 axis([-.4 Xpos(end)+.8 MIN MAX])
 

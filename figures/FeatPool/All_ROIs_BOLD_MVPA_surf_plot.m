@@ -21,6 +21,8 @@ addpath(genpath(fullfile(CodeDir, 'subfun')))
 
 Get_dependencies()
 
+plot_pvalue = 0;
+
 % plot only main results
 % only deactivations
 % only A_contra - A_ipsi in V1 and V2
@@ -137,6 +139,7 @@ for iAnalysis= 1:numel(TitSuf)
     ToPlot.Visible= 'on';
     ToPlot.FigureFolder=Dirs.FigureFolder;
     ToPlot.OneSideTTest = Test_side;
+    ToPlot.plot_pvalue = plot_pvalue;
     
     ToPlot.profile.MEAN=[];
     ToPlot.profile.SEM=[];
@@ -481,7 +484,6 @@ for iAnalysis= 1:numel(TitSuf)
         
         
         Plot_BOLD_MVPA_all_ROIs(ToPlot)
-        
         
     end
     
