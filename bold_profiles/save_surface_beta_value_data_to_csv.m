@@ -34,7 +34,9 @@ mkdir(Results_dir)
 
 
 %%
-Stim = 1;
+% to decide if we extract the data from the base sitmuli (1) or from the
+% target stimuli (0)
+Stim = 0;
 
 NbLayers = 6;
 LayerInd = NbLayers:-1:1;
@@ -59,7 +61,7 @@ SubLs = dir(fullfile(Dirs.DerDir,'sub*'));
 NbSub = numel(SubLs);
 
 
-for iSub = 2:NbSub
+for iSub = 1:NbSub
     
     fprintf('\n\n\n')
     
