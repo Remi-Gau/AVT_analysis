@@ -18,9 +18,7 @@ Can be done with this function for the PCM:
 
 ## Dependencies for analysis:
 
-Many extra matlab functions from github and the mathwork file exchange are needed and are added to the path by the function `code/subfun/Get_dependencies`. Yeah this weird, tiring and cumbersome but that's matlab weirdness for you.
-
-“And this why we can’t have nice things. Have you heard of [python](http://python.org).”
+Many extra matlab functions from github and the mathwork file exchange are needed and are listed in the `dependencies.txt` file and in the table below. Yeah this weird, tiring and cumbersome but that's matlab weirdness for you.
 
 | Matlab, toolbox and other dependencies                                                                                                            | Used version | Purpose                    |
 |---------------------------------------------------------------------------------------------------------------------------------------------------|--------------|----------------------------|
@@ -36,7 +34,23 @@ Many extra matlab functions from github and the mathwork file exchange are neede
 | [matlab_for_CBS_tools](https://github.com/Remi-Gau/matlab_for_cbs_tools)                                                                          | NA           | import CBS-tools VTK files |
 | [brain_colours](https://github.com/CPernet/brain_colours)                                                                                         | NA           | brain color maps           |
 | [RSA toolbox](https://github.com/rsagroup/rsatoolbox)  |   |   |
-| [PCM toolbox](https://github.com/jdiedrichsen/pcm_toolbox)  |   |   |
+| [PCM toolbox](https://github.com/jdiedrichsen/pcm_toolbox)  | v1.3  |   |
+
+### Installing dependencies
+
+You can use the [matlab package maanger](https://github.com/mobeets/mpm) to download all the "small" dependencies in some sort of environment with a command like:
+
+```matlab
+mpm install -i /home/remi/github/AVT_analysis/dependencies.txt -c AVT
+```
+
+After that you can simply add to your path by typing
+```matlab
+mpm init -c AVT
+```
+
+
+
 
 
 ## Data analysis workflow

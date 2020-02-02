@@ -30,11 +30,11 @@ Name = strrep(Name, '_', '-');
 
 switch size(SubPlots,2)
     case 3
-    figdim = [50, 50, 1800, 800];
-	case 2
-    figdim = [50, 50, 1200, 600];
+        figdim = [50, 50, 1800, 800];
+    case 2
+        figdim = [50, 50, 1200, 600];
     case 1
-    figdim = [50, 50, 600, 600];
+        figdim = [50, 50, 600, 600];
 end
 
 for iRow = 1:size(ToPlot.Legend,1)
@@ -45,6 +45,9 @@ for iRow = 1:size(ToPlot.Legend,1)
     set(gca,'units','centimeters')
     pos = get(gca,'Position');
     ti = get(gca,'TightInset');
+    
+    set(0,'defaultAxesFontName','Arial')
+    set(0,'defaultTextFontName','Arial')
     
     set(fig, 'PaperUnits','centimeters');
     set(fig, 'PaperSize', [pos(3)+ti(1)+ti(3) pos(4)+ti(2)+ti(4)]);
@@ -61,7 +64,7 @@ for iRow = 1:size(ToPlot.Legend,1)
         ToPlot.Cst = 0;
         ToPlot.MVPA_BOLD = MVPA_BOLD;
         
-
+        
         % plot profiles
         subplot(m,n,SubPlots{1,iColumn})
         PlotRectangle(6,fontsize-1)
@@ -136,7 +139,7 @@ for iRow = 1:size(ToPlot.Legend,1)
         subplot(m,n,SubPlots{3,iColumn})
         
         hold on
-
+        
         Data = ToPlot.profile(iRow,iColumn).beta(:,ROIs_to_plot,2);
         
         if MVPA_BOLD==1
@@ -157,11 +160,11 @@ for iRow = 1:size(ToPlot.Legend,1)
     
     mtit(ToPlot.Titles{iRow,1},'xoff', 0, 'yoff', +0.04, 'fontsize', fontsize+4)
     
-
+    
     print(fig, fullfile(ToPlot.FigureFolder, ...
-            ['All_ROIs_' ToPlot.avg_hs '_' ToPlot.plot_main '_'...
-            strrep(fig.Name,'\n','-'), suffix, '.tif']), '-dtiff')
-
+        ['All_ROIs_' ToPlot.avg_hs '_' ToPlot.plot_main '_'...
+        strrep(fig.Name,'\n','-'), suffix, '.tif']), '-dtiff')
+    
 end
 
 
@@ -257,10 +260,10 @@ end
 
 
 function [ROIs_to_plot, NbROI] = find_rois(profile)
-        if isfield(profile, 'main')
-            ROIs_to_plot = profile.main;
-        else
-            ROIs_to_plot = 1:size(profile.MEAN, 2);
-        end
-        NbROI = numel(ROIs_to_plot);
+if isfield(profile, 'main')
+    ROIs_to_plot = profile.main;
+else
+    ROIs_to_plot = 1:size(profile.MEAN, 2);
+end
+NbROI = numel(ROIs_to_plot);
 end

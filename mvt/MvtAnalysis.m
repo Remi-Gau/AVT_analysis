@@ -1,6 +1,3 @@
-
-
-
 % Analyizes realignement parameters and computes / plots several QC results
 clear; clc; close all
 
