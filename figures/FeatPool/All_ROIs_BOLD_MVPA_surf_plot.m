@@ -467,17 +467,9 @@ for iAnalysis= 1:numel(TitSuf)
     
     %% Plot
     for WithPerm = 1
+
+        [ToPermute] = list_permutation(WithPerm, NbSub);
         
-        sets = {};
-        for iSub=1:NbSub
-            sets{iSub} = [-1 1]; %#ok<*AGROW>
-        end
-        [a, b, c, d, e, f, g, h, i, j] = ndgrid(sets{:});
-        ToPermute = [a(:), b(:), c(:), d(:), e(:), f(:), g(:), h(:), i(:), j(:)];
-        
-        if ~WithPerm
-            ToPermute = [];
-        end
         
         ToPlot.Legend = Legend; clear Legend
         ToPlot.ToPermute = ToPermute;

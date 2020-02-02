@@ -26,27 +26,6 @@ NbSub = numel(SubLs);
 NbLayers=6;
 
 WithPerm = 1;
-sets = {};
-for iSub=1:NbSub
-    sets{iSub} = [-1 1]; %#ok<*AGROW>
-end
-[a, b, c, d, e, f, g, h, i, j] = ndgrid(sets{:});
-ToPermute = [a(:), b(:), c(:), d(:), e(:), f(:), g(:), h(:), i(:), j(:)];
-if ~WithPerm
-    ToPermute = [];
-end
-
-% ROIs = {
-%     'A1'
-%     'PT'
-%     'V1'
-%     'V2'
-%     'V3'
-%     'V4'
-%     'V5'};
-% NbROI = numel(ROIs);
-% ROI_order_BOLD = [1 NbROI 2:NbROI-1];
-% ROI_order_MVPA = [NbROI-1 NbROI 1:NbROI-2];
 
 ROIs = {
     'A1'
@@ -116,11 +95,10 @@ else
 end
 
 SavedTxt = fullfile(Dirs.FigureFolder, 'BOLD_and_MVPA_results');
-if WithPerm
-    SavedTxt = [SavedTxt '_perm.csv'];
-else
-    SavedTxt = [SavedTxt '_ttest.csv'];
-end
+
+[ToPermute, PermSuffix] = list_permutation(WithPerm, NbSub);
+
+SavedTxt = [SavedTxt PermSuffix '.csv'];
 
 fid = fopen (SavedTxt, 'w');
 

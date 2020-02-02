@@ -17,7 +17,7 @@ addpath(genpath(fullfile(CodeDir, 'subfun')))
 
 Get_dependencies()
 
-SubLs = dir(fullfile(StartDir,'sub*'));
+SubLs = dir(fullfile(Dirs.DerDir,'sub*'));
 NbSub = numel(SubLs);
 
 NbLayers=6;
@@ -51,16 +51,8 @@ SubSVM = [1:3;4:6;7:9];
 
 for WithPerm = 1
     
-    sets = {};
-    for iSub=1:NbSub
-        sets{iSub} = [-1 1];
-    end
-    [a, b, c, d, e, f, g, h, i, j] = ndgrid(sets{:});
-    ToPermute = [a(:), b(:), c(:), d(:), e(:), f(:), g(:), h(:), i(:), j(:)];
+    [ToPermute] = list_permutation(WithPerm, NbSub);
     
-    if ~WithPerm
-        ToPermute = [];
-    end
     
     %% Plot Stim and targets alone
     for IsStim = [1 0]
