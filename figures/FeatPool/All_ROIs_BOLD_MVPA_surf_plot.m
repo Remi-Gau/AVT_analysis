@@ -248,7 +248,7 @@ for iAnalysis= 1:numel(TitSuf)
                 ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
             end
             
-            % Same for the MVPA data (contra)
+            % Same for the MVPA data
             ToPlot.Row = 3:4;
             
             if avg_hs
@@ -320,10 +320,10 @@ for iAnalysis= 1:numel(TitSuf)
                     1; ...
                     1];
                 
-                Legend{1,1} = 'contra, ipsi';
-                Legend{2,1} = 'contra, ipsi';
-                Legend{3,1} = 'contra, ipsi';
-                Legend{4,1} = 'contra, ipsi';
+                Legend{1,1} = 'mean(contra, ipsi)';
+                Legend{2,1} = 'mean(contra, ipsi)';
+                Legend{3,1} = 'mean(contra, ipsi)';
+                Legend{4,1} = 'mean(contra, ipsi)';
                 
                 ToPlot.n=1;
                 ToPlot.SubPlots = {...
@@ -391,6 +391,8 @@ for iAnalysis= 1:numel(TitSuf)
             
             
         case 3
+            
+            ToPlot.CI_s_parameter = 1;
             
             ToPlot.OneSideTTest = ...
                 cat(3, ...
