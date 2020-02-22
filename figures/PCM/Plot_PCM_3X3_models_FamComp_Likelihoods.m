@@ -11,16 +11,28 @@
 
 clc; clear; close all
 
-StartDir = fullfile(pwd, '..', '..', '..');
-addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
+%% set up directories and get dependencies
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
 
-PCM_dir = fullfile(StartDir, 'figures', 'PCM');
+addpath(genpath(fullfile(CodeDir, 'subfun')))
 
-% Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/', 'D:\github/')
+[Dirs] = set_dir();
+
+Get_dependencies()
+
+PCM_dir = fullfile(Dirs.DerDir, 'figures', 'PCM');
 
 Comp_suffix{1} = '3X3_Ipsi';
 Comp_suffix{end+1} = '3X3_Contra';
+Comp_suffix{end+1} = '3X3_ContraIpsi';
 
 %% Sorting models for each family comparison
 
@@ -113,7 +125,7 @@ else
         Save_suffix = 'beta-wht'; %#ok<*UNRCH>
     end
 end
-Save_dir = fullfile(StartDir, 'results', 'PCM', Output_dir);
+Save_dir = fullfile(Dirs.DerDir, 'results', 'PCM', Output_dir);
 
 if raw
     Beta_suffix = 'raw-betas';
@@ -132,7 +144,7 @@ end
 
 % To know how many ROIs we have
 if surf
-    load(fullfile(StartDir, 'sub-02', 'roi', 'surf','sub-02_ROI_VertOfInt.mat'), 'ROI', 'NbVertex')
+    load(fullfile(Dirs.DerDir, 'sub-02', 'roi', 'surf','sub-02_ROI_VertOfInt.mat'), 'ROI', 'NbVertex')
 else
     ROI(1).name ='A1';
     ROI(2).name ='PT';
@@ -151,7 +163,7 @@ set(0,'defaultTextFontName','Arial')
 FigDim = [50, 50, 480, 600];
 
 
-for iToPlot = 1:2 %:numel(ToPlot)
+for iToPlot = 1 %:numel(ToPlot)
     
     for Target = 1
         
@@ -165,10 +177,10 @@ for iToPlot = 1:2 %:numel(ToPlot)
             
             for ihs=1:NbHS
                 
-                for iComp = 1:2
+                for iComp = 1:3Save_dir = fullfile(Dirs.DerDir, 'results', 'PCM', Output_dir);
                     
                     ls_files_2_load = dir(fullfile(Save_dir, ...
-                        sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_201*.mat', ...
+                        sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_20*.mat', ...
                         Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
                         ToPlot{iToPlot}, Split_suffix, Comp_suffix{iComp})));
                     
