@@ -15,6 +15,8 @@ raw = 0; % run on raw betas or prewhitened
 hs_idpdt = 0; % only implemented for volume
 Split_half = 0; % only implemented for surface
 
+print_models = 0;
+
 MaxIteration = 50000;
 runEffect  = 'fixed';
 
@@ -96,11 +98,13 @@ mkdir(Save_dir)
 fprintf('Building models\n')
 M_ori = Set_PCM_3X3_models;
 
-fig_h = Plot_PCM_models_feature(M_ori);
-for iFig = 1:numel(fig_h)
-    print(fig_h(iFig), fullfile(Dirs.FigureFolder, 'PCM', 'Cdt', '3X3_models', ...
-        ['Model-' num2str(iFig) '-' strrep(strrep(fig_h(iFig).Name ,',',''),' ','') '.tif']),...
-        '-dtiff');
+if print_models
+    fig_h = Plot_PCM_models_feature(M_ori);
+    for iFig = 1:numel(fig_h)
+        print(fig_h(iFig), fullfile(Dirs.FigureFolder, 'PCM', 'Cdt', '3X3_models', ...
+            ['Model-' num2str(iFig) '-' strrep(strrep(fig_h(iFig).Name ,',',''),' ','') '.tif']),...
+            '-dtiff');
+    end
 end
 
 
@@ -125,7 +129,7 @@ end
 fprintf('Get started\n')
 
 
-for iToPlot = 2%:numel(ToPlot) % decides on what parameter the PCM is run (ToPlot={'Cst','Lin','Avg','ROI'};)
+for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (ToPlot={'Cst','Lin','Avg','ROI'};)
     
     for Target = 1
         
@@ -190,7 +194,7 @@ for iToPlot = 2%:numel(ToPlot) % decides on what parameter the PCM is run (ToPlo
         end
         
         %%
-        for iROI =  1:5 %:numel(ROI)
+        for iROI =  1:4 %:numel(ROI)
             
             fprintf('\n %s\n', ROI(iROI).name)
             
@@ -335,14 +339,14 @@ for iToPlot = 2%:numel(ToPlot) % decides on what parameter the PCM is run (ToPlo
                     G_hat(:,:,iSub)=pcm_estGCrossval(Y{iSub},partVec{iSub},condVec{iSub});
                     
                 end
-                  
+                
                 %% Save G matrix
                 save(fullfile(Save_dir, sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s.mat', ...
                     Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
                     ToPlot{iToPlot}, datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
-                   'partVec', 'condVec','G_hat')
-               
-               clear G_hat
+                    'partVec', 'condVec','G_hat')
+                
+                clear G_hat
                 
                 %% Run the PCM
                 Y_ori = Y;
@@ -360,7 +364,7 @@ for iToPlot = 2%:numel(ToPlot) % decides on what parameter the PCM is run (ToPlo
                         Split_suffix = '';
                     end
                     
-                    for iComparison = 1:2
+                    for iComparison = 3
                         
                         switch iComparison
                             case 1
@@ -369,37 +373,51 @@ for iToPlot = 2%:numel(ToPlot) % decides on what parameter the PCM is run (ToPlo
                             case 2
                                 Comp_suffix = '3X3_Contra';
                                 CdtToSelect = 2:2:6;
+                            case 3
+                                Comp_suffix = '3X3_ContraIpsi';
+                                CdtToSelect = 1:6;
                         end
                         
+                        % loop through subjects and compute G matrices
                         condVec = condVec_ori;
                         for iSub = 1:numel(condVec)
                             condVec{iSub}(~ismember(condVec{iSub},CdtToSelect)) = 0;
                             
-                            G_hat(:,:,iSub,iSplit)=pcm_estGCrossval(Y{iSub},partVec{iSub},condVec{iSub});
-                            G(:,:,iSub,iSplit) = Y_avg{iSub}*Y_avg{iSub}'/size(Y_avg{iSub},2); % with no CV.
+                            % collapse across ipsi and contra stimuli by
+                            % pooling (not averaging)
+                            if iComparison==3
+                                condVec{iSub}(condVec{iSub}==2) = 1;
+                                condVec{iSub}(condVec{iSub}==4) = 3;
+                                condVec{iSub}(condVec{iSub}==6) = 5;
+                            end
+                            
+                            G_hat(:,:,iSub,iSplit) = pcm_estGCrossval( Y{iSub}, partVec{iSub}, condVec{iSub} );
+                            
+                            G(:,:,iSub,iSplit) = Y_avg{iSub} * Y_avg{iSub}' / size(Y_avg{iSub},2); % with no CV.
                         end
                         
                         M = M_ori;
-
+                        
                         % Fit the models on the group level
                         fprintf('\n\n  Running PCM_grp %s\n\n', Comp_suffix)
-%                         try
-                            [T_group,theta_gr,G_pred_gr] = pcm_fitModelGroup(Y,M,partVec,condVec,'runEffect',runEffect,'fitScale',1);
-                            [T_cross,theta_cr,G_pred_cr] = pcm_fitModelGroupCrossval(Y,M,partVec,condVec,'runEffect',runEffect,'groupFit',...
-                                theta_gr,'fitScale',1,'MaxIteration',MaxIteration);
-                            
-                            % Save
-                            save(fullfile(Save_dir, sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_%s.mat', Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
-                                ToPlot{iToPlot}, Split_suffix, Comp_suffix , datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
-                                'M', 'partVec', 'condVec','G_hat', 'G',...
-                                'T_group','theta_gr','G_pred_gr',...
-                                'T_cross','theta_cr','G_pred_cr' )
-% 
-%                         catch
-%                             save(fullfile(Save_dir, sprintf('Failed_PCM_group_features_%s_%s_%s_%s_%s_%s_%s.mat', Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
-%                                 ToPlot{iToPlot}, datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
-%                                 'M', 'partVec', 'condVec', 'Y')
-%                         end
+                        
+                        [T_group,theta_gr,G_pred_gr] = pcm_fitModelGroup(Y, M, partVec, condVec, ...
+                            'runEffect', runEffect, ...
+                            'fitScale', 1);
+                        
+                        [T_cross,theta_cr,G_pred_cr] = pcm_fitModelGroupCrossval(Y, M, partVec, condVec, ...
+                            'runEffect', runEffect, ...
+                            'groupFit', theta_gr, ...
+                            'fitScale',1, ...
+                            'MaxIteration', MaxIteration);
+                        
+                        % Save
+                        save(fullfile(Save_dir, sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_%s.mat', ...
+                            Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
+                            ToPlot{iToPlot}, Split_suffix, Comp_suffix , datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
+                            'M', 'partVec', 'condVec','G_hat', 'G',...
+                            'T_group','theta_gr','G_pred_gr',...
+                            'T_cross','theta_cr','G_pred_cr' )
                         
                     end
                     
