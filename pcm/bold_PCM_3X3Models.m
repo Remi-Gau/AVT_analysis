@@ -9,30 +9,52 @@
 
 clc; clear; close all
 
-StartDir = fullfile(pwd, '..','..');
-addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
 
-Get_dependencies('D:\Dropbox\', 'D:\github\')
-
-surf = 1; % run of volumne whole ROI or surface profile data
+surf = 1; % run of volume whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
 hs_idpdt = 0; % only implemented for volume
-
 Split_half = 0; % only implemented for surface
+
+MaxIteration = 50000;
+runEffect  = 'fixed';
+
+
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
+
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+
+[Dirs] = set_dir();
+
+Get_dependencies()
+
+SubLs = dir(fullfile(Dirs.DerDir,'sub*'));
+NbSub = numel(SubLs);
+
+
+
 if Split_half==1
     NbSplits=2;
 else
     NbSplits=1;
 end
 
-cd(StartDir)
-SubLs = dir('sub*');
-NbSub = numel(SubLs);
-
-MaxIteration = 50000;
-runEffect  = 'fixed';
 
 if surf
+    % decides on what parameter the PCM is run
+    % S parameters:
+    % - cst at each vertex
+    % - linear at each vertex
+    % B parameters:
+    % - average at each vertex
+    % - all vertices and voxels values for that ROI
     ToPlot={'Cst','Lin','Avg','ROI'};
     Output_dir = 'surf';
 else
@@ -45,11 +67,13 @@ else
     end
 end
 
+
 if raw
     Beta_suffix = 'raw-betas';
 else
     Beta_suffix = 'wht-betas';
 end
+
 
 if hs_idpdt
     hs_suffix = {'LHS' 'RHS'};
@@ -57,11 +81,14 @@ else
     hs_suffix = {'LRHS'};
 end
 
-PCM_dir = fullfile(StartDir, 'figures', 'PCM');
+
+PCM_dir = fullfile(Dirs.DerDir, 'figures', 'PCM');
 mkdir(PCM_dir)
 mkdir(PCM_dir, 'Cdt');
+mkdir(fullfile(PCM_dir, 'Cdt'), '3X3_models');
 
-Save_dir = fullfile(StartDir, 'results', 'PCM', Output_dir);
+
+Save_dir = fullfile(Dirs.DerDir, 'results', 'PCM', Output_dir);
 mkdir(Save_dir)
 
 
@@ -71,7 +98,7 @@ M_ori = Set_PCM_3X3_models;
 
 fig_h = Plot_PCM_models_feature(M_ori);
 for iFig = 1:numel(fig_h)
-    print(fig_h(iFig), fullfile('D:\Dropbox\PhD\Experiments\AVT\derivatives\figures\PCM\Cdt\3X3_models', ...
+    print(fig_h(iFig), fullfile(Dirs.FigureFolder, 'PCM', 'Cdt', '3X3_models', ...
         ['Model-' num2str(iFig) '-' strrep(strrep(fig_h(iFig).Name ,',',''),' ','') '.tif']),...
         '-dtiff');
 end
@@ -82,7 +109,7 @@ fprintf('Define ROI\n')
 
 % to know how many ROIs we have
 if surf
-    load(fullfile(StartDir, 'sub-02', 'roi', 'surf','sub-02_ROI_VertOfInt.mat'), 'ROI', 'NbVertex')
+    load(fullfile(Dirs.DerDir, 'sub-02', 'roi', 'surf','sub-02_ROI_VertOfInt.mat'), 'ROI', 'NbVertex')
 else
     ROI(1).name ='V1_thres';
     ROI(2).name ='V2_thres';
@@ -97,7 +124,8 @@ end
 %% Start
 fprintf('Get started\n')
 
-for iToPlot = 2%:numel(ToPlot)
+
+for iToPlot = 2%:numel(ToPlot) % decides on what parameter the PCM is run (ToPlot={'Cst','Lin','Avg','ROI'};)
     
     for Target = 1
         
@@ -121,7 +149,7 @@ for iToPlot = 2%:numel(ToPlot)
         %% Create partition and condition vector
         for iSub = 1:NbSub
             
-            Sub_dir = fullfile(StartDir, SubLs(iSub).name);
+            Sub_dir = fullfile(Dirs.DerDir, SubLs(iSub).name);
             
             load(fullfile(Sub_dir, 'ffx_nat', 'SPM.mat'))
             Nb_sess(iSub) = numel(SPM.Sess);   %#ok<*SAGROW>
@@ -178,7 +206,7 @@ for iToPlot = 2%:numel(ToPlot)
                     
                     fprintf(' Loading %s\n', SubLs(iSub).name)
                     
-                    Sub_dir = fullfile(StartDir, SubLs(iSub).name);
+                    Sub_dir = fullfile(Dirs.DerDir, SubLs(iSub).name);
                     
                     partitionVec =  partitionVec_ori{iSub};
                     conditionVec = conditionVec_ori{iSub};
