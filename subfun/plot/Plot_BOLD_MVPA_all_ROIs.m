@@ -188,7 +188,7 @@ else
     plot([-25 25], [0 0], '-k','LineWidth', .8)
 end
 
-% plot spead
+% plot spread
 tmp_cell = mat2cell(Data,size(Data,1),ones(1,size(Data,2)));
 for i=1:numel(Xpos)
     distributionPlot(tmp_cell{i}, 'xValues', Xpos(i), ...
@@ -202,11 +202,38 @@ for i=1:numel(Xpos)
 end
 
 % plot mean+SEM
-plot(Xpos-.8, nanmean(Data), 'k. ', 'MarkerSize', 7)
+plot(Xpos-.8, nanmean(Data), 'k. ', 'MarkerSize', 9)
+
 for i=1:numel(Xpos)
-    plot([Xpos(i)-.8;Xpos(i)-.8], ...
-        [nanmean(Data(:,i))+nansem(Data(:,i)); ...
-        nanmean(Data(:,i))-nansem(Data(:,i))], ' k','LineWidth', 1.2 )
+    
+    if ToPlot.CI_s_parameter
+        
+        % the more traditional 95% CI based on student distribution
+        %         Lower = nanmean(Data(:,i))-1.96*nansem(Data(:,i))
+        %         Upper = nanmean(Data(:,i))+1.96*nansem(Data(:,i))
+
+
+        % based on bias-corrected and accelerated bootstrap confidence interval
+        
+        % using bias correction of effect size estimate (Hedges and Olkin)
+        %         CI = bootci(10000,{@(x) Unbiased_ES(x), Data(:,i)},'alpha', Alpha, 'type','bca');
+        %         Lower = CI(1);
+        %         Upper = CI(2);
+        
+        % using mean as estimate of effect size
+        CI = bootci(10000,{@(x) mean(x), Data(:,i)},'alpha', Alpha, 'type','bca');
+        Lower = CI(1);
+        Upper = CI(2);
+        
+    else
+        Lower = nanmean(Data(:,i))-nansem(Data(:,i));
+        Upper = nanmean(Data(:,i))+nansem(Data(:,i));
+    end
+    
+    plot(...
+        [Xpos(i)-.8;Xpos(i)-.8], ...
+        [Lower; Upper], ...
+        ' k','LineWidth', 1.5 )
 end
 
 
@@ -267,4 +294,12 @@ else
     ROIs_to_plot = 1:size(profile.MEAN, 2);
 end
 NbROI = numel(ROIs_to_plot);
+end
+
+function du = Unbiased_ES(grp_data)
+% from DOI 10.1177/0013164404264850
+d = mean(grp_data)/std(grp_data);
+nu = length(grp_data)-1;
+G = gamma(nu/2)/(sqrt(nu/2)*gamma((nu-1)/2));
+du = d*G;
 end
