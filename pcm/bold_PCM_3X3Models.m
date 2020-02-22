@@ -351,8 +351,12 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
                 %% Run the PCM
                 Y_ori = Y;
                 condVec_ori = condVec;
+                partVec_ori = partVec;
                 
                 for iSplit = 1:NbSplits
+                    
+                    Y{iSub} = Y_ori{iSub};
+
                     if Split_half
                         clear Y Vert2Take
                         for iSub=1:NbSub
@@ -364,7 +368,7 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
                         Split_suffix = '';
                     end
                     
-                    for iComparison = 3
+                    for iComparison = 1:3
                         
                         switch iComparison
                             case 1
@@ -381,15 +385,36 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
                         % loop through subjects and compute G matrices
                         condVec = condVec_ori;
                         for iSub = 1:numel(condVec)
-                            condVec{iSub}(~ismember(condVec{iSub},CdtToSelect)) = 0;
                             
-                            % collapse across ipsi and contra stimuli by
-                            % pooling (not averaging)
+                            condVec{iSub}(~ismember(condVec{iSub},CdtToSelect)) = 0;
+   
+                            % collapse across ipsi and contra stimuli by averaging
+                            % we loop over partitions and then for each condition (A, V, T) we 
+                            % average the ipsi and contra data of that partition.
+                             
                             if iComparison==3
-                                condVec{iSub}(condVec{iSub}==2) = 1;
-                                condVec{iSub}(condVec{iSub}==4) = 3;
-                                condVec{iSub}(condVec{iSub}==6) = 5;
+                                for ipart = 1:max(partVec{iSub}) 
+                                    this_part = partVec{iSub} == ipart;
+                                    for iCdt = 1:2:5
+                                    Y{iSub}( all([this_part, condVec{iSub}==iCdt],2) , : ) = ...
+                                        mean( Y{iSub}(  all([this_part, ismember(condVec{iSub},iCdt:(iCdt+1))],2) , : ) ) ; 
+                                    end
+                                end
+                                
+                                % Then we only keep the rows where the data has been averaged
+                                condVec{iSub}(condVec{iSub}==2) = 0;
+                                condVec{iSub}(condVec{iSub}==4) = 0;
+                                condVec{iSub}(condVec{iSub}==6) = 0;
+                                
+                                partVec{iSub}(condVec{iSub}==0) = [];
+                                Y{iSub}(condVec{iSub}==0, :) = [];
+                                condVec{iSub}(condVec{iSub}==0) = [];
+                            else
+                                
                             end
+                            
+                            
+                            
                             
                             G_hat(:,:,iSub,iSplit) = pcm_estGCrossval( Y{iSub}, partVec{iSub}, condVec{iSub} );
                             
