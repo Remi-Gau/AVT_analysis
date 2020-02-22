@@ -4,10 +4,22 @@
 
 clc; clear; close all
 
-StartDir = fullfile(pwd, '..', '..', '..');
-addpath(genpath(fullfile(StartDir, 'code','subfun')))
+%% set up directories and get dependencies
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
 
-Get_dependencies('D:\Dropbox/', 'D:\github/')
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+
+[Dirs] = set_dir();
+
+Get_dependencies()
 
 % These are the 12 models from the PCM
 % M{1}.name = 'all_scaled';
@@ -41,8 +53,8 @@ else
     Split_suffix = '';
 end
 
-cd(StartDir)
-SubLs = dir('sub*');
+
+SubLs = dir(fullfile(Dirs.DerDir,'sub*'));
 NbSub = numel(SubLs);
 
 ColorSubject = ColorSubject();
@@ -67,17 +79,17 @@ else
 end
 
 
-ColorMap = seismic(1000);
+ColorMap = jet;%seismic(1000);
 FigDim = [50, 50, 1400, 750];
 visible = 'on';
 
 
-PCM_dir = fullfile(StartDir, 'figures', 'PCM');
-Save_dir = fullfile(StartDir, 'results', 'PCM', Output_dir);
+PCM_dir = fullfile(Dirs.DerDir, 'figures', 'PCM');
+Save_dir = fullfile(Dirs.DerDir, 'results', 'PCM', Output_dir);
 
 % to know how many ROIs we have
 if surf
-    load(fullfile(StartDir, 'sub-02', 'roi', 'surf','sub-02_ROI_VertOfInt.mat'), 'ROI', 'NbVertex')
+    load(fullfile(Dirs.DerDir, 'sub-02', 'roi', 'surf','sub-02_ROI_VertOfInt.mat'), 'ROI', 'NbVertex')
 else
     ROI(1).name ='A1';
     ROI(2).name ='PT';
@@ -99,7 +111,7 @@ end
 Comp_suffix{1} = '3X3_Ipsi';
 Comp_suffix{end+1} = '3X3_Contra';
 
-for iToPlot = 2%:numel(ToPlot)
+for iToPlot = 2:numel(ToPlot)
     
     for Target = 1
         
@@ -381,7 +393,7 @@ for iToPlot = 2%:numel(ToPlot)
                     mtit(opt.FigName, 'fontsize', 12, 'xoff',0,'yoff',.035)
                     set(gcf,'visible', visible')
                     
-                    print(gcf, fullfile(PCM_dir, 'Cdt', '3X3_models', [opt.FigName '.tif'] ), '-dtiff')
+%                     print(gcf, fullfile(PCM_dir, 'Cdt', '3X3_models', [opt.FigName '.tif'] ), '-dtiff')
                     
                 end
             end

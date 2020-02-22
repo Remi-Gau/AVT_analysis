@@ -49,8 +49,11 @@ After that you can simply add to your path by typing
 mpm init -c AVT
 ```
 
-
-
+or manually add them by doing
+```matlab
+mpm_folder = fileparts(which('mpm'));
+addpath(genpath(fullfile(mpm_folder, 'mpm-packages', 'mpm-collections', 'AVT')));
+```
 
 
 ## Data analysis workflow

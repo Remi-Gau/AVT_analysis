@@ -2,10 +2,22 @@
 
 clc; clear; close all
 
-StartDir = fullfile(pwd, '..', '..', '..');
-addpath(genpath(fullfile(StartDir, 'code','subfun')))
+%% set up directories and get dependencies
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
 
-Get_dependencies('D:\Dropbox/', 'D:\github/')
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+
+[Dirs] = set_dir();
+
+Get_dependencies()
 
 surf = 1; % run of volumne whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened

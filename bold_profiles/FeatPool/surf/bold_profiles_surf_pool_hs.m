@@ -1,11 +1,23 @@
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..','..','..');
-addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
-Get_dependencies('D:\Dropbox/')
+%% set up directories and get dependencies
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
 
-cd(StartDir)
-SubLs = dir('sub*');
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+
+[Dirs] = set_dir();
+
+Get_dependencies()
+
+SubLs = dir(fullfile(Dirs.DerDir,'sub*'));
 NbSub = numel(SubLs);
 
 NbLayers = 6;
@@ -19,7 +31,7 @@ CondNames = {...
     %     'TTargL','TTargR';...
     };
 
-load(fullfile(StartDir,'results','roi','MinNbVert.mat'),'MinVert')
+load(fullfile(Dirs.DerDir,'results','roi','MinNbVert.mat'),'MinVert')
 
 for iSub = 1:NbSub
     
@@ -27,7 +39,7 @@ for iSub = 1:NbSub
     
     fprintf('Processing %s\n', SubLs(iSub).name)
     
-    Sub_dir = fullfile(StartDir, SubLs(iSub).name);
+    Sub_dir = fullfile(Dirs.DerDir, SubLs(iSub).name);
     GLM_dir = fullfile(Sub_dir, 'ffx_nat');
     Data_dir = fullfile(GLM_dir,'betas','6_surf');
     
@@ -60,7 +72,7 @@ for iSub = 1:NbSub
             num2str(NbLayers) '_surf.mat']);
         
         InfSurfFile=spm_select('FPList', fullfile(Sub_dir, 'anat', 'cbs'), ...
-            ['^' SubLs(iSub).name '.*' HsSufix 'cr_gm_avg_inf.vtk$']);
+            ['^' SubLs(iSub).name '.*' HsSufix 'cr_gm_avg_inf_qT1.vtk$']);
         [inf_vertex,inf_faces,~] = read_vtk(InfSurfFile, 0, 1);
         
         NbVertices(hs)=size(inf_vertex,2);

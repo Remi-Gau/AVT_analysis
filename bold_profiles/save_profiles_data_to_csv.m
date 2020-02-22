@@ -1,6 +1,6 @@
 %%
-% This script gets data from the beta values from the whole brain surface at the different depth
-% for each condition, block, ROI, subject
+% This script computes the bold profile for for each condition, session,
+% subject and saves it in a different file for each ROI
 
 clc; clear;
 
@@ -10,7 +10,11 @@ ROIs = {
     'V1'
     'V2'};
 
-Median = 1;
+Median = 1; % if set to 0 will compute mean
+
+% to decide if we extract the data from the base sitmuli (1) or from the
+% target stimuli (0)
+Stim = 0;
 
 
 %% set up directories and get dependencies
@@ -37,10 +41,6 @@ mkdir(Results_dir)
 
 
 %%
-% to decide if we extract the data from the base sitmuli (1) or from the
-% target stimuli (0)
-Stim = 0;
-
 NbLayers = 6;
 LayerInd = NbLayers:-1:1;
 
@@ -163,9 +163,3 @@ for iROI = 1:numel(ROIs)
     fclose (fid);
     
 end
-
-
-
-
-
-
