@@ -130,7 +130,7 @@ end
 
 close all
 
-for iAnalysis= 1:numel(TitSuf)
+for iAnalysis= 3; %1:numel(TitSuf)
     
     % init
     clear ToPlot ToPlot2
