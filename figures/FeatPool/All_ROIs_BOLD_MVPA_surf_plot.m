@@ -28,9 +28,10 @@ plot_pvalue = 0;
 % only A_contra - A_ipsi in V1 and V2
 % only V_contra - V_ipsi in A1 and PT
 % only differences between non-preferred modalities of a ROI
-plot_main = 1;
+plot_main = 0;
 
 % average results over ipsi and contra (only for cross sensory comparisons)
+% for MVPA the accuracy are averaged.
 avg_hs = 1;
 
 
@@ -130,7 +131,7 @@ end
 
 close all
 
-for iAnalysis= 3; %1:numel(TitSuf)
+for iAnalysis= 1:numel(TitSuf)
     
     % init
     clear ToPlot ToPlot2
@@ -140,6 +141,8 @@ for iAnalysis= 3; %1:numel(TitSuf)
     ToPlot.FigureFolder=Dirs.FigureFolder;
     ToPlot.OneSideTTest = Test_side;
     ToPlot.plot_pvalue = plot_pvalue;
+    
+    ToPlot.CI_s_parameter = 1;
     
     ToPlot.profile.MEAN=[];
     ToPlot.profile.SEM=[];
@@ -166,6 +169,7 @@ for iAnalysis= 3; %1:numel(TitSuf)
     
     %% Get BOLD
     switch iAnalysis
+        
         case 1
             % Get BOLD data for Contra - Ipsi
             Data = cat(1,AllSubjects_Data_BOLD(:).Contra_VS_Ipsi);
@@ -233,9 +237,7 @@ for iAnalysis= 3; %1:numel(TitSuf)
                 Data_ipsi = cat(1,AllSubjects_Data_BOLD(:).ContSensModIpsi);
                 
                 Data = average_hs(Data_contra, Data_ipsi);
-                
-                ToPlot = Get_data(ToPlot, Data, ROI_order_BOLD);
-                
+
             else
                 % Get BOLD data for between senses contrasts (contra)
                 Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModContra);
@@ -244,21 +246,21 @@ for iAnalysis= 3; %1:numel(TitSuf)
                 % Get BOLD data for between senses contrasts (ipsi)
                 ToPlot.Col = 2;
                 Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModIpsi);
-                
-                ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+
             end
+            
+            ToPlot = Get_data(ToPlot, Data, ROI_order_BOLD);
             
             % Same for the MVPA data
             ToPlot.Row = 3:4;
+            ToPlot.Col = 1;
             
             if avg_hs
                 Data_contra = Get_data_MVPA(ROIs_to_get,SubSVM,3,SVM);
                 Data_ipsi = Get_data_MVPA(ROIs_to_get,SubSVM,2,SVM);
                 
                 Data = average_hs(Data_contra, Data_ipsi, 1);
-                
-                ToPlot = Get_data(ToPlot, Data, ROI_order_MVPA);
-                
+
             else
                 % contra
                 Data = Get_data_MVPA(ROIs_to_get,SubSVM,3,SVM);
@@ -267,8 +269,10 @@ for iAnalysis= 3; %1:numel(TitSuf)
                 % ipsi
                 ToPlot.Col = 2;
                 Data = Get_data_MVPA(ROIs_to_get,SubSVM,2,SVM);
-                ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+                
             end
+            
+            ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             
             % To specify which ROIs to plot for each figure 
             if plot_main
