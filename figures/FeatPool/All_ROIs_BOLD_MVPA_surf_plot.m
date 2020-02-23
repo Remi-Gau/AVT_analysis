@@ -28,7 +28,7 @@ plot_pvalue = 0;
 % only A_contra - A_ipsi in V1 and V2
 % only V_contra - V_ipsi in A1 and PT
 % only differences between non-preferred modalities of a ROI
-plot_main = 0;
+plot_main = 1;
 
 % average results over ipsi and contra (only for cross sensory comparisons)
 % for MVPA the accuracy are averaged.
@@ -131,7 +131,7 @@ end
 
 close all
 
-for iAnalysis= 1:numel(TitSuf)
+for iAnalysis = 3 %1:numel(TitSuf)
     
     % init
     clear ToPlot ToPlot2
