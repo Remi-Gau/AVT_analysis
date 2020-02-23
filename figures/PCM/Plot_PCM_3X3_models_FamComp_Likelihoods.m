@@ -3,7 +3,7 @@
 % - computes exceedance probabilities by performing 2 family comparison with spm_compare_families
 %           a) Families.names{1}='Scaled';
 %           b) Families.names{2}='Scaled+Idpdt and Idpdt';
-% or 
+% or
 %           a) Families.names{1}='Scaled';
 %           b) Families.names{2}='Scaled+Idpdt'
 %           c) Families.names{3}='Idpdt'
@@ -11,16 +11,28 @@
 
 clc; clear; close all
 
-StartDir = fullfile(pwd, '..', '..', '..');
-addpath(genpath(fullfile(StartDir, 'AVT-7T-code','subfun')))
+%% set up directories and get dependencies
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
 
-PCM_dir = fullfile(StartDir, 'figures', 'PCM');
+addpath(genpath(fullfile(CodeDir, 'subfun')))
 
-% Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/', 'D:\github/')
+[Dirs] = set_dir();
+
+Get_dependencies()
+
+PCM_dir = fullfile(Dirs.DerDir, 'figures', 'PCM');
 
 Comp_suffix{1} = '3X3_Ipsi';
 Comp_suffix{end+1} = '3X3_Contra';
+Comp_suffix{end+1} = '3X3_ContraIpsi';
 
 %% Sorting models for each family comparison
 
@@ -113,7 +125,7 @@ else
         Save_suffix = 'beta-wht'; %#ok<*UNRCH>
     end
 end
-Save_dir = fullfile(StartDir, 'results', 'PCM', Output_dir);
+Save_dir = fullfile(Dirs.DerDir, 'results', 'PCM', Output_dir);
 
 if raw
     Beta_suffix = 'raw-betas';
@@ -132,7 +144,7 @@ end
 
 % To know how many ROIs we have
 if surf
-    load(fullfile(StartDir, 'sub-02', 'roi', 'surf','sub-02_ROI_VertOfInt.mat'), 'ROI', 'NbVertex')
+    load(fullfile(Dirs.DerDir, 'sub-02', 'roi', 'surf','sub-02_ROI_VertOfInt.mat'), 'ROI', 'NbVertex')
 else
     ROI(1).name ='A1';
     ROI(2).name ='PT';
@@ -151,7 +163,7 @@ set(0,'defaultTextFontName','Arial')
 FigDim = [50, 50, 480, 600];
 
 
-for iToPlot = 1:2 %:numel(ToPlot)
+for iToPlot = 1 %:numel(ToPlot)
     
     for Target = 1
         
@@ -165,10 +177,12 @@ for iToPlot = 1:2 %:numel(ToPlot)
             
             for ihs=1:NbHS
                 
-                for iComp = 1:2
+                for iComp = 1:3
+                    
+                    Save_dir = fullfile(Dirs.DerDir, 'results', 'PCM', Output_dir);
                     
                     ls_files_2_load = dir(fullfile(Save_dir, ...
-                        sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_201*.mat', ...
+                        sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_20*.mat', ...
                         Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
                         ToPlot{iToPlot}, Split_suffix, Comp_suffix{iComp})));
                     
@@ -239,121 +253,93 @@ for iToPlot = 1:2 %:numel(ToPlot)
             
             Mat2Save_struct = struct(...
                 'comp',{{'Ai VS Vi', 'Ai VS Ti', 'Vi VS Ti', ...
-                         'Ac VS Vc', 'Ac VS Tc', 'Vc VS Tc'}}, ...
+                'Ac VS Vc', 'Ac VS Tc', 'Vc VS Tc'}}, ...
                 'p_s',[ ],...
                 'p_si',[ ],...
                 'p_i',[ ]);
+            
+            for iComp = 1:size(XP,4)
+                
+                if iFam==1
+                    NbFam = '3';
+                    Mat2Plot = squeeze(XP(:,3,:,iComp)+XP(:,1,:,iComp));
+                    Mat2Save = cat(1, XP([2 1 3],:,:,iComp), XP([2 1 3],:,:,iComp));
+                else
+                    NbFam = '2';
+                    Mat2Plot = squeeze(XP2(:,1,:,iComp));
+                    Mat2Save = zeros(6,3,NbROI);
+                end
+                
+                opt.FigName = sprintf('ExcProba-%sFam-%s-%s-PCM_{grp}-%s-%s-%s', ...
+                    NbFam, hs_suffix{ihs}, Comp_suffix{iComp}, ...
+                    Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+                
+                print_PCM_table(Mat2Save, Mat2Save_struct, ROI, NbROI, save_dir, opt)
+                
+                
+                figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
+                
+                colormap('gray')
 
-            if iFam==1
-                NbFam = '3';
-                Mat2Plot = squeeze(XP(:,3,:,1)+XP(:,1,:,1));
-                Mat2Save = cat(1, XP([2 1 3],:,:,1), XP([2 1 3],:,:,2));
-            else
-                NbFam = '2';
-                Mat2Plot = squeeze(XP2(:,1,:,1));
-                Mat2Save = zeros(6,3,NbROI);
+                hold on
+                box off
+                
+                imagesc(flipud(Mat2Plot), [0 1])
+                
+                plot([.5 NbROI+.5], [1.5 1.5], 'color', [.2 .2 .2], 'linewidth', 1)
+                plot([.5 NbROI+.5], [2.5 2.5], 'color', [.2 .2 .2], 'linewidth', 1)
+                plot([1.5 1.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
+                plot([2.5 2.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
+                plot([3.5 3.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
+                plot([4.5 4.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
+                
+                patch([2.44 2.56 2.56 2.44], [.5 .5 3.5 3.5], 'w', 'linewidth', 2)
+                
+                plot([.5 .5], [.5 3.5], 'k', 'linewidth', 2)
+                plot([NbROI+.5 NbROI+.5], [.5 3.5], 'k', 'linewidth', 2)
+                plot([.5 NbROI+.5], [.5 .5], 'k', 'linewidth', 2)
+                plot([.5 NbROI+.5], [3.5 3.5], 'k', 'linewidth', 2)
+                
+                title(strrep(Comp_suffix{iComp}, '3X3_', ''))
+
+                switch iComp
+                    case 1
+                        yticklabel = ['V_i VS T_i';'A_i VS T_i';'A_i VS V_i'];
+                    case 2
+                        yticklabel = ['V_c VS T_c';'A_c VS T_c';'A_c VS V_c'];
+                    case 3
+                        yticklabel = ['V VS T';'A VS T';'A VS V'];
+                end
+                
+                set(gca,'fontsize', 10, ...
+                    'ytick', 1:3,...
+                    'yticklabel', yticklabel,...
+                    'xtick', 1:NbROI,...
+                    'xticklabel', {ROI(1:NbROI).name}, 'Xcolor', 'k')
+                
+%                 colorbar
+                
+%                 p=mtit(['Exc probability Idpt + Scaled & Idpdt - ' ToPlot{iToPlot}],...
+%                     'fontsize',14,...
+%                     'xoff',0,'yoff',.025);
+                
+                axis([.5 NbROI+.5 .5 3.5])
+                axis square
+
+                print(gcf, fullfile(save_dir, [opt.FigName  '.tif'] ), '-dtiff')
+                pause(2)
+                
+                
+                ColorMap = brain_colour_maps('hot_increasing');
+                colormap(ColorMap)
+                print(gcf, fullfile(save_dir, [opt.FigName  '_hot.tif'] ), '-dtiff')
+                
+                
+                
             end
-
-            opt.FigName = sprintf('ExcProba-%sFam-3X3Models-%s-PCM_{grp}-%s-%s-%s', ...
-                NbFam, hs_suffix{ihs}, ...
-                Stim_suffix, Beta_suffix, ToPlot{iToPlot});
-            
-            print_PCM_table(Mat2Save, Mat2Save_struct, ROI, NbROI, save_dir, opt)
             
             
-            figure('name', opt.FigName, 'Position', FigDim, 'Color', [1 1 1]);
-            
-            colormap('gray')
-            
-            subplot(2,1,2)
-            hold on
-            box off
-
-            imagesc(flipud(Mat2Plot), [0 1])
-            
-            plot([.5 NbROI+.5], [1.5 1.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            plot([.5 NbROI+.5], [2.5 2.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            plot([1.5 1.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            plot([2.5 2.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            plot([3.5 3.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            plot([4.5 4.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            
-            patch([2.44 2.56 2.56 2.44], [.5 .5 3.5 3.5], 'w', 'linewidth', 2)
-            
-            plot([.5 .5], [.5 3.5], 'k', 'linewidth', 2)
-            plot([NbROI+.5 NbROI+.5], [.5 3.5], 'k', 'linewidth', 2)
-            plot([.5 NbROI+.5], [.5 .5], 'k', 'linewidth', 2)
-            plot([.5 NbROI+.5], [3.5 3.5], 'k', 'linewidth', 2)
-            
-            title('Ipsi')
-            set(gca,'fontsize', 10, ...
-                'ytick', 1:3,...
-                'yticklabel', ['V_i VS T_i';'A_i VS T_i';'A_i VS V_i'],...
-                'xtick', 1:NbROI,...
-                'xticklabel', {ROI(1:NbROI).name}, 'Xcolor', 'k')
-            colorbar
-            
-            axis([.5 NbROI+.5 .5 3.5])
-            
-            
-            
-            subplot(2,1,1)
-            hold on
-            box off
-            
-            if iFam==1
-                Mat2Plot = squeeze(XP(:,3,:,2)+XP(:,1,:,2));
-            else
-                Mat2Plot = squeeze(XP2(:,1,:,2));
-            end
-
-            imagesc(flipud(Mat2Plot), [0 1])
-            
-            plot([.5 NbROI+.5], [1.5 1.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            plot([.5 NbROI+.5], [2.5 2.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            plot([1.5 1.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            plot([2.5 2.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            plot([3.5 3.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            plot([4.5 4.5], [.5 3.5], 'color', [.2 .2 .2], 'linewidth', 1)
-            
-            patch([2.44 2.56 2.56 2.44], [.5 .5 3.5 3.5], 'w', 'linewidth', 2)
-            
-            plot([.5 .5], [.5 3.5], 'k', 'linewidth', 2)
-            plot([NbROI+.5 NbROI+.5], [.5 3.5], 'k', 'linewidth', 2)
-            plot([.5 NbROI+.5], [.5 .5], 'k', 'linewidth', 2)
-            plot([.5 NbROI+.5], [3.5 3.5], 'k', 'linewidth', 2)
-            
-            title(Comp_suffix{2})
-            title('Contra')
-            set(gca,'fontsize', 10, ...
-                'ytick', 1:3,...
-                'yticklabel', ['V_c VS T_c';'A_c VS T_c';'A_c VS V_c'],...
-                'xtick', 1:NbROI,...
-                'xticklabel', {ROI(1:NbROI).name}, 'Xcolor', 'k')
-            colorbar
-            
-            axis([.5 NbROI+.5 .5 3.5])
-
-            %             p=mtit(['Exc probability Idpt + Scaled & Idpdt - ' ToPlot{iToPlot}],...
-            %                 'fontsize',14,...
-            %                 'xoff',0,'yoff',.025);
-            
-            print(gcf, fullfile(save_dir, [opt.FigName  '.tif'] ), '-dtiff')
-            pause(2)
-            
-            ColorMap = brain_colour_maps('hot_increasing');
-            colormap(ColorMap)
-            print(gcf, fullfile(save_dir, [opt.FigName  '_hot.tif'] ), '-dtiff')
-            
-            subplot(2,1,1)
-            axis off
-            title ' '
-            
-            subplot(2,1,2)
-            axis off
-            title ' '
-
         end
-               
+        
     end
 end

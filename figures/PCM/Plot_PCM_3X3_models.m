@@ -79,7 +79,7 @@ else
 end
 
 
-ColorMap = jet;%seismic(1000);
+ColorMap = seismic(1000);
 FigDim = [50, 50, 1400, 750];
 visible = 'on';
 
@@ -110,8 +110,9 @@ end
 
 Comp_suffix{1} = '3X3_Ipsi';
 Comp_suffix{end+1} = '3X3_Contra';
+Comp_suffix{end+1} = '3X3_ContraIpsi';
 
-for iToPlot = 2:numel(ToPlot)
+for iToPlot = 1%:numel(ToPlot)
     
     for Target = 1
         
@@ -148,14 +149,14 @@ for iToPlot = 2:numel(ToPlot)
             end
         end
         
-        for iROI = 1:5 %numel(ROI)
+        for iROI = 1:4 %numel(ROI)
             
             for ihs=1:NbHS
                 
-                for iComp = 1:2
+                for iComp = 1:3
                     
                     ls_files_2_load = dir(fullfile(Save_dir, ...
-                        sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_201*.mat', ...
+                        sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_20*.mat', ...
                         Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
                         ToPlot{iToPlot}, Split_suffix, Comp_suffix{iComp})));
                     
@@ -275,7 +276,7 @@ for iToPlot = 2:numel(ToPlot)
                     
                     mtit(opt.FigName, 'fontsize', 12, 'xoff',0,'yoff',.035)
 
-%                     print(gcf, fullfile(PCM_dir, 'Cdt', '3X3_models', [opt.FigName '.tif'] ), '-dtiff')
+                    print(gcf, fullfile(PCM_dir, 'Cdt', '3X3_models', [opt.FigName '.tif'] ), '-dtiff')
           
                 end
 
@@ -332,12 +333,6 @@ for iToPlot = 2:numel(ToPlot)
                                 hold on
                                 Scatter = linspace(-.3, .3, NbSub);
                                 for iM=2:numel(M)-1
-                                    %                                     h = plotSpread(T.likelihood_norm(:,iM), ...
-                                    %                                         'distributionIdx', ones(size(T.likelihood_norm(:,iM))), ...
-                                    %                                         'distributionMarkers',{'o'},'distributionColors',{'w'}, ...
-                                    %                                         'xValues', iM-1, 'binWidth', 100, 'spreadWidth', .5);
-                                    %                                     set(h{1}, 'MarkerSize', 3, 'MarkerEdgeColor', 'k', ...
-                                    %                                         'MarkerFaceColor', 'w', 'LineWidth', 1)
                                     for isubj=1:NbSub
                                         plot(iM-1+Scatter(isubj),T.likelihood_norm(isubj,iM),...
                                             'marker', 'o', 'MarkerSize', 3,...
@@ -393,7 +388,7 @@ for iToPlot = 2:numel(ToPlot)
                     mtit(opt.FigName, 'fontsize', 12, 'xoff',0,'yoff',.035)
                     set(gcf,'visible', visible')
                     
-%                     print(gcf, fullfile(PCM_dir, 'Cdt', '3X3_models', [opt.FigName '.tif'] ), '-dtiff')
+                    print(gcf, fullfile(PCM_dir, 'Cdt', '3X3_models', [opt.FigName '.tif'] ), '-dtiff')
                     
                 end
             end

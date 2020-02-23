@@ -21,16 +21,14 @@ addpath(genpath(fullfile(CodeDir, 'subfun')))
 
 Get_dependencies()
 
-plot_pvalue = 0;
-
 % plot only main results
 % only deactivations
-% only A_contra - A_ipsi in V1 and V2
-% only V_contra - V_ipsi in A1 and PT
+% only contra - ipsi for tactile stim
 % only differences between non-preferred modalities of a ROI
 plot_main = 1;
 
-% average results over ipsi and contra (only for cross sensory comparisons)
+% average results over ipsi and contra
+% for MVPA the accuracy are averaged.
 avg_hs = 1;
 
 
@@ -70,6 +68,14 @@ opt.session.loro = 0;
 opt.MVNN = 0;
 opt.vol = 0;
 
+IsStim = 1;
+
+if ~plot_main
+    plot_pvalue = 1;
+else
+    plot_pvalue = 0;
+end
+
 % multivariate noise normalisation
 if opt.MVNN
     ParamToPlot={'Cst','Lin','Avg','ROI'};
@@ -91,8 +97,6 @@ opt.scaling.feat.range = 0;
 opt.scaling.feat.sessmean = 0;
 
 SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
-
-IsStim = 1;
 
 % load BOLD and MVPA
 if IsStim
@@ -130,7 +134,7 @@ end
 
 close all
 
-for iAnalysis= 1:numel(TitSuf)
+for iAnalysis = 3%:numel(TitSuf)
     
     % init
     clear ToPlot ToPlot2
@@ -140,6 +144,8 @@ for iAnalysis= 1:numel(TitSuf)
     ToPlot.FigureFolder=Dirs.FigureFolder;
     ToPlot.OneSideTTest = Test_side;
     ToPlot.plot_pvalue = plot_pvalue;
+    
+    ToPlot.CI_s_parameter = 1;
     
     ToPlot.profile.MEAN=[];
     ToPlot.profile.SEM=[];
@@ -166,57 +172,92 @@ for iAnalysis= 1:numel(TitSuf)
     
     %% Get BOLD
     switch iAnalysis
+        
+        
+        %% Contra - Ipsi
         case 1
+            
             % Get BOLD data for Contra - Ipsi
             Data = cat(1,AllSubjects_Data_BOLD(:).Contra_VS_Ipsi);
-            
-            % which conditions goes into which column and row
-            ToPlot.Col = [1 2 3];
+
             ToPlot.Row = 1;
-            ToPlot.Cdt = 1:3;
-            ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
-            
-            % Same for the MVPA data
-            ToPlot.Row = 2; % a new row means a new figure
-            Data = Get_data_MVPA(ROIs_to_get,SubSVM,iAnalysis,SVM);
-            ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
-            
-            % To know which type of data we are plotting every time
-            ToPlot.IsMVPA = [...
-                0 0 0; ...
-                1 1 1];
-            
-            % Defines the number of subplots on each figure
-            ToPlot.m=4;
-            ToPlot.n=3;
-            ToPlot.SubPlots = {... %Each column of this cell is a new condition
-                [1 4] [2 5] [3 6];...
-                7, 8, 9;...
-                10, 11, 12;...
-                13, 14, 15;... %The fourth row is for the plotting of the whole ROI
-                };
-            
-            Legend{1,1} = 'Auditory';
-            Legend{1,2} = 'Visual';
-            Legend{1,3} = 'Tactile';
-            Legend{2,1} = 'Auditory';
-            Legend{2,2} = 'Visual';
-            Legend{2,3} = 'Tactile';
-            
+
             ToPlot.Titles{1,1} = '[Contra - Ipsi]';
             ToPlot.Titles{2,1} = '[Contra VS Ipsi]';
             
             if plot_main
-                ToPlot.profile(1,1).main = 3:4;
-                ToPlot.profile(1,2).main = 1:2;
-                ToPlot.profile(1,3).main = 1:4;
-                ToPlot.profile(2,1).main = 3:4;
-                ToPlot.profile(2,2).main = 1:2;
-                ToPlot.profile(2,3).main = 1:4;
+                
+                % which conditions goes into which column and row
+                ToPlot.Col = 1;
+                
+                ToPlot.Cdt = 3;
+                ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+                
+                % Same for the MVPA data
+                ToPlot.Row = 2; % a new row means a new figure
+                Data = Get_data_MVPA(ROIs_to_get,SubSVM,iAnalysis,SVM);
+                ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+                
+                % Defines the number of subplots on each figure
+                ToPlot.m=4;
+                ToPlot.n=1;
+                ToPlot.SubPlots = {... %Each column of this cell is a new condition
+                    [1 2] ;...
+                    3;...
+                    4;...
+                    5;... %The fourth row is for the plotting of the whole ROI
+                    };
+                
+                % To know which type of data we are plotting every time
+                ToPlot.IsMVPA = [...
+                    0; ...
+                    1];
+                
+                Legend{1,1} = 'Tactile';
+                Legend{2,1} = 'Tactile';
+                
+                
+                ToPlot.profile(1,1).main = 1:4;
+                ToPlot.profile(2,1).main = 1:4;
+            else
+                
+                % which conditions goes into which column and row
+                ToPlot.Col = [1 2 3];
+
+                ToPlot.Cdt = 1:3;
+                ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+                
+                % Same for the MVPA data
+                ToPlot.Row = 2; % a new row means a new figure
+                Data = Get_data_MVPA(ROIs_to_get,SubSVM,iAnalysis,SVM);
+                ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+
+                % Defines the number of subplots on each figure
+                ToPlot.m=4;
+                ToPlot.n=3;
+                ToPlot.SubPlots = {... %Each column of this cell is a new condition
+                    [1 4] [2 5] [3 6];...
+                    7, 8, 9;...
+                    10, 11, 12;...
+                    13, 14, 15;... %The fourth row is for the plotting of the whole ROI
+                    };
+                
+                % To know which type of data we are plotting every time
+                ToPlot.IsMVPA = [...
+                    0 0 0; ...
+                    1 1 1];
+                
+                Legend{1,1} = 'Auditory';
+                Legend{1,2} = 'Visual';
+                Legend{1,3} = 'Tactile';
+                Legend{2,1} = 'Auditory';
+                Legend{2,2} = 'Visual';
+                Legend{2,3} = 'Tactile';
+                
             end
             
             
-            
+        %% Cross sensory    
         case 2
             
             ToPlot.Col = 1;
@@ -233,9 +274,7 @@ for iAnalysis= 1:numel(TitSuf)
                 Data_ipsi = cat(1,AllSubjects_Data_BOLD(:).ContSensModIpsi);
                 
                 Data = average_hs(Data_contra, Data_ipsi);
-                
-                ToPlot = Get_data(ToPlot, Data, ROI_order_BOLD);
-                
+
             else
                 % Get BOLD data for between senses contrasts (contra)
                 Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModContra);
@@ -244,21 +283,21 @@ for iAnalysis= 1:numel(TitSuf)
                 % Get BOLD data for between senses contrasts (ipsi)
                 ToPlot.Col = 2;
                 Data = cat(1,AllSubjects_Data_BOLD(:).ContSensModIpsi);
-                
-                ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+
             end
             
-            % Same for the MVPA data (contra)
+            ToPlot = Get_data(ToPlot, Data, ROI_order_BOLD);
+            
+            % Same for the MVPA data
             ToPlot.Row = 3:4;
+            ToPlot.Col = 1;
             
             if avg_hs
                 Data_contra = Get_data_MVPA(ROIs_to_get,SubSVM,3,SVM);
                 Data_ipsi = Get_data_MVPA(ROIs_to_get,SubSVM,2,SVM);
                 
                 Data = average_hs(Data_contra, Data_ipsi, 1);
-                
-                ToPlot = Get_data(ToPlot, Data, ROI_order_MVPA);
-                
+
             else
                 % contra
                 Data = Get_data_MVPA(ROIs_to_get,SubSVM,3,SVM);
@@ -267,8 +306,10 @@ for iAnalysis= 1:numel(TitSuf)
                 % ipsi
                 ToPlot.Col = 2;
                 Data = Get_data_MVPA(ROIs_to_get,SubSVM,2,SVM);
-                ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+                
             end
+            
+            ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             
             % To specify which ROIs to plot for each figure 
             if plot_main
@@ -320,10 +361,10 @@ for iAnalysis= 1:numel(TitSuf)
                     1; ...
                     1];
                 
-                Legend{1,1} = 'contra, ipsi';
-                Legend{2,1} = 'contra, ipsi';
-                Legend{3,1} = 'contra, ipsi';
-                Legend{4,1} = 'contra, ipsi';
+                Legend{1,1} = 'mean(contra, ipsi)';
+                Legend{2,1} = 'mean(contra, ipsi)';
+                Legend{3,1} = 'mean(contra, ipsi)';
+                Legend{4,1} = 'mean(contra, ipsi)';
                 
                 ToPlot.n=1;
                 ToPlot.SubPlots = {...
@@ -389,9 +430,9 @@ for iAnalysis= 1:numel(TitSuf)
             ToPlot.Titles{4,1} = '[V VS T]';
             
             
-            
+        %% Against baseline    
         case 3
-            
+
             ToPlot.OneSideTTest = ...
                 cat(3, ...
                 [3 3 1 1;
@@ -400,50 +441,79 @@ for iAnalysis= 1:numel(TitSuf)
                 2*ones(3,4),...
                 2*ones(3,4));
             
-            % Get BOLD data for Cdt-Fix Contra
-            Data = cat(1,AllSubjects_Data_BOLD(:).Contra);
-            ToPlot.Col = 1;
             ToPlot.Row = 1:3;
+            ToPlot.Col = 1;
             ToPlot.Cdt = [1;2;3];
-            ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
             
-            Data = cat(1,AllSubjects_Data_BOLD(:).Ispi);
-            ToPlot.Col = 2;
-            ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
-            
+            % Get BOLD data for Cdt-Fix Contra
+            if avg_hs 
+                % we average the data from each hemisphere
+                Data_contra = cat(1,AllSubjects_Data_BOLD(:).Contra);
+                Data_ipsi = cat(1,AllSubjects_Data_BOLD(:).Ispi);
+                
+                Data = average_hs(Data_contra, Data_ipsi);
+                
+                ToPlot = Get_data(ToPlot, Data, ROI_order_BOLD);
+                
+            else
+                Data = cat(1,AllSubjects_Data_BOLD(:).Contra);
+                ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+                
+                Data = cat(1,AllSubjects_Data_BOLD(:).Ispi);
+                ToPlot.Col = 2;
+                ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+            end
+
+            % To specify which ROIs to plot for each figure 
             if plot_main
-                ToPlot.profile(1,1).main = 3:4;
+                ToPlot.profile(1,1).main = 3:4; 
                 ToPlot.profile(2,1).main = 1:2;
                 ToPlot.profile(3,1).main = 1:4;
-                ToPlot.profile(1,2).main = 3:4;
-                ToPlot.profile(2,2).main = 1:2;
-                ToPlot.profile(3,2).main = 1:4;
+                if ~avg_hs
+                    ToPlot.profile(1,2).main = 3:4;
+                    ToPlot.profile(2,2).main = 1:2;
+                    ToPlot.profile(3,2).main = 1:4;
+                end
             end
-            
+
             ToPlot.IsMVPA = [...
                 0 0;...
                 0 0;...
                 0 0];
             
             ToPlot.m=4;
-            ToPlot.n=2;
-            ToPlot.SubPlots = {...
-                [1 3] [2 4];...
-                5, 6;...
-                7, 8;...
-                9, 10;...
-                };
             
-            Legend{1,1} = 'contra';
-            Legend{2,1} = 'contra';
-            Legend{3,1} = 'contra';
-            Legend{1,2} = 'ipsi';
-            Legend{2,2} = 'ipsi';
-            Legend{3,2} = 'ipsi';
-            
-            ToPlot.Titles{1,1} = '[A - Fix]';
-            ToPlot.Titles{2,1} = '[V - Fix]';
-            ToPlot.Titles{3,1} = '[T - Fix]';
+            if ~avg_hs
+                % To know which type of data we are plotting every time
+                Legend{1,1} = 'contra';
+                Legend{2,1} = 'contra';
+                Legend{3,1} = 'contra';
+                Legend{1,2} = 'ipsi';
+                Legend{2,2} = 'ipsi';
+                Legend{3,2} = 'ipsi';
+                
+                ToPlot.n=2;
+                ToPlot.SubPlots = {...
+                    [1 3] [2 4];...
+                    5, 6;...
+                    7, 8;...
+                    9, 10;...
+                    };
+                
+            else
+                Legend{1,1} = 'mean(contra, ipsi)';
+                Legend{2,1} = 'mean(contra, ipsi)';
+                Legend{3,1} = 'mean(contra, ipsi)';
+                
+                ToPlot.n=1;
+                ToPlot.SubPlots = {...
+                    [1 2];...
+                    3;...
+                    4;...
+                    5};
+                
+            end
+
             
             % set maximum and minimum for B parameters profiles (row 1) and
             % for S param (row 2: Cst; row 3: Lin)
@@ -461,9 +531,15 @@ for iAnalysis= 1:numel(TitSuf)
                     };
             end
             
+            
             if opt.MVNN
                 ToPlot = rmfield(ToPlot,'MinMax');
             end
+            
+            
+            ToPlot.Titles{1,1} = '[A - Fix]';
+            ToPlot.Titles{2,1} = '[V - Fix]';
+            ToPlot.Titles{3,1} = '[T - Fix]';
             
     end
     

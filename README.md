@@ -55,6 +55,13 @@ mpm_folder = fileparts(which('mpm'));
 addpath(genpath(fullfile(mpm_folder, 'mpm-packages', 'mpm-collections', 'AVT')));
 ```
 
+#### Compiling mex file for pcm
+You might need to compile a a mex file to run the PCM if you are on a linux OS.
+
+```matlab
+cd(fullfile('mpm_folder', 'mpm-packages', 'mpm-collections', 'AVT', 'pcm_toolbox'))
+mex traceABtrans.c
+```
 
 ## Data analysis workflow
 
@@ -128,7 +135,10 @@ For the surface registration, a lot of the JIST layouts use .txt files as inputs
 3. `MMSR1/2.LayoutXML`: Runs the actual surface registration
 4. `avg_inter.LayoutXML` : Creates a first group surface average that will be used as target in the second round of the registration
 
+### Pattern component model
+Run by the script: `pcm/bold_PCM_3X3Models.m`
 
+The `surf` and `vol` contains the scripts to extract the data from the ROI in the volume data or in the surface data before or after whitening (spatial multivariate normalization done by the RSA toolbox).
 
 ## Data structure
 
