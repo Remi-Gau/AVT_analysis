@@ -21,16 +21,13 @@ addpath(genpath(fullfile(CodeDir, 'subfun')))
 
 Get_dependencies()
 
-plot_pvalue = 0;
-
 % plot only main results
 % only deactivations
-% only A_contra - A_ipsi in V1 and V2
-% only V_contra - V_ipsi in A1 and PT
+% only contra - ipsi for tactile stim
 % only differences between non-preferred modalities of a ROI
 plot_main = 1;
 
-% average results over ipsi and contra (only for cross sensory comparisons)
+% average results over ipsi and contra
 % for MVPA the accuracy are averaged.
 avg_hs = 1;
 
@@ -71,6 +68,14 @@ opt.session.loro = 0;
 opt.MVNN = 0;
 opt.vol = 0;
 
+IsStim = 1;
+
+if ~plot_main
+    plot_pvalue = 1;
+else
+    plot_pvalue = 0;
+end
+
 % multivariate noise normalisation
 if opt.MVNN
     ParamToPlot={'Cst','Lin','Avg','ROI'};
@@ -92,8 +97,6 @@ opt.scaling.feat.range = 0;
 opt.scaling.feat.sessmean = 0;
 
 SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
-
-IsStim = 1;
 
 % load BOLD and MVPA
 if IsStim
@@ -131,7 +134,7 @@ end
 
 close all
 
-for iAnalysis = 3 %1:numel(TitSuf)
+for iAnalysis = 3%:numel(TitSuf)
     
     % init
     clear ToPlot ToPlot2
@@ -173,52 +176,84 @@ for iAnalysis = 3 %1:numel(TitSuf)
         
         %% Contra - Ipsi
         case 1
+            
             % Get BOLD data for Contra - Ipsi
             Data = cat(1,AllSubjects_Data_BOLD(:).Contra_VS_Ipsi);
-            
-            % which conditions goes into which column and row
-            ToPlot.Col = [1 2 3];
+
             ToPlot.Row = 1;
-            ToPlot.Cdt = 1:3;
-            ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
-            
-            % Same for the MVPA data
-            ToPlot.Row = 2; % a new row means a new figure
-            Data = Get_data_MVPA(ROIs_to_get,SubSVM,iAnalysis,SVM);
-            ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
-            
-            % To know which type of data we are plotting every time
-            ToPlot.IsMVPA = [...
-                0 0 0; ...
-                1 1 1];
-            
-            % Defines the number of subplots on each figure
-            ToPlot.m=4;
-            ToPlot.n=3;
-            ToPlot.SubPlots = {... %Each column of this cell is a new condition
-                [1 4] [2 5] [3 6];...
-                7, 8, 9;...
-                10, 11, 12;...
-                13, 14, 15;... %The fourth row is for the plotting of the whole ROI
-                };
-            
-            Legend{1,1} = 'Auditory';
-            Legend{1,2} = 'Visual';
-            Legend{1,3} = 'Tactile';
-            Legend{2,1} = 'Auditory';
-            Legend{2,2} = 'Visual';
-            Legend{2,3} = 'Tactile';
-            
+
             ToPlot.Titles{1,1} = '[Contra - Ipsi]';
             ToPlot.Titles{2,1} = '[Contra VS Ipsi]';
             
             if plot_main
-                ToPlot.profile(1,1).main = 3:4;
-                ToPlot.profile(1,2).main = 1:2;
-                ToPlot.profile(1,3).main = 1:4;
-                ToPlot.profile(2,1).main = 3:4;
-                ToPlot.profile(2,2).main = 1:2;
-                ToPlot.profile(2,3).main = 1:4;
+                
+                % which conditions goes into which column and row
+                ToPlot.Col = 1;
+                
+                ToPlot.Cdt = 3;
+                ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+                
+                % Same for the MVPA data
+                ToPlot.Row = 2; % a new row means a new figure
+                Data = Get_data_MVPA(ROIs_to_get,SubSVM,iAnalysis,SVM);
+                ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+                
+                % Defines the number of subplots on each figure
+                ToPlot.m=4;
+                ToPlot.n=1;
+                ToPlot.SubPlots = {... %Each column of this cell is a new condition
+                    [1 2] ;...
+                    3;...
+                    4;...
+                    5;... %The fourth row is for the plotting of the whole ROI
+                    };
+                
+                % To know which type of data we are plotting every time
+                ToPlot.IsMVPA = [...
+                    0; ...
+                    1];
+                
+                Legend{1,1} = 'Tactile';
+                Legend{2,1} = 'Tactile';
+                
+                
+                ToPlot.profile(1,1).main = 1:4;
+                ToPlot.profile(2,1).main = 1:4;
+            else
+                
+                % which conditions goes into which column and row
+                ToPlot.Col = [1 2 3];
+
+                ToPlot.Cdt = 1:3;
+                ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
+                
+                % Same for the MVPA data
+                ToPlot.Row = 2; % a new row means a new figure
+                Data = Get_data_MVPA(ROIs_to_get,SubSVM,iAnalysis,SVM);
+                ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
+
+                % Defines the number of subplots on each figure
+                ToPlot.m=4;
+                ToPlot.n=3;
+                ToPlot.SubPlots = {... %Each column of this cell is a new condition
+                    [1 4] [2 5] [3 6];...
+                    7, 8, 9;...
+                    10, 11, 12;...
+                    13, 14, 15;... %The fourth row is for the plotting of the whole ROI
+                    };
+                
+                % To know which type of data we are plotting every time
+                ToPlot.IsMVPA = [...
+                    0 0 0; ...
+                    1 1 1];
+                
+                Legend{1,1} = 'Auditory';
+                Legend{1,2} = 'Visual';
+                Legend{1,3} = 'Tactile';
+                Legend{2,1} = 'Auditory';
+                Legend{2,2} = 'Visual';
+                Legend{2,3} = 'Tactile';
+                
             end
             
             
