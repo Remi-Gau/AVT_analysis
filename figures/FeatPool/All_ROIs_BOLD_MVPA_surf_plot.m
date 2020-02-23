@@ -469,7 +469,6 @@ for iAnalysis= 1:numel(TitSuf)
                 Legend{1,1} = 'mean(contra, ipsi)';
                 Legend{2,1} = 'mean(contra, ipsi)';
                 Legend{3,1} = 'mean(contra, ipsi)';
-                Legend{4,1} = 'mean(contra, ipsi)';
                 
                 ToPlot.n=1;
                 ToPlot.SubPlots = {...
