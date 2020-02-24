@@ -25,6 +25,10 @@ else
     suffix = '_perm';
 end
 
+if ~isfield(ToPlot, 'on_same_figure')
+    ToPlot.on_same_figure = 0;
+end
+
 Name = strrep([ToPlot.TitSuf '--' ToPlot.Name], ' ', '_');
 Name = strrep(Name, '_', '-');
 
@@ -77,17 +81,11 @@ for iRow = 1:size(ToPlot.Legend,1)
         else
             plot([-5 15], [0 0], '-k','linewidth',.8)
         end
+
+        plot_lines(NbROI, ToPlot, iRow, iColumn, ROIs_to_plot, line_colors, 0)
         
-        l=errorbar(...
-            repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,NbROI),6,1),...
-            ToPlot.profile(iRow,iColumn).MEAN(:,ROIs_to_plot),...
-            ToPlot.profile(iRow,iColumn).SEM(:,ROIs_to_plot));
-        l2=plot(...
-            repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,NbROI),6,1),...
-            ToPlot.profile(iRow,iColumn).MEAN(:,ROIs_to_plot));
-        for iLine=1:numel(l)
-            set(l(iLine),'color', line_colors(ROIs_to_plot(iLine),:))
-            set(l2(iLine),'color', line_colors(ROIs_to_plot(iLine),:),'linewidth',2)
+        if ToPlot.on_same_figure
+            plot_lines(NbROI, ToPlot, iRow, iColumn+1, ROIs_to_plot, line_colors, 1)
         end
         
         axis tight
@@ -168,6 +166,33 @@ for iRow = 1:size(ToPlot.Legend,1)
 end
 
 
+
+end
+
+
+function plot_lines(NbROI, ToPlot, iRow, iColumn, ROIs_to_plot, line_colors, dash)
+
+X_pos = repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,NbROI),6,1);
+if dash
+    X_pos = repmat((1:6)',1,NbROI)+repmat(linspace(-.1,.3,NbROI),6,1);
+end
+
+l=errorbar(...
+    X_pos ,...
+    ToPlot.profile(iRow,iColumn).MEAN(:,ROIs_to_plot),...
+    ToPlot.profile(iRow,iColumn).SEM(:,ROIs_to_plot));
+
+l2=plot(...
+    X_pos,...
+    ToPlot.profile(iRow,iColumn).MEAN(:,ROIs_to_plot));
+
+for iLine=1:numel(l)
+    set(l(iLine),'color', line_colors(ROIs_to_plot(iLine),:))
+    set(l2(iLine),'color', line_colors(ROIs_to_plot(iLine),:),'linewidth',2)
+    if dash
+        set(l2(iLine),'linestyle', '--')
+    end
+end
 
 end
 
