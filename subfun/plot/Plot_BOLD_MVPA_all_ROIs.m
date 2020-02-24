@@ -69,7 +69,11 @@ for iRow = 1:size(ToPlot.Legend,1)
         
         [ROIs_to_plot, NbROI] = find_rois(ToPlot.profile(iRow,iColumn));
         
-        MVPA_BOLD = 1+ToPlot.IsMVPA(iRow,iColumn);
+        if isfield(ToPlot, 'IsMVPA')
+            MVPA_BOLD = 1 + ToPlot.IsMVPA(iRow,iColumn);
+        else
+            MVPA_BOLD = 1;
+        end
         ToPlot.Cst = 0;
         ToPlot.MVPA_BOLD = MVPA_BOLD;
         
@@ -311,7 +315,7 @@ for i=1:numel(Xpos)
 end
 
 % plot mean+SEM
-plot(Xpos-.8, nanmean(Data), 'k. ', 'MarkerSize', 9)
+plot(Xpos-.8, nanmean(Data), 'k. ', 'MarkerSize', 18)
 
 for i=1:numel(Xpos)
     
@@ -342,7 +346,7 @@ for i=1:numel(Xpos)
     plot(...
         [Xpos(i)-.8;Xpos(i)-.8], ...
         [Lower; Upper], ...
-        ' k','LineWidth', 1.5 )
+        ' k','LineWidth', 2.5 )
 end
 
 
