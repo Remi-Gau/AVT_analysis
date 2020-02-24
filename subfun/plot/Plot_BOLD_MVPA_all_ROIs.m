@@ -28,6 +28,11 @@ end
 if ~isfield(ToPlot, 'on_same_figure')
     ToPlot.on_same_figure = 0;
 end
+if ~isfield(ToPlot, 'bivariate_subplot')
+    ToPlot.bivariate_subplot = 0;
+end
+
+
 
 Name = strrep([ToPlot.TitSuf '--' ToPlot.Name], ' ', '_');
 Name = strrep(Name, '_', '-');
@@ -81,7 +86,7 @@ for iRow = 1:size(ToPlot.Legend,1)
         else
             plot([-5 15], [0 0], '-k','linewidth',.8)
         end
-
+        
         plot_lines(NbROI, ToPlot, iRow, iColumn, ROIs_to_plot, line_colors, 0)
         
         if ToPlot.on_same_figure
@@ -115,43 +120,122 @@ for iRow = 1:size(ToPlot.Legend,1)
         
         
         
-        % plot betas constant
-        subplot(m,n,SubPlots{2,iColumn})
+        %% plot betas constant or bi-variate results
         
-        hold on
-        
-        Data = ToPlot.profile(iRow,iColumn).beta(:,ROIs_to_plot,1);
-        
-        if isfield(ToPlot,'MinMax')
-            ToPlot.MIN = ToPlot.MinMax{2,iRow}(iColumn,1);
-            ToPlot.MAX = ToPlot.MinMax{2,iRow}(iColumn,2);
+        if ToPlot.bivariate_subplot
+            
+            for cst_lin = 0:1
+                
+                subplot(m,n,SubPlots{2,iColumn}+cst_lin)
+                
+                hold on
+                
+                MINMAX = [];
+                
+                for iROI = ROIs_to_plot
+                    
+                    X = ToPlot.profile(iRow,iColumn).beta(:,iROI,1+cst_lin);
+                    Y = ToPlot.profile(iRow,iColumn+1).beta(:,iROI,1+cst_lin);
+                    
+                    scatter(X, Y, 50, line_colors(iROI,:), 'o');
+                    
+%                     CI_X = bootci(10000,{@(x) mean(x), X},'alpha', 0.05/NbROI, 'type','bca');
+%                     XNEG = CI_X(1);
+%                     XPOS = CI_X(2);
+                    
+                    XNEG = std(X);
+                    XPOS = std(X);
+                    
+                    
+%                     CI_Y = bootci(10000,{@(x) mean(x), Y},'alpha', 0.05/NbROI, 'type','bca');
+%                     YNEG = CI_Y(1);
+%                     YPOS = CI_Y(2);
+                    
+                    YNEG = std(Y);
+                    YPOS = std(Y);
+                    
+                   
+                    l = errorbar(mean(X), mean(Y), YNEG, YPOS, XNEG, XPOS);
+                    set(l, ...
+                        'color', line_colors(iROI,:), ...
+                        'LineWidth', 1.5, ...
+                        'Marker', 'o', ...
+                        'MarkerFaceColor', line_colors(iROI,:))
+                    
+                    MINMAX = [MINMAX; X ; Y ; XNEG ; XPOS; YNEG; YPOS]; %#ok<AGROW>
+                    
+                end
+                
+                % add some lines
+                plot ([-10 10], [-10 10], '--k') % diagonal
+                plot ([-10 +10], [0 0], '-k') %
+                plot ([0 0], [-10 +10], '-k') %
+                
+                MAX = max(MINMAX)*1.1;
+                MIN = min(MINMAX)*1.1;
+                
+                axis([MIN MAX MIN MAX]);
+                
+                set(gca, ...
+                    'XTick', get(gca, 'Ytick'), ...
+                    'XTickLabel', get(gca, 'YTickLabel'));
+                
+                xlabel('s parameter - contra')
+                ylabel('s parameter - ipsi')
+                
+                axis square
+                
+                switch cst_lin
+                    case 0
+                        Title = 'constant';
+                    case 1
+                        Title = 'linear';
+                end
+                title(Title);
+                
+            end
+
+            
+        else
+            
+            % plot betas constant
+            subplot(m,n,SubPlots{2,iColumn})
+            
+            hold on
+            
+            Data = ToPlot.profile(iRow,iColumn).beta(:,ROIs_to_plot,1);
+            
+            if isfield(ToPlot,'MinMax')
+                ToPlot.MIN = ToPlot.MinMax{2,iRow}(iColumn,1);
+                ToPlot.MAX = ToPlot.MinMax{2,iRow}(iColumn,2);
+            end
+            plot_betas(Data, ToPlot, fontsize, iRow, iColumn, 1)
+            
+            t=ylabel(sprintf('constant\nS Param. est. [a u]'));
+            set(t,'fontsize',fontsize);
+            
+            
+            % plot betas linear
+            subplot(m,n,SubPlots{3,iColumn})
+            
+            hold on
+            
+            Data = ToPlot.profile(iRow,iColumn).beta(:,ROIs_to_plot,2);
+            
+            if MVPA_BOLD==1
+                Data=Data*-1;
+            end
+            
+            if isfield(ToPlot,'MinMax')
+                ToPlot.MIN = ToPlot.MinMax{3,iRow}(iColumn,1);
+                ToPlot.MAX = ToPlot.MinMax{3,iRow}(iColumn,2);
+            end
+            plot_betas(Data, ToPlot, fontsize, iRow, iColumn, 2)
+            
+            t=ylabel(sprintf('linear\nS Param. est. [a u]'));
+            set(t,'fontsize',fontsize);
+            
         end
-        plot_betas(Data, ToPlot, fontsize, iRow, iColumn, 1)
-        
-        t=ylabel(sprintf('constant\nS Param. est. [a u]'));
-        set(t,'fontsize',fontsize);
-        
-        
-        
-        % plot betas linear
-        subplot(m,n,SubPlots{3,iColumn})
-        
-        hold on
-        
-        Data = ToPlot.profile(iRow,iColumn).beta(:,ROIs_to_plot,2);
-        
-        if MVPA_BOLD==1
-            Data=Data*-1;
-        end
-        
-        if isfield(ToPlot,'MinMax')
-            ToPlot.MIN = ToPlot.MinMax{3,iRow}(iColumn,1);
-            ToPlot.MAX = ToPlot.MinMax{3,iRow}(iColumn,2);
-        end
-        plot_betas(Data, ToPlot, fontsize, iRow, iColumn, 2)
-        
-        t=ylabel(sprintf('linear\nS Param. est. [a u]'));
-        set(t,'fontsize',fontsize);
         
         
     end
@@ -236,8 +320,8 @@ for i=1:numel(Xpos)
         % the more traditional 95% CI based on student distribution
         %         Lower = nanmean(Data(:,i))-1.96*nansem(Data(:,i))
         %         Upper = nanmean(Data(:,i))+1.96*nansem(Data(:,i))
-
-
+        
+        
         % based on bias-corrected and accelerated bootstrap confidence interval
         
         % using bias correction of effect size estimate (Hedges and Olkin)
