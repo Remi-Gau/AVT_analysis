@@ -180,8 +180,8 @@ for iRow = 1:size(ToPlot.Legend,1)
                     'XTick', get(gca, 'Ytick'), ...
                     'XTickLabel', get(gca, 'YTickLabel'));
                 
-                xlabel('s parameter - contra')
-                ylabel('s parameter - ipsi')
+                xlabel(['s parameter - ' ToPlot.bivariate_subplot_legend{iRow,1}{1}])
+                ylabel(['s parameter - ' ToPlot.bivariate_subplot_legend{iRow,1}{2}])
                 
                 axis square
                 
