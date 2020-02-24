@@ -5,6 +5,31 @@ function All_ROIs_BOLD_MVPA_surf_plot
 
 clc; clear;
 
+
+Analysis_to_plot = 4;
+
+
+% Title of analysis
+TitSuf = {
+    'Contra_vs_Ipsi';...
+    'Between_Senses';...
+    'Contra_&_Ipsi'; ...
+    'Contra_&_Ipsi_same_plot'};
+
+
+% plot only main results
+% only deactivations
+% only contra - ipsi for tactile stim
+% only differences between non-preferred modalities of a ROI
+plot_main = 1;
+
+
+% average results over ipsi and contra
+% for MVPA the accuracy are averaged.
+avg_hs = 0;
+
+
+%%
 if isunix
     CodeDir = '/home/remi/github/AVT_analysis';
     StartDir = '/home/remi';
@@ -20,26 +45,6 @@ addpath(genpath(fullfile(CodeDir, 'subfun')))
 [Dirs] = set_dir();
 
 Get_dependencies()
-
-Analysis_to_plot = 4;
-
-% Title of analysis
-TitSuf = {
-    'Contra_vs_Ipsi';...
-    'Between_Senses';...
-    'Contra_&_Ipsi'; ...
-    'Contra_&_Ipsi_same_plot'};
-
-% plot only main results
-% only deactivations
-% only contra - ipsi for tactile stim
-% only differences between non-preferred modalities of a ROI
-plot_main = 0;
-
-% average results over ipsi and contra
-% for MVPA the accuracy are averaged.
-avg_hs = 0;
-
 
 SubLs = dir(fullfile(Dirs.DerDir,'sub*'));
 NbSub = numel(SubLs);
@@ -424,10 +429,6 @@ for iAnalysis = Analysis_to_plot
                 end
             end
             
-            if opt.MVNN
-                ToPlot = rmfield(ToPlot,'MinMax');
-            end
-            
             ToPlot.Titles{1,1} = '[A - T]';
             ToPlot.Titles{2,1} = '[V - T]';
             ToPlot.Titles{3,1} = '[A VS T]';
@@ -534,13 +535,7 @@ for iAnalysis = Analysis_to_plot
                     repmat([-0.4 1.3],2,1) , repmat([-0.4 0.65],2,1) , repmat([-0.5 0.35],2,1);...
                     };
             end
-            
-            
-            if opt.MVNN
-                ToPlot = rmfield(ToPlot,'MinMax');
-            end
-            
-            
+
             ToPlot.Titles{1,1} = '[A - Fix]';
             ToPlot.Titles{2,1} = '[V - Fix]';
             ToPlot.Titles{3,1} = '[T - Fix]';
@@ -559,11 +554,48 @@ for iAnalysis = Analysis_to_plot
                 2*ones(4,4),...
                 2*ones(4,4));
             
-            ToPlot.Row = 1:4;
+            
             ToPlot.Col = 1;
-            ToPlot.Cdt = [1;2;3;3];
+            
             
             ToPlot.on_same_figure = 1;
+            ToPlot.bivariate_subplot = 1;
+
+            
+            % To specify which ROIs to plot for each figure
+            if plot_main
+                
+                ToPlot.Row = 1:2;
+                ToPlot.Cdt = [3;3];
+                
+                ToPlot.profile(1,1).main = 1:2;
+                ToPlot.profile(2,1).main = 3:4;
+                ToPlot.profile(1,2).main = 1:2;
+                ToPlot.profile(2,2).main = 3:4;
+                
+                ToPlot.Titles{1,1} = '[T - Fix]';
+                ToPlot.Titles{2,1} = '[T - Fix]';
+                
+                Legend{1,1} = 'contra & ipsi';
+                Legend{2,1} = 'contra & ipsi';
+                
+            else
+                
+                ToPlot.Row = 1:4;
+                ToPlot.Cdt = [1;2;3;3];
+                
+                ToPlot.Titles{1,1} = '[A - Fix]';
+                ToPlot.Titles{2,1} = '[V - Fix]';
+                ToPlot.Titles{3,1} = '[T - Fix]';
+                ToPlot.Titles{4,1} = '[T - Fix]';
+                
+                Legend{1,1} = 'contra & ipsi';
+                Legend{2,1} = 'contra & ipsi';
+                Legend{3,1} = 'contra & ipsi';
+                Legend{4,1} = 'contra & ipsi';
+                
+            end
+            
             
             % Get BOLD data for Cdt-Fix Contra
             
@@ -575,69 +607,40 @@ for iAnalysis = Analysis_to_plot
             ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
             
             
-            % To specify which ROIs to plot for each figure
-            if plot_main
-                
-                ToPlot.profile(1,1).main = 3:4;
-                ToPlot.profile(2,1).main = 1:2;
-                ToPlot.profile(3,1).main = 1:2;
-                ToPlot.profile(4,1).main = 3:4;
-                ToPlot.profile(1,2).main = 3:4;
-                ToPlot.profile(2,2).main = 1:2;
-                ToPlot.profile(3,2).main = 1:2;
-                ToPlot.profile(4,2).main = 3:4;
-                
-            end
-            
             ToPlot.IsMVPA = [...
                 0 0;...
                 0 0;...
                 0 0;...
                 0 0];
             
-            ToPlot.m=4;
-            
-            ToPlot.n=1;
+            ToPlot.m=2;
+            ToPlot.n=2;
             ToPlot.SubPlots = {... %Each column of this cell is a new condition
                 [1 2] ;...
                 3;...
                 4;...
-                5;... %The fourth row is for the plotting of the whole ROI
                 };
             
-            Legend{1,1} = 'contra & ipsi';
-            Legend{2,1} = 'contra & ipsi';
-            Legend{3,1} = 'contra & ipsi';
-            Legend{4,1} = 'contra & ipsi';
+
             
             % set maximum and minimum for B parameters profiles (row 1) and
             % for S param (row 2: Cst; row 3: Lin)
             if plot_main
                 ToPlot.MinMax={...
-                    repmat([-1.4 0.35],2,1) , repmat([-1.4 0.35],2,1) , repmat([-1.4 0.35],2,1) , repmat([-1.4 0.35],2,1);...
-                    repmat([-1.5 1],2,1)    , repmat([-1.5 1],2,1)    , repmat([-1.5 1],2,1)    , repmat([-1.5 1],2,1);...
-                    repmat([-0.5 0.35],2,1) , repmat([-0.5 0.35],2,1) , repmat([-0.5 0.35],2,1) , repmat([-0.5 0.35],2,1);...
+                    repmat([-1.4 0.35],2,1) , repmat([-0.9 0.35],2,1);...
                     };
             else
                 ToPlot.MinMax={...
                     repmat([-1 4.2],2,1)   , repmat([-1.2 2.2],2,1)  , repmat([-1.4 0.1],2,1)  , repmat([-1.4 0.1],2,1);...
-                    repmat([-1.2 4],2,1)   , repmat([-1.5 2.5],2,1)  , repmat([-1.5 1],2,1)    , repmat([-1.5 1],2,1);...
-                    repmat([-0.4 1.3],2,1) , repmat([-0.4 0.65],2,1) , repmat([-0.5 0.35],2,1) , repmat([-0.5 0.35],2,1);...
                     };
             end
+
             
-            
-            if opt.MVNN
-                ToPlot = rmfield(ToPlot,'MinMax');
-            end
-            
-            
-            ToPlot.Titles{1,1} = '[A - Fix]';
-            ToPlot.Titles{2,1} = '[V - Fix]';
-            ToPlot.Titles{3,1} = '[T - Fix]';
-            ToPlot.Titles{4,1} = '[T - Fix]';
-            
-            
+    end
+    
+    
+    if opt.MVNN
+        ToPlot = rmfield(ToPlot,'MinMax');
     end
     
     

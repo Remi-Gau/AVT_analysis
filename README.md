@@ -63,6 +63,14 @@ cd(fullfile('mpm_folder', 'mpm-packages', 'mpm-collections', 'AVT', 'pcm_toolbox
 mex traceABtrans.c
 ```
 
+## Recreating figures
+
+### For BOLD and MVPA analysis
+The script `figures/FeatPool/All_ROIs_BOLD_MVPA_surf_plot.m` will plot the main figures of the publication if the variable `plot_main` is set to true. Otherwise this will plot all the results on the same figures.
+
+### For PCM
+Use the script `figures/PCM/Plot_PCM_3X3_models_FamComp_Likelihoods.m`
+
 ## Data analysis workflow
 
 I indicate here the different folders where the code is kept. I try to indicate and in which order the scripts (or other manual interventions) have to be  run.
