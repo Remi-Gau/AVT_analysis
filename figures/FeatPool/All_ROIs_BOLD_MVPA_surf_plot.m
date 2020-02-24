@@ -26,7 +26,8 @@ plot_main = 1;
 
 % average results over ipsi and contra
 % for MVPA the accuracy are averaged.
-avg_hs = 0;
+avg_hs = 1;
+
 
 
 %%
@@ -573,8 +574,8 @@ for iAnalysis = Analysis_to_plot
                 ToPlot.profile(1,2).main = 1:2;
                 ToPlot.profile(2,2).main = 3:4;
                 
-                ToPlot.Titles{1,1} = '[T - Fix]';
-                ToPlot.Titles{2,1} = '[T - Fix]';
+                ToPlot.Titles{1,1} = '[T - Fix]-A';
+                ToPlot.Titles{2,1} = '[T - Fix]-V';
                 
                 Legend{1,1} = 'contra & ipsi';
                 Legend{2,1} = 'contra & ipsi';
