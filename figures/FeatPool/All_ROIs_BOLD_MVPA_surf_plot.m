@@ -287,7 +287,8 @@ for iAnalysis = Analysis_to_plot
             ToPlot = Get_data(ToPlot,Data,ROI_order_MVPA);
             
             
-            % set MIN and MAX for plotting
+            % set maximum and minimum for B parameters profiles (row 1) and
+            % for S param (row 2: Cst; row 3: Lin)
             if plot_main
                 tmp={...
                     [-.5 .7;-.5 .7] , [.4 .6;.4 .6];...
@@ -421,8 +422,6 @@ for iAnalysis = Analysis_to_plot
             ToPlot = Get_data(ToPlot,Data,ROI_order_BOLD);
             
             
-            % set maximum and minimum for B parameters profiles (row 1) and
-            % for S param (row 2: Cst; row 3: Lin)
             if plot_main
                 ToPlot.MinMax={...
                     repmat([-1.4 0.35],2,1) , repmat([-0.9 0.35],2,1);...
@@ -458,25 +457,20 @@ for iAnalysis = Analysis_to_plot
             ToPlot.Cdt = 1;
             ToPlot = Get_data(ToPlot, Data, ROI_order_BOLD);
             
-            ToPlot.Row = 1;
             ToPlot.Col = 2;
             ToPlot.Cdt = 3;
             ToPlot = Get_data(ToPlot, Data, ROI_order_BOLD);
-            
             
             ToPlot.Row = 2;
             ToPlot.Col = 1;
             ToPlot.Cdt = 2;
             ToPlot = Get_data(ToPlot, Data, ROI_order_BOLD);
             
-            ToPlot.Row = 2;
             ToPlot.Col = 2;
             ToPlot.Cdt = 3;
             ToPlot = Get_data(ToPlot, Data, ROI_order_BOLD);
             
             
-            % set maximum and minimum for B parameters profiles (row 1) and
-            % for S param (row 2: Cst; row 3: Lin)
             if plot_main
                 ToPlot.MinMax={...
                     repmat([-0.8 0.35],2,1) , repmat([-1.4 0.1],2,1);...
@@ -542,6 +536,7 @@ switch iAnalysis
             % Defines the number of subplots on each figure
             ToPlot = subplots_structure('4X1', ToPlot);
             
+            % Which ROIs to plot on each figure
             ToPlot.profile(1,1).main = 1:4;
             ToPlot.profile(2,1).main = 1:4;
             
@@ -559,11 +554,8 @@ switch iAnalysis
             Legend{2,2} = 'Visual';
             Legend{2,3} = 'Tactile';
             
-            
-            % Defines the number of subplots on each figure
             ToPlot = subplots_structure('4X3', ToPlot);
             
-            % To know which type of data we are plotting every time
             ToPlot.IsMVPA = [...
                 0 0 0; ...
                 1 1 1];
@@ -726,12 +718,6 @@ switch iAnalysis
         
     case 5 % contra & ipsi on same figure
         
-        ToPlot.on_same_figure = 1;
-        ToPlot.bivariate_subplot = 1;
-        
-        ToPlot.bivariate_subplot_legend{1,1} = {'Audio', 'Tactile'};
-        ToPlot.bivariate_subplot_legend{2,1} = {'Visual', 'Tactile'};
-        
         ToPlot.Titles{1,1} = 'A & T';
         ToPlot.Titles{2,1} = 'V & T';
         
@@ -739,6 +725,12 @@ switch iAnalysis
         Legend{2,1} = 'mean(contra, ipsi)';
         
         ToPlot = subplots_structure('2X2', ToPlot);
+        
+        ToPlot.on_same_figure = 1;
+        ToPlot.bivariate_subplot = 1;
+        
+        ToPlot.bivariate_subplot_legend{1,1} = {'Audio', 'Tactile'};
+        ToPlot.bivariate_subplot_legend{2,1} = {'Visual', 'Tactile'};
         
         
         if plot_main
@@ -837,7 +829,7 @@ for iROI = 1:numel(ROIs)
     
     for iSVM = SubSVM(iSubSVM,:)
         
-        tmp_grp{end+1} = SVM(iSVM).ROI(iROI).layers.DATA;
+        tmp_grp{end+1} = SVM(iSVM).ROI(iROI).layers.DATA; %#ok<*AGROW>
         
         Data(iROI).whole_roi_grp(:,iSVM+1-SubSVM(iSubSVM,1)) = SVM(iSVM).ROI(iROI).grp;
         

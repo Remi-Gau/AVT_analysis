@@ -202,42 +202,35 @@ for iRow = 1:size(ToPlot.Legend,1)
             
         else
             
-            % plot betas constant
-            subplot(m,n,SubPlots{2,iColumn})
-            
-            hold on
-            
-            Data = ToPlot.profile(iRow,iColumn).beta(:,ROIs_to_plot,1);
-            
-            if isfield(ToPlot,'MinMax')
-                ToPlot.MIN = ToPlot.MinMax{2,iRow}(iColumn,1);
-                ToPlot.MAX = ToPlot.MinMax{2,iRow}(iColumn,2);
+            for cst_lin = 1:2
+                
+                % plot betas constant
+                subplot(m,n,SubPlots{cst_lin+1,iColumn})
+                
+                hold on
+                
+                Data = ToPlot.profile(iRow,iColumn).beta(:,ROIs_to_plot,cst_lin);
+                
+                if cst_lin && MVPA_BOLD==1
+                    Data = Data*-1;
+                end
+                
+                if isfield(ToPlot,'MinMax')
+                    ToPlot.MIN = ToPlot.MinMax{cst_lin+1,iRow}(iColumn,1);
+                    ToPlot.MAX = ToPlot.MinMax{cst_lin+1,iRow}(iColumn,2);
+                end
+                
+                plot_betas(Data, ToPlot, fontsize, iRow, iColumn, cst_lin)
+                
+                if cst_lin==1
+                    t=ylabel(sprintf('constant\nS Param. est. [a u]'));
+                else
+                    t=ylabel(sprintf('linear\nS Param. est. [a u]'));
+                end
+                
+                set(t,'fontsize',fontsize);
+                
             end
-            plot_betas(Data, ToPlot, fontsize, iRow, iColumn, 1)
-            
-            t=ylabel(sprintf('constant\nS Param. est. [a u]'));
-            set(t,'fontsize',fontsize);
-            
-            
-            % plot betas linear
-            subplot(m,n,SubPlots{3,iColumn})
-            
-            hold on
-            
-            Data = ToPlot.profile(iRow,iColumn).beta(:,ROIs_to_plot,2);
-            
-            if MVPA_BOLD==1
-                Data=Data*-1;
-            end
-            
-            if isfield(ToPlot,'MinMax')
-                ToPlot.MIN = ToPlot.MinMax{3,iRow}(iColumn,1);
-                ToPlot.MAX = ToPlot.MinMax{3,iRow}(iColumn,2);
-            end
-            plot_betas(Data, ToPlot, fontsize, iRow, iColumn, 2)
-            
-            t=ylabel(sprintf('linear\nS Param. est. [a u]'));
-            set(t,'fontsize',fontsize);
             
         end
         
