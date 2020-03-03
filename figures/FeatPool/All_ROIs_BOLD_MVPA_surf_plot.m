@@ -6,7 +6,7 @@ function All_ROIs_BOLD_MVPA_surf_plot
 clc; clear;
 
 
-Analysis_to_plot = 1:5;
+Analysis_to_plot = 5;
 
 
 % Title of analysis
@@ -29,6 +29,8 @@ plot_main = 1;
 % for MVPA the accuracy are averaged.
 avg_hs = 1;
 
+% choose the type of bivariate plot; 1 --> 2D ; 2 --> spaghetti plot
+bivariate_subplot = 2;
 
 
 %%
@@ -396,7 +398,7 @@ for iAnalysis = Analysis_to_plot
             %% contra & ipsi on same figure
         case 4
             
-            [ToPlot, Legend] = set_param_fig(ToPlot, iAnalysis, plot_main, avg_hs);
+            [ToPlot, Legend] = set_param_fig(ToPlot, iAnalysis, plot_main, avg_hs, bivariate_subplot);
             
             
             if plot_main
@@ -438,7 +440,7 @@ for iAnalysis = Analysis_to_plot
             %% Cross sensory on same figure
         case 5
             
-            [ToPlot, Legend] = set_param_fig(ToPlot, iAnalysis, plot_main, avg_hs);
+            [ToPlot, Legend] = set_param_fig(ToPlot, iAnalysis, plot_main, avg_hs, bivariate_subplot);
             
             % Get BOLD data for Cdt-Fix Contra
             % we average the data from each hemisphere
@@ -518,7 +520,11 @@ end
 
 
 
-function [ToPlot, Legend] = set_param_fig(ToPlot, iAnalysis, plot_main, avg_hs)
+function [ToPlot, Legend] = set_param_fig(ToPlot, iAnalysis, plot_main, avg_hs, bivariate_subplot)
+
+if nargin<5 || isempty(bivariate_subplot)
+    bivariate_subplot = 0;
+end
 
 switch iAnalysis
     
@@ -679,7 +685,7 @@ switch iAnalysis
         ToPlot = subplots_structure('2X2', ToPlot);
         
         ToPlot.on_same_figure = 1;
-        ToPlot.bivariate_subplot = 1;
+        ToPlot.bivariate_subplot = bivariate_subplot;
         
         ToPlot.bivariate_subplot_legend{1,1} = {'contra', 'ipsi'};
         ToPlot.bivariate_subplot_legend{2,1} = {'contra', 'ipsi'};
@@ -727,7 +733,7 @@ switch iAnalysis
         ToPlot = subplots_structure('2X2', ToPlot);
         
         ToPlot.on_same_figure = 1;
-        ToPlot.bivariate_subplot = 1;
+        ToPlot.bivariate_subplot = bivariate_subplot;
         
         ToPlot.bivariate_subplot_legend{1,1} = {'Audio', 'Tactile'};
         ToPlot.bivariate_subplot_legend{2,1} = {'Visual', 'Tactile'};

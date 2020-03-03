@@ -15,7 +15,7 @@ line_colors = [...
     184,220,143;...
     235,215,184;...
     ]/255;
-ToPlot.line_colors=line_colors;
+ToPlot.line_colors = line_colors;
 
 
 
@@ -91,10 +91,10 @@ for iRow = 1:size(ToPlot.Legend,1)
             plot([-5 15], [0 0], '-k','linewidth',.8)
         end
         
-        plot_lines(NbROI, ToPlot, iRow, iColumn, ROIs_to_plot, line_colors, 0)
+        plot_lines(NbROI, ToPlot, iRow, iColumn, ROIs_to_plot, 0)
         
         if ToPlot.on_same_figure
-            plot_lines(NbROI, ToPlot, iRow, iColumn+1, ROIs_to_plot, line_colors, 1)
+            plot_lines(NbROI, ToPlot, iRow, iColumn+1, ROIs_to_plot, 1)
         end
         
         axis tight
@@ -126,7 +126,7 @@ for iRow = 1:size(ToPlot.Legend,1)
         
         %% plot betas constant or bi-variate results
         
-        if ToPlot.bivariate_subplot
+        if ToPlot.bivariate_subplot==1
             
             for cst_lin = 0:1
                 
@@ -141,24 +141,29 @@ for iRow = 1:size(ToPlot.Legend,1)
                     X = ToPlot.profile(iRow,iColumn).beta(:,iROI,1+cst_lin);
                     Y = ToPlot.profile(iRow,iColumn+1).beta(:,iROI,1+cst_lin);
                     
+                    if cst_lin
+                        X = X*-1;
+                        Y = Y*-1;
+                    end
+                    
                     scatter(X, Y, 50, line_colors(iROI,:), 'o');
                     
-%                     CI_X = bootci(10000,{@(x) mean(x), X},'alpha', 0.05/NbROI, 'type','bca');
-%                     XNEG = CI_X(1);
-%                     XPOS = CI_X(2);
+                    %                     CI_X = bootci(10000,{@(x) mean(x), X},'alpha', 0.05/NbROI, 'type','bca');
+                    %                     XNEG = CI_X(1);
+                    %                     XPOS = CI_X(2);
                     
                     XNEG = std(X);
                     XPOS = std(X);
                     
                     
-%                     CI_Y = bootci(10000,{@(x) mean(x), Y},'alpha', 0.05/NbROI, 'type','bca');
-%                     YNEG = CI_Y(1);
-%                     YPOS = CI_Y(2);
+                    %                     CI_Y = bootci(10000,{@(x) mean(x), Y},'alpha', 0.05/NbROI, 'type','bca');
+                    %                     YNEG = CI_Y(1);
+                    %                     YPOS = CI_Y(2);
                     
                     YNEG = std(Y);
                     YPOS = std(Y);
                     
-                   
+                    
                     l = errorbar(mean(X), mean(Y), YNEG, YPOS, XNEG, XPOS);
                     set(l, ...
                         'color', line_colors(iROI,:), ...
@@ -198,7 +203,7 @@ for iRow = 1:size(ToPlot.Legend,1)
                 title(Title);
                 
             end
-
+            
             
         else
             
@@ -209,18 +214,26 @@ for iRow = 1:size(ToPlot.Legend,1)
                 
                 hold on
                 
-                Data = ToPlot.profile(iRow,iColumn).beta(:,ROIs_to_plot,cst_lin);
-                
-                if cst_lin && MVPA_BOLD==1
-                    Data = Data*-1;
+                if ToPlot.bivariate_subplot==2
+                    
+                    spaghetti_plot(ToPlot, iRow, iColumn, cst_lin)
+                    
+                else
+                    
+                    Data = ToPlot.profile(iRow,iColumn).beta(:,ROIs_to_plot,cst_lin);
+                    
+                    if cst_lin==2 && MVPA_BOLD==1
+                        Data = Data*-1;
+                    end
+                    
+                    if isfield(ToPlot,'MinMax')
+                        ToPlot.MIN = ToPlot.MinMax{cst_lin+1,iRow}(iColumn,1);
+                        ToPlot.MAX = ToPlot.MinMax{cst_lin+1,iRow}(iColumn,2);
+                    end
+                    
+                    plot_betas(Data, ToPlot, fontsize, iRow, iColumn, cst_lin)
+                    
                 end
-                
-                if isfield(ToPlot,'MinMax')
-                    ToPlot.MIN = ToPlot.MinMax{cst_lin+1,iRow}(iColumn,1);
-                    ToPlot.MAX = ToPlot.MinMax{cst_lin+1,iRow}(iColumn,2);
-                end
-                
-                plot_betas(Data, ToPlot, fontsize, iRow, iColumn, cst_lin)
                 
                 if cst_lin==1
                     t=ylabel(sprintf('constant\nS Param. est. [a u]'));
@@ -250,8 +263,92 @@ end
 
 end
 
+function spaghetti_plot(ToPlot, iRow, iColumn, cst_lin)
 
-function plot_lines(NbROI, ToPlot, iRow, iColumn, ROIs_to_plot, line_colors, dash)
+
+if strcmp(ToPlot.plot_main,'')
+    Xpos = [...
+        1 2.5 ; ...
+        5 6.5 ; ...
+        10 11.5 ; ...
+        14 15.5 ; ];
+else
+    Xpos = [...
+        1 2.5 ; ...
+        5 6.5 ; ...
+        1 2.5 ; ...
+        5 6.5 ; ];
+end
+
+[ROIs_to_plot, NbROI] = find_rois(ToPlot.profile(iRow,iColumn));
+
+Alpha = 0.05/NbROI;
+
+
+for iROI = ROIs_to_plot
+    
+    X = ToPlot.profile(iRow, iColumn).beta(:, iROI, cst_lin);
+    Y = ToPlot.profile(iRow, iColumn+1).beta(:, iROI, cst_lin);
+    
+    if cst_lin==2
+        X = X*-1;
+        Y = Y*-1;
+    end
+    
+    abscissa = [ones(size(X))' * Xpos(iROI,1) ; ones(size(Y))' * Xpos(iROI,2)];
+    
+    plot(abscissa, [X';Y'], 'o-', 'color', ToPlot.line_colors(iROI,:));
+    
+    
+    for i=1:2
+        if i==1
+            Data = X;
+            offset = Xpos(iROI,1)-.5;
+        elseif i==2
+            Data = Y;
+            offset = Xpos(iROI,2)+.5;
+        end
+        
+        plot(offset, nanmean(Data), 'o', ...
+            'MarkerSize', 5, ...
+            'MarkerFaceColor', ToPlot.line_colors(iROI,:), ...
+            'color', ToPlot.line_colors(iROI,:))
+        
+        CI = bootci(10000,{@(x) mean(x), Data},'alpha', Alpha, 'type','bca');
+        Lower = CI(1);
+        Upper = CI(2);
+        
+        plot(...
+            [offset; offset], ...
+            [Lower; Upper], ...
+            'color', ToPlot.line_colors(iROI,:), 'LineWidth', 2.5 )
+    end
+    
+end
+
+plot([min(Xpos(:))-1 max(Xpos(:))+1], [0 0], '-k')
+
+switch cst_lin
+    case 1
+        Title = 'constant';
+    case 2
+        Title = 'linear';
+end
+title(Title);
+
+set(gca, 'xtick', sort(unique(Xpos(:))), ...
+         'xticklabel', ...
+            {ToPlot.bivariate_subplot_legend{iRow,1}{1};...
+             ToPlot.bivariate_subplot_legend{iRow,1}{2};...
+             ToPlot.bivariate_subplot_legend{iRow,1}{1};...
+             ToPlot.bivariate_subplot_legend{iRow,1}{2}}, ...
+          'fontsize', 8)
+       
+end
+
+
+
+function plot_lines(NbROI, ToPlot, iRow, iColumn, ROIs_to_plot, dash)
 
 X_pos = repmat((1:6)',1,NbROI)+repmat(linspace(-.2,.2,NbROI),6,1);
 if dash
@@ -268,8 +365,8 @@ l2=plot(...
     ToPlot.profile(iRow,iColumn).MEAN(:,ROIs_to_plot));
 
 for iLine=1:numel(l)
-    set(l(iLine),'color', line_colors(ROIs_to_plot(iLine),:))
-    set(l2(iLine),'color', line_colors(ROIs_to_plot(iLine),:),'linewidth',2)
+    set(l(iLine),'color', ToPlot.line_colors(ROIs_to_plot(iLine),:))
+    set(l2(iLine),'color', ToPlot.line_colors(ROIs_to_plot(iLine),:),'linewidth',2)
     if dash
         set(l2(iLine),'linestyle', '--')
     end
