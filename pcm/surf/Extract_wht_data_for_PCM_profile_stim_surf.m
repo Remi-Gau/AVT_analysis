@@ -1,12 +1,22 @@
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..','..');
-addpath(genpath(fullfile(StartDir, 'code','subfun')))
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox\')
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
 
-cd(StartDir)
-SubLs = dir('sub*');
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+
+[Dirs] = set_dir();
+
+Get_dependencies()
+
+SubLs = dir(fullfile(Dirs.DerDir, 'sub*'));
 NbSub = numel(SubLs);
 
 NbLayers = 6;
@@ -25,18 +35,17 @@ DesMat = (1:NbLayers)-mean(1:NbLayers);
 DesMat = [ones(NbLayers,1) DesMat'];
 DesMat = spm_orth(DesMat);
 
-ToPlot={'Cst','Lin'};
+ToPlot = {'Cst','Lin', 'Avg'};
 
-for iSub = 2:NbSub
+for iSub = 1:NbSub
     
     fprintf('\n\n\n')
     
     fprintf('Processing %s\n', SubLs(iSub).name)
     
-    Sub_dir = fullfile(StartDir, SubLs(iSub).name);
+    Sub_dir = fullfile(Dirs.DerDir, SubLs(iSub).name);
     GLM_dir = fullfile(Sub_dir, 'ffx_rsa');
-%     Data_dir = fullfile('E:\derivatives', SubLs(iSub).name, 'ffx_rsa', 'betas','6_surf');
-        Data_dir = fullfile(GLM_dir,'betas','6_surf');
+    Data_dir = fullfile(GLM_dir, 'betas','6_surf');
     
     
     % Get number of sessions, regressors of interest numbers, and names of conditions
@@ -45,18 +54,19 @@ for iSub = 2:NbSub
     Nb_sess = numel(SPM.Sess);
     clear SPM
     
-    % Load Vertices of interest for each ROI;
-    load(fullfile(Sub_dir, 'roi', 'surf',[SubLs(iSub).name  '_ROI_VertOfInt.mat']), 'ROI', 'NbVertex')
     
-    % Loads which runs happened on which day to set up the CVs
-    load(fullfile(StartDir, 'RunsPerSes.mat'))
-    Idx = ismember({RunPerSes.Subject}, SubLs(iSub).name);
-    RunPerSes = RunPerSes(Idx).RunsPerSes;
-    DayCVs = {...
-        1:RunPerSes(1), ...
-        RunPerSes(1)+1:RunPerSes(1)+RunPerSes(2),...
-        RunPerSes(1)+RunPerSes(2)+1:sum(RunPerSes)};
-    clear Idx RunPerSes
+    conditionVec = repmat(1:numel(CondNames),Nb_sess,1);
+    conditionVec = conditionVec(:);
+    
+    partitionVec = repmat((1:Nb_sess)',numel(CondNames),1);
+    
+    
+    % Load Vertices of interest for each ROI;
+    load(fullfile(Sub_dir, 'roi', 'surf', [SubLs(iSub).name  '_ROI_VertOfInt.mat']), 'ROI', 'NbVertex')
+    
+    
+    
+    
     
     %% For the 2 hemispheres
     NbVertices = nan(1,2);
@@ -122,12 +132,12 @@ for iSub = 2:NbSub
             for iCV = 1:size(Features,3)
                 Sess2Sel = iCV;
                 if strcmp(SubLs(iSub).name,'sub-06') && iSess==17 && (iCdt<3 || iCdt==7 || iCdt==8)
-%                     BetaCdt{hs,iCV}(1:size(DesMat,2),:,iCdt) = nan(size(DesMat,2),size(Features,1));
-%                     BetaCdt{hs,iCV}(size(DesMat,2)+1,:,iCdt) = nan(1,size(Features,1));
+                    %                     BetaCdt{hs,iCV}(1:size(DesMat,2),:,iCdt) = nan(size(DesMat,2),size(Features,1));
+                    %                     BetaCdt{hs,iCV}(size(DesMat,2)+1,:,iCdt) = nan(1,size(Features,1));
                 else
                     Y = Features(:,:,Sess2Sel);
-%                     AllData{hs,iCV}(:,:,iCdt) = Y;
-                    X=repmat(DesMat,size(Y,3),1);
+                    %                     AllData{hs,iCV}(:,:,iCdt) = Y;
+                    X=repmat(DesMat, size(Y,3), 1);
                     Y = shiftdim(Y,1);
                     B = pinv(X)*Y;
                     BetaCdt{hs,iCV}(1:size(DesMat,2),:,iCdt) = B;
@@ -153,6 +163,10 @@ for iSub = 2:NbSub
     end
     
     %%
+    
+    export_dir = fullfile(Dirs.DerDir, 'pcm', SubLs(iSub).name);
+    mkdir(export_dir)
+    
     for iToPlot = 1:size(BetaCdt{1,1},1)
         
         X_lh = nan(size(CondNames,2)*Nb_sess,NbVertex(1));
@@ -174,16 +188,40 @@ for iSub = 2:NbSub
         end
     end
     
-    X_lh = nan(size(CondNames,2)*Nb_sess,NbVertex(1));
-    X_rh = nan(size(CondNames,2)*Nb_sess,NbVertex(2));
-    row=1;
-    
+    % save data for each ROI, hs and for Cst / Lin / Avg
+    for iToPlot = 1:size(BetaCdt{1,1},1)
+        
+        for iROI = 1:numel(ROI)
+            
+            for hs = 1:2
+                
+                if hs==1
+                    HsSufix = 'l';
+                else
+                    HsSufix = 'r';
+                end
+                
+                filename = fullfile(export_dir, ...
+                    [SubLs(iSub).name '_pcmdata-MVNN_space-surf'...
+                    '_ROI-'  ROI(iROI).name ...
+                    '_hs-' HsSufix ...
+                    '_param-' lower(ToPlot{iToPlot}) ...
+                    '.mat']);
+                
+                data = PCM_data{iToPlot,iROI,hs};
+
+                save(filename, '-v7.3',  'data', 'CondNames', 'conditionVec', 'partitionVec')
+                
+            end
+        end
+        
+    end    
     
     
     %%
-        mkdir(fullfile(Sub_dir,'results','profiles','surf','PCM'))
+    mkdir(fullfile(Sub_dir,'results','profiles','surf','PCM'))
     save(fullfile(Sub_dir,'results','profiles','surf','PCM','Data_PCM.mat'), '-v7.3',  ...
-        'PCM_data')
+        'PCM_data', 'CondNames', 'conditionVec', 'partitionVec')
     
     clear BetaCdt PCM_data
     

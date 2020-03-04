@@ -6,7 +6,7 @@ function All_ROIs_BOLD_MVPA_surf_plot
 clc; clear;
 
 
-Analysis_to_plot = 5;
+Analysis_to_plot = 4:5;
 
 
 % Title of analysis

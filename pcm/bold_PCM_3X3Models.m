@@ -229,6 +229,9 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
                         
                         tmp = PCM_data{iToPlot,iROI,2};
                         
+                        % we relabel conditions from the right hemipshere
+                        % so that it matches the contra and ipsi of the
+                        % left one
                         for i=1:2:12
                             tmp(conditionVec==i,:) = PCM_data{iToPlot,iROI,2}(conditionVec==(i+1),:);
                         end
