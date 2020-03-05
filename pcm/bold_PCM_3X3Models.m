@@ -163,30 +163,7 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
             
             partitionVec = repmat((1:Nb_sess(iSub))',numel(CondNames)*2,1);
             
-            if ~surf && iSub == 5
-                % remove lines corresponding to auditory stim and
-                % targets for sub-06
-                ToRemove = all([any([conditionVec<3 conditionVec==7 conditionVec==8],2) partitionVec==17],2);
-                
-                partitionVec(ToRemove) = [];
-                conditionVec(ToRemove) = [];
-            end
-            
-            if surf && iSub == 5 && iToPlot==4
-                % remove lines corresponding to auditory stim and
-                % targets for sub-06
-                ToRemove = all([any([conditionVec<3 conditionVec==7 conditionVec==8],2) partitionVec==17],2);
-                
-                partitionVec(ToRemove) = [];
-                conditionVec(ToRemove) = [];
-            end
-            
-            if Target==1
-                conditionVec(conditionVec>6)=0;
-            else
-                conditionVec(conditionVec<7)=0;
-                conditionVec(conditionVec>6)=conditionVec(conditionVec>6)-6;
-            end
+            [partitionVec, conditionVec] = partition_condition_vectors(partitionVec, conditionVec, iSub, iToPlot, surf, Target);
             
             partitionVec_ori{iSub} = partitionVec;
             conditionVec_ori{iSub} = conditionVec;
@@ -446,7 +423,42 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
     end
     
 end
-                    
+
+
+function [partitionVec, conditionVec] = partition_condition_vectors(partitionVec, conditionVec, iSub, iToPlot, surf, target)
+
+if iSub == 5
+    
+    if surf && iToPlot==4
+        % remove lines corresponding to auditory stim and
+        % targets for sub-06
+        ToRemove = all([any([conditionVec<3 conditionVec==7 conditionVec==8],2) partitionVec==17],2);
+        
+        partitionVec(ToRemove) = [];
+        conditionVec(ToRemove) = [];
+        
+    elseif ~surf
+        % remove lines corresponding to auditory stim and
+        % targets for sub-06
+        ToRemove = all([any([conditionVec<3 conditionVec==7 conditionVec==8],2) partitionVec==17],2);
+        
+        partitionVec(ToRemove) = [];
+        conditionVec(ToRemove) = [];
+        
+    else
+        error('This case is not covered.')
+    end
+    
+end
+
+if target==1
+    conditionVec(conditionVec>6)=0;
+else
+    conditionVec(conditionVec<7)=0;
+    conditionVec(conditionVec>6)=conditionVec(conditionVec>6)-6;
+end
+
+end
                 end
                 
                 
