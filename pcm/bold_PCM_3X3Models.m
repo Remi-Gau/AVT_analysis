@@ -58,6 +58,7 @@ if surf
     % - all vertices and voxels values for that ROI
     ToPlot={'Cst','Lin','Avg','ROI'};
     Output_dir = 'surf';
+    Save_suffix = '';
 else
     ToPlot={'ROI'}; %#ok<*UNRCH>
     Output_dir = 'vol';
@@ -192,10 +193,9 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
                     conditionVec = conditionVec_ori{iSub};
                     
                     %% load data
-                    Data = load_data(Sub_dir, surf, raw, iToPlot, iROI, conditionVec, Save_suffix, SubLs, iSub, ihs)
+                    X_temp = load_data(Sub_dir, surf, raw, hs_idpdt, iToPlot, iROI, conditionVec, Save_suffix, SubLs, iSub, ihs);
                     
                     %% Get just the right data
-                    X_temp = Data; clear Data
                     X_temp(conditionVec==0,:)=[];
                     partitionVec(conditionVec==0,:)=[];
                     conditionVec(conditionVec==0,:)=[];
@@ -381,9 +381,7 @@ if iSub == 5
         
         partitionVec(ToRemove) = [];
         conditionVec(ToRemove) = [];
-        
-    else
-        error('This case is not covered.')
+
     end
     
 end
@@ -398,7 +396,7 @@ end
 end
 
 
-function Data = load_data(Sub_dir, surf, raw, iToPlot, iROI, conditionVec, Save_suffix, SubLs, iSub, ihs)
+function Data = load_data(Sub_dir, surf, raw, hs_idpdt, iToPlot, iROI, conditionVec, Save_suffix, SubLs, iSub, ihs)
 
 if surf==1
     
