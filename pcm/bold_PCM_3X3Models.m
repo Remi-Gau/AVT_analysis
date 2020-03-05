@@ -205,23 +205,6 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
                     ToRemove = find(any(isnan(X_temp)));
                     X_temp(:,ToRemove)=[];
                     
-                    if Split_half
-                        Nb_vert_L = Nb_vert_L - numel(ToRemove(ToRemove<=Nb_vert_L));
-                        Nb_vert_R = Nb_vert_R - numel(ToRemove(ToRemove>Nb_vert_L));
-                        
-                        tmp = 1:Nb_vert_L;
-                        tmp = tmp(randperm(numel(tmp)));
-                        VertL{iSub,1} = tmp(1:floor(numel(tmp)/2));
-                        VertL{iSub,2} = tmp((1+floor(numel(tmp)/2)):end);
-                        clear tmp
-                        
-                        tmp = (1:Nb_vert_R)+Nb_vert_L;
-                        tmp = tmp(randperm(numel(tmp)));
-                        VertR{iSub,1} = tmp(1:floor(numel(tmp)/2));
-                        VertR{iSub,2} = tmp((1+floor(numel(tmp)/2)):end);
-                        clear tmp
-                    end
-                    
                     if any(all(isnan(X_temp),2)) || any(all(X_temp==0,2))
                         warning('We have some NaNs issue.')
                         ToRemove = any([all(isnan(X_temp),2) all(X_temp==0,2)],2);
