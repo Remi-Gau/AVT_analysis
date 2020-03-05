@@ -13,7 +13,6 @@ clc; clear; close all
 surf = 1; % run of volume whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
 hs_idpdt = 0; % only implemented for volume
-Split_half = 0; % only implemented for surface
 
 analysis_to_run = 4; %1:4
 
@@ -47,14 +46,6 @@ Get_dependencies()
 
 SubLs = dir(fullfile(Dirs.DerDir,'sub*'));
 NbSub = numel(SubLs);
-
-
-
-if Split_half==1
-    NbSplits=2;
-else
-    NbSplits=1;
-end
 
 
 if surf
@@ -241,11 +232,6 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
                         Data = [PCM_data{iToPlot,iROI,1} tmp];
                         clear tmp
                         
-                        if Split_half
-                            Nb_vert_L = size(PCM_data{iToPlot,iROI,1},2);
-                            Nb_vert_R = size(PCM_data{iToPlot,iROI,2},2);
-                        end
-                        
                     elseif surf==1 && raw ==0 && iToPlot==4
                         load(fullfile(Sub_dir,'results','profiles','surf','PCM','Data_PCM_whole_ROI.mat'), 'PCM_data')
                         tmp = PCM_data{iROI,2};
@@ -364,111 +350,102 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
                 condVec_ori = condVec;
                 partVec_ori = partVec;
                 
-                for iSplit = 1:NbSplits
+                Y{iSub} = Y_ori{iSub};
+                
+                
+                for iComparison = analysis_to_run
                     
-                    Y{iSub} = Y_ori{iSub};
-
-                    if Split_half
-                        clear Y Vert2Take
-                        for iSub=1:NbSub
-                            Vert2Take = [VertL{iSub,iSplit} VertR{iSub,iSplit}];
-                            Y{iSub} = Y_ori{iSub}(:,Vert2Take);
-                        end
-                        Split_suffix = ['Split_' num2str(iSplit)];
-                    else
-                        Split_suffix = '';
+                    switch iComparison
+                        
+                        case 1
+                            Comp_suffix = '3X3_Ipsi';
+                            CdtToSelect = 1:2:5;
+                        case 2
+                            Comp_suffix = '3X3_Contra';
+                            CdtToSelect = 2:2:6;
+                        case 3
+                            Comp_suffix = '3X3_ContraIpsi';
+                            CdtToSelect = 1:6;
+                        case 4
+                            Comp_suffix = '3X3_ContraIpsiPool';
+                            CdtToSelect = 1:6;
                     end
                     
                     
-                    for iComparison = analysis_to_run
+                    % loop through subjects and compute G matrices
+                    condVec = condVec_ori;
+                    for iSub = 1:numel(condVec)
                         
-                        switch iComparison
-                            
-                            case 1
-                                Comp_suffix = '3X3_Ipsi';
-                                CdtToSelect = 1:2:5;
-                            case 2
-                                Comp_suffix = '3X3_Contra';
-                                CdtToSelect = 2:2:6;
-                            case 3
-                                Comp_suffix = '3X3_ContraIpsi';
-                                CdtToSelect = 1:6;                              
-                            case 4
-                                Comp_suffix = '3X3_ContraIpsiPool';
-                                CdtToSelect = 1:6;
-                        end  
-
+                        condVec{iSub}(~ismember(condVec{iSub},CdtToSelect)) = 0;
                         
-                        % loop through subjects and compute G matrices
-                        condVec = condVec_ori;
-                        for iSub = 1:numel(condVec)
-                            
-                            condVec{iSub}(~ismember(condVec{iSub},CdtToSelect)) = 0;
-   
-                            % collapse across ipsi and contra stimuli by averaging
-                            % we loop over partitions and then for each condition (A, V, T) we 
-                            % average the ipsi and contra data of that partition.
-                             
-                            if iComparison==3
-                                for ipart = 1:max(partVec{iSub}) 
-                                    this_part = partVec{iSub} == ipart;
-                                    for iCdt = 1:2:5
+                        % collapse across ipsi and contra stimuli by averaging
+                        % we loop over partitions and then for each condition (A, V, T) we
+                        % average the ipsi and contra data of that partition.
+                        
+                        if iComparison==3
+                            for ipart = 1:max(partVec{iSub})
+                                this_part = partVec{iSub} == ipart;
+                                for iCdt = 1:2:5
                                     Y{iSub}( all([this_part, condVec{iSub}==iCdt],2) , : ) = ...
-                                        mean( Y{iSub}(  all([this_part, ismember(condVec{iSub},iCdt:(iCdt+1))],2) , : ) ) ; 
-                                    end
+                                        mean( Y{iSub}(  all([this_part, ismember(condVec{iSub},iCdt:(iCdt+1))],2) , : ) ) ;
                                 end
-                                
-                                % Then we only keep the rows where the data has been averaged
-                                condVec{iSub}(condVec{iSub}==2) = 0;
-                                condVec{iSub}(condVec{iSub}==4) = 0;
-                                condVec{iSub}(condVec{iSub}==6) = 0;
-                                
-                                partVec{iSub}(condVec{iSub}==0) = [];
-                                Y{iSub}(condVec{iSub}==0, :) = [];
-                                condVec{iSub}(condVec{iSub}==0) = [];
-                                
-                            elseif iComparison==4
-                                
-                                % Then we only keep the rows where the data has been averaged
-                                condVec{iSub}(condVec{iSub}==2) = 1;
-                                condVec{iSub}(condVec{iSub}==4) = 3;
-                                condVec{iSub}(condVec{iSub}==6) = 5;
-                                
                             end
                             
+                            % Then we only keep the rows where the data has been averaged
+                            condVec{iSub}(condVec{iSub}==2) = 0;
+                            condVec{iSub}(condVec{iSub}==4) = 0;
+                            condVec{iSub}(condVec{iSub}==6) = 0;
                             
+                            partVec{iSub}(condVec{iSub}==0) = [];
+                            Y{iSub}(condVec{iSub}==0, :) = [];
+                            condVec{iSub}(condVec{iSub}==0) = [];
                             
+                        elseif iComparison==4
                             
-                            G_hat(:,:,iSub,iSplit) = pcm_estGCrossval( Y{iSub}, partVec{iSub}, condVec{iSub} );
+                            % Then we only keep the rows where the data has been averaged
+                            condVec{iSub}(condVec{iSub}==2) = 1;
+                            condVec{iSub}(condVec{iSub}==4) = 3;
+                            condVec{iSub}(condVec{iSub}==6) = 5;
                             
-                            G(:,:,iSub,iSplit) = Y_avg{iSub} * Y_avg{iSub}' / size(Y_avg{iSub},2); % with no CV.
                         end
                         
-                        M = M_ori;
+                        G_hat(:,:,iSub) = pcm_estGCrossval( Y{iSub}, partVec{iSub}, condVec{iSub} );
                         
-                        % Fit the models on the group level
-                        fprintf('\n\n  Running PCM_grp %s\n\n', Comp_suffix)
-                        
-                        [T_group,theta_gr,G_pred_gr] = pcm_fitModelGroup(Y, M, partVec, condVec, ...
-                            'runEffect', runEffect, ...
-                            'fitScale', 1);
-                        
-                        [T_cross,theta_cr,G_pred_cr] = pcm_fitModelGroupCrossval(Y, M, partVec, condVec, ...
-                            'runEffect', runEffect, ...
-                            'groupFit', theta_gr, ...
-                            'fitScale',1, ...
-                            'MaxIteration', MaxIteration);
-                        
-                        % Save
-                        save(fullfile(Save_dir, sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_%s.mat', ...
-                            Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
-                            ToPlot{iToPlot}, Split_suffix, Comp_suffix , datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
-                            'M', 'partVec', 'condVec','G_hat', 'G',...
-                            'T_group','theta_gr','G_pred_gr',...
-                            'T_cross','theta_cr','G_pred_cr' )
+                        G(:,:,iSub) = Y_avg{iSub} * Y_avg{iSub}' / size(Y_avg{iSub},2); % with no CV.
                         
                     end
                     
+                    M = M_ori;
+                    
+                    % Fit the models on the group level
+                    fprintf('\n\n  Running PCM_grp %s\n\n', Comp_suffix)
+                    
+                    [T_group,theta_gr,G_pred_gr] = pcm_fitModelGroup(Y, M, partVec, condVec, ...
+                        'runEffect', runEffect, ...
+                        'fitScale', 1);
+                    
+                    [T_cross,theta_cr,G_pred_cr] = pcm_fitModelGroupCrossval(Y, M, partVec, condVec, ...
+                        'runEffect', runEffect, ...
+                        'groupFit', theta_gr, ...
+                        'fitScale',1, ...
+                        'MaxIteration', MaxIteration);
+                    
+                    % Save
+                    save(fullfile(Save_dir, sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_%s.mat', ...
+                        Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
+                        ToPlot{iToPlot}, Comp_suffix , datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
+                        'M', 'partVec', 'condVec','G_hat', 'G',...
+                        'T_group','theta_gr','G_pred_gr',...
+                        'T_cross','theta_cr','G_pred_cr' )
+                    
+                end
+                
+            end
+            
+        end
+    end
+    
+end
                     
                 end
                 
