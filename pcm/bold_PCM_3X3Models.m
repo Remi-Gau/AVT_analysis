@@ -192,53 +192,7 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
                     conditionVec = conditionVec_ori{iSub};
                     
                     %% load data
-                    if surf==1 && raw ==0 && iToPlot<4
-                        load(fullfile(Sub_dir,'results','profiles','surf','PCM','Data_PCM.mat'), 'PCM_data')
-                        
-                        tmp = PCM_data{iToPlot,iROI,2};
-                        
-                        % we relabel conditions from the right hemipshere
-                        % so that it matches the contra and ipsi of the
-                        % left one
-                        for i=1:2:12
-                            tmp(conditionVec==i,:) = PCM_data{iToPlot,iROI,2}(conditionVec==(i+1),:);
-                        end
-                        for i=2:2:12
-                            tmp(conditionVec==i,:) = PCM_data{iToPlot,iROI,2}(conditionVec==(i-1),:);
-                        end
-                        Data = [PCM_data{iToPlot,iROI,1} tmp];
-                        clear tmp
-                        
-                    elseif surf==1 && raw ==0 && iToPlot==4
-                        load(fullfile(Sub_dir,'results','profiles','surf','PCM','Data_PCM_whole_ROI.mat'), 'PCM_data')
-                        tmp = PCM_data{iROI,2};
-                        for i=1:2:12
-                            tmp(conditionVec==i,:) = PCM_data{iROI,2}(conditionVec==(i+1),:);
-                        end
-                        for i=2:2:12
-                            tmp(conditionVec==i,:) = PCM_data{iROI,2}(conditionVec==(i-1),:);
-                        end
-                        Data = [PCM_data{iROI,1} tmp];
-                        
-                    elseif surf==1 && raw==1
-                        error('not implemented')
-                        
-                    else
-                        load(fullfile(Sub_dir,'results','rsa','vol',[SubLs(iSub).name '_data_' Save_suffix '.mat']), 'Features')
-                        if hs_idpdt
-                            Data = Features{iROI,ihs};
-                        else
-                            tmp = Features{iROI,2};
-                            for i=1:2:12
-                                tmp(conditionVec==i,:) = Features{iROI,2}(conditionVec==(i+1),:);
-                            end
-                            for i=2:2:12
-                                tmp(conditionVec==i,:) = Features{iROI,2}(conditionVec==(i-1),:);
-                            end
-                            Data = [Features{iROI,1} tmp];
-                        end
-                        clear Features
-                    end
+                    Data = load_data(Sub_dir, surf, raw, iToPlot, iROI, conditionVec, Save_suffix, SubLs, iSub, ihs)
                     
                     %% Get just the right data
                     X_temp = Data; clear Data
@@ -303,14 +257,14 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
                     Cdts = unique(conditionVec);
                     X_temp_avg = [];
                     for iCdt = 1:numel(Cdts)
-                        X_temp_avg(end+1,:) = mean(X_temp(conditionVec==Cdts(iCdt),:));
+                        X_temp_avg(end+1,:) = mean( X_temp(conditionVec==Cdts(iCdt),:) );
                     end
                     Y_avg{iSub} = X_temp_avg;
                     
                     clear X_temp X_temp_avg
                     
                     % Compute G matrix with all conditions
-                    G_hat(:,:,iSub)=pcm_estGCrossval(Y{iSub},partVec{iSub},condVec{iSub});
+                    G_hat(:,:,iSub)=pcm_estGCrossval(Y{iSub}, partVec{iSub}, condVec{iSub});
                     
                 end
                 
@@ -459,12 +413,85 @@ else
 end
 
 end
-                end
+
+
+function Data = load_data(Sub_dir, surf, raw, iToPlot, iROI, conditionVec, Save_suffix, SubLs, iSub, ihs)
+
+if surf==1
+    
+    if raw == 0
+        
+        if iToPlot < 4
+            
+            load(fullfile(Sub_dir,'results','profiles','surf','PCM','Data_PCM.mat'), 'PCM_data')
+            
+            if hs_idpdt
                 
+                Data = PCM_data{iToPlot,iROI,ihs};
                 
+            else
+                
+            tmp = PCM_data{iToPlot,iROI,2};
+            
+            % we relabel conditions from the right hemipshere
+            % so that it matches the contra and ipsi of the
+            % left one
+            for i=1:2:12
+                tmp(conditionVec==i,:) = PCM_data{iToPlot,iROI,2}(conditionVec==(i+1),:);
+            end
+            for i=2:2:12
+                tmp(conditionVec==i,:) = PCM_data{iToPlot,iROI,2}(conditionVec==(i-1),:);
+            end
+            Data = [PCM_data{iToPlot,iROI,1} tmp];
+
+            end
+
+        elseif iToPlot==4
+            
+            load(fullfile(Sub_dir,'results','profiles','surf','PCM','Data_PCM_whole_ROI.mat'), 'PCM_data')
+            
+            if hs_idpdt
+                Data = PCM_data{iROI,ihs};
+            else
+                Data = reorganize_ipsi_contra(PCM_data, iROI, conditionVec);
             end
             
         end
+        
+    else
+        
+        error('Raw data for surfaces: not implemented')
+        
     end
     
+else
+    
+    load(fullfile(Sub_dir,'results', 'rsa', 'vol', [SubLs(iSub).name '_data_' Save_suffix '.mat']), 'Features')
+    
+    if hs_idpdt
+        Data = Features{iROI,ihs};
+    else
+        Data = reorganize_ipsi_contra(Features, iROI, conditionVec);
+    end
+    
+    
+end
+
+
+end
+
+
+function data = reorganize_ipsi_contra(data, iROI, conditionVec)
+
+        tmp = data{iROI,2};
+        
+        for i=1:2:12
+            tmp(conditionVec==i,:) = data{iROI,2}(conditionVec==(i+1),:);
+        end
+        for i=2:2:12
+            tmp(conditionVec==i,:) = data{iROI,2}(conditionVec==(i-1),:);
+        end
+        
+        data = [data{iROI,1} tmp];
+
 end
