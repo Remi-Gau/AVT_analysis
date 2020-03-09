@@ -10,16 +10,21 @@
 clc; clear; close all
 
 
-surf = 1; % run of volume whole ROI or surface profile data
+surf = 0; % run of volume whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
 hs_idpdt = 0; % only implemented for volume
-
-analysis_to_run = 4; %1:4
 
 % 1 - '3X3_Ipsi';
 % 2 - '3X3_Contra';
 % 3 - '3X3_ContraIpsi'; average over ipsi and contra
 % 4 - '3X3_ContraIpsiPool'; pool over ipsi and contra with no averaging
+analysis_to_run = 3; %1:4
+
+if surf
+    rois_to_run = 1:4;
+else
+    rois_to_run = [1 2 6 7];
+end
 
 
 print_models = 0;
@@ -129,7 +134,7 @@ end
 fprintf('Get started\n')
 
 
-for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (ToPlot={'Cst','Lin','Avg','ROI'};)
+for iToPlot = 1:numel(ToPlot) % decides on what parameter the PCM is run (ToPlot={'Cst','Lin','Avg','ROI'};)
     
     for Target = 1
         
@@ -171,7 +176,7 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
         end
         
         %%
-        for iROI =  1:4 %:numel(ROI)
+        for iROI =  rois_to_run
             
             fprintf('\n %s\n', ROI(iROI).name)
             
@@ -264,10 +269,9 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
                 condVec_ori = condVec;
                 partVec_ori = partVec;
                 
-                Y{iSub} = Y_ori{iSub};
-                
-                
                 for iComparison = analysis_to_run
+
+                    Y{iSub} = Y_ori{iSub};
                     
                     switch iComparison
                         
@@ -299,9 +303,11 @@ for iToPlot = 1:2 %:numel(ToPlot) % decides on what parameter the PCM is run (To
                         if iComparison==3
                             for ipart = 1:max(partVec{iSub})
                                 this_part = partVec{iSub} == ipart;
-                                for iCdt = 1:2:5
-                                    Y{iSub}( all([this_part, condVec{iSub}==iCdt],2) , : ) = ...
-                                        mean( Y{iSub}(  all([this_part, ismember(condVec{iSub},iCdt:(iCdt+1))],2) , : ) ) ;
+                                if any(this_part) % extra check for subject 06
+                                    for iCdt = 1:2:5
+                                        Y{iSub}( all([this_part, condVec{iSub}==iCdt],2) , : ) = ...
+                                            mean( Y{iSub}(  all([this_part, ismember(condVec{iSub},iCdt:(iCdt+1))],2) , : ) ) ;
+                                    end
                                 end
                             end
                             
@@ -381,7 +387,7 @@ if iSub == 5
         
         partitionVec(ToRemove) = [];
         conditionVec(ToRemove) = [];
-
+        
     end
     
 end
@@ -412,21 +418,21 @@ if surf==1
                 
             else
                 
-            tmp = PCM_data{iToPlot,iROI,2};
+                tmp = PCM_data{iToPlot,iROI,2};
+                
+                % we relabel conditions from the right hemipshere
+                % so that it matches the contra and ipsi of the
+                % left one
+                for i=1:2:12
+                    tmp(conditionVec==i,:) = PCM_data{iToPlot,iROI,2}(conditionVec==(i+1),:);
+                end
+                for i=2:2:12
+                    tmp(conditionVec==i,:) = PCM_data{iToPlot,iROI,2}(conditionVec==(i-1),:);
+                end
+                Data = [PCM_data{iToPlot,iROI,1} tmp];
+                
+            end
             
-            % we relabel conditions from the right hemipshere
-            % so that it matches the contra and ipsi of the
-            % left one
-            for i=1:2:12
-                tmp(conditionVec==i,:) = PCM_data{iToPlot,iROI,2}(conditionVec==(i+1),:);
-            end
-            for i=2:2:12
-                tmp(conditionVec==i,:) = PCM_data{iToPlot,iROI,2}(conditionVec==(i-1),:);
-            end
-            Data = [PCM_data{iToPlot,iROI,1} tmp];
-
-            end
-
         elseif iToPlot==4
             
             load(fullfile(Sub_dir,'results','profiles','surf','PCM','Data_PCM_whole_ROI.mat'), 'PCM_data')
@@ -464,15 +470,15 @@ end
 
 function data = reorganize_ipsi_contra(data, iROI, conditionVec)
 
-        tmp = data{iROI,2};
-        
-        for i=1:2:12
-            tmp(conditionVec==i,:) = data{iROI,2}(conditionVec==(i+1),:);
-        end
-        for i=2:2:12
-            tmp(conditionVec==i,:) = data{iROI,2}(conditionVec==(i-1),:);
-        end
-        
-        data = [data{iROI,1} tmp];
+tmp = data{iROI,2};
+
+for i=1:2:12
+    tmp(conditionVec==i,:) = data{iROI,2}(conditionVec==(i+1),:);
+end
+for i=2:2:12
+    tmp(conditionVec==i,:) = data{iROI,2}(conditionVec==(i-1),:);
+end
+
+data = [data{iROI,1} tmp];
 
 end
