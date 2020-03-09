@@ -42,16 +42,13 @@ Get_dependencies()
 surf = 1; % run of volumne whole ROI or surface profile data
 raw = 0; % run on raw betas or prewhitened
 hs_idpdt = 0;
-Split_half = 0; % only implemented for surface
-if Split_half==1
-    NbSplits=2;
-else
-    NbSplits=1;
-end
-if Split_half
-else
-    Split_suffix = '';
-end
+
+Comp_suffix{1} = '3X3_Ipsi';
+Comp_suffix{end+1} = '3X3_Contra';
+Comp_suffix{end+1} = '3X3_ContraIpsi';
+Comp_suffix{end+1} = '3X3_ContraIpsiPool';
+
+NbROI = 4;
 
 
 SubLs = dir(fullfile(Dirs.DerDir,'sub*'));
@@ -108,11 +105,7 @@ else
     NbHS = 1;
 end
 
-Comp_suffix{1} = '3X3_Ipsi';
-Comp_suffix{end+1} = '3X3_Contra';
-Comp_suffix{end+1} = '3X3_ContraIpsi';
-
-for iToPlot = 1%:numel(ToPlot)
+for iToPlot = 1 %:numel(ToPlot)
     
     for Target = 1
         
@@ -149,16 +142,16 @@ for iToPlot = 1%:numel(ToPlot)
             end
         end
         
-        for iROI = 1:4 %numel(ROI)
+        for iROI = 1:NbROI
             
             for ihs=1:NbHS
                 
-                for iComp = 1:3
+                for iComp = 1:numel(Comp_suffix)
                     
                     ls_files_2_load = dir(fullfile(Save_dir, ...
-                        sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_20*.mat', ...
+                        sprintf('PCM_group_features_%s_%s_%s_%s_%s_*%s*.mat', ...
                         Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
-                        ToPlot{iToPlot}, Split_suffix, Comp_suffix{iComp})));
+                        ToPlot{iToPlot}, Comp_suffix{iComp})));
                     
                     disp(fullfile(Save_dir,ls_files_2_load(end).name))
                     load(fullfile(Save_dir,ls_files_2_load(end).name),...
@@ -199,8 +192,8 @@ for iToPlot = 1%:numel(ToPlot)
                     
                     Subplot=1;
                     
-                    opt.FigName = sprintf('GMat-3x3Models-%s-%s-%s-PCM_{grp}-%s-%s-%s', ...
-                        Comp_suffix{iComp},strrep(ROI(iROI).name, '_thresh',''), ...
+                    opt.FigName = sprintf('GMat_space-%s_3x3Models-%s-%s-%s-PCM_{grp}-%s-%s-%s', ...
+                        Output_dir, Comp_suffix{iComp},strrep(ROI(iROI).name, '_thresh',''), ...
                         hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
                     
                     figure('name', [opt.FigName], 'Position', FigDim, 'Color', [1 1 1], 'visible', visible);
@@ -286,10 +279,15 @@ for iToPlot = 1%:numel(ToPlot)
 
                 for WithSubj = 1:2
                     
-                    opt.FigName = sprintf('LikelihoodsBarPlot-3x3Models-%s-%s-PCM_{grp}-%s-%s-%s', strrep(ROI(iROI).name, '_thresh',''), ...
-                        hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+                    opt.FigName = sprintf('LikelihoodsBarPlot_space-%s_3x3Models-%s-%s-PCM_{grp}-%s-%s-%s', ...
+                            Output_dir, ...     
+                            strrep(ROI(iROI).name, '_thresh',''), ...
+                            hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
+                        
                     if WithSubj==2
-                        opt.FigName = sprintf('LikelihoodsBarPlot-SUBJ-3x3Models-%s-%s-PCM_{grp}-%s-%s-%s', strrep(ROI(iROI).name, '_thresh',''), ...
+                        opt.FigName = sprintf('LikelihoodsBarPlot_space-%s_-SUBJ-3x3Models-%s-%s-PCM_{grp}-%s-%s-%s', ...
+                            Output_dir, ...
+                            strrep(ROI(iROI).name, '_thresh',''), ...
                             hs_suffix{ihs}, Stim_suffix, Beta_suffix, ToPlot{iToPlot});
                     end
                     

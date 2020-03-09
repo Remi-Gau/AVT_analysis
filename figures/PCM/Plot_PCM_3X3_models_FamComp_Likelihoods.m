@@ -30,9 +30,17 @@ Get_dependencies()
 
 PCM_dir = fullfile(Dirs.DerDir, 'figures', 'PCM');
 
+
+surf = 0; % run of volumne whole ROI or surface profile data
+raw = 0; % run on raw betas or prewhitened
+hs_idpdt = 0;
+
+NbROI = 4;
+
 Comp_suffix{1} = '3X3_Ipsi';
 Comp_suffix{end+1} = '3X3_Contra';
 Comp_suffix{end+1} = '3X3_ContraIpsi';
+Comp_suffix{end+1} = '3X3_ContraIpsiPool';
 
 %% Sorting models for each family comparison
 
@@ -103,15 +111,6 @@ for iCdt = 1:3
 end
 
 %%
-surf = 1; % run of volumne whole ROI or surface profile data
-raw = 0; % run on raw betas or prewhitened
-hs_idpdt = 0;
-on_merged_ROI = 0;
-
-Split_suffix = '';
-
-NbROI = 4;
-
 
 if surf
     ToPlot={'Cst','Lin','Avg','ROI'};
@@ -177,14 +176,14 @@ for iToPlot = 1 %:numel(ToPlot)
             
             for ihs=1:NbHS
                 
-                for iComp = 1:3
+                for iComp = 1:numel(Comp_suffix)
                     
                     Save_dir = fullfile(Dirs.DerDir, 'results', 'PCM', Output_dir);
                     
                     ls_files_2_load = dir(fullfile(Save_dir, ...
-                        sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s_20*.mat', ...
+                        sprintf('PCM_group_features_%s_%s_%s_%s_%s_*%s*.mat', ...
                         Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs},...
-                        ToPlot{iToPlot}, Split_suffix, Comp_suffix{iComp})));
+                        ToPlot{iToPlot}, Comp_suffix{iComp})));
                     
                     disp(fullfile(Save_dir,ls_files_2_load(end).name))
                     load(fullfile(Save_dir,ls_files_2_load(end).name),...
