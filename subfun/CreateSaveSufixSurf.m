@@ -15,6 +15,8 @@ end
 
 if opt.MVNN
     SaveSufix = [SaveSufix '_mvnn-1']; %#ok<*AGROW>
+else
+    SaveSufix = [SaveSufix '_mvnn-0']; %#ok<*AGROW>
 end
 
 if opt.fs.do

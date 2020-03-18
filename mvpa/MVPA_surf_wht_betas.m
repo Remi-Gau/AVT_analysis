@@ -1,12 +1,24 @@
 function MVPA_surf_wht_betas
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..');
-cd (StartDir)
-addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
 
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/')
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+
+[Dirs] = set_dir();
+
+Get_dependencies()
+
+SubLs = dir(fullfile(Dirs.DerDir, 'sub*'));
+NbSub = numel(SubLs);
 
 NbLayers = 6;
 
@@ -56,33 +68,32 @@ ROIs_ori = {
     'A1',...
     'PT',...
     'V1',...
-    'V2',...
-    'V3'};
+    'V2'};
 
 ToPlot={'Cst','Lin','Avg','ROI'};
 
 % --------------------------------------------------------- %
 %                     Analysis to perform                   %
 % --------------------------------------------------------- %
-% SVM_Ori(1) = struct('name', 'A Ipsi VS Contra', 'class', [1 2], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-% SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [3 4], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-% SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-% 
-% SVM_Ori(end+1) = struct('name', 'A VS V Ipsi', 'class', [1 3], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-% SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], ...
-%     'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 1);
-% SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [3 5], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+SVM_Ori(1) = struct('name', 'A Ipsi VS Contra', 'class', [1 2], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [3 4], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+ 
+SVM_Ori(1) = struct('name', 'A VS V Ipsi', 'class', [1 3], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], ...
+    'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 1);
+SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [3 5], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 
-% SVM_Ori(1) = struct('name', 'A VS V Contra', 'class', [2 4], ...
-%     'ROI_2_analyse', 1, 'Featpool', 1);
-% SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-SVM_Ori(1) = struct('name', 'V VS T Contra', 'class', [4 6], ...
+SVM_Ori(end+1) = struct('name', 'A VS V Contra', 'class', [2 4], ...
+    'ROI_2_analyse', 1, 'Featpool', 1);
+SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
+SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 
 
@@ -156,21 +167,18 @@ opt.session.maxcv = 25;
 % -------------------------%
 [KillGcpOnExit] = OpenParWorkersPool(NbWorkers);
 
-SubLs = dir('sub*');
-NbSub = numel(SubLs);
-
-for iToPlot = 4
+for iToPlot = 1:2
     
     opt.toplot = ToPlot{iToPlot};
     
-    for iSub = 1 %NbSub
+    for iSub = [1:4 6:NbSub]
         
         % --------------------------------------------------------- %
         %                        Subject data                       %
         % --------------------------------------------------------- %
         fprintf('\n\nProcessing %s\n', SubLs(iSub).name)
         
-        SubDir = fullfile(StartDir, SubLs(iSub).name);
+        SubDir = fullfile(Dirs.DerDir, SubLs(iSub).name);
         
         Data_dir = fullfile(SubDir,'results','profiles','surf','PCM');
         
@@ -456,7 +464,7 @@ for iToPlot = 4
                         % Defines the test sessions for the CV: take one
                         % session from each day as test: all the others as
                         % training
-                        load(fullfile(StartDir, 'RunsPerSes.mat'))
+                        load(fullfile(Dirs.DerDir, 'RunsPerSes.mat'))
                         Idx = ismember({RunPerSes.Subject}, SubLs(iSub).name);
                         RunPerSes = RunPerSes(Idx).RunsPerSes;
                         sets = {...
