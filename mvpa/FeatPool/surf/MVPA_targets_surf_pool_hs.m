@@ -448,39 +448,6 @@ CloseParWorkersPool(KillGcpOnExit)
 
 end
 
-
-function SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, iROI, SaveSufix) %#ok<INUSL>
-
-save(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]), 'Results', 'opt', 'Class_Acc', '-v7.3');
-
-end
-
-function [acc_layer, results_layer, results, weight] = RunSVM(SVM, Features, LogFeat, FeaturesLayers, CV_Mat, TrainSess, TestSess, opt, iSVM)
-
-if isempty(Features) || all(Features(:)==Inf)
-    
-    warning('Empty ROI')
-    
-    acc_layer = NaN;
-    results = struct();
-    results_layer = struct();
-    weight = [];
-    
-else
-    
-    [acc_layer, weight, results_layer] = machine_SVC_layers(SVM(iSVM), ...
-        Features(:,LogFeat), FeaturesLayers(:,LogFeat), CV_Mat, TrainSess, TestSess, opt);
-    
-    if opt.verbose
-        fprintf('\n       Running on all layers.')
-    end
-    
-    results = machine_SVC(SVM(iSVM), Features(:,LogFeat), CV_Mat, TrainSess, TestSess, opt);
-    
-end
-
-end
-
 function str = Seconds_to_hours(s)
 
 h = floor(s/3600);
