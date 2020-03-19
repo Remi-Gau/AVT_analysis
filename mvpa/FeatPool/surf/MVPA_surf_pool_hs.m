@@ -1,9 +1,24 @@
 function MVPA_surf_pool_hs
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..','..','..');
-cd (StartDir)
-addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
+
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+
+[Dirs] = set_dir();
+
+Get_dependencies()
+
+SubLs = dir(fullfile(Dirs.DerDir, 'sub*'));
+NbSub = numel(SubLs);
 
 NbLayers = 6;
 
@@ -135,18 +150,14 @@ opt.session.maxcv = 100;
 % -------------------------%
 [KillGcpOnExit] = OpenParWorkersPool(NbWorkers);
 
-SubLs = dir('sub*');
-NbSub = numel(SubLs);
-
-
-for iSub = 1%8:NbSub    
+for iSub = 5 %1:NbSub    
     
     % --------------------------------------------------------- %
     %                        Subject data                       %
     % --------------------------------------------------------- %
     fprintf('\n\nProcessing %s\n', SubLs(iSub).name)
     
-    SubDir = fullfile(StartDir, SubLs(iSub).name);
+    SubDir = fullfile(Dirs.DerDir, SubLs(iSub).name);
     
     Data_dir = fullfile(SubDir, 'ffx_nat', 'betas', '6_surf');
     
@@ -269,56 +280,7 @@ for iSub = 1%8:NbSub
     %% Run for different type of normalization/scaling
     for Norm = 6
         
-        switch Norm
-            case 1
-                opt.scaling.img.eucledian = 1;
-                opt.scaling.img.zscore = 0;
-                opt.scaling.feat.mean = 0;
-                opt.scaling.feat.range = 0;
-                opt.scaling.feat.sessmean = 1;
-            case 2
-                opt.scaling.img.eucledian = 1;
-                opt.scaling.img.zscore = 0;
-                opt.scaling.feat.mean = 0;
-                opt.scaling.feat.range = 1;
-                opt.scaling.feat.sessmean = 0;
-            case 3
-                opt.scaling.img.eucledian = 1;
-                opt.scaling.img.zscore = 0;
-                opt.scaling.feat.mean = 1;
-                opt.scaling.feat.range = 0;
-                opt.scaling.feat.sessmean = 0;
-            case 4
-                opt.scaling.img.eucledian = 0;
-                opt.scaling.img.zscore = 1;
-                opt.scaling.feat.mean = 0;
-                opt.scaling.feat.range = 0;
-                opt.scaling.feat.sessmean = 1;
-            case 5
-                opt.scaling.img.eucledian = 0;
-                opt.scaling.img.zscore = 1;
-                opt.scaling.feat.mean = 0;
-                opt.scaling.feat.range = 1;
-                opt.scaling.feat.sessmean = 0;
-            case 6
-                opt.scaling.img.eucledian = 0;
-                opt.scaling.img.zscore = 1;
-                opt.scaling.feat.mean = 1;
-                opt.scaling.feat.range = 0;
-                opt.scaling.feat.sessmean = 0;
-            case 7
-                opt.scaling.img.eucledian = 0;
-                opt.scaling.img.zscore = 0;
-                opt.scaling.feat.mean = 1;
-                opt.scaling.feat.range = 0;
-                opt.scaling.feat.sessmean = 0;
-            case 8
-                opt.scaling.img.eucledian = 0;
-                opt.scaling.img.zscore = 0;
-                opt.scaling.feat.mean = 0;
-                opt.scaling.feat.range = 0;
-                opt.scaling.feat.sessmean = 0;
-        end
+        opt = ChooseNorm(Norm, opt);
         
         SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
         
@@ -559,12 +521,6 @@ CloseParWorkersPool(KillGcpOnExit)
 
 end
 
-
-function SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, iROI, SaveSufix) %#ok<INUSL>
-
-save(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]), 'Results', 'opt', 'Class_Acc', '-v7.3');
-
-end
 
 function [acc_layer, results_layer, results, weight] = RunSVM(SVM, Features, LogFeat, FeaturesLayers, CV_Mat, TrainSess, TestSess, opt, iSVM)
 

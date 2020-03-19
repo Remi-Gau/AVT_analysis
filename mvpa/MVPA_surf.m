@@ -1,4 +1,11 @@
-function MVPA_surf_wht_betas
+function MVPA_surf
+% very generic function to run MVPA on surface data
+% - either on B parameters layer by layer (or on the whole ROI)
+% - or on the S parameters (cst, lin or average for each vertex)
+%
+% Analysis is run by pooling over hemisphere
+
+
 clc; clear;
 
 if isunix
@@ -34,7 +41,7 @@ opt.session.curve = 0; % learning curves on a subsample of all the sessions
 opt.session.proptest = 0.2; % proportion of all sessions to keep as a test set
 opt.verbose = 0;
 opt.session.loro = 1;
-opt.MVNN = 1;
+opt.MVNN = 0;
 
 CondNames = {...
     'AStimL','AStimR',...
@@ -81,7 +88,7 @@ SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [3 4], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
- 
+
 SVM_Ori(1) = struct('name', 'A VS V Ipsi', 'class', [1 3], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], ...
@@ -104,14 +111,14 @@ SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], ...
 %     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
 % SVM_Ori(end+1) = struct('name', 'T_L VS T_R', 'class', [5 6], ...
 %     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-% 
+%
 % SVM_Ori(end+1) = struct('name', 'A_L VS V_L', 'class', [1 3], ...
 %     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
 % SVM_Ori(end+1) = struct('name', 'A_L VS T_L', 'class', [1 5], ...
 %     'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 0);
 % SVM_Ori(end+1) = struct('name', 'V_L VS T_L', 'class', [3 5], ...
 %     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-% 
+%
 % SVM_Ori(end+1) = struct('name', 'A_R VS V_R', 'class', [2 4], ...
 %     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
 % SVM_Ori(end+1) = struct('name', 'A_R VS T_R', 'class', [2 6], ...
@@ -161,6 +168,12 @@ opt.session.subsample.nreps = 30;
 % Maximum numbers of CVs
 opt.session.maxcv = 25;
 
+if opt.MVNN
+    file2load_suffix = 'MVNN';
+else
+    file2load_suffix = 'raw';
+end
+
 
 % -------------------------%
 %          START           %
@@ -206,12 +219,24 @@ for iToPlot = 1:2
         clear SPM
         
         
-        %% Create partition and condition vector
-        conditionVec = repmat(1:numel(CondNames)*2,Nb_sess,1);
-        conditionVec = conditionVec(:);
+        %% Read features
+        fprintf(' Reading features\n')
+        if iToPlot<4
+            FeatureSaveFile = ['Data_' file2load_suffix '.mat'];
+            load(fullfile(Data_dir,FeatureSaveFile), 'PCM_data', 'conditionVec', 'partitionVec')
+            for iROI = 1:numel(ROI)
+                Data{iROI,1} = PCM_data{iToPlot,iROI,1}; %#ok<*AGROW,*USENS>
+                Data{iROI,2} = PCM_data{iToPlot,iROI,2};
+            end
+        else
+            FeatureSaveFile = 'Data_PCM_whole_ROI.mat';
+            load(fullfile(Data_dir,FeatureSaveFile), 'PCM_data')
+            Data = PCM_data;
+        end
+        clear PCM_data
         
-        partitionVec = repmat((1:Nb_sess)',numel(CondNames)*2,1);
         
+        %% process partition and condition vector
         if iToPlot==4 && iSub==5
             % remove lines corresponding to auditory stim and
             % targets for sub-06
@@ -227,24 +252,9 @@ for iToPlot = 1:2
         conditionVec(conditionVec>6)=0;
         %         conditionVec(conditionVec>6)=conditionVec(conditionVec>6)-6;
         
-        %% Read features
-        fprintf(' Reading features\n')
-        if iToPlot<4
-            FeatureSaveFile = 'Data_PCM.mat';
-            load(fullfile(Data_dir,FeatureSaveFile), 'PCM_data')
-            for iROI = 1:numel(ROI)
-                Data{iROI,1} = PCM_data{iToPlot,iROI,1}; %#ok<*AGROW,*USENS>
-                Data{iROI,2} = PCM_data{iToPlot,iROI,2};
-            end
-        else
-            FeatureSaveFile = 'Data_PCM_whole_ROI.mat';
-            load(fullfile(Data_dir,FeatureSaveFile), 'PCM_data')
-            Data = PCM_data;
-        end
-        clear PCM_data
         
         %% Remove extra data and checks for zeros and NANs
-        for iROI = 1:numel(ROI)
+        for iROI = 1:numel(ROIs_ori)
             % Get just the right data
             Data{iROI,1}(conditionVec==0,:)=[];
             Data{iROI,2}(conditionVec==0,:)=[];
@@ -274,7 +284,7 @@ for iToPlot = 1:2
                 ToRemove = find(any(isnan(Data{iROI,2})));
                 Data{iROI,2}(:,ToRemove)=[]; clear ToRemove
             end
-           
+            
             
             if any(all(isnan(Data{iROI,1}),2)) || any(all(Data{iROI,1}==0,2)) || ...
                     any(all(isnan(Data{iROI,2}),2)) || any(all(Data{iROI,2}==0,2))
@@ -330,56 +340,7 @@ for iToPlot = 1:2
         %% Run for different type of normalization
         for Norm = 6
             
-            switch Norm
-                case 1
-                    opt.scaling.img.eucledian = 1;
-                    opt.scaling.img.zscore = 0;
-                    opt.scaling.feat.mean = 0;
-                    opt.scaling.feat.range = 0;
-                    opt.scaling.feat.sessmean = 1;
-                case 2
-                    opt.scaling.img.eucledian = 1;
-                    opt.scaling.img.zscore = 0;
-                    opt.scaling.feat.mean = 0;
-                    opt.scaling.feat.range = 1;
-                    opt.scaling.feat.sessmean = 0;
-                case 3
-                    opt.scaling.img.eucledian = 1;
-                    opt.scaling.img.zscore = 0;
-                    opt.scaling.feat.mean = 1;
-                    opt.scaling.feat.range = 0;
-                    opt.scaling.feat.sessmean = 0;
-                case 4
-                    opt.scaling.img.eucledian = 0;
-                    opt.scaling.img.zscore = 1;
-                    opt.scaling.feat.mean = 0;
-                    opt.scaling.feat.range = 0;
-                    opt.scaling.feat.sessmean = 1;
-                case 5
-                    opt.scaling.img.eucledian = 0;
-                    opt.scaling.img.zscore = 1;
-                    opt.scaling.feat.mean = 0;
-                    opt.scaling.feat.range = 1;
-                    opt.scaling.feat.sessmean = 0;
-                case 6
-                    opt.scaling.img.eucledian = 0;
-                    opt.scaling.img.zscore = 1;
-                    opt.scaling.feat.mean = 1;
-                    opt.scaling.feat.range = 0;
-                    opt.scaling.feat.sessmean = 0;
-                case 7
-                    opt.scaling.img.eucledian = 0;
-                    opt.scaling.img.zscore = 0;
-                    opt.scaling.feat.mean = 1;
-                    opt.scaling.feat.range = 0;
-                    opt.scaling.feat.sessmean = 0;
-                case 8
-                    opt.scaling.img.eucledian = 0;
-                    opt.scaling.img.zscore = 0;
-                    opt.scaling.feat.mean = 0;
-                    opt.scaling.feat.range = 0;
-                    opt.scaling.feat.sessmean = 0;
-            end
+            opt = ChooseNorm(Norm, opt);
             
             SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
             
@@ -406,7 +367,7 @@ for iToPlot = 1:2
                 %% reorganise data for this SVM if we need feature pooling or not
                 clear FeaturesAll
                 if SVM(iSVM).Featpool
-                    for iROI = 1:numel(ROI)
+                    for iROI = 1:numel(ROIs_ori)
                         tmp = Data{iROI,2};
                         for i=1:2:12
                             tmp(conditionVec==i,:) = Data{iROI,2}(conditionVec==(i+1),:);
@@ -417,7 +378,7 @@ for iToPlot = 1:2
                         FeaturesAll{iROI,1}= [ Data{iROI,1} tmp ];
                     end
                 else
-                    for iROI = 1:numel(ROI)
+                    for iROI = 1:numel(ROIs_ori)
                         FeaturesAll{iROI,1}= [ Data{iROI,1} Data{iROI,2} ];
                     end
                 end
@@ -564,7 +525,7 @@ for iToPlot = 1:2
                                     fprintf(1,'    [%s]\n    [ ',repmat('.',1,NbCV));
                                     parfor iCV=1:NbCV
                                         fprintf(1,'.');
-                                        
+                                        git log --full-history  -- myfile
                                         TestSess = []; %#ok<NASGU>
                                         TrainSess = []; %#ok<NASGU>
                                         
@@ -654,11 +615,7 @@ end
 
 
 
-function SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, iROI, SaveSufix) %#ok<INUSL>
 
-save(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]), 'Results', 'opt', 'Class_Acc', '-v7.3');
-
-end
 
 function [acc_layer, results_layer, weight] = RunSVM(SVM, Features, LogFeat, FeaturesLayers, CV_Mat, TrainSess, TestSess, opt, iSVM)
 
