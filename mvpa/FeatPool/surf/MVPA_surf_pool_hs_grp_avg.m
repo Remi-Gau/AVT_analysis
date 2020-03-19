@@ -30,34 +30,9 @@ for Norm = 6
     
     clear ROIs SVM
     
-    switch Norm
-        case 5
-            opt.scaling.img.eucledian = 0;
-            opt.scaling.img.zscore = 1;
-            opt.scaling.feat.mean = 0;
-            opt.scaling.feat.range = 1;
-            opt.scaling.feat.sessmean = 0;
-        case 6
-            opt.scaling.img.eucledian = 0;
-            opt.scaling.img.zscore = 1;
-            opt.scaling.feat.mean = 1;
-            opt.scaling.feat.range = 0;
-            opt.scaling.feat.sessmean = 0;
-        case 7
-            opt.scaling.img.eucledian = 0;
-            opt.scaling.img.zscore = 0;
-            opt.scaling.feat.mean = 1;
-            opt.scaling.feat.range = 0;
-            opt.scaling.feat.sessmean = 0;
-        case 8
-            opt.scaling.img.eucledian = 0;
-            opt.scaling.img.zscore = 0;
-            opt.scaling.feat.mean = 0;
-            opt.scaling.feat.range = 0;
-            opt.scaling.feat.sessmean = 0;
-    end
+    [opt] = ChooseNorm(Norm, opt);
     
-    SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
+    SaveSufix = CreateSaveSuffix(opt, [], NbLayers, 'surf');
     
     % ROI
     ROIs(1) = struct('name', 'V1');
@@ -70,11 +45,11 @@ for Norm = 6
     ROIs(end+1) = struct('name', 'PT');
     
     % Analysis
-%     SVM(1) = struct('name', 'A Ipsi VS Contra', 'ROI', 1:length(ROIs));
-%     SVM(end+1) = struct('name', 'V Ipsi VS Contra', 'ROI', 1:length(ROIs));
-%     SVM(end+1) = struct('name', 'T Ipsi VS Contra', 'ROI', 1:length(ROIs));
-%     
-%     SVM(end+1) = struct('name', 'A VS V Ipsi', 'ROI', 1:length(ROIs));
+    %     SVM(1) = struct('name', 'A Ipsi VS Contra', 'ROI', 1:length(ROIs));
+    %     SVM(end+1) = struct('name', 'V Ipsi VS Contra', 'ROI', 1:length(ROIs));
+    %     SVM(end+1) = struct('name', 'T Ipsi VS Contra', 'ROI', 1:length(ROIs));
+    %
+    %     SVM(end+1) = struct('name', 'A VS V Ipsi', 'ROI', 1:length(ROIs));
     SVM(1) = struct('name', 'A VS T Ipsi', 'ROI', 1:length(ROIs));
     SVM(end+1) = struct('name', 'V VS T Ipsi', 'ROI', 1:length(ROIs));
     
@@ -114,7 +89,7 @@ for Norm = 6
                     %                 save(File2Save, 'Results', 'Class_Acc', 'opt')
                     
                     SVM(iSVM).ROI(iROI).grp(iSubj) = Class_Acc.TotAcc;
-%                     SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = Class_Acc.TotAccLayers{1};
+                    %                     SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = Class_Acc.TotAccLayers{1};
                     
                     % Extract results
                     CV = Results.session(end).rand.perm.CV;
@@ -124,7 +99,7 @@ for Norm = 6
                         
                         % For the whole ROI
                         SVM(iSVM).ROI(iROI).DATA{iSubj}(iCV) = CV(iCV).acc;
-
+                        
                         for iLayer = 1:NbLayers
                             label = CV(iCV).layers.results{1}{iLayer}.label;
                             pred = CV(iCV).layers.results{1}{iLayer}.pred(:,iLayer);
@@ -184,8 +159,8 @@ for Norm = 6
                 
                 if ~all(isnan(Blocks(:))) || ~isempty(Blocks)
                     
-                    Y = flipud(Blocks-.5);
-                    [B] = ProfileGLM(DesMat, Y);
+                    Y = Blocks-.5;
+                    [B] = laminar_glm(DesMat, Y);
                     
                     SVM(iSVM).ROI(iROI).layers.Beta.DATA(:,iSub)=B;
                     
@@ -230,24 +205,5 @@ for Norm = 6
     
 end
 
-
-end
-
-function [B] = ProfileGLM(X, Y)
-
-if any(isnan(Y(:)))
-    [~,y]=find(isnan(Y));
-    y=unique(y);
-    Y(:,y)=[];
-    clear y
-end
-
-if isempty(Y)
-    B=nan(1,size(X,2));
-else
-    X=repmat(X,size(Y,2),1);
-    Y=Y(:);
-    [B,~,~] = glmfit(X, Y, 'normal', 'constant', 'off');
-end
 
 end

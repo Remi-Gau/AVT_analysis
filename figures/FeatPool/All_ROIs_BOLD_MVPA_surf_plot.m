@@ -6,7 +6,7 @@ function All_ROIs_BOLD_MVPA_surf_plot
 clc; clear;
 
 
-Analysis_to_plot = 4:5;
+Analysis_to_plot = 1;
 
 
 % Title of analysis
@@ -69,10 +69,13 @@ SubSVM = [1:3;4:6;7:9];
 
 Test_side = []; % default side of the test to use
 
-% Options for the SVM
-[opt, ~] = get_mvpa_options();
+Norm = 6;
 
 IsStim = 1;
+
+% Options for the SVM
+[opt, ~] = get_mvpa_options();
+opt.vol =  false;
 
 if ~plot_main
     plot_pvalue = 1;
@@ -92,19 +95,20 @@ end
 
 if opt.vol
     Dirs.BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles');
+    space_suffix = 'vol';
+else
+    space_suffix = 'surf';
 end
 
-opt.scaling.img.eucledian = 0;
-opt.scaling.img.zscore = 1;
-opt.scaling.feat.mean = 1;
-opt.scaling.feat.range = 0;
-opt.scaling.feat.sessmean = 0;
+[opt] = ChooseNorm(Norm, opt);
 
-SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
+SaveSufix = CreateSaveSuffix(opt, [], NbLayers, space_suffix);
 
 % load BOLD and MVPA
 if IsStim
+    
     Stim_prefix = 'Stimuli';
+    
     if opt.MVNN
         if opt.vol
             load( fullfile(Dirs.BOLD_resultsDir, ...
@@ -117,14 +121,19 @@ if IsStim
         load( fullfile(Dirs.BOLD_resultsDir, ...
             strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data' )
     end
+    
     File2Load = fullfile(Dirs.MVPA_resultsDir, ...
-        strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
+        strcat('GrpPoolQuadGLM', SaveSufix)); %#ok<*UNRCH>
 else
+    
     Stim_prefix = 'Target';
+    
     load(fullfile(Dirs.BOLD_resultsDir, ...
         strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data') %#ok<*UNRCH>
+    
     File2Load = fullfile(Dirs.MVPA_resultsDir, ...
         strcat('GrpTargetsPoolQuadGLM', SaveSufix)); %#ok<*UNRCH>
+    
 end
 
 AllSubjects_Data_BOLD = AllSubjects_Data;
