@@ -148,6 +148,14 @@ Run by the script: `pcm/bold_PCM_3X3Models.m`
 
 The `surf` and `vol` contains the scripts to extract the data from the ROI in the volume data or in the surface data before or after whitening (spatial multivariate normalization done by the RSA toolbox).
 
+
+### MVPA
+
+The scripts are all in the `mvpa` folder.
+
+Options for the MVPA are set in the `subfun/mvpa/get_mvpa_options.m`
+
+
 ## Data structure
 
 Left and right hemisphere can be denoted by:

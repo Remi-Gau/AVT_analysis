@@ -11,15 +11,7 @@ FWHM = 0;
 NbWorkers = 8;
 
 % Options for the SVM
-opt.fs.do = 0; % feature selection
-opt.rfe.do = 0; % recursive feature elimination
-opt.scaling.idpdt = 1; % scale test and training sets independently
-opt.permutation.test = 0;  % do permutation test
-opt.session.curve = 0; % learning curves on a subsample of all the sessions
-opt.session.proptest = 0.2; % proportion of all sessions to keep as a test set
-opt.layersubsample.do = 0; % Subsample voxels so that layers have the same number of voxels
-
-
+[opt, ~] = get_mvpa_options();
 
 CondNames = {...
     'AStimL','AStimR';...
@@ -129,53 +121,6 @@ SVM_Ori(end+1) = struct('name', 'V left VS T left', 'class', [6 8], 'ROI', [2 12
 SVM_Ori(end+1) = struct('name', 'A right VS V right', 'class', [5 7], 'ROI', [2 12 22]);
 SVM_Ori(end+1) = struct('name', 'A right VS T right', 'class', [5 9], 'ROI', [2 12 22]);
 SVM_Ori(end+1) = struct('name', 'V right VS T right', 'class', [7 9], 'ROI', [2 12 22]);
-
-% --------------------------------------------------------- %
-%          Data pre-processing and SVM parameters           %
-% --------------------------------------------------------- %
-% Feature selection (FS)
-opt.fs.threshold = 0.75;
-opt.fs.type = 'ttest2';
-
-% Recursive feature elminiation (RFE)
-opt.rfe.threshold = 0.01;
-opt.rfe.nreps = 20;
-
-% SVM C/nu parameters and default arguments
-opt.svm.machine = 'C-SVC';
-if strcmp(opt.svm.machine, 'C-SVC')
-    opt.svm.log2c = 1;
-    opt.svm.dargs = '-s 0';
-elseif strcmp(opt.svm.machine, 'nu-SVC')
-    opt.svm.nu = [0.0001 0.001 0.01 0.1:0.1:1];
-    opt.svm.dargs = '-s 1';
-end
-
-opt.svm.kernel = 0;
-if opt.svm.kernel
-    % should be implemented
-else
-    opt.svm.dargs = [opt.svm.dargs ' -t 0 -q']; % inherent linear kernel, quiet mode
-end
-
-% Randomization options
-if opt.permutation.test
-    opt.permutation.nreps = 101; % #repetitions for permutation test
-else
-    opt.permutation.nreps = 1;
-end
-
-% Learning curve
-% #repetitions for session subsampling if needed
-opt.session.subsample.nreps = 30;
-
-% Maximum numbers of CVs
-opt.session.maxcv = [];
-
-% Number of subsampling repetition
-opt.layersubsample.repscheme = [20 2];
-
-
 
 % -------------------------%
 %          START           %
@@ -401,14 +346,14 @@ for iSub = 1:NbSub
         Features = FeaturesAll;
         
         clear FilesList FeaturesAll
-
-            
+        
+        
         %% Run for different type of normalization
         for Norm = 6
             
             opt = ChooseNorm(Norm, opt);
             
-                                SaveSufix = CreateSaveSuffix(opt, FWHM(iFWHM), NbLayers, 'vol');
+            SaveSufix = CreateSaveSuffix(opt, FWHM(iFWHM), NbLayers, 'vol');
             
             %% Run cross-validation for each model and ROI
             SVM = SVM_Ori;
@@ -449,7 +394,7 @@ for iSub = 1:NbSub
                         else
                             fprintf('  Running analysis with all sessions\n')
                         end
-                                                
+                        
                         % All possible ways of only choosing X sessions of the total
                         CV_id = nchoosek(1:NbRuns, NbSess2Incl);
                         CV_id = CV_id(randperm(size(CV_id, 1)),:);
@@ -474,13 +419,13 @@ for iSub = 1:NbSub
                         
                         for i=1:size(CV_id,1)
                             TestSessList{i,1} = cartProd;
-%                             TestSessList{i,1} = nchoosek(CV_id(i,:), floor(opt.session.proptest*NbSess2Incl));
-%                             TestSessList{i,1} = TestSessList{i,1}(randperm(size(TestSessList{i,1},1)),:);
-%                             if size(TestSessList{i,1}, 1) >  opt.session.maxcv    
-%                                 TestSessList{i,1} = TestSessList{i,1}(1:opt.session.maxcv,:);
-%                             end                        
+                            %                             TestSessList{i,1} = nchoosek(CV_id(i,:), floor(opt.session.proptest*NbSess2Incl));
+                            %                             TestSessList{i,1} = TestSessList{i,1}(randperm(size(TestSessList{i,1},1)),:);
+                            %                             if size(TestSessList{i,1}, 1) >  opt.session.maxcv
+                            %                                 TestSessList{i,1} = TestSessList{i,1}(1:opt.session.maxcv,:);
+                            %                             end
                         end
-
+                        
                         
                         %% Subsampled sessions loop
                         for iSubSampSess=1:size(CV_id, 1)
@@ -608,9 +553,9 @@ for iSub = 1:NbSub
                                         SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).SubSamp{i,j}.CV_id= CV_id;
                                         SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).SubSamp{i,j}.TestSessList = TestSessList;
                                         
-                                        % Calculate prediction accuracies                                        
+                                        % Calculate prediction accuracies
                                         for iLayer = 1:(NbLayers+1)
-                                            for iCV=1:size(TestSessList{iSubSampSess,1}, 1) 
+                                            for iCV=1:size(TestSessList{iSubSampSess,1}, 1)
                                                 pred = SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).SubSamp{i,j}.CV(iCV,iLayer).pred;
                                                 label = SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).SubSamp{i,j}.CV(iCV,iLayer).label;
                                                 Acc(iCV) = mean(pred==label);
@@ -626,7 +571,7 @@ for iSub = 1:NbSub
                                 t = toc;
                                 SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).ExecTime = t;
                                 
-
+                                
                                 %% Display some results
                                 if iPerm == 1 && NbSess2Incl == NbRuns && opt.layersubsample.do==0
                                     if ~isempty(SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).SubSamp{1,1}.CV(1).fs)

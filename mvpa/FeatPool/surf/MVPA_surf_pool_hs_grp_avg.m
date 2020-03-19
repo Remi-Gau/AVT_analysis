@@ -15,22 +15,11 @@ addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 
 NbLayers = 6;
 
-% Options
-opt.svm.log2c = 1;
-opt.svm.dargs = '-s 0';
-opt.fs.do = 0;
-opt.rfe.do = 0;
-opt.permutation.test = 0;
-opt.session.curve = 0;
-opt.scaling.idpdt = 1;
-opt.MVNN = 0;
-opt.session.loro = 0;
+% Options for the SVM
+[opt, ~] = get_mvpa_options();
 
 
-DesMat = (1:NbLayers)-mean(1:NbLayers);
-DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
-% DesMat = [DesMat' ones(NbLayers,1)];
-DesMat = spm_orth(DesMat);
+DesMat = set_design_mat_lam_GLM(NbLayers);
 
 
 SubLs = dir('sub*');

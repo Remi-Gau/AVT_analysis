@@ -11,15 +11,7 @@ FWHM = 0;
 NbWorkers = 4;
 
 % Options for the SVM
-opt.fs.do = 0; % feature selection
-opt.rfe.do = 0; % recursive feature elimination
-opt.scaling.idpdt = 1; % scale test and training sets independently
-opt.permutation.test = 0;  % do permutation test
-opt.session.curve = 0; % learning curves on a subsample of all the sessions
-opt.session.proptest = 0.2; % proportion of all sessions to keep as a test set
-opt.layersubsample.do = 0; % Subsample voxels so that layers have the same number of voxels
-
-
+[opt, ~] = get_mvpa_options();
 
 CondNames = {...
     'AStimL','AStimR';...
@@ -116,51 +108,6 @@ SVM_Ori(end+1) = struct('name', 'T - Targets VS Stim - Ipsi', 'class', [5 11], '
 SVM_Ori(end+1) = struct('name', 'A - Targets VS Stim - Contra', 'class', [2 8], 'ROI', 1:size(PoolHs,1), 'swap', 0, 'shift', -1);
 SVM_Ori(end+1) = struct('name', 'V - Targets VS Stim - Contra', 'class', [4 10], 'ROI', 1:size(PoolHs,1), 'swap', 0, 'shift', -1);
 SVM_Ori(end+1) = struct('name', 'T - Targets VS Stim - Contra', 'class', [6 12], 'ROI', 1:size(PoolHs,1), 'swap', 0, 'shift', -1);
-
-% --------------------------------------------------------- %
-%          Data pre-processing and SVM parameters           %
-% --------------------------------------------------------- %
-% Feature selection (FS)
-opt.fs.threshold = 0.75;
-opt.fs.type = 'ttest2';
-
-% Recursive feature elminiation (RFE)
-opt.rfe.threshold = 0.01;
-opt.rfe.nreps = 20;
-
-% SVM C/nu parameters and default arguments
-opt.svm.machine = 'C-SVC';
-if strcmp(opt.svm.machine, 'C-SVC')
-    opt.svm.log2c = 1;
-    opt.svm.dargs = '-s 0';
-elseif strcmp(opt.svm.machine, 'nu-SVC')
-    opt.svm.nu = [0.0001 0.001 0.01 0.1:0.1:1];
-    opt.svm.dargs = '-s 1';
-end
-
-opt.svm.kernel = 0;
-if opt.svm.kernel
-    % should be implemented
-else
-    opt.svm.dargs = [opt.svm.dargs ' -t 0 -q']; % inherent linear kernel, quiet mode
-end
-
-% Randomization options
-if opt.permutation.test;
-    opt.permutation.nreps = 101; % #repetitions for permutation test
-else
-    opt.permutation.nreps = 1;
-end
-
-% Learning curve
-% #repetitions for session subsampling if needed
-opt.session.subsample.nreps = 30;
-
-% Maximum numbers of CVs
-opt.session.maxcv = [];
-
-% Number of subsampling repetition
-opt.layersubsample.repscheme = [20 2];
 
 
 
