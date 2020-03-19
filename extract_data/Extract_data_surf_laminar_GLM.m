@@ -1,5 +1,7 @@
 clc; clear;
 
+MVNN = true;
+
 if isunix
     CodeDir = '/home/remi/github/AVT_analysis';
     StartDir = '/home/remi';
@@ -21,7 +23,14 @@ NbSub = numel(SubLs);
 
 NbLayers = 6;
 
-CondNames = {...
+DesMat = set_design_mat_lam_GLM(NbLayers)
+
+ToPlot = {'Cst','Lin', 'Avg'};
+
+if MVNN
+    MVNN_suffix = 'MVNN';
+    
+    CondNames = {...
     'AStimL','AStimR',...
     'VStimL','VStimR',...
     'TStimL','TStimR',...
@@ -29,25 +38,30 @@ CondNames = {...
     'VTargL','VTargR',...
     'TTargL','TTargR',...
     };
+     
+else
+    MVNN_suffix = 'raw';
+    
+    CondNames = {...
+    'AStimL','AStimR',...
+    'VStimL','VStimR',...
+    'TStimL','TStimR'};
+end
 
-DesMat = (1:NbLayers)-mean(1:NbLayers);
-% DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
-DesMat = [ones(NbLayers,1) DesMat'];
-DesMat = spm_orth(DesMat);
-
-ToPlot = {'Cst','Lin', 'Avg'};
-
-for iSub = 1:NbSub
+for iSub = 5%; 1:NbSub
     
     fprintf('\n\n\n')
     
     fprintf('Processing %s\n', SubLs(iSub).name)
     
     Sub_dir = fullfile(Dirs.DerDir, SubLs(iSub).name);
-    GLM_dir = fullfile(Sub_dir, 'ffx_rsa');
-    Data_dir = fullfile(GLM_dir, 'betas','6_surf');
     
-    
+    if MVNN
+        GLM_dir = fullfile(Sub_dir, 'ffx_rsa');
+    else
+        GLM_dir = fullfile(Sub_dir, 'ffx_nat');
+    end
+
     % Get number of sessions, regressors of interest numbers, and names of conditions
     load(fullfile(Sub_dir, 'ffx_nat', 'SPM.mat'))
     [BetaOfInterest, BetaNames] = GetBOI(SPM,CondNames);
@@ -63,9 +77,7 @@ for iSub = 1:NbSub
     
     % Load Vertices of interest for each ROI;
     load(fullfile(Sub_dir, 'roi', 'surf', [SubLs(iSub).name  '_ROI_VertOfInt.mat']), 'ROI', 'NbVertex')
-    
-    
-    
+       
     
     
     %% For the 2 hemispheres
@@ -80,6 +92,8 @@ for iSub = 1:NbSub
             HsSufix = 'r';
         end
         
+        Data_dir = fullfile(GLM_dir, 'betas','6_surf');
+        
         FeatureSaveFile = fullfile(Data_dir,[SubLs(iSub).name  '_features_' HsSufix 'hs_' ...
             num2str(NbLayers) '_surf.mat']);
         
@@ -92,8 +106,28 @@ for iSub = 1:NbSub
         % Load data or extract them
         fprintf('  Reading VTKs\n')
         if exist(FeatureSaveFile, 'file')
+            
             load(FeatureSaveFile)
+            
             VertexWithDataHS{hs} = VertexWithData; %#ok<*SAGROW>
+            
+            % get the data for the targets
+            if ~MVNN
+                
+                warning('only the beta values will be extracted not those for the targets')
+                
+%                 tmp = AllMapping;
+%                 
+%                 Data_dir = fullfile(GLM_dir,'betas','6_surf', 'targets');
+%                 FeatureSaveFile = fullfile(Data_dir,[SubLs(iSub).name  '_features_' HsSufix 'hs_' ...
+%                     num2str(NbLayers) '_surf.mat']);
+%                 
+%                 load(FeatureSaveFile)
+%                 
+%                 AllMapping = cat(3, tmp, AllMapping);
+                
+            end
+
         else
             error('The features have not been extracted from the VTK files.')
         end
@@ -103,7 +137,7 @@ for iSub = 1:NbSub
         fprintf('\n   All conditions\n')
         
         for iCdt = 1:numel(CondNames) % For each Condition
-            fprintf('    %s\n',CondNames{iCdt})
+            fprintf('    %s\n', CondNames{iCdt})
             
             % Identify the relevant betas
             Beta2Sel = [];
@@ -130,20 +164,14 @@ for iSub = 1:NbSub
             
             % Run the "cross-validation"
             for iCV = 1:size(Features,3)
+                
                 Sess2Sel = iCV;
-                if strcmp(SubLs(iSub).name,'sub-06') && iSess==17 && (iCdt<3 || iCdt==7 || iCdt==8)
-                    %                     BetaCdt{hs,iCV}(1:size(DesMat,2),:,iCdt) = nan(size(DesMat,2),size(Features,1));
-                    %                     BetaCdt{hs,iCV}(size(DesMat,2)+1,:,iCdt) = nan(1,size(Features,1));
-                else
+                   
                     Y = Features(:,:,Sess2Sel);
-                    %                     AllData{hs,iCV}(:,:,iCdt) = Y;
                     X=repmat(DesMat, size(Y,3), 1);
                     Y = shiftdim(Y,1);
                     B = pinv(X)*Y;
                     BetaCdt{hs,iCV}(1:size(DesMat,2),:,iCdt) = B;
-                    BetaCdt{hs,iCV}(size(DesMat,2)+1,:,iCdt) = mean(Y);
-                    
-                end
             end
             
             clear Features Beta2Sel X Y B iSess
@@ -163,8 +191,11 @@ for iSub = 1:NbSub
     end
     
     %%
-    
-    export_dir = fullfile(Dirs.DerDir, 'pcm', SubLs(iSub).name);
+    if MVNN
+        export_dir = fullfile(Dirs.DerDir, 'rsa_toolbox', SubLs(iSub).name, 'extracted_data');
+    else
+        export_dir = fullfile(Dirs.DerDir, 'spm12', SubLs(iSub).name, 'extracted_data');
+    end
     mkdir(export_dir)
     
     for iToPlot = 1:size(BetaCdt{1,1},1)
@@ -202,7 +233,9 @@ for iSub = 1:NbSub
                 end
                 
                 filename = fullfile(export_dir, ...
-                    [SubLs(iSub).name '_pcmdata-MVNN_space-surf'...
+                    [SubLs(iSub).name ...
+                    '_data-' MVNN_suffix ...
+                    '_space-surf'...
                     '_ROI-'  ROI(iROI).name ...
                     '_hs-' HsSufix ...
                     '_param-' lower(ToPlot{iToPlot}) ...
@@ -220,7 +253,7 @@ for iSub = 1:NbSub
     
     %%
     mkdir(fullfile(Sub_dir,'results','profiles','surf','PCM'))
-    save(fullfile(Sub_dir,'results','profiles','surf','PCM','Data_PCM.mat'), '-v7.3',  ...
+    save(fullfile(Sub_dir,'results','profiles','surf','PCM', ['Data_' MVNN_suffix '.mat']), '-v7.3',  ...
         'PCM_data', 'CondNames', 'conditionVec', 'partitionVec')
     
     clear BetaCdt PCM_data
