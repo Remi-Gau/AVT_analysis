@@ -16,32 +16,44 @@ end
 
 if opt.layersubsample.do
     SaveSufix = [SaveSufix '_subsamp-1'];
+else
+    SaveSufix = [SaveSufix '_subsamp-0'];
 end
 
 if opt.MVNN
     SaveSufix = [SaveSufix '_mvnn-1']; %#ok<*AGROW>
 else
-    SaveSufix = [SaveSufix '_mvnn-0']; %#ok<*AGROW>
+    SaveSufix = [SaveSufix '_mvnn-0'];
 end
 
 if opt.fs.do
-    SaveSufix = [SaveSufix '_fs-1']; %#ok<*AGROW>
+    SaveSufix = [SaveSufix '_fs-1'];
+else
+    SaveSufix = [SaveSufix '_fs-0'];
 end
 
 if opt.rfe.do
     SaveSufix = [SaveSufix '_rfe-1'];
+else
+    SaveSufix = [SaveSufix '_rfe-0'];
 end
 
 if opt.permutation.test
     SaveSufix = [SaveSufix '_perm-1'];
+else
+    SaveSufix = [SaveSufix '_perm-0'];
 end
 
 if opt.session.curve
     SaveSufix = [SaveSufix '_lear-1'];
+else
+    SaveSufix = [SaveSufix '_lear-0'];
 end
 
 if opt.session.loro
     SaveSufix = [SaveSufix '_loro-1'];
+else
+    SaveSufix = [SaveSufix '_loro-0'];
 end
 
 SaveSufix = [SaveSufix '_NORM'];
@@ -73,7 +85,7 @@ if isfield(opt, 'toplot')
 end
 
 if exist('NbLayers', 'var')
-SaveSufix = [SaveSufix '_l-' num2str(NbLayers)];
+    SaveSufix = [SaveSufix '_l-' num2str(NbLayers)];
 end
 
 if exist('FWHM', 'var')

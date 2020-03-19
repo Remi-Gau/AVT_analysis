@@ -6,6 +6,13 @@ function MVPA_surf
 % Analysis is run by pooling over hemisphere
 
 
+% to do
+% test on whole ROI
+
+
+% to do
+% make it usable with targets
+
 clc; clear;
 
 if isunix
@@ -46,6 +53,8 @@ ToPlot={'Cst','Lin','Avg','ROI'};
 
 [opt, file2load_suffix] = get_mvpa_options();
 
+opt
+
 % --------------------------------------------------------- %
 %              Classes and associated conditions            %
 % --------------------------------------------------------- %
@@ -80,7 +89,7 @@ SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [3 4], ...
 SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 
-SVM_Ori(1) = struct('name', 'A VS V Ipsi', 'class', [1 3], ...
+SVM_Ori(end+1) = struct('name', 'A VS V Ipsi', 'class', [1 3], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], ...
     'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 1);
@@ -94,35 +103,35 @@ SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], ...
 SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], ...
     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
 
+SVM_Ori(end+1) = struct('name', 'A_L VS A_R', 'class', [1 2], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+SVM_Ori(end+1) = struct('name', 'V_L VS V_R', 'class', [3 4], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+SVM_Ori(end+1) = struct('name', 'T_L VS T_R', 'class', [5 6], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+
+SVM_Ori(end+1) = struct('name', 'A_L VS V_L', 'class', [1 3], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+SVM_Ori(end+1) = struct('name', 'A_L VS T_L', 'class', [1 5], ...
+    'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 0);
+SVM_Ori(end+1) = struct('name', 'V_L VS T_L', 'class', [3 5], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+
+SVM_Ori(end+1) = struct('name', 'A_R VS V_R', 'class', [2 4], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+SVM_Ori(end+1) = struct('name', 'A_R VS T_R', 'class', [2 6], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
+SVM_Ori(end+1) = struct('name', 'V_R VS T_R', 'class', [4 6], ...
+    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
 
 
-% SVM_Ori(end+1) = struct('name', 'A_L VS A_R', 'class', [1 2], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-% SVM_Ori(end+1) = struct('name', 'V_L VS V_R', 'class', [3 4], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-% SVM_Ori(end+1) = struct('name', 'T_L VS T_R', 'class', [5 6], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-%
-% SVM_Ori(end+1) = struct('name', 'A_L VS V_L', 'class', [1 3], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-% SVM_Ori(end+1) = struct('name', 'A_L VS T_L', 'class', [1 5], ...
-%     'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 0);
-% SVM_Ori(end+1) = struct('name', 'V_L VS T_L', 'class', [3 5], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-%
-% SVM_Ori(end+1) = struct('name', 'A_R VS V_R', 'class', [2 4], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-% SVM_Ori(end+1) = struct('name', 'A_R VS T_R', 'class', [2 6], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-% SVM_Ori(end+1) = struct('name', 'V_R VS T_R', 'class', [4 6], ...
-%     'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
 
 % -------------------------%
 %          START           %
 % -------------------------%
 [KillGcpOnExit] = OpenParWorkersPool(NbWorkers);
 
-for iToPlot = 1:2
+for iToPlot = 1:4
     
     opt.toplot = ToPlot{iToPlot};
     
@@ -136,9 +145,7 @@ for iToPlot = 1:2
         SubDir = fullfile(Dirs.DerDir, SubLs(iSub).name);
         
         Data_dir = fullfile(SubDir,'results','profiles','surf','PCM');
-        
-        GLM_dir = fullfile(SubDir,'ffx_nat');
-        
+
         SaveDir = fullfile(SubDir, 'results', 'SVM');
         [~,~,~] = mkdir(SaveDir);
         
@@ -146,26 +153,11 @@ for iToPlot = 1:2
         load(fullfile(SubDir, 'roi', 'surf',[SubLs(iSub).name  '_ROI_VertOfInt.mat']), 'ROI', 'NbVertex')
         
         
-        %% Get beta images names
-        load(fullfile(GLM_dir,'SPM.mat'))
-        
-        % If we want to have a learning curve
-        Nb_sess = numel(SPM.Sess);
-        if opt.session.curve
-            % #sessions over which to run the learning curve
-            opt.session.nsamples = 10:2:Nb_sess;
-        else
-            opt.session.nsamples = Nb_sess;
-        end
-        
-        clear SPM
-        
-        
         %% Read features
         fprintf(' Reading features\n')
         if iToPlot<4
             FeatureSaveFile = ['Data_' file2load_suffix '.mat'];
-            load(fullfile(Data_dir,FeatureSaveFile), 'PCM_data', 'conditionVec', 'partitionVec')
+            load(fullfile(Data_dir, FeatureSaveFile), 'PCM_data', 'conditionVec', 'partitionVec')
             for iROI = 1:numel(ROI)
                 Data{iROI,1} = PCM_data{iToPlot,iROI,1}; %#ok<*AGROW,*USENS>
                 Data{iROI,2} = PCM_data{iToPlot,iROI,2};
@@ -179,29 +171,21 @@ for iToPlot = 1:2
         
         
         %% process partition and condition vector
-        if iToPlot==4 && iSub==5
-            % remove lines corresponding to auditory stim and
-            % targets for sub-06
-            ToRemove = all([any([conditionVec<3 conditionVec==7 conditionVec==8],2) partitionVec==17],2);
-            
-            partitionVec(ToRemove) = [];
-            conditionVec(ToRemove) = [];
-            clear ToRemove
+        if iSub==5
+            % remove session 17 for sub-06
+            RowsToRemove = all(partitionVec==17,2);
+            partitionVec(partitionVec>17) = partitionVec(partitionVec>17) - 1;
+        else
+            RowsToRemove = zeros(size(partitionVec));
         end
         
-        % "remove" rows corresponding to targets
-        partitionVec(conditionVec>6)=0;
-        conditionVec(conditionVec>6)=0;
-        %         conditionVec(conditionVec>6)=conditionVec(conditionVec>6)-6;
-        
+        RowsToRemove(conditionVec>6) = 1;
+ 
         
         %% Remove extra data and checks for zeros and NANs
         for iROI = 1:numel(ROIs_ori)
-            % Get just the right data
-            Data{iROI,1}(conditionVec==0,:)=[];
-            Data{iROI,2}(conditionVec==0,:)=[];
             
-            % Remove nans
+            % Remove nans along columns
             if iToPlot==4
                 % reshape data to remove a whole vertex even if it has one
                 % NAN
@@ -220,25 +204,20 @@ for iToPlot = 1:2
                     [size(Data{iROI,1},1), NbLayers*size(Data{iROI,1},3)]);
                 Data{iROI,2} = reshape(Data{iROI,2}, ...
                     [size(Data{iROI,2},1), NbLayers*size(Data{iROI,2},3)]);
+                
             else
-                ToRemove = find(any(isnan(Data{iROI,1})));
-                Data{iROI,1}(:,ToRemove)=[]; clear ToRemove
-                ToRemove = find(any(isnan(Data{iROI,2})));
-                Data{iROI,2}(:,ToRemove)=[]; clear ToRemove
+                
+                Data{iROI,1} = clean_data(Data{iROI,1}, 2);
+                Data{iROI,2} = clean_data(Data{iROI,2}, 2);
+                
             end
             
+            % note rows made of only NaNs and zeros
+            [~, RowsToRemove] = clean_data(Data{iROI,1}, 1, RowsToRemove);
+            [~, RowsToRemove] = clean_data(Data{iROI,2}, 1, RowsToRemove);
+
             
-            if any(all(isnan(Data{iROI,1}),2)) || any(all(Data{iROI,1}==0,2)) || ...
-                    any(all(isnan(Data{iROI,2}),2)) || any(all(Data{iROI,2}==0,2))
-                warning('We have some NaNs or zeros issue: ignore if sub-06')
-                ZeroRowsToRemove(:,iROI) = any([all(isnan(Data{iROI,1}),2) all(Data{iROI,1}==0,2) ...
-                    all(isnan(Data{iROI,2}),2) all(Data{iROI,2}==0,2)],2);
-                Data{iROI,1}(ZeroRowsToRemove(:,iROI),:) = [];
-                Data{iROI,2}(ZeroRowsToRemove(:,iROI),:) = [];
-            end
-            
-            % construc a vector that identify what column belongs to which
-            % layer
+            % construct a vector that identify what column belongs to which layer
             if iToPlot==4
                 FeaturesLayers{iROI,1} = ...
                     repmat(NbLayers:-1:1, 1, size(Data{iROI,1},2)/NbLayers);
@@ -248,35 +227,57 @@ for iToPlot = 1:2
             
         end
         
-        if exist('ZeroRowsToRemove', 'var')
-            partitionVec(any(ZeroRowsToRemove,2),:)=[];
-            conditionVec(any(ZeroRowsToRemove,2),:)=[];
+        % take note of any row that needs to be removed across all ROIs
+        RowsToRemove = any(RowsToRemove,2);
+        
+        % remove those rows from all ROIs
+        for iROI = 1:numel(ROIs_ori) 
+            
+            Data{iROI,1}(RowsToRemove,:) = [];
+            Data{iROI,2}(RowsToRemove,:) = [];
+        
         end
-        clear ZeroRowsToRemove
+
+
+        %% check that we have the same number of conditions in each partition
+        
+        partitionVec(RowsToRemove) = [];
+        conditionVec(RowsToRemove) = [];
         
         CV_Mat_Orig = [conditionVec partitionVec];
-        CV_Mat_Orig(conditionVec==0,:) = [];
-        partitionVec(conditionVec==0,:) = [];
-        conditionVec(conditionVec==0,:) = [];
         
         
-        %% check that we have the same number of conditions in each partition
         A = tabulate(CV_Mat_Orig(:,2));
         A = A(:,1:2);
         if numel(unique(A(:,2)))>1
-            warning('We have different numbers of conditions in at least one partition.')
+            error('We have different numbers of conditions in at least one partition.')
+            
             Sess2Remove = find(A(:,2)<numel(unique(conditionVec)));
+            
             conditionVec(ismember(partitionVec,Sess2Remove)) = [];
             for iROI = 1:numel(ROI)
                 Data{iROI,1}(ismember(partitionVec,Sess2Remove),:) = [];
                 Data{iROI,2}(ismember(partitionVec,Sess2Remove),:) = [];
             end
+            
             CV_Mat_Orig(ismember(partitionVec,Sess2Remove),:) = [];
             partitionVec(ismember(partitionVec,Sess2Remove)) = [];
             Sess2Remove = [];
+            
         end
         clear A Sess2Remove
         
+        
+        
+        %% Number of partitions
+        % If we want to have a learning curve
+        Nb_sess = max(partitionVec);
+        if opt.session.curve
+            % #sessions over which to run the learning curve
+            opt.session.nsamples = 10:2:Nb_sess;
+        else
+            opt.session.nsamples = Nb_sess;
+        end
         
         
         %% Run for different type of normalization
@@ -334,7 +335,7 @@ for iToPlot = 1:2
                     fprintf('Analysing subject %s\n', SubLs(iSub).name)
                     fprintf(' Running SVM:  %s\n', SVM(iSVM).name)
                     fprintf('  Running ROI:  %s\n', SVM(iSVM).ROI(ROI_idx).name)
-                    fprintf('  Number of vertices before FS/RFE: %i\n', SVM(iSVM).ROI(ROI_idx).size)
+                    fprintf('  Number of features before FS/RFE: %i\n', SVM(iSVM).ROI(ROI_idx).size)
                     fprintf('   Running on %i layers\n', NbLayers)
                     
                     FeaturesBoth = FeaturesAll{iROI,1};
@@ -370,42 +371,57 @@ for iToPlot = 1:2
                         load(fullfile(Dirs.DerDir, 'RunsPerSes.mat'))
                         Idx = ismember({RunPerSes.Subject}, SubLs(iSub).name);
                         RunPerSes = RunPerSes(Idx).RunsPerSes;
-                        sets = {...
-                            1:RunPerSes(1), ...
-                            RunPerSes(1)+1:RunPerSes(1)+RunPerSes(2),...
-                            RunPerSes(1)+RunPerSes(2)+1:sum(RunPerSes)};
-                        [x, y, z] = ndgrid(sets{:});
-                        cartProd = [x(:) y(:) z(:)];
-                        clear x y Idx
                         
+                        if iSub==5
+                            RunPerSes(end) = RunPerSes(end)-1;
+                        end
+
                         % Test sets for the different CVs
                         if opt.session.curve
-                            for i=1:size(CV_id,1)
-                                % Limits to CV max
-                                %TestSessList{i,1} = nchoosek(CV_id(i,:), floor(opt.session.proptest*NbSess2Incl));
-                                %TestSessList{i,1} = TestSessList{i,1}(randperm(size(TestSessList{i,1},1)),:);
-                                %if size(TestSessList{i,1}, 1) >  opt.session.maxcv
-                                %   TestSessList{i,1} = TestSessList{i,1}(1:opt.session.maxcv,:);
-                                %end
-                                %if opt.permutation.test
-                                %     TestSessList{i,1} = cartProd;
-                                %end
-                            end
+                            
+                            error('learning curves are not implemented')
+                            
+%                             for i=1:size(CV_id,1)
+%                                 Limits to CV max
+%                                 TestSessList{i,1} = nchoosek(CV_id(i,:), floor(opt.session.proptest*NbSess2Incl));
+%                                 TestSessList{i,1} = TestSessList{i,1}(randperm(size(TestSessList{i,1},1)),:);
+%                                 if size(TestSessList{i,1}, 1) >  opt.session.maxcv
+%                                   TestSessList{i,1} = TestSessList{i,1}(1:opt.session.maxcv,:);
+%                                 end
+%                                 if opt.permutation.test
+%                                     TestSessList{i,1} = cartProd;
+%                                 end
+%                             end
+
                         else
+                            
                             if opt.session.loro
+                                
                                 TestSessList{1,1} = (1:sum(RunPerSes))';
-                                if iSub==5
-                                    TestSessList{1,1}(TestSessList{1,1}==17) = [];
-                                end
+                                
                             else
+                                
+                                sets = {...
+                                    1:RunPerSes(1), ...
+                                    RunPerSes(1)+1:RunPerSes(1)+RunPerSes(2),...
+                                    RunPerSes(1)+RunPerSes(2)+1:sum(RunPerSes)};
+                                
+                                [x, y, z] = ndgrid(sets{:});
+                                
+                                cartProd = [x(:) y(:) z(:)];
+
                                 TestSessList{1,1} = cartProd; % take all possible CVs
+                                
+                                clear cartProd sets x y Idx
+                                
                                 if opt.permutation.test % limits the number of CV for permutation
                                     cartProd = cartProd(randperm(size(cartProd,1)),:);
                                     TestSessList{1,1} = cartProd(1:opt.session.maxcv,:);
                                 end
                             end
+                            
                         end
-                        clear cartProd RunPerSes
+                        clear  RunPerSes
                         
                         
                         %% Subsampled sessions loop
@@ -467,7 +483,7 @@ for iToPlot = 1:2
                                     fprintf(1,'    [%s]\n    [ ',repmat('.',1,NbCV));
                                     parfor iCV=1:NbCV
                                         fprintf(1,'.');
-                                        git log --full-history  -- myfile
+
                                         TestSess = []; %#ok<NASGU>
                                         TrainSess = []; %#ok<NASGU>
                                         
