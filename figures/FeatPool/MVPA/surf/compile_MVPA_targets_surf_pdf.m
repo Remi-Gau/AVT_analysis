@@ -15,13 +15,8 @@ ROIs= {...
     'PT'
     };
 
-opt.svm.log2c = 1;
-opt.svm.dargs = '-s 0';
-opt.fs.do = 0;
-opt.rfe.do = 0;
-opt.permutation.test = 0;
-opt.session.curve = 0;
-opt.scaling.idpdt = 1;
+% Options for the SVM
+[opt, ~] = get_mvpa_options();
 
 NbLayers = 6;
 
@@ -41,32 +36,7 @@ for Perm = 0:1
     
     for Norm = [6 8]
         
-        switch Norm
-            case 5
-                opt.scaling.img.eucledian = 0;
-                opt.scaling.img.zscore = 1;
-                opt.scaling.feat.mean = 0;
-                opt.scaling.feat.range = 1;
-                opt.scaling.feat.sessmean = 0;
-            case 6
-                opt.scaling.img.eucledian = 0;
-                opt.scaling.img.zscore = 1;
-                opt.scaling.feat.mean = 1;
-                opt.scaling.feat.range = 0;
-                opt.scaling.feat.sessmean = 0;
-            case 7
-                opt.scaling.img.eucledian = 0;
-                opt.scaling.img.zscore = 0;
-                opt.scaling.feat.mean = 1;
-                opt.scaling.feat.range = 0;
-                opt.scaling.feat.sessmean = 0;
-                                    case 8
-                        opt.scaling.img.eucledian = 0;
-                        opt.scaling.img.zscore = 0;
-                        opt.scaling.feat.mean = 0;
-                        opt.scaling.feat.range = 0;
-                        opt.scaling.feat.sessmean = 0;  
-        end
+        [opt] = ChooseNorm(Norm, opt)
         
         SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
         SaveSufix = strrep(SaveSufix, '_', '-');

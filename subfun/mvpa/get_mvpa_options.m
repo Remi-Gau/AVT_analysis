@@ -1,15 +1,16 @@
 function [opt, file2load_suffix] = get_mvpa_options()
 
 % Options for the SVM
-opt.fs.do = 0; % feature selection
-opt.rfe.do = 0; % recursive feature elimination
-opt.scaling.idpdt = 1; % scale test and training sets independently
-opt.permutation.test = 0;  % do permutation test
-opt.session.curve = 0; % learning curves on a subsample of all the sessions
+opt.fs.do = false; % feature selection
+opt.rfe.do = false; % recursive feature elimination
+opt.scaling.idpdt = true; % scale test and training sets independently
+opt.permutation.test = false;  % do permutation test
+opt.session.curve = false; % learning curves on a subsample of all the sessions
 opt.session.proptest = 0.2; % proportion of all sessions to keep as a test set
-opt.verbose = 0;
-opt.session.loro = 1;
-opt.MVNN = 0;
+opt.verbose = false;
+opt.layersubsample.do = false;
+opt.session.loro = true;
+opt.MVNN = false;
 
 
 % --------------------------------------------------------- %

@@ -45,23 +45,9 @@ TitSuf = {
 
 SubSVM = [1:3;4:6;7:9];
 
-opt.svm.log2c = 1;
-opt.svm.dargs = '-s 0';
-opt.fs.do = 0;
-opt.rfe.do = 0;
-opt.permutation.test = 0;
-opt.session.curve = 0;
-opt.scaling.idpdt = 1;
-opt.session.loro = 0;
+% Options for the SVM
+[opt, ~] = get_mvpa_options();
 
-opt.scaling.img.eucledian = 0;
-opt.scaling.img.zscore = 1;
-opt.scaling.feat.mean = 1;
-opt.scaling.feat.range = 0;
-opt.scaling.feat.sessmean = 0;
-
-opt.MVNN = 0;
-opt.vol = 0;
 %
 if opt.MVNN
     ParamToPlot={'Cst','Lin','Avg','ROI'};

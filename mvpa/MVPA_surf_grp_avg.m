@@ -1,4 +1,4 @@
-function MVPA_surf_wht_betas_grp_avg
+function MVPA_surf_grp_avg
 
 clc; clear;
 
@@ -15,24 +15,13 @@ ToPlot={'Cst','Lin','Avg','ROI'};
 
 NbLayers = 6;
 
-% Options
-opt.svm.log2c = 1;
-opt.svm.dargs = '-s 0';
-opt.fs.do = 0;
-opt.rfe.do = 0;
-opt.permutation.test = 0;
-opt.session.curve = 0;
-opt.scaling.idpdt = 1;
-opt.MVNN = 1;
-opt.session.loro = 0;
+% Options for the SVM
+[opt, ~] = get_mvpa_options();
 
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
-DesMat = (1:NbLayers)-mean(1:NbLayers);
-DesMat = [ones(NbLayers,1) DesMat' (DesMat.^2)'];
-% DesMat = [DesMat' ones(NbLayers,1)];
-DesMat = spm_orth(DesMat);
+DesMat = set_design_mat_lam_GLM(NbLayers);
 
 for iToPlot = 4
     
@@ -48,32 +37,7 @@ for Norm = 6
     
     clear ROIs SVM
     
-    switch Norm
-        case 5
-            opt.scaling.img.eucledian = 0;
-            opt.scaling.img.zscore = 1;
-            opt.scaling.feat.mean = 0;
-            opt.scaling.feat.range = 1;
-            opt.scaling.feat.sessmean = 0;
-        case 6
-            opt.scaling.img.eucledian = 0;
-            opt.scaling.img.zscore = 1;
-            opt.scaling.feat.mean = 1;
-            opt.scaling.feat.range = 0;
-            opt.scaling.feat.sessmean = 0;
-        case 7
-            opt.scaling.img.eucledian = 0;
-            opt.scaling.img.zscore = 0;
-            opt.scaling.feat.mean = 1;
-            opt.scaling.feat.range = 0;
-            opt.scaling.feat.sessmean = 0;
-        case 8
-            opt.scaling.img.eucledian = 0;
-            opt.scaling.img.zscore = 0;
-            opt.scaling.feat.mean = 0;
-            opt.scaling.feat.range = 0;
-            opt.scaling.feat.sessmean = 0;
-    end
+    [opt] = ChooseNorm(Norm, opt);
     
     SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
     
@@ -217,8 +181,8 @@ for Norm = 6
                     
                     if ~all(isnan(Blocks(:))) || ~isempty(Blocks)
                         
-                        Y = flipud(Blocks-.5);
-                        [B] = ProfileGLM(DesMat, Y);
+                        Y = Blocks-.5;
+                        [B] = laminar_glm(DesMat, Y);
                         
                         SVM(iSVM).ROI(iROI).layers.Beta.DATA(:,iSub)=B;
                         
@@ -264,25 +228,6 @@ for Norm = 6
     cd(StartDir)
     
 end
-end
-
-end
-
-function [B] = ProfileGLM(X, Y)
-
-if any(isnan(Y(:)))
-    [~,y]=find(isnan(Y));
-    y=unique(y);
-    Y(:,y)=[];
-    clear y
-end
-
-if isempty(Y)
-    B=nan(1,size(X,2));
-else
-    X=repmat(X,size(Y,2),1);
-    Y=Y(:);
-    [B,~,~] = glmfit(X, Y, 'normal', 'constant', 'off');
 end
 
 end

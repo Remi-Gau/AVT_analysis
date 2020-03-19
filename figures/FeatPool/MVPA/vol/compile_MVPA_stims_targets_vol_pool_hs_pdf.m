@@ -19,20 +19,8 @@ ROIs= {...
     'PT'
     };
 
-opt.svm.log2c = 1;
-opt.svm.dargs = '-s 0';
-opt.fs.do = 0;
-opt.rfe.do = 0;
-opt.permutation.test = 0;
-opt.layersubsample.do = 0;
-opt.session.curve = 0;
-opt.scaling.idpdt = 1;
-
-opt.scaling.img.eucledian = 0;
-opt.scaling.img.zscore = 1;
-opt.scaling.feat.mean = 1;
-opt.scaling.feat.range = 0;
-opt.scaling.feat.sessmean = 0;
+% Options for the SVM
+[opt, ~] = get_mvpa_options();
 
 SaveSufix = CreateSaveSufix(opt, [], NbLayers);
 SaveSufix = strrep(SaveSufix, '_', '-');
