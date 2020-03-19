@@ -282,9 +282,7 @@ for iSub = 5 %1:NbSub
         
         opt = ChooseNorm(Norm, opt);
         
-        SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
-        
-        
+        SaveSufix = CreateSaveSuffix(opt, [], NbLayers, 'surf');
         
         %% Run cross-validation for each model and ROI
         SVM = SVM_Ori;

@@ -260,7 +260,7 @@ for iSub = 1:NbSub
         
         opt = ChooseNorm(Norm, opt);
         
-        SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
+        SaveSufix = CreateSaveSuffix(opt, [], NbLayers, 'surf');
         
         
         
@@ -494,13 +494,6 @@ for iSub = 1:NbSub
 end % for iSub = 1:NbSub
 
 CloseParWorkersPool(KillGcpOnExit)
-
-end
-
-
-function SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, iROI, SaveSufix) %#ok<INUSL>
-
-save(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_no-pool-ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]), 'Results', 'opt', 'Class_Acc', '-v7.3');
 
 end
 

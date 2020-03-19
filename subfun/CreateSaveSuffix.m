@@ -1,16 +1,21 @@
-function SaveSufix = CreateSaveSufixSurf(opt, FWHM, NbLayers)
+function SaveSufix = CreateSaveSuffix(opt, FWHM, NbLayers, space)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
+
 
 if isempty(FWHM)
     FWHM = 0;
 end
-    
+
 
 if numel(opt.svm.log2c)==1
-    SaveSufix = ['_results_surf_C-' num2str(opt.svm.log2c)];
+    SaveSufix = ['_results_' lower(space) '_C-' num2str(opt.svm.log2c)];
 else
-    SaveSufix = '_results_surf';
+    SaveSufix = ['_results_' lower(space)];
+end
+
+if opt.layersubsample.do
+    SaveSufix = [SaveSufix '_subsamp-1'];
 end
 
 if opt.MVNN
@@ -72,7 +77,7 @@ SaveSufix = [SaveSufix '_l-' num2str(NbLayers)];
 end
 
 if exist('FWHM', 'var')
-SaveSufix = [SaveSufix '_s-' num2str(FWHM)  '.mat'];
+    SaveSufix = [SaveSufix '_s-' num2str(FWHM)  '.mat'];
 else
     SaveSufix = [SaveSufix '.mat'];
 end
@@ -80,4 +85,3 @@ end
 
 
 end
-

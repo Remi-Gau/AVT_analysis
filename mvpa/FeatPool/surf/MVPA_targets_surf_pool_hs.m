@@ -262,7 +262,7 @@ for iSub = 1:NbSub
         
         opt = ChooseNorm(Norm, opt);
         
-        SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
+        SaveSufix = CreateSaveSuffix(opt, [], NbLayers, 'surf');
         
         
         
@@ -372,7 +372,11 @@ for iSub = 1:NbSub
                         else
                             fprintf('    Running analysis with all sessions\n\n')
                             NbPerm = opt.permutation.nreps;
-                        end
+                        endfunction SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, iROI, SaveSufix) %#ok<INUSL>
+
+save(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]), 'Results', 'opt', 'Class_Acc', '-v7.3');
+
+end
                         
                         %%
                         T = [];

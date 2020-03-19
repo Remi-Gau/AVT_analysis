@@ -97,7 +97,7 @@ Mask_Ori.ROI(end+1) = struct('name', 'V2_R_thres', 'fname', 'SubjName_rcr_V2_Pma
 Mask_Ori.ROI(end+1) = struct('name', 'V3_R_thres', 'fname', 'SubjName_rcr_V3_Pmap_Ret_thres_10_data.nii');
 Mask_Ori.ROI(end+1) = struct('name', 'V4_R_thres', 'fname', 'SubjName_rcr_V4_Pmap_Ret_thres_10_data.nii');
 Mask_Ori.ROI(end+1) = struct('name', 'V5_R_thres', 'fname', 'SubjName_rcr_V5_Pmap_Ret_thres_10_data.nii');
-    
+
 Mask_Ori.ROI(end+1) = struct('name', 'A1_R', 'fname', 'SubjName_A1_rcr_RG_data.nii');
 
 Mask_Ori.ROI(end+1) = struct('name', 'PT_R', 'fname', 'rwA41-42_R.nii');
@@ -344,7 +344,7 @@ for iSub = 1:NbSub
         
         %% Mask each image by each ROI and create a features set (images x voxel)
         fprintf('\n Get features\n')
-
+        
         for i=1:length(Mask.ROI)
             
             FeatureFile = fullfile(AnalysisFolder, ['Features_' Mask.ROI(i).name ...
@@ -397,10 +397,9 @@ for iSub = 1:NbSub
         %% Run for different type of normalization
         for Norm = 6
             
-        opt = ChooseNorm(Norm, opt);
+            opt = ChooseNorm(Norm, opt);
             
-            SaveSufix = CreateSaveSufix(opt, FWHM(iFWHM), NbLayers);
-            
+            SaveSufix = CreateSaveSuffix(opt, FWHM(iFWHM), NbLayers, 'vol');
             
             %% Run cross-validation for each model and ROI
             SVM = SVM_Ori;
@@ -411,13 +410,13 @@ for iSub = 1:NbSub
                     SVM(i).ROI_XYZ{j,1} = [...
                         Mask.ROI(PoolHs(SVM(i).ROI(j),1)).XYZ ...
                         Mask.ROI(PoolHs(SVM(i).ROI(j),2)).XYZ];
-
+                    
                 end
                 
                 SVM(i).ROI = struct('name', strrep({Mask.ROI(SVM(i).ROI).name}','_L', ''), ...
                     'size', num2cell([Mask.ROI(PoolHs(SVM(i).ROI,1)).size]' ...
                     + [Mask.ROI(PoolHs(SVM(i).ROI,2)).size]') );
-
+                
                 
             end
             
@@ -441,7 +440,7 @@ for iSub = 1:NbSub
                     ROI_R = ismember(strrep({Mask.ROI(numel(Mask.ROI)/2+1:end).name},'_R',''),...
                         SVM(iSVM).ROI(iROI).name);
                     ROI_R = PoolHs(ROI_R,2);
-
+                    
                     fprintf('\n Subject %s running SVM:  %s\n', SubLs(iSub).name, SVM(iSVM).name)
                     fprintf('  Running ROI:  %s\n', SVM(iSVM).ROI(iROI).name)
                     fprintf('  Number of voxel before FS/RFE: %i\n', SVM(iSVM).ROI(iROI).size)
@@ -456,7 +455,7 @@ for iSub = 1:NbSub
                         else
                             fprintf('  Running analysis with all sessions\n')
                         end
-                                                
+                        
                         % All possible ways of only choosing X sessions of the total
                         CV_id = nchoosek(1:NbRuns, NbSess2Incl);
                         CV_id = CV_id(randperm(size(CV_id, 1)),:);
@@ -481,13 +480,13 @@ for iSub = 1:NbSub
                         
                         for i=1:size(CV_id,1)
                             TestSessList{i,1} = cartProd;
-%                             TestSessList{i,1} = nchoosek(CV_id(i,:), floor(opt.session.proptest*NbSess2Incl));
-%                             TestSessList{i,1} = TestSessList{i,1}(randperm(size(TestSessList{i,1},1)),:);
-%                             if size(TestSessList{i,1}, 1) >  opt.session.maxcv    
-%                                 TestSessList{i,1} = TestSessList{i,1}(1:opt.session.maxcv,:);
-%                             end                        
+                            %                             TestSessList{i,1} = nchoosek(CV_id(i,:), floor(opt.session.proptest*NbSess2Incl));
+                            %                             TestSessList{i,1} = TestSessList{i,1}(randperm(size(TestSessList{i,1},1)),:);
+                            %                             if size(TestSessList{i,1}, 1) >  opt.session.maxcv
+                            %                                 TestSessList{i,1} = TestSessList{i,1}(1:opt.session.maxcv,:);
+                            %                             end
                         end
-
+                        
                         
                         %% Subsampled sessions loop
                         for iSubSampSess=1:size(CV_id, 1)
@@ -514,7 +513,7 @@ for iSub = 1:NbSub
                                     end
                                 end
                                 clear temp
-
+                                
                                 
                                 %% Get ROIs features
                                 % Swap features rows for the right ROI
@@ -535,7 +534,7 @@ for iSub = 1:NbSub
                                 
                                 Features_ROI = Features_ROI(:,logical(LayerLabels_ROI));
                                 LayerLabels_ROI = LayerLabels_ROI(:,logical(LayerLabels_ROI));
-
+                                
                                 
                                 %% Subsample voxels withing a layer
                                 % so that all layers an equal number of voxels
@@ -627,9 +626,9 @@ for iSub = 1:NbSub
                                         SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).SubSamp{i,j}.CV_id= CV_id;
                                         SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).SubSamp{i,j}.TestSessList = TestSessList;
                                         
-                                        % Calculate prediction accuracies                                        
+                                        % Calculate prediction accuracies
                                         for iLayer = 1:(NbLayers+1)
-                                            for iCV=1:size(TestSessList{iSubSampSess,1}, 1) 
+                                            for iCV=1:size(TestSessList{iSubSampSess,1}, 1)
                                                 pred = SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).SubSamp{i,j}.CV(iCV,iLayer).pred;
                                                 label = SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).SubSamp{i,j}.CV(iCV,iLayer).label;
                                                 Acc(iCV) = mean(pred==label);
@@ -645,7 +644,7 @@ for iSub = 1:NbSub
                                 t = toc;
                                 SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).ExecTime = t;
                                 
-
+                                
                                 %% Display some results
                                 if iPerm == 1 && NbSess2Incl == NbRuns && opt.layersubsample.do==0
                                     if ~isempty(SVM(iSVM).ROI(iROI).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).SubSamp{1,1}.CV(1).fs)
@@ -698,12 +697,5 @@ end % for iSub = 1:NbSub
 
 
 CloseParWorkersPool(KillGcpOnExit)
-
-end
-
-
-function SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, iROI, SaveSufix) %#ok<INUSL>
-
-save(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]), 'Results', 'opt', 'Class_Acc', '-v7.3');
 
 end

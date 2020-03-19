@@ -408,8 +408,7 @@ for iSub = 1:NbSub
             
             opt = ChooseNorm(Norm, opt);
             
-            SaveSufix = CreateSaveSufix(opt, FWHM(iFWHM), NbLayers);
-            
+                                SaveSufix = CreateSaveSuffix(opt, FWHM(iFWHM), NbLayers, 'vol');
             
             %% Run cross-validation for each model and ROI
             SVM = SVM_Ori;
@@ -680,12 +679,5 @@ end % for iSub = 1:NbSub
 
 
 CloseParWorkersPool(KillGcpOnExit)
-
-end
-
-
-function SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, iROI, SaveSufix) %#ok<INUSL>
-
-save(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]), 'Results', 'opt', 'Class_Acc', '-v7.3');
 
 end

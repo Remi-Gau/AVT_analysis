@@ -342,7 +342,7 @@ for iToPlot = 1:2
             
             opt = ChooseNorm(Norm, opt);
             
-            SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
+            SaveSufix = CreateSaveSuffix(opt, [], NbLayers, 'surf');
             
             
             %% Run cross-validation for each model and ROI
