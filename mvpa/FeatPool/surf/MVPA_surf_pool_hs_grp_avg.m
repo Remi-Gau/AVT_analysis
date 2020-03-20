@@ -2,28 +2,35 @@ function MVPA_surf_pool_hs_grp_avg
 
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..','..','..');
-cd (StartDir)
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
 
-Get_dependencies('/home/rxg243/Dropbox')
+addpath(genpath(fullfile(CodeDir, 'subfun')))
 
+[Dirs] = set_dir();
+
+Get_dependencies()
+
+SubLs = dir(fullfile(Dirs.DerDir, 'sub*'));
+NbSub = numel(SubLs);
 
 ResultsDir = fullfile(StartDir, 'results', 'SVM');
 [~,~,~] = mkdir(ResultsDir);
-
-addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 
 NbLayers = 6;
 
 % Options for the SVM
 [opt, ~] = get_mvpa_options();
 
-
 DesMat = set_design_mat_lam_GLM(NbLayers);
 
-
-SubLs = dir('sub*');
-NbSub = numel(SubLs);
 
 
 for Norm = 6
@@ -37,20 +44,20 @@ for Norm = 6
     % ROI
     ROIs(1) = struct('name', 'V1');
     ROIs(end+1) = struct('name', 'V2');
-    ROIs(end+1) = struct('name', 'V3');
-    ROIs(end+1) = struct('name', 'V4');
-    ROIs(end+1) = struct('name', 'V5');
+%     ROIs(end+1) = struct('name', 'V3');
+%     ROIs(end+1) = struct('name', 'V4');
+%     ROIs(end+1) = struct('name', 'V5');
     
     ROIs(end+1) = struct('name', 'A1');
     ROIs(end+1) = struct('name', 'PT');
     
     % Analysis
-    %     SVM(1) = struct('name', 'A Ipsi VS Contra', 'ROI', 1:length(ROIs));
-    %     SVM(end+1) = struct('name', 'V Ipsi VS Contra', 'ROI', 1:length(ROIs));
-    %     SVM(end+1) = struct('name', 'T Ipsi VS Contra', 'ROI', 1:length(ROIs));
-    %
-    %     SVM(end+1) = struct('name', 'A VS V Ipsi', 'ROI', 1:length(ROIs));
-    SVM(1) = struct('name', 'A VS T Ipsi', 'ROI', 1:length(ROIs));
+    SVM(1) = struct('name', 'A Ipsi VS Contra', 'ROI', 1:length(ROIs));
+    SVM(end+1) = struct('name', 'V Ipsi VS Contra', 'ROI', 1:length(ROIs));
+    SVM(end+1) = struct('name', 'T Ipsi VS Contra', 'ROI', 1:length(ROIs));
+    
+    SVM(end+1) = struct('name', 'A VS V Ipsi', 'ROI', 1:length(ROIs));
+    SVM(end+1) = struct('name', 'A VS T Ipsi', 'ROI', 1:length(ROIs));
     SVM(end+1) = struct('name', 'V VS T Ipsi', 'ROI', 1:length(ROIs));
     
     SVM(end+1) = struct('name', 'A VS V Contra', 'ROI', 1:length(ROIs));
@@ -66,7 +73,7 @@ for Norm = 6
     for iSubj = 1:NbSub
         fprintf('\n\nProcessing %s', SubLs(iSubj).name)
         
-        SubDir = fullfile(StartDir, SubLs(iSubj).name);
+        SubDir = fullfile(Dirs.DerDir, SubLs(iSubj).name);
         SaveDir = fullfile(SubDir, 'results', 'SVM');
         
         for iSVM = 1:numel(SVM)

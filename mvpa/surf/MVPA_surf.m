@@ -1,9 +1,25 @@
 function MVPA_surf
+
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..','..');
-cd (StartDir)
-addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
+
+addpath(genpath(fullfile(CodeDir, 'subfun')))
+
+[Dirs] = set_dir();
+
+Get_dependencies()
+
+SubLs = dir(fullfile(Dirs.DerDir, 'sub*'));
+NbSub = numel(SubLs);
 
 NbLayers = 6;
 
@@ -11,7 +27,7 @@ NbWorkers = 10;
 
 
 % Options for the SVM
-[opt, file2load_suffix] = get_mvpa_options();
+[opt, ~] = get_mvpa_options();
 
 
 CondNames = {...
@@ -76,9 +92,6 @@ SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse'
 % -------------------------%
 [KillGcpOnExit] = OpenParWorkersPool(NbWorkers);
 
-SubLs = dir('sub*');
-NbSub = numel(SubLs);
-
 
 for iSub = 1:NbSub
     
@@ -87,7 +100,7 @@ for iSub = 1:NbSub
     % --------------------------------------------------------- %
     fprintf('\n\nProcessing %s\n', SubLs(iSub).name)
     
-    SubDir = fullfile(StartDir, SubLs(iSub).name);
+    SubDir = fullfile(Dirs.DerDir, SubLs(iSub).name);
     
     Data_dir = fullfile(SubDir, 'ffx_nat', 'betas', '6_surf');
     
@@ -223,7 +236,7 @@ for iSub = 1:NbSub
                     SVM(i).ROI(1,1) = struct('name', ROI(j).name, ...
                         'size', numel(ROI(j).VertOfInt(2)),...
                         'opt', opt);
-                    SVM(i).ROI(1,2) = struct('name', ROI(j).name, ...
+                    SVM(iStartDir).ROI(1,2) = struct('name', ROI(j).name, ...
                         'size', numel(ROI(j).VertOfInt(2)),...
                         'opt', opt);
                 else
@@ -271,7 +284,7 @@ for iSub = 1:NbSub
                     % Defines the test sessions for the CV: take one
                     % session from each day as test: all the others as
                     % training
-                    load(fullfile(StartDir, 'RunsPerSes.mat'))
+                    load(fullfile(Dirs.DerDir, 'RunsPerSes.mat'))
                     Idx = ismember({RunPerSes.Subject}, SubLs(iSub).name);
                     RunPerSes = RunPerSes(Idx).RunsPerSes;
                     sets = {...

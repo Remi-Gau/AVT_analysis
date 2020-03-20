@@ -39,7 +39,7 @@ for Norm = 6
     
     [opt] = ChooseNorm(Norm, opt);
     
-    SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
+    SaveSufix = CreateSaveSuffix(opt, [], NbLayers, 'surf');
     
     
     % ROI

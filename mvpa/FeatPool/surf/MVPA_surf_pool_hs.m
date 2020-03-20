@@ -61,35 +61,36 @@ Class(end).cond = {'TStimL'};
 Class(6) = struct('name', 'T Stim - Right', 'cond', cell(1), 'nbetas', 1);
 Class(end).cond = {'TStimR'};
 
+% ROIs_ori = {
+%     'A1',...
+%     'PT',...
+%     'V1',...
+%     'V2',...
+%     'V3',...
+%     'V4',...
+%     'V5'};
+
 ROIs_ori = {
     'A1',...
     'PT',...
     'V1',...
-    'V2',...
-    'V3',...
-    'V4',...
-    'V5'};
+    'V2'};
 
 % --------------------------------------------------------- %
 %                     Analysis to perform                   %
 % --------------------------------------------------------- %
-% SVM_Ori(1) = struct('name', 'A Ipsi VS Contra', 'class', [1 2], 'ROI_2_analyse', 1:numel(ROIs_ori));
-% SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [3 4], 'ROI_2_analyse', 1:numel(ROIs_ori));
-% SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
-% 
-% SVM_Ori(end+1) = struct('name', 'A VS V Ipsi', 'class', [1 3], 'ROI_2_analyse', 1:numel(ROIs_ori));
-% SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], 'ROI_2_analyse', 1:numel(ROIs_ori));
-% SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [3 5], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(1) = struct('name', 'A Ipsi VS Contra', 'class', [1 2], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [3 4], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
 
-% SVM_Ori(1) = struct('name', 'A VS T Ipsi', 'class', [1 5], 'ROI_2_analyse',3);
-% SVM_Ori(1) = struct('name', 'V VS T Ipsi', 'class', [3 5], 'ROI_2_analyse', 1);
+SVM_Ori(end+1) = struct('name', 'A VS V Ipsi', 'class', [1 3], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [3 5], 'ROI_2_analyse', 1:numel(ROIs_ori));
 
-% SVM_Ori(1) = struct('name', 'A VS V Contra', 'class', [2 4], 'ROI_2_analyse', 1);
-% SVM_Ori(1) = struct('name', 'A VS T Contra', 'class', [2 6], 'ROI_2_analyse', 1);
-SVM_Ori(1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse', 1);
+SVM_Ori(end+1) = struct('name', 'A VS V Contra', 'class', [2 4], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
 
-% SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], 'ROI_2_analyse', 3);
-% SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse', 1);
 
 
 % -------------------------%
@@ -97,7 +98,7 @@ SVM_Ori(1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI_2_analyse', 1)
 % -------------------------%
 [KillGcpOnExit] = OpenParWorkersPool(NbWorkers);
 
-for iSub = 5 %1:NbSub    
+for iSub = 1:NbSub    
     
     % --------------------------------------------------------- %
     %                        Subject data                       %
@@ -287,7 +288,7 @@ for iSub = 5 %1:NbSub
                     % Defines the test sessions for the CV: take one
                     % session from each day as test: all the others as
                     % training
-                    load(fullfile(StartDir, 'RunsPerSes.mat'))
+                    load(fullfile(Dirs.DerDir, 'RunsPerSes.mat'))
                     Idx = ismember({RunPerSes.Subject}, SubLs(iSub).name);
                     RunPerSes = RunPerSes(Idx).RunsPerSes;
                     sets = {...
@@ -380,7 +381,15 @@ for iSub = 5 %1:NbSub
                                 TestSess(TestSessList{iSubSampSess,1}(iCV,:)) = 1; %#ok<*PFBNS>
                                 TrainSess(setdiff(CV_id(iSubSampSess,:), TestSessList{iSubSampSess,1}(iCV,:)) )= 1;
                                 
-                                [acc_layer, results_layer, results, ~] = RunSVM(SVM, FeaturesBoth, LogFeatBoth, FeaturesLayersBoth, CV_Mat, TrainSess, TestSess, opt, iSVM);
+                                [acc_layer, results_layer, ~] = RunSVM(...
+                                    SVM, ...
+                                    FeaturesBoth, LogFeatBoth, FeaturesLayersBoth, ...
+                                    CV_Mat, TrainSess, TestSess, opt, iSVM);
+                                
+                                results = machine_SVC(...
+                                    SVM(iSVM), ...
+                                    FeaturesBoth(:,LogFeatBoth), ...
+                                    CV_Mat, TrainSess, TestSess, opt);
                                 
                                 TEMP(iCV,1).layers.results = {results_layer};
                                 TEMP(iCV,1).layers.acc = acc_layer;
@@ -441,7 +450,6 @@ for iSub = 5 %1:NbSub
                 subject = sprintf('Analysis subject %s - SVM %s - ROI %s : done', ...
                     SubLs(iSub).name, SVM(iSVM).name, SVM(iSVM).ROI(ROI_idx).name);
                 message = sprintf('Accuracy = %f', Class_Acc.TotAcc(:));
-                matlabmail('remi_gau@hotmail.com', message, subject);
                 
                 clear Results
                 
@@ -458,7 +466,6 @@ for iSub = 5 %1:NbSub
     
     subject = sprintf('Analysis subject %s : done', ...
         SubLs(iSub).name);
-    matlabmail('remi_gau@hotmail.com', 'done', subject);
     
 end % for iSub = 1:NbSub
 
