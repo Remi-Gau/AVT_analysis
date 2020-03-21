@@ -23,30 +23,6 @@ CondNames = {...
 Cdt_ROI_lhs = 1:6;
 Cdt_ROI_rhs = [2 1 4 3 6 5];
 
-
-% --------------------------------------------------------- %
-%              Classes and associated conditions            %
-% --------------------------------------------------------- %
-Class(1) = struct('name', 'A Targ - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'ATargL'};
-
-Class(2) = struct('name', 'A Targ - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'ATargR'};
-
-
-Class(3) = struct('name', 'V Targ - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'VTargL'};
-
-Class(4) = struct('name', 'V Targ - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'VTargR'};
-
-
-Class(5) = struct('name', 'T Targ - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'TTargL'};
-
-Class(6) = struct('name', 'T Targ - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'TTargR'};
-
 ROIs_ori = {
     'A1',...
     'PT',...
@@ -56,20 +32,22 @@ ROIs_ori = {
     'V4',...
     'V5'};
 
+Class = get_mvpa_class();
+
 % --------------------------------------------------------- %
 %                     Analysis to perform                   %
 % --------------------------------------------------------- %
-% SVM_Ori(1) = struct('name', 'A Ipsi VS Contra - Targets', 'class', [1 2], 'ROI_2_analyse', 1:numel(ROIs_ori));
-% SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra - Targets', 'class', [3 4], 'ROI_2_analyse', 1:numel(ROIs_ori));
-% SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra - Targets', 'class', [5 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(1) = struct('name', 'A Ipsi VS Contra - Targets', 'class', [7:8], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra - Targets', 'class', [9:10], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra - Targets', 'class', [11:12], 'ROI_2_analyse', 1:numel(ROIs_ori));
 
-% SVM_Ori(end+1) = struct('name', 'A VS V Ipsi - Targets', 'class', [1 3], 'ROI_2_analyse', 1:numel(ROIs_ori));
-SVM_Ori(1) = struct('name', 'A VS T Ipsi - Targets', 'class', [1 5], 'ROI_2_analyse', 1:numel(ROIs_ori));
-SVM_Ori(end+1) = struct('name', 'V VS T Ipsi - Targets', 'class', [3 5], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'A VS V Ipsi - Targets', 'class', [7 9], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'A VS T Ipsi - Targets', 'class', [7 11], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'V VS T Ipsi - Targets', 'class', [9 11], 'ROI_2_analyse', 1:numel(ROIs_ori));
 
-% SVM_Ori(end+1) = struct('name', 'A VS V Contra - Targets', 'class', [2 4], 'ROI_2_analyse', 1:numel(ROIs_ori));
-% SVM_Ori(end+1) = struct('name', 'A VS T Contra - Targets', 'class', [2 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
-% SVM_Ori(end+1) = struct('name', 'V VS T Contra - Targets', 'class', [4 6], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'A VS V Contra - Targets', 'class', [8 10], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'A VS T Contra - Targets', 'class', [8 12], 'ROI_2_analyse', 1:numel(ROIs_ori));
+SVM_Ori(end+1) = struct('name', 'V VS T Contra - Targets', 'class', [10 12], 'ROI_2_analyse', 1:numel(ROIs_ori));
 
 
 % -------------------------%

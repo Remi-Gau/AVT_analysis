@@ -22,40 +22,7 @@ CondNames = {...
     'TTargL','TTargR';...
     };
 
-
-% --------------------------------------------------------- %
-%              Classes and associated conditions            %
-% --------------------------------------------------------- %
-Class(1) = struct('name', 'A Stim', 'cond', cell(1), 'nbetas', 2);
-Class(end).cond = {'AStimL' 'AStimR'};
-
-Class(2) = struct('name', 'V Stim', 'cond', cell(1), 'nbetas', 2);
-Class(end).cond = {'VStimL' 'VStimR'};
-
-Class(3) = struct('name', 'T Stim', 'cond', cell(1), 'nbetas', 2);
-Class(end).cond = {'TStimL' 'TStimR'};
-
-
-Class(4) = struct('name', 'A Stim - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'AStimL'};
-
-Class(5) = struct('name', 'A Stim - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'AStimR'};
-
-
-Class(6) = struct('name', 'V Stim - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'VStimL'};
-
-Class(7) = struct('name', 'V Stim - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'VStimR'};
-
-
-Class(8) = struct('name', 'T Stim - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'TStimL'};
-
-Class(9) = struct('name', 'T Stim - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'TStimR'};
-
+Class = get_mvpa_class();
 
 % --------------------------------------------------------- %
 %                            ROIs                           %
@@ -102,25 +69,25 @@ Mask_Ori.ROI(end+1) = struct('name', 'V4_R', 'fname', 'rwV4_R_ProbRet.nii');
 Mask_Ori.ROI(end+1) = struct('name', 'V5_R', 'fname', 'rwV5_R_ProbRet.nii');
 
 
-
 % --------------------------------------------------------- %
 %                     Analysis to perform                   %
 % --------------------------------------------------------- %
-SVM_Ori(1) = struct('name', 'A VS V', 'class', [1 2], 'ROI',  [2 12 22]);
-SVM_Ori(end+1) = struct('name', 'A VS T', 'class', [1 3], 'ROI', [2 12 22]);
-SVM_Ori(end+1) = struct('name', 'V VS T', 'class', [2 3], 'ROI', [2 12 22]);
+SVM_Ori(1) = struct('name', 'A left VS A right', 'class', [1 2], 'ROI', [2 12 22]);
+SVM_Ori(end+1) = struct('name', 'V left VS V right', 'class', [3 4], 'ROI', [2 12 22]);
+SVM_Ori(end+1) = struct('name', 'T left VS T right', 'class', [5 6], 'ROI', [2 12 22]);
 
-SVM_Ori(end+1) = struct('name', 'A left VS A right', 'class', [4 5], 'ROI', [2 12 22]);
-SVM_Ori(end+1) = struct('name', 'V left VS V right', 'class', [6 7], 'ROI', [2 12 22]);
-SVM_Ori(end+1) = struct('name', 'T left VS T right', 'class', [8 9], 'ROI', [2 12 22]);
+SVM_Ori(end+1) = struct('name', 'A left VS V left', 'class', [1 3], 'ROI', [2 12 22]);
+SVM_Ori(end+1) = struct('name', 'A left VS T left', 'class', [1 5], 'ROI', [2 12 22]);
+SVM_Ori(end+1) = struct('name', 'V left VS T left', 'class', [3 5], 'ROI', [2 12 22]);
 
-SVM_Ori(end+1) = struct('name', 'A left VS V left', 'class', [4 6], 'ROI', [2 12 22]);
-SVM_Ori(end+1) = struct('name', 'A left VS T left', 'class', [4 8], 'ROI', [2 12 22]);
-SVM_Ori(end+1) = struct('name', 'V left VS T left', 'class', [6 8], 'ROI', [2 12 22]);
+SVM_Ori(end+1) = struct('name', 'A right VS V right', 'class', [2 4], 'ROI', [2 12 22]);
+SVM_Ori(end+1) = struct('name', 'A right VS T right', 'class', [2 6], 'ROI', [2 12 22]);
+SVM_Ori(end+1) = struct('name', 'V right VS T right', 'class', [4 6], 'ROI', [2 12 22]);
 
-SVM_Ori(end+1) = struct('name', 'A right VS V right', 'class', [5 7], 'ROI', [2 12 22]);
-SVM_Ori(end+1) = struct('name', 'A right VS T right', 'class', [5 9], 'ROI', [2 12 22]);
-SVM_Ori(end+1) = struct('name', 'V right VS T right', 'class', [7 9], 'ROI', [2 12 22]);
+SVM_Ori(end+1) = struct('name', 'A VS V', 'class', [13 14], 'ROI',  [2 12 22]);
+SVM_Ori(end+1) = struct('name', 'A VS T', 'class', [13 15], 'ROI', [2 12 22]);
+SVM_Ori(end+1) = struct('name', 'V VS T', 'class', [14 15], 'ROI', [2 12 22]);
+
 
 % -------------------------%
 %          START           %

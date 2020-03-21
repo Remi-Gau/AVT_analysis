@@ -6,7 +6,7 @@ cd (StartDir)
 addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
 
 NbLayers = 6;
-FWHM = [0];
+FWHM = 0;
 
 NbWorkers = 8;
 
@@ -23,38 +23,7 @@ CondNames = {...
     };
 
 
-% --------------------------------------------------------- %
-%              Classes and associated conditions            %
-% --------------------------------------------------------- %
-Class(1) = struct('name', 'A Stim', 'cond', cell(1), 'nbetas', 2);
-Class(end).cond = {'AStimL' 'AStimR'};
-
-Class(2) = struct('name', 'V Stim', 'cond', cell(1), 'nbetas', 2);
-Class(end).cond = {'VStimL' 'VStimR'};
-
-Class(3) = struct('name', 'T Stim', 'cond', cell(1), 'nbetas', 2);
-Class(end).cond = {'TStimL' 'TStimR'};
-
-
-Class(4) = struct('name', 'A Stim - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'AStimL'};
-
-Class(5) = struct('name', 'A Stim - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'AStimR'};
-
-
-Class(6) = struct('name', 'V Stim - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'VStimL'};
-
-Class(7) = struct('name', 'V Stim - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'VStimR'};
-
-
-Class(8) = struct('name', 'T Stim - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'TStimL'};
-
-Class(9) = struct('name', 'T Stim - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'TStimR'};
+Class = get_mvpa_class();
 
 
 % --------------------------------------------------------- %
@@ -93,18 +62,17 @@ PoolHs = [[1:10]',[11:20]']; %#ok<NBRAK>
 % --------------------------------------------------------- %
 %                     Analysis to perform                   %
 % --------------------------------------------------------- %
-SVM_Ori(1) = struct('name', 'A Ipsi VS Contra', 'class', [4 5], 'ROI', 2, 'swap', 1, 'shift', 0);
-SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [6 7], 'ROI', 2, 'swap', 1, 'shift', 0);
-SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [8 9], 'ROI', 2, 'swap', 1, 'shift', 0);
-% 
-SVM_Ori(end+1) = struct('name', 'A VS V Ipsi', 'class', [4 6], 'ROI', 2, 'swap', 0, 'shift', 1);
-SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [4 8], 'ROI', 2, 'swap', 0, 'shift', 1);
-SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [6 8], 'ROI', 2, 'swap', 0, 'shift', 1);
+SVM_Ori(1) = struct('name', 'A Ipsi VS Contra', 'class', [1 2], 'ROI', 2, 'swap', 1, 'shift', 0);
+SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [3 4], 'ROI', 2, 'swap', 1, 'shift', 0);
+SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], 'ROI', 2, 'swap', 1, 'shift', 0);
 
-SVM_Ori(end+1) = struct('name', 'A VS V Contra', 'class', [5 7], 'ROI', 2, 'swap', 0, 'shift', -1);
-SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [5 9], 'ROI', 2, 'swap', 0, 'shift', -1);
-SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [7 9], 'ROI', 2, 'swap', 0, 'shift', -1);
-% SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [7 9], 'ROI', 1:size(PoolHs,1), 'swap', 0, 'shift', -1);
+SVM_Ori(end+1) = struct('name', 'A VS V Ipsi', 'class', [1 3], 'ROI', 2, 'swap', 0, 'shift', 1);
+SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], 'ROI', 2, 'swap', 0, 'shift', 1);
+SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [3 5], 'ROI', 2, 'swap', 0, 'shift', 1);
+
+SVM_Ori(end+1) = struct('name', 'A VS V Contra', 'class', [2 4], 'ROI', 2, 'swap', 0, 'shift', -1);
+SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], 'ROI', 2, 'swap', 0, 'shift', -1);
+SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], 'ROI', 1:size(PoolHs,1), 'swap', 0, 'shift', -1);
 
 % -------------------------%
 %          START           %

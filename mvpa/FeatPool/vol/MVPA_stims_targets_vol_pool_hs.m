@@ -22,51 +22,7 @@ CondNames = {...
     'TTargL','TTargR';...
     };
 
-
-% --------------------------------------------------------- %
-%              Classes and associated conditions            %
-% --------------------------------------------------------- %
-Class(1) = struct('name', 'A Stim - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'AStimL'};
-
-Class(2) = struct('name', 'A Stim - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'AStimR'};
-
-
-Class(3) = struct('name', 'V Stim - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'VStimL'};
-
-Class(4) = struct('name', 'V Stim - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'VStimR'};
-
-
-Class(5) = struct('name', 'T Stim - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'TStimL'};
-
-Class(6) = struct('name', 'T Stim - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'TStimR'};
-
-
-
-Class(7) = struct('name', 'A Targ - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'ATargL'};
-
-Class(8) = struct('name', 'A Targ - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'ATargR'};
-
-
-Class(9) = struct('name', 'V Targ - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'VTargL'};
-
-Class(10) = struct('name', 'V Targ - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'VTargR'};
-
-
-Class(11) = struct('name', 'T Targ - Left', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'TTargL'};
-
-Class(12) = struct('name', 'T Targ - Right', 'cond', cell(1), 'nbetas', 1);
-Class(end).cond = {'TTargR'};
+Class = get_mvpa_class();
 
 
 % --------------------------------------------------------- %
