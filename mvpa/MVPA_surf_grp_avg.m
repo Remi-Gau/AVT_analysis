@@ -2,28 +2,45 @@ function MVPA_surf_grp_avg
 
 clc; clear;
 
-StartDir = fullfile(pwd, '..','..');
-cd (StartDir)
-addpath(genpath(fullfile(StartDir, 'code', 'subfun')))
-Get_dependencies('/home/rxg243/Dropbox/')
-Get_dependencies('D:\Dropbox/')
+if isunix
+    CodeDir = '/home/remi/github/AVT_analysis';
+    StartDir = '/home/remi';
+elseif ispc
+    CodeDir = 'D:\github\AVT-7T-code';
+    StartDir = 'D:\';
+else
+    disp('Platform not supported')
+end
 
-ResultsDir = fullfile(StartDir, 'results', 'SVM');
-[~,~,~] = mkdir(ResultsDir);
+addpath(genpath(fullfile(CodeDir, 'subfun')))
 
-ToPlot={'Cst','Lin','Avg','ROI'};
+[Dirs] = set_dir();
+
+Get_dependencies()
+
+SubLs = dir(fullfile(Dirs.DerDir, 'sub*'));
+NbSub = numel(SubLs);
 
 NbLayers = 6;
+
+ROIs_ori = {
+    'A1',...
+    'PT',...
+    'V1',...
+    'V2'};
+
+ToPlot={'Cst','Lin','Avg','ROI'};
 
 % Options for the SVM
 [opt, ~] = get_mvpa_options();
 
-SubLs = dir('sub*');
-NbSub = numel(SubLs);
+SVM_Ori = get_mvpa_classification(ROIs_ori);
+SVM_Ori(10:end) = [];
 
 DesMat = set_design_mat_lam_GLM(NbLayers);
 
-for iToPlot = 4
+
+for iToPlot = 1
     
     opt.toplot = ToPlot{iToPlot};
                  
@@ -40,63 +57,28 @@ for Norm = 6
     [opt] = ChooseNorm(Norm, opt);
     
     SaveSufix = CreateSaveSuffix(opt, [], NbLayers, 'surf');
-    
-    
-    % ROI
-    ROIs(1) = struct('name', 'A1');
-    ROIs(end+1) = struct('name', 'PT');
-    
-    ROIs(end+1) = struct('name', 'V1');
-    ROIs(end+1) = struct('name', 'V2');
-    ROIs(end+1) = struct('name', 'V3');
-%     ROIs(end+1) = struct('name', 'V4');
-%     ROIs(end+1) = struct('name', 'V5');
-    
+   
+    SVM = SVM_Ori;
 
-    % Analysis
-    SVM(1) = struct('name', 'A Ipsi VS Contra', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'V Ipsi VS Contra', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'T Ipsi VS Contra', 'ROI', 1:length(ROIs));
-    
-    SVM(end+1) = struct('name', 'A VS V Ipsi', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'A VS T Ipsi', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'V VS T Ipsi', 'ROI', 1:length(ROIs));
-    
-    SVM(end+1) = struct('name', 'A VS V Contra', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'A VS T Contra', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'V VS T Contra', 'ROI', 1:length(ROIs));
-    
-    
-    SVM(end+1) = struct('name', 'A_L VS A_R', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'V_L VS V_R', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'T_L VS T_R', 'ROI', 1:length(ROIs));
-    
-    SVM(end+1) = struct('name', 'A_L VS V_L', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'A_L VS T_L', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'V_L VS T_L', 'ROI', 1:length(ROIs));
-    
-    SVM(end+1) = struct('name', 'A_R VS V_R', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'A_R VS T_R', 'ROI', 1:length(ROIs));
-    SVM(end+1) = struct('name', 'V_R VS T_R', 'ROI', 1:length(ROIs));
-
-
-    for i=1:numel(SVM)
-        SVM(i).ROI = struct('name', {ROIs(SVM(i).ROI).name}); %#ok<*AGROW>
+    for i = 1:numel(SVM)
+        for j = 1:numel(SVM(i).ROI_2_analyse)
+            SVM(i).ROI(j).name = ROIs_ori{SVM(i).ROI_2_analyse(j)}; %#ok<*AGROW>
+        end
     end
     
     %% Gets data for each subject
     for iSubj = 1:NbSub
         fprintf('\n\nProcessing %s', SubLs(iSubj).name)
         
-        SubDir = fullfile(StartDir, SubLs(iSubj).name);
+        SubDir = fullfile(Dirs.DerDir, SubLs(iSubj).name);
         SaveDir = fullfile(SubDir, 'results', 'SVM');
         
         for iSVM = 1:numel(SVM)
             fprintf('\n Running SVM:  %s', SVM(iSVM).name)
             
-            for iROI=1:numel(ROIs)
+            for iROI=1:numel(SVM(i).ROI_2_analyse)
                 
-                File2Load = fullfile(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]));
+                File2Load = fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]);
                 
                 if exist(File2Load,'file')
                     
@@ -147,7 +129,7 @@ for Norm = 6
     
     %% Averages over subjects
     for iSVM = 1:numel(SVM)
-        for iROI=1:numel(ROIs)
+        for iROI=1:numel(ROIs_ori)
             
             SVM(iSVM).ROI(iROI).MEAN = nanmean(SVM(iSVM).ROI(iROI).grp); 
             SVM(iSVM).ROI(iROI).STD = nanstd(SVM(iSVM).ROI(iROI).grp);
@@ -172,7 +154,7 @@ for Norm = 6
         for iSVM = 1:numel(SVM)
             fprintf('\n Running SVM:  %s', SVM(iSVM).name)
             
-            for iROI=1:numel(ROIs)
+            for iROI=1:numel(ROIs_ori)
                 
                 %% Actually compute betas
                 for iSub = 1:NbSub
@@ -216,14 +198,14 @@ for Norm = 6
     fprintf('\n\nSaving\n')
     
     for iSVM = 1:numel(SVM)
-        for iROI=1:numel(ROIs)
+        for iROI=1:numel(ROIs_ori)
             Results = SVM(iSVM).ROI(iROI);
-            save( fullfile(ResultsDir, strcat('Grp_', SVM(iSVM).ROI(iROI).name, '_', strrep(SVM(iSVM).name,' ','-'),...
+            save( fullfile(Dirs.MVPA_resultsDir, strcat('Grp_', SVM(iSVM).ROI(iROI).name, '_', strrep(SVM(iSVM).name,' ','-'),...
                 '_PoolQuadGLM',  SaveSufix, '.mat')), 'Results')
         end
     end
     
-    save( fullfile(ResultsDir, strcat('GrpPoolQuadGLM', SaveSufix, '.mat')) )
+    save( fullfile(Dirs.MVPA_resultsDir, strcat('GrpPoolQuadGLM', SaveSufix, '.mat')) )
     
     cd(StartDir)
     
