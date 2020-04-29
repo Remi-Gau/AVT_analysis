@@ -13,6 +13,7 @@ function MVPA_surf
 % to do
 % make it usable with targets
 
+
 clc; clear;
 
 if isunix
@@ -55,66 +56,21 @@ ToPlot={'Cst','Lin','Avg','ROI'};
 
 opt
 
-Class = get_mvpa_class();
+% Class = get_mvpa_class();
 
-
-% --------------------------------------------------------- %
-%                     Analysis to perform                   %
-% --------------------------------------------------------- %
-SVM_Ori(1) = struct('name', 'A Ipsi VS Contra', 'class', [1 2], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-SVM_Ori(end+1) = struct('name', 'V Ipsi VS Contra', 'class', [3 4], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-SVM_Ori(end+1) = struct('name', 'T Ipsi VS Contra', 'class', [5 6], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-
-SVM_Ori(end+1) = struct('name', 'A VS V Ipsi', 'class', [1 3], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-SVM_Ori(end+1) = struct('name', 'A VS T Ipsi', 'class', [1 5], ...
-    'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 1);
-SVM_Ori(end+1) = struct('name', 'V VS T Ipsi', 'class', [3 5], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-
-SVM_Ori(end+1) = struct('name', 'A VS V Contra', 'class', [2 4], ...
-    'ROI_2_analyse', 1, 'Featpool', 1);
-SVM_Ori(end+1) = struct('name', 'A VS T Contra', 'class', [2 6], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-SVM_Ori(end+1) = struct('name', 'V VS T Contra', 'class', [4 6], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 1);
-
-SVM_Ori(end+1) = struct('name', 'A_L VS A_R', 'class', [1 2], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-SVM_Ori(end+1) = struct('name', 'V_L VS V_R', 'class', [3 4], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-SVM_Ori(end+1) = struct('name', 'T_L VS T_R', 'class', [5 6], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-
-SVM_Ori(end+1) = struct('name', 'A_L VS V_L', 'class', [1 3], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-SVM_Ori(end+1) = struct('name', 'A_L VS T_L', 'class', [1 5], ...
-    'ROI_2_analyse',1:numel(ROIs_ori), 'Featpool', 0);
-SVM_Ori(end+1) = struct('name', 'V_L VS T_L', 'class', [3 5], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-
-SVM_Ori(end+1) = struct('name', 'A_R VS V_R', 'class', [2 4], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-SVM_Ori(end+1) = struct('name', 'A_R VS T_R', 'class', [2 6], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-SVM_Ori(end+1) = struct('name', 'V_R VS T_R', 'class', [4 6], ...
-    'ROI_2_analyse', 1:numel(ROIs_ori), 'Featpool', 0);
-
-
+SVM_Ori = get_mvpa_classification(ROIs_ori);
+SVM_Ori(10:end) = [];
 
 % -------------------------%
 %          START           %
 % -------------------------%
 [KillGcpOnExit] = OpenParWorkersPool(NbWorkers);
 
-for iToPlot = 1:4
+for iToPlot = 1:2
     
     opt.toplot = ToPlot{iToPlot};
     
-    for iSub = [1:4 6:NbSub]
+    for iSub = 5 %[1:4 6:NbSub]
         
         % --------------------------------------------------------- %
         %                        Subject data                       %

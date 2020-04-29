@@ -58,4 +58,11 @@ Class(end).cond = {'VStimL' 'VStimR'};
 Class(15) = struct('name', 'T Stim', 'cond', cell(1), 'nbetas', 2);
 Class(end).cond = {'TStimL' 'TStimR'};
 
+
+fprintf('\n\n')
+for iClass = 1:numel(Class)
+    fprintf('Class %02.0f : %s\n', iClass, Class(iClass).name)
+end
+fprintf('\n\n')
+
 end

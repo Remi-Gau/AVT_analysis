@@ -39,7 +39,7 @@ Cdt_ROI_rhs = [2 1 4 3 6 5];
 
 
 Class = get_mvpa_class();
-
+Class(7:end) = [];
 
 % ROIs_ori = {
 %     'A1',...
