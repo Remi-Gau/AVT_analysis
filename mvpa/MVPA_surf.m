@@ -70,7 +70,7 @@ for iToPlot = 1:2
     
     opt.toplot = ToPlot{iToPlot};
     
-    for iSub = 5 %[1:4 6:NbSub]
+    for iSub = 1:NbSub 
         
         % --------------------------------------------------------- %
         %                        Subject data                       %
@@ -104,16 +104,9 @@ for iToPlot = 1:2
         end
         clear PCM_data
         
-        
         %% process partition and condition vector
-        if iSub==5
-            % remove session 17 for sub-06
-            RowsToRemove = all(partitionVec==17,2);
-            partitionVec(partitionVec>17) = partitionVec(partitionVec>17) - 1;
-        else
-            RowsToRemove = zeros(size(partitionVec));
-        end
-        
+        RowsToRemove = zeros(size(partitionVec));
+
         RowsToRemove(conditionVec>6) = 1;
  
         
@@ -161,9 +154,16 @@ for iToPlot = 1:2
             end
             
         end
+
+        if iSub==5
+            % remove session 17 for sub-06
+            RowsToRemove(:,end+1) = all(partitionVec==17,2);
+        end
         
         % take note of any row that needs to be removed across all ROIs
         RowsToRemove = any(RowsToRemove,2);
+        SessToRemove = unique(partitionVec(RowsToRemove));
+        RowsToRemove = ismember(partitionVec, SessToRemove);
         
         % remove those rows from all ROIs
         for iROI = 1:numel(ROIs_ori) 
@@ -178,6 +178,10 @@ for iToPlot = 1:2
         
         partitionVec(RowsToRemove) = [];
         conditionVec(RowsToRemove) = [];
+        
+        if iSub==5
+            partitionVec(partitionVec>17) = partitionVec(partitionVec>17) - 1;
+        end
         
         CV_Mat_Orig = [conditionVec partitionVec];
         
@@ -308,7 +312,7 @@ for iToPlot = 1:2
                         RunPerSes = RunPerSes(Idx).RunsPerSes;
                         
                         if iSub==5
-                            RunPerSes(end) = RunPerSes(end)-1;
+                            RunPerSes(end) = RunPerSes(end)-2;
                         end
 
                         % Test sets for the different CVs
@@ -394,7 +398,7 @@ for iToPlot = 1:2
                                 NbCV = size(TestSessList{iSubSampSess,1}, 1);
                                 
                                 fprintf(1,'    [%s]\n    [ ',repmat('.',1,NbCV));
-                                parfor iCV=1:NbCV
+                                for iCV=1:NbCV
                                     fprintf(1,'.');
                                     
                                     TestSess = []; %#ok<NASGU>
