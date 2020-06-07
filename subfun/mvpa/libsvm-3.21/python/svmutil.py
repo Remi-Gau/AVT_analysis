@@ -128,11 +128,8 @@ def svm_train(arg1, arg2=None, arg3=None):
 		prob = svm_problem(y, x, isKernel=(param.kernel_type == PRECOMPUTED))
 	elif isinstance(arg1, svm_problem):
 		prob = arg1
-		if isinstance(arg2, svm_parameter):
-			param = arg2
-		else:
-			param = svm_parameter(arg2)
-	if prob == None or param == None:
+		param = arg2 if isinstance(arg2, svm_parameter) else svm_parameter(arg2)
+	if prob is None or param is None:
 		raise TypeError("Wrong types for the arguments")
 
 	if param.kernel_type == PRECOMPUTED:
