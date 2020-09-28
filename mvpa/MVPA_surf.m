@@ -54,9 +54,7 @@ ToPlot={'Cst','Lin','Avg','ROI'};
 
 [opt, file2load_suffix] = get_mvpa_options();
 
-opt
-
-% Class = get_mvpa_class();
+Class = get_mvpa_class();
 
 SVM_Ori = get_mvpa_classification(ROIs_ori);
 SVM_Ori(10:end) = [];

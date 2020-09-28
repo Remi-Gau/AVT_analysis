@@ -22,14 +22,13 @@ CondNames = {...
     'TTargL','TTargR';...
     };
 
-
 Class = get_mvpa_class();
 
 
 % --------------------------------------------------------- %
 %                            ROIs                           %
 % --------------------------------------------------------- %
-Mask_Ori.ROI(1) = struct('name', 'TE_L', 'fname', 'rwTe_L_Cyt.nii');
+Mask_Ori.ROI(1) =     struct('name', 'TE_L', 'fname', 'rwTe_L_Cyt.nii');
 Mask_Ori.ROI(end+1) = struct('name', 'PT_L', 'fname', 'rwA41-42_L.nii');
 Mask_Ori.ROI(end+1) = struct('name', 'pSTG_L', 'fname', 'rwpSTG_L.nii');
 

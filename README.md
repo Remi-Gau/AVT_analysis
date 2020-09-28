@@ -122,6 +122,10 @@ The layers level-sets were computed for the whole brain but they are mapped on t
 `code/roi`
 1. `Extract_vert_of_interest_ROI.m` : get the vertices of interest for each ROI (reads them from the surface binary mask).
 
+in the cbs folder to extract beta values mapped on surfaces
+
+
+### BOLD profiles
 `code/bold_profiles/FeatPool/surf`
 1. `bold_profiles_surf_pool_hs.m` : compute the bold profiles and does the laminar GLM for each ROI, condition, contrast. Saves the values and the betas of the laminar GLM for each subject. Feature pooling from each hemisphere is done there.
 2. `bold_profiles_surf_pool_hs_grp_avg.m` : compile results from all subjects and does the group averaging
@@ -129,7 +133,8 @@ The layers level-sets were computed for the whole brain but they are mapped on t
 `code/figures/FeatPool/BOLD/surf/``
 1. `All_ROIs_profile_surf_pool_hs_plot.m` : plots the results of all ROIs. Calls sub-function for plotting and to do the permutation test.
 
-`code/mvpa/FeatPool/surf` (moved on the `before-remove-MVPA` branch of the repository)
+### MVPA
+`code/mvpa/FeatPool/surf`
 1. `MVPA_surf_pool_hs.m` : Runs the MVPA analysis at the laminar level and whole ROI level. Does it for all the classifications and ROIs. Calls to sub-function in code/subfun/mvpa. Adapted from Agoston scripts. Many options for permutation, feature and image scaling, learning curves, feature selection, grid-search... Feature pooling from each hemipshere is done there. Saves one mat file  / subject / classification / ROI the accuracies for all cross-validation for the whole ROI and each layer.
 2. `MVPA_surf_pool_hs_grp_avg.m` : averages accuracies across subjects and does the laminar GLM over them.
 
