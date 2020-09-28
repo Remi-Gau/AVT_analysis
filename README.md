@@ -38,7 +38,7 @@ Many extra matlab functions from github and the mathwork file exchange are neede
 
 ### Installing dependencies
 
-You can use the [matlab package maanger](https://github.com/mobeets/mpm) to download all the "small" dependencies in some sort of environment with a command like:
+You can use the [matlab package manager](https://github.com/mobeets/mpm) to download all the "small" dependencies in some sort of environment with a command like:
 
 ```matlab
 mpm install -i /home/remi/github/AVT_analysis/dependencies.txt -c AVT
