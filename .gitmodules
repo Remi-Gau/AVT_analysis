@@ -1,3 +1,21 @@
-[submodule "subfun/spmup"]
-	path = subfun/spmup
-	url = https://github.com/Remi-Gau/spmup
+[submodule "lib/spmup"]
+	path = lib/spmup
+	url = https://github.com/CPernet/spmup.git
+[submodule "lib/shadedErrorBar"]
+	path = lib/shadedErrorBar
+	url = https://github.com/raacampbell/shadedErrorBar.git
+[submodule "lib/matlab_for_cbs_tools"]
+	path = lib/matlab_for_cbs_tools
+	url = https://github.com/Remi-Gau/matlab_for_cbs_tools.git
+[submodule "lib/brain_colours"]
+	path = lib/brain_colours
+	url = https://github.com/CPernet/brain_colours.git
+[submodule "lib/rsatoolbox"]
+	path = lib/rsatoolbox
+	url = https://github.com/rsagroup/rsatoolbox.git
+[submodule "lib/pcm_toolbox"]
+	path = lib/pcm_toolbox
+	url = https://github.com/jdiedrichsen/pcm_toolbox.git
+[submodule "lib/CPP_BIDS_SPM_pipeline"]
+	path = lib/CPP_BIDS_SPM_pipeline
+	url = https://github.com/cpp-lln-lab/CPP_BIDS_SPM_pipeline.git
