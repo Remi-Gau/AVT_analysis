@@ -54,6 +54,7 @@ function [opt, file2load_suffix] = get_mvpa_options()
     % Maximum numbers of CVs
     opt.session.maxcv = 25;
 
+    % Multivariate noise normalization
     if opt.MVNN
         file2load_suffix = 'MVNN';
     else
