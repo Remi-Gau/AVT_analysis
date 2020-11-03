@@ -67,39 +67,39 @@ iSubPlot = 1;
 
 for iToPlot = 1:size(ToPLot, 1)
 
-    for iROI = 1:numel(ToPLot{iToPlot, 1})
+  for iROI = 1:numel(ToPLot{iToPlot, 1})
 
-        Idx = find(strcmp({AllSubjects_Data.name}', ToPLot{iToPlot, 1}{iROI}));
+    Idx = find(strcmp({AllSubjects_Data.name}', ToPLot{iToPlot, 1}{iROI}));
 
-        subplot(size(ToPLot, 1), 2, iSubPlot);
-        hold on;
-        errorbar(iROI, AllSubjects_Data(Idx).size.MEAN(1, 1), AllSubjects_Data(Idx).size.STD(1, 1), '.k');
-        for iSubj = 1:NbSub
-            plot((iROI - 1) * 1 + Scatter(iSubj), AllSubjects_Data(Idx).size.data(iSubj, 1), 'marker', '.', 'markersize', 30, ....
-                 'color', COLOR_Subject(iSubj, :));
-        end
-        XtickLabel1{iROI} = strrep(AllSubjects_Data(Idx).name, '_', ' ');
-        set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel1);
-        axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 160000]);
-
-        Idx2 = find(strcmp({AllSubjects_Data.name}', strrep(AllSubjects_Data(Idx).name, 'L', 'R')));
-
-        subplot(size(ToPLot, 1), 2, iSubPlot + 1);
-        hold on;
-        errorbar(iROI, AllSubjects_Data(Idx2).size.MEAN(1, 1), AllSubjects_Data(Idx2).size.STD(1, 1), '.k');
-        for iSubj = 1:NbSub
-            plot((iROI - 1) * 1 + Scatter(iSubj), AllSubjects_Data(Idx2).size.data(iSubj, 1), 'marker', '.', 'markersize', 30, ....
-                 'color', COLOR_Subject(iSubj, :));
-        end
-        XtickLabel2{iROI} = strrep(AllSubjects_Data(Idx2).name, '_', ' ');
-        set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel2);
-        axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 160000]);
-
+    subplot(size(ToPLot, 1), 2, iSubPlot);
+    hold on;
+    errorbar(iROI, AllSubjects_Data(Idx).size.MEAN(1, 1), AllSubjects_Data(Idx).size.STD(1, 1), '.k');
+    for iSubj = 1:NbSub
+      plot((iROI - 1) * 1 + Scatter(iSubj), AllSubjects_Data(Idx).size.data(iSubj, 1), 'marker', '.', 'markersize', 30, ....
+           'color', COLOR_Subject(iSubj, :));
     end
+    XtickLabel1{iROI} = strrep(AllSubjects_Data(Idx).name, '_', ' ');
+    set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel1);
+    axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 160000]);
 
-    clear XtickLabel1 XtickLabel2;
+    Idx2 = find(strcmp({AllSubjects_Data.name}', strrep(AllSubjects_Data(Idx).name, 'L', 'R')));
 
-    iSubPlot = iSubPlot + 2;
+    subplot(size(ToPLot, 1), 2, iSubPlot + 1);
+    hold on;
+    errorbar(iROI, AllSubjects_Data(Idx2).size.MEAN(1, 1), AllSubjects_Data(Idx2).size.STD(1, 1), '.k');
+    for iSubj = 1:NbSub
+      plot((iROI - 1) * 1 + Scatter(iSubj), AllSubjects_Data(Idx2).size.data(iSubj, 1), 'marker', '.', 'markersize', 30, ....
+           'color', COLOR_Subject(iSubj, :));
+    end
+    XtickLabel2{iROI} = strrep(AllSubjects_Data(Idx2).name, '_', ' ');
+    set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel2);
+    axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 160000]);
+
+  end
+
+  clear XtickLabel1 XtickLabel2;
+
+  iSubPlot = iSubPlot + 2;
 
 end
 
@@ -128,43 +128,43 @@ iSubPlot = 1;
 
 for iToPlot = 1:size(ToPLot, 1)
 
-    for iROI = 1:numel(ToPLot{iToPlot, 1})
+  for iROI = 1:numel(ToPLot{iToPlot, 1})
 
-        Idx = find(strcmp({AllSubjects_Data.name}', ToPLot{iToPlot, 1}{iROI}));
+    Idx = find(strcmp({AllSubjects_Data.name}', ToPLot{iToPlot, 1}{iROI}));
 
-        subplot(size(ToPLot, 1), 2, iSubPlot);
-        hold on;
-        errorbar(iROI, ...
-                 mean(AllSubjects_Data(Idx).size.data(:, 1) ./ AllSubjects_Data(Idx).size.data(:, 2)), ...
-                 std(AllSubjects_Data(Idx).size.data(:, 1) ./ AllSubjects_Data(Idx).size.data(:, 2)), '.k');
-        for iSubj = 1:NbSub
-            plot((iROI - 1) * 1 + Scatter(iSubj), AllSubjects_Data(Idx).size.data(iSubj, 1) / AllSubjects_Data(Idx).size.data(iSubj, 2), 'marker', '.', 'markersize', 30, ....
-                 'color', COLOR_Subject(iSubj, :));
-        end
-        XtickLabel1{iROI} = strrep(AllSubjects_Data(Idx).name, '_', ' ');
-        set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel1);
-        axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 1]);
-
-        Idx2 = find(strcmp({AllSubjects_Data.name}', strrep(AllSubjects_Data(Idx).name, 'L', 'R')));
-
-        subplot(size(ToPLot, 1), 2, iSubPlot + 1);
-        hold on;
-        errorbar(iROI, ...
-                 mean(AllSubjects_Data(Idx2).size.data(:, 1) ./ AllSubjects_Data(Idx2).size.data(:, 2)), ...
-                 std(AllSubjects_Data(Idx2).size.data(:, 1) ./ AllSubjects_Data(Idx2).size.data(:, 2)), '.k');
-        for iSubj = 1:NbSub
-            plot((iROI - 1) * 1 + Scatter(iSubj), AllSubjects_Data(Idx2).size.data(iSubj, 1) / AllSubjects_Data(Idx2).size.data(iSubj, 2), 'marker', '.', 'markersize', 30, ....
-                 'color', COLOR_Subject(iSubj, :));
-        end
-        XtickLabel2{iROI} = strrep(AllSubjects_Data(Idx2).name, '_', ' ');
-        set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel2);
-        axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 1]);
-
+    subplot(size(ToPLot, 1), 2, iSubPlot);
+    hold on;
+    errorbar(iROI, ...
+             mean(AllSubjects_Data(Idx).size.data(:, 1) ./ AllSubjects_Data(Idx).size.data(:, 2)), ...
+             std(AllSubjects_Data(Idx).size.data(:, 1) ./ AllSubjects_Data(Idx).size.data(:, 2)), '.k');
+    for iSubj = 1:NbSub
+      plot((iROI - 1) * 1 + Scatter(iSubj), AllSubjects_Data(Idx).size.data(iSubj, 1) / AllSubjects_Data(Idx).size.data(iSubj, 2), 'marker', '.', 'markersize', 30, ....
+           'color', COLOR_Subject(iSubj, :));
     end
+    XtickLabel1{iROI} = strrep(AllSubjects_Data(Idx).name, '_', ' ');
+    set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel1);
+    axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 1]);
 
-    clear XtickLabel1 XtickLabel2;
+    Idx2 = find(strcmp({AllSubjects_Data.name}', strrep(AllSubjects_Data(Idx).name, 'L', 'R')));
 
-    iSubPlot = iSubPlot + 2;
+    subplot(size(ToPLot, 1), 2, iSubPlot + 1);
+    hold on;
+    errorbar(iROI, ...
+             mean(AllSubjects_Data(Idx2).size.data(:, 1) ./ AllSubjects_Data(Idx2).size.data(:, 2)), ...
+             std(AllSubjects_Data(Idx2).size.data(:, 1) ./ AllSubjects_Data(Idx2).size.data(:, 2)), '.k');
+    for iSubj = 1:NbSub
+      plot((iROI - 1) * 1 + Scatter(iSubj), AllSubjects_Data(Idx2).size.data(iSubj, 1) / AllSubjects_Data(Idx2).size.data(iSubj, 2), 'marker', '.', 'markersize', 30, ....
+           'color', COLOR_Subject(iSubj, :));
+    end
+    XtickLabel2{iROI} = strrep(AllSubjects_Data(Idx2).name, '_', ' ');
+    set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel2);
+    axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 1]);
+
+  end
+
+  clear XtickLabel1 XtickLabel2;
+
+  iSubPlot = iSubPlot + 2;
 
 end
 

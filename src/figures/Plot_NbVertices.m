@@ -17,86 +17,86 @@ load(fullfile(StartDir, 'results', 'roi', 'MinNbVert.mat'), 'MinVert');
 
 for iSub = 1:NbSub
 
-    fprintf('\n\n\n');
+  fprintf('\n\n\n');
 
-    fprintf('Processing %s\n', SubLs(iSub).name);
+  fprintf('Processing %s\n', SubLs(iSub).name);
 
-    Sub_dir = fullfile(StartDir, SubLs(iSub).name);
-    Data_dir = fullfile(Sub_dir, 'ffx_nat', 'betas', '6_surf');
+  Sub_dir = fullfile(StartDir, SubLs(iSub).name);
+  Data_dir = fullfile(Sub_dir, 'ffx_nat', 'betas', '6_surf');
 
-    % Load Vertices of interest for each ROI;
-    load(fullfile(Sub_dir, 'roi', 'surf', [SubLs(iSub).name  '_ROI_VertOfInt.mat']), 'ROI', 'NbVertex');
+  % Load Vertices of interest for each ROI;
+  load(fullfile(Sub_dir, 'roi', 'surf', [SubLs(iSub).name  '_ROI_VertOfInt.mat']), 'ROI', 'NbVertex');
 
-    %% For the 2 hemispheres
-    NbVertices = nan(1, 2);
-    for hs = 1:2
+  %% For the 2 hemispheres
+  NbVertices = nan(1, 2);
+  for hs = 1:2
 
-        if hs == 1
-            fprintf('\n Left hemipshere\n');
-            HsSufix = 'l';
-        else
-            fprintf('\n Right hemipshere\n');
-            HsSufix = 'r';
-        end
-
-        FeatureSaveFile = fullfile(Data_dir, [SubLs(iSub).name  '_features_' HsSufix 'hs_' ...
-                                              num2str(NbLayers) '_surf.mat']);
-
-        InfSurfFile = spm_select('FPList', fullfile(Sub_dir, 'anat', 'cbs'), ...
-                                 ['^' SubLs(iSub).name '.*' HsSufix 'cr_gm_avg.vtk$']);
-        [vertex, faces, ~] = read_vtk(InfSurfFile, 0, 1);
-
-        NbVertices(hs) = size(vertex, 2);
-
-        % Load data or extract them
-        fprintf('  Reading VTKs\n');
-        if exist(FeatureSaveFile, 'file')
-            load(FeatureSaveFile, 'VertexWithData', 'AllMapping');
-            VertexWithDataHS{hs} = VertexWithData;
-            MappingBothHS{hs} = AllMapping;
-        else
-            error('The features have not been extracted from the VTK files.');
-        end
-
+    if hs == 1
+      fprintf('\n Left hemipshere\n');
+      HsSufix = 'l';
+    else
+      fprintf('\n Right hemipshere\n');
+      HsSufix = 'r';
     end
 
-    cd(StartDir);
+    FeatureSaveFile = fullfile(Data_dir, [SubLs(iSub).name  '_features_' HsSufix 'hs_' ...
+                                          num2str(NbLayers) '_surf.mat']);
 
-    if any(NbVertex ~= NbVertices)
-        NbVertex;
-        NbVertices; %#ok<*NOPTS>
-        error('The number of vertices does not match.');
+    InfSurfFile = spm_select('FPList', fullfile(Sub_dir, 'anat', 'cbs'), ...
+                             ['^' SubLs(iSub).name '.*' HsSufix 'cr_gm_avg.vtk$']);
+    [vertex, faces, ~] = read_vtk(InfSurfFile, 0, 1);
+
+    NbVertices(hs) = size(vertex, 2);
+
+    % Load data or extract them
+    fprintf('  Reading VTKs\n');
+    if exist(FeatureSaveFile, 'file')
+      load(FeatureSaveFile, 'VertexWithData', 'AllMapping');
+      VertexWithDataHS{hs} = VertexWithData;
+      MappingBothHS{hs} = AllMapping;
+    else
+      error('The features have not been extracted from the VTK files.');
     end
 
-    Features_lh = nan(NbVertex(1), NbLayers, size(MappingBothHS{1}, 3));
-    Features_lh(VertexWithDataHS{1}, :, :) = MappingBothHS{1};
+  end
 
-    Features_rh = nan(NbVertex(2), NbLayers, size(MappingBothHS{2}, 3));
-    Features_rh(VertexWithDataHS{2}, :, :) = MappingBothHS{2};
+  cd(StartDir);
 
-    %%
-    fprintf(' Averaging for ROI:\n');
+  if any(NbVertex ~= NbVertices)
+    NbVertex;
+    NbVertices; %#ok<*NOPTS>
+    error('The number of vertices does not match.');
+  end
 
-    for iROI = 1:numel(ROI)
+  Features_lh = nan(NbVertex(1), NbLayers, size(MappingBothHS{1}, 3));
+  Features_lh(VertexWithDataHS{1}, :, :) = MappingBothHS{1};
 
-        clear Data_ROI;
+  Features_rh = nan(NbVertex(2), NbLayers, size(MappingBothHS{2}, 3));
+  Features_rh(VertexWithDataHS{2}, :, :) = MappingBothHS{2};
 
-        Data_ROI.name = ROI(iROI).name;
+  %%
+  fprintf(' Averaging for ROI:\n');
 
-        fprintf(['  '  Data_ROI.name '\n']);
+  for iROI = 1:numel(ROI)
 
-        FeaturesL = Features_lh(ROI(iROI).VertOfInt{1}, :, :);
-        FeaturesR = Features_rh(ROI(iROI).VertOfInt{2}, :, :);
+    clear Data_ROI;
 
-        NbVert.All(iSub, 1:2, iROI) = [size(FeaturesL, 1) size(FeaturesR, 1)];
+    Data_ROI.name = ROI(iROI).name;
 
-        NbVert.AnyNan(iSub, 1:2, iROI) = [sum(any(any(isnan(FeaturesL), 3), 2)) sum(any(any(isnan(FeaturesR), 3), 2))];
-        NbVert.AnyZero(iSub, 1:2, iROI) = [sum(any(any(FeaturesL == 0, 3), 2)) sum(any(any(FeaturesR == 0, 3), 2))];
+    fprintf(['  '  Data_ROI.name '\n']);
 
-        NbVert.AllNan(iSub, 1:2, iROI) = [sum(all(any(isnan(FeaturesL), 3), 2)) sum(all(any(isnan(FeaturesR), 3), 2))];
-        NbVert.AllZero(iSub, 1:2, iROI) = [sum(all(any(FeaturesL == 0, 3), 2)) sum(all(any(FeaturesR == 0, 3), 2))];
+    FeaturesL = Features_lh(ROI(iROI).VertOfInt{1}, :, :);
+    FeaturesR = Features_rh(ROI(iROI).VertOfInt{2}, :, :);
 
-    end
+    NbVert.All(iSub, 1:2, iROI) = [size(FeaturesL, 1) size(FeaturesR, 1)];
+
+    NbVert.AnyNan(iSub, 1:2, iROI) = [sum(any(any(isnan(FeaturesL), 3), 2)) sum(any(any(isnan(FeaturesR), 3), 2))];
+    NbVert.AnyZero(iSub, 1:2, iROI) = [sum(any(any(FeaturesL == 0, 3), 2)) sum(any(any(FeaturesR == 0, 3), 2))];
+
+    NbVert.AllNan(iSub, 1:2, iROI) = [sum(all(any(isnan(FeaturesL), 3), 2)) sum(all(any(isnan(FeaturesR), 3), 2))];
+    NbVert.AllZero(iSub, 1:2, iROI) = [sum(all(any(FeaturesL == 0, 3), 2)) sum(all(any(FeaturesR == 0, 3), 2))];
+
+  end
 
 end
 
@@ -152,36 +152,36 @@ iSubPlot = 1;
 
 for iToPlot = 1:size(ToPLot, 1)
 
-    for iROI = 1:numel(ToPLot{iToPlot, 1})
+  for iROI = 1:numel(ToPLot{iToPlot, 1})
 
-        Idx = find(strcmp({ROI.name}', ToPLot{iToPlot, 1}{iROI}));
+    Idx = find(strcmp({ROI.name}', ToPLot{iToPlot, 1}{iROI}));
 
-        subplot(size(ToPLot, 1), 2, iSubPlot);
-        hold on;
-        errorbar(iROI, mean(NbVert.All(:, 1, Idx)), std(NbVert.All(:, 1, Idx)), '.k');
-        for iSubj = 1:NbSub
-            plot((iROI - 1) * 1 + Scatter(iSubj), NbVert.All(iSubj, 1, Idx), 'marker', '.', 'markersize', 30, ....
-                 'color', COLOR_Subject(iSubj, :));
-        end
-        XtickLabel1{iROI} = ROI(Idx).name;
-        set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel1);
-        axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 25000]);
-
-        subplot(size(ToPLot, 1), 2, iSubPlot + 1);
-        hold on;
-        errorbar(iROI, mean(NbVert.All(:, 2, Idx)), std(NbVert.All(:, 2, Idx)), '.k');
-        for iSubj = 1:NbSub
-            plot((iROI - 1) * 1 + Scatter(iSubj), NbVert.All(iSubj, 2, Idx), 'marker', '.', 'markersize', 30, ....
-                 'color', COLOR_Subject(iSubj, :));
-        end
-        set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel1);
-        axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 25000]);
-
+    subplot(size(ToPLot, 1), 2, iSubPlot);
+    hold on;
+    errorbar(iROI, mean(NbVert.All(:, 1, Idx)), std(NbVert.All(:, 1, Idx)), '.k');
+    for iSubj = 1:NbSub
+      plot((iROI - 1) * 1 + Scatter(iSubj), NbVert.All(iSubj, 1, Idx), 'marker', '.', 'markersize', 30, ....
+           'color', COLOR_Subject(iSubj, :));
     end
+    XtickLabel1{iROI} = ROI(Idx).name;
+    set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel1);
+    axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 25000]);
 
-    clear XtickLabel1 XtickLabel2;
+    subplot(size(ToPLot, 1), 2, iSubPlot + 1);
+    hold on;
+    errorbar(iROI, mean(NbVert.All(:, 2, Idx)), std(NbVert.All(:, 2, Idx)), '.k');
+    for iSubj = 1:NbSub
+      plot((iROI - 1) * 1 + Scatter(iSubj), NbVert.All(iSubj, 2, Idx), 'marker', '.', 'markersize', 30, ....
+           'color', COLOR_Subject(iSubj, :));
+    end
+    set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel1);
+    axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 25000]);
 
-    iSubPlot = iSubPlot + 2;
+  end
+
+  clear XtickLabel1 XtickLabel2;
+
+  iSubPlot = iSubPlot + 2;
 
 end
 
@@ -212,36 +212,36 @@ Coverage = 1 - NbVert.AnyNan ./ NbVert.All;
 
 for iToPlot = 1:size(ToPLot, 1)
 
-    for iROI = 1:numel(ToPLot{iToPlot, 1})
+  for iROI = 1:numel(ToPLot{iToPlot, 1})
 
-        Idx = find(strcmp({ROI.name}', ToPLot{iToPlot, 1}{iROI}));
+    Idx = find(strcmp({ROI.name}', ToPLot{iToPlot, 1}{iROI}));
 
-        subplot(size(ToPLot, 1), 2, iSubPlot);
-        hold on;
-        errorbar(iROI, mean(Coverage(:, 1, Idx)), std(Coverage(:, 1, Idx)), '.k');
-        for iSubj = 1:NbSub
-            plot((iROI - 1) * 1 + Scatter(iSubj), Coverage(iSubj, 1, Idx), 'marker', '.', 'markersize', 30, ....
-                 'color', COLOR_Subject(iSubj, :));
-        end
-        XtickLabel1{iROI} = ROI(Idx).name;
-        set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel1);
-        axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 1]);
-
-        subplot(size(ToPLot, 1), 2, iSubPlot + 1);
-        hold on;
-        errorbar(iROI, mean(Coverage(:, 2, Idx)), std(Coverage(:, 2, Idx)), '.k');
-        for iSubj = 1:NbSub
-            plot((iROI - 1) * 1 + Scatter(iSubj), Coverage(iSubj, 2, Idx), 'marker', '.', 'markersize', 30, ....
-                 'color', COLOR_Subject(iSubj, :));
-        end
-        set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel1);
-        axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 1]);
-
+    subplot(size(ToPLot, 1), 2, iSubPlot);
+    hold on;
+    errorbar(iROI, mean(Coverage(:, 1, Idx)), std(Coverage(:, 1, Idx)), '.k');
+    for iSubj = 1:NbSub
+      plot((iROI - 1) * 1 + Scatter(iSubj), Coverage(iSubj, 1, Idx), 'marker', '.', 'markersize', 30, ....
+           'color', COLOR_Subject(iSubj, :));
     end
+    XtickLabel1{iROI} = ROI(Idx).name;
+    set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel1);
+    axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 1]);
 
-    clear XtickLabel1 XtickLabel2;
+    subplot(size(ToPLot, 1), 2, iSubPlot + 1);
+    hold on;
+    errorbar(iROI, mean(Coverage(:, 2, Idx)), std(Coverage(:, 2, Idx)), '.k');
+    for iSubj = 1:NbSub
+      plot((iROI - 1) * 1 + Scatter(iSubj), Coverage(iSubj, 2, Idx), 'marker', '.', 'markersize', 30, ....
+           'color', COLOR_Subject(iSubj, :));
+    end
+    set(gca, 'ygrid', 'on', 'xtick', 1:numel(ToPLot{iToPlot, 1}), 'xticklabel', XtickLabel1);
+    axis([0.9 numel(ToPLot{iToPlot, 1}) + .6 0 1]);
 
-    iSubPlot = iSubPlot + 2;
+  end
+
+  clear XtickLabel1 XtickLabel2;
+
+  iSubPlot = iSubPlot + 2;
 
 end
 
@@ -264,35 +264,35 @@ Coverage = 1 - sum(NbVert.AnyNan, 2) ./ sum(NbVert.All, 2);
 fid = fopen (SavedTxt, 'w');
 
 for i = 1:length(Legends1)
-    fprintf (fid, '%s,', Legends1{i});
+  fprintf (fid, '%s,', Legends1{i});
 end
 fprintf (fid, '\nROI,');
 
 for j = 1:2
-    for i = 1:length(Legends2)
-        fprintf (fid, '%s,', Legends2{i});
-    end
+  for i = 1:length(Legends2)
+    fprintf (fid, '%s,', Legends2{i});
+  end
 end
 fprintf (fid, '\n');
 
 for iROI = 1:numel(ROI)
-    Idx = iROI; % find(strcmp({ROI.name}',ToPLot{iToPlot,1}{iROI}));
+  Idx = iROI; % find(strcmp({ROI.name}',ToPLot{iToPlot,1}{iROI}));
 
-    fprintf (fid, '%s,', ROI(Idx).name);
+  fprintf (fid, '%s,', ROI(Idx).name);
 
-    fprintf (fid, '%f,', mean(sum(NbVert.All(:, :, Idx), 2)) / 1000);
-    fprintf (fid, '%f,', std(sum(NbVert.All(:, :, Idx), 2)) / 1000);
-    fprintf (fid, '(,%f,', min(sum(NbVert.All(:, :, Idx), 2)) / 1000);
-    fprintf (fid, '-,%f,),', max(sum(NbVert.All(:, :, Idx), 2)) / 1000);
+  fprintf (fid, '%f,', mean(sum(NbVert.All(:, :, Idx), 2)) / 1000);
+  fprintf (fid, '%f,', std(sum(NbVert.All(:, :, Idx), 2)) / 1000);
+  fprintf (fid, '(,%f,', min(sum(NbVert.All(:, :, Idx), 2)) / 1000);
+  fprintf (fid, '-,%f,),', max(sum(NbVert.All(:, :, Idx), 2)) / 1000);
 
-    fprintf (fid, ',');
+  fprintf (fid, ',');
 
-    fprintf (fid, '%f,', mean(sum(Coverage(:, :, Idx), 2)));
-    fprintf (fid, '%f,', std(sum(Coverage(:, :, Idx), 2)));
-    fprintf (fid, '(,%f,', min(sum(Coverage(:, :, Idx), 2)));
-    fprintf (fid, '-,%f,),', max(sum(Coverage(:, :, Idx), 2)));
+  fprintf (fid, '%f,', mean(sum(Coverage(:, :, Idx), 2)));
+  fprintf (fid, '%f,', std(sum(Coverage(:, :, Idx), 2)));
+  fprintf (fid, '(,%f,', min(sum(Coverage(:, :, Idx), 2)));
+  fprintf (fid, '-,%f,),', max(sum(Coverage(:, :, Idx), 2)));
 
-    fprintf (fid, '\n');
+  fprintf (fid, '\n');
 
 end
 

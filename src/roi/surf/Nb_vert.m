@@ -18,25 +18,25 @@ ROIs(end + 1) = struct('name', 'V5', 'NbVertices', []);
 
 for iSub = 1:NbSub
 
-    fprintf('\n\n\n');
+  fprintf('\n\n\n');
 
-    fprintf('Processing %s\n', SubLs(iSub).name);
+  fprintf('Processing %s\n', SubLs(iSub).name);
 
-    Sub_dir = fullfile(StartDir, SubLs(iSub).name);
+  Sub_dir = fullfile(StartDir, SubLs(iSub).name);
 
-    %% Load Vertices of interest for each ROI;
-    load(fullfile(Sub_dir, 'roi', 'surf', [SubLs(iSub).name  '_ROI_VertOfInt.mat']), 'ROI', 'NbVertex');
+  %% Load Vertices of interest for each ROI;
+  load(fullfile(Sub_dir, 'roi', 'surf', [SubLs(iSub).name  '_ROI_VertOfInt.mat']), 'ROI', 'NbVertex');
 
-    for iROI = 1:numel(ROIs)
-        Idx = find(strcmp(ROIs(iROI).name, {ROI.name}'));
-        ROIs(iROI).NbVertices(iSub, 1) = sum(cellfun('length', ROI(Idx).VertOfInt)); %#ok<*SAGROW>
-    end
+  for iROI = 1:numel(ROIs)
+    Idx = find(strcmp(ROIs(iROI).name, {ROI.name}'));
+    ROIs(iROI).NbVertices(iSub, 1) = sum(cellfun('length', ROI(Idx).VertOfInt)); %#ok<*SAGROW>
+  end
 
 end
 
 for iROI = 1:numel(ROIs)
-    ROIs(iROI).MinVert = floor(min(ROIs(iROI).NbVertices) / 100) * 100;
-    MinVert = ROIs;
+  ROIs(iROI).MinVert = floor(min(ROIs(iROI).NbVertices) / 100) * 100;
+  MinVert = ROIs;
 end
 mkdir(fullfile(StartDir, 'results', 'roi'));
 save(fullfile(StartDir, 'results', 'roi', 'MinNbVert.mat'), 'MinVert');

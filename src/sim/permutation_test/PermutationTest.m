@@ -15,40 +15,40 @@ betas = betas';
 % no be necessary if you have "a lot" of subjects then you can just randomly permutate X number of times
 % but with 10 subejcts that's only 1024 permutations.
 for iSub = 1:size(betas, 1)
-    sets{iSub} = [-1 1];
+  sets{iSub} = [-1 1];
 end
 [a, b, c, d, e, f, g, h, i, j] = ndgrid(sets{:});
 ToPermute = [a(:), b(:), c(:), d(:), e(:), f(:), g(:), h(:), i(:), j(:)];
 
 % Compute the null distributions: one for each o
 for iPerm = 1:size(ToPermute, 1)
-    tmp2 = (ToPermute(iPerm, :))';
-    Perms(iPerm, :) = mean(betas .* repmat(tmp2, 1, size(betas, 2), 1)); %#ok<*SAGROW>
+  tmp2 = (ToPermute(iPerm, :))';
+  Perms(iPerm, :) = mean(betas .* repmat(tmp2, 1, size(betas, 2), 1)); %#ok<*SAGROW>
 end
 
 for i = 1:size(betas, 2)
-    if strcmp(Tail, 'left')
-        % check the proportion of permutation results that are inferior to
-        % the mean of my sample
-        P(i) = sum(Perms(:, i) < mean(betas(:, i))) / numel(Perms(:, i));
-    elseif strcmp(Tail, 'right')
-        % same but the other way
-        P(i) = sum(Perms(:, i) > mean(betas(:, i))) / numel(Perms(:, i));
-    elseif strcmp(Tail, 'both')
-        % for the 2 tailed just compare to the distribution of absolute value of the distance
-        % between the result of each permutation to the mean of all
-        % permutation results
+  if strcmp(Tail, 'left')
+    % check the proportion of permutation results that are inferior to
+    % the mean of my sample
+    P(i) = sum(Perms(:, i) < mean(betas(:, i))) / numel(Perms(:, i));
+  elseif strcmp(Tail, 'right')
+    % same but the other way
+    P(i) = sum(Perms(:, i) > mean(betas(:, i))) / numel(Perms(:, i));
+  elseif strcmp(Tail, 'both')
+    % for the 2 tailed just compare to the distribution of absolute value of the distance
+    % between the result of each permutation to the mean of all
+    % permutation results
 
-        % Then you check the proportion of those distances are superior to
-        % the distance between the mean of your sample and the mean of all
-        % permutation results
-        % P(i) = sum( abs((Perms(:,i)-mean(Perms(:,i)))) > abs((mean(betas(:,i))-mean(Perms(:,i)))) ) / numel(Perms(:,i)) ;
+    % Then you check the proportion of those distances are superior to
+    % the distance between the mean of your sample and the mean of all
+    % permutation results
+    % P(i) = sum( abs((Perms(:,i)-mean(Perms(:,i)))) > abs((mean(betas(:,i))-mean(Perms(:,i)))) ) / numel(Perms(:,i)) ;
 
-        % Actually not just take the absolute values: the above assumes
-        % that your null distribution is symmetric
-        P(i) = sum(abs(Perms(:, i)) > abs(mean(betas(:, i))))  / numel(Perms(:, i));
+    % Actually not just take the absolute values: the above assumes
+    % that your null distribution is symmetric
+    P(i) = sum(abs(Perms(:, i)) > abs(mean(betas(:, i))))  / numel(Perms(:, i));
 
-    end
+  end
 end
 P;
 

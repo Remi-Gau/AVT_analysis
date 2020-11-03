@@ -136,8 +136,8 @@ M{17}.Gc         = nearestSPD(zeros(7));
 M{17}.name       = 'null_zero';
 
 for mm = 1:numel(M)
-    %   M{mm}.fitAlgorithm='NR'; % NR or minimize
-    M{mm}.fitAlgorithm = 'minimize'; % NR or minimize
+  %   M{mm}.fitAlgorithm='NR'; % NR or minimize
+  M{mm}.fitAlgorithm = 'minimize'; % NR or minimize
 end
 
 save(['pcm_models.mat'], 'M');

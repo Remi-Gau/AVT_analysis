@@ -74,33 +74,33 @@ MVPAFigDir =  fullfile(StartDir, 'figures', 'SVM');
 
 for iROI = 1:numel(ROIs)
 
-    cd(ProfileFigDir);
-    A = dir([strrep(ROIs{iROI}, '_', '-') '-Conditions_6Layers.pdf']);
-    B = dir([strrep(ROIs{iROI}, '_', '-') '-SensoryModalities_6Layers.pdf']);
-    C = dir([strrep(ROIs{iROI}, '_', '-') '-SideContrast_6Layers.pdf']);
-    D = dir([strrep(ROIs{iROI}, '_', '-') '-SensModContrasts_6Layers.pdf']);
+  cd(ProfileFigDir);
+  A = dir([strrep(ROIs{iROI}, '_', '-') '-Conditions_6Layers.pdf']);
+  B = dir([strrep(ROIs{iROI}, '_', '-') '-SensoryModalities_6Layers.pdf']);
+  C = dir([strrep(ROIs{iROI}, '_', '-') '-SideContrast_6Layers.pdf']);
+  D = dir([strrep(ROIs{iROI}, '_', '-') '-SensModContrasts_6Layers.pdf']);
 
-    %     cd(MVPAFigDir)
-    %     MVPA_Fig = dir([strrep(ROIs{iROI}, '_', '-') '*_6Layers.pdf']);
+  %     cd(MVPAFigDir)
+  %     MVPA_Fig = dir([strrep(ROIs{iROI}, '_', '-') '*_6Layers.pdf']);
 
-    Command = [];
+  Command = [];
 
-    for iFile = 1:numel(A)
-        disp(A(iFile).name);
-        disp(B(iFile).name);
-        disp(C(iFile).name);
-        disp(D(iFile).name);
-        %         disp(MVPA_Fig(iFile).name)
-        Command = [Command ' ' fullfile(ProfileFigDir, A(iFile).name)]; %#ok<*AGROW>
-        Command = [Command ' ' fullfile(ProfileFigDir, B(iFile).name)]; %#ok<*AGROW>
-        Command = [Command ' ' fullfile(ProfileFigDir, C(iFile).name)]; %#ok<*AGROW>
-        Command = [Command ' ' fullfile(ProfileFigDir, D(iFile).name)]; %#ok<*AGROW>
-        %         Command = [Command ' ' fullfile(MVPAFigDir,MVPA_Fig(iFile).name)];
-    end
+  for iFile = 1:numel(A)
+    disp(A(iFile).name);
+    disp(B(iFile).name);
+    disp(C(iFile).name);
+    disp(D(iFile).name);
+    %         disp(MVPA_Fig(iFile).name)
+    Command = [Command ' ' fullfile(ProfileFigDir, A(iFile).name)]; %#ok<*AGROW>
+    Command = [Command ' ' fullfile(ProfileFigDir, B(iFile).name)]; %#ok<*AGROW>
+    Command = [Command ' ' fullfile(ProfileFigDir, C(iFile).name)]; %#ok<*AGROW>
+    Command = [Command ' ' fullfile(ProfileFigDir, D(iFile).name)]; %#ok<*AGROW>
+    %         Command = [Command ' ' fullfile(MVPAFigDir,MVPA_Fig(iFile).name)];
+  end
 
-    system([ ...
-            'gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite ' ...
-            '-sOutputFile=' fullfile(StartDir, 'figures', ...
-                                     [ROIs{iROI} '_BOLD_Layers-6_' date '.pdf']) ' ' Command]);
+  system([ ...
+          'gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite ' ...
+          '-sOutputFile=' fullfile(StartDir, 'figures', ...
+                                   [ROIs{iROI} '_BOLD_Layers-6_' date '.pdf']) ' ' Command]);
 
 end
