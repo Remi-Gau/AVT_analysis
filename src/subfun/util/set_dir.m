@@ -29,7 +29,7 @@ function [Dirs] = set_dir(space)
 
 %     Dirs.BOLD_resultsDir = fullfile(Dirs.DerDir, 'results', 'profiles', 'surf');
     
-    [~, ~, ~] = mkdir(fullfile(Dirs.DerDir, ['libsvm-' space]));
+    [~, ~, ~] = mkdir(fullfile(Dirs.DerDir, ['libsvm-' space], 'group'));
     [~, ~, ~] = mkdir(Dirs.FigureFolder);
     
     Get_dependencies(Dirs);
