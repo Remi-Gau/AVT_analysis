@@ -5,7 +5,7 @@ function All_ROIs_BOLD_MVPA_surf_plot
     clc;
     clear;
 
-    Analysis_to_plot = 1;
+    analysis_to_plot = 1;
 
     % Title of analysis
     TitSuf = {
@@ -29,21 +29,7 @@ function All_ROIs_BOLD_MVPA_surf_plot
     bivariate_subplot = 2;
 
     %%
-    if isunix
-        CodeDir = '/home/remi/github/AVT_analysis';
-        StartDir = '/home/remi';
-    elseif ispc
-        CodeDir = 'D:\github\AVT-7T-code';
-        StartDir = 'D:\';
-    else
-        disp('Platform not supported');
-    end
-
-    addpath(genpath(fullfile(CodeDir, 'subfun')));
-
     [Dirs] = set_dir();
-
-    Get_dependencies();
 
     SubLs = dir(fullfile(Dirs.DerDir, 'sub*'));
     NbSub = numel(SubLs);
@@ -72,10 +58,9 @@ function All_ROIs_BOLD_MVPA_surf_plot
     [opt, ~] = get_mvpa_options();
     opt.vol =  false;
 
+    plot_pvalue = 0;
     if ~plot_main
         plot_pvalue = 1;
-    else
-        plot_pvalue = 0;
     end
 
     % multivariate noise normalisation
@@ -88,61 +73,62 @@ function All_ROIs_BOLD_MVPA_surf_plot
         suffix = 'Wht_Betas';
     end
 
+    space_suffix = 'surf';
     if opt.vol
         Dirs.BOLD_resultsDir = fullfile(StartDir, 'results', 'profiles');
         space_suffix = 'vol';
-    else
-        space_suffix = 'surf';
     end
 
     [opt] = ChooseNorm(Norm, opt);
 
     SaveSufix = CreateSaveSuffix(opt, [], NbLayers, space_suffix);
 
-    % load BOLD and MVPA
-    if IsStim
+    %% load BOLD and MVPA
+    
+    Stim_prefix = 'Stimuli';
 
-        Stim_prefix = 'Stimuli';
-
-        if opt.MVNN
-            if opt.vol
-                load(fullfile(Dirs.BOLD_resultsDir, ...
-                              strcat('ResultsVolWhtBetasPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data');
-            else
-                load(fullfile(Dirs.BOLD_resultsDir, ...
-                              strcat('ResultsSurfPoolQuadGLM', suffix, '_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data');
-            end
+    if opt.MVNN
+        if opt.vol
+            ResultsFile = ['ResultsVolWhtBetasPoolQuadGLM_l-', num2str(NbLayers)];
         else
-            load(fullfile(Dirs.BOLD_resultsDir, ...
-                          strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data');
+            ResultsFile = ['ResultsSurfPoolQuadGLM', suffix, '_l-', num2str(NbLayers)];
         end
-
-        File2Load = fullfile(Dirs.MVPA_resultsDir, ...
-                             strcat('GrpPoolQuadGLM', SaveSufix)); %#ok<*UNRCH>
     else
+        ResultsFile = ['ResultsSurfPoolQuadGLM_l-', num2str(NbLayers)];
+    end
 
+    MvpaFile2Load = 'GrpPoolQuadGLM'; %#ok<*UNRCH>
+    
+    if ~IsStim
         Stim_prefix = 'Target';
 
-        load(fullfile(Dirs.BOLD_resultsDir, ...
-                      strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data'); %#ok<*UNRCH>
+        ResultsFile = ['ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers)]; %#ok<*UNRCH>
 
-        File2Load = fullfile(Dirs.MVPA_resultsDir, ...
-                             strcat('GrpTargetsPoolQuadGLM', SaveSufix)); %#ok<*UNRCH>
+        MvpaFile2Load = 'GrpTargetsPoolQuadGLM'; %#ok<*UNRCH>
 
     end
+
+    load(fullfile( ...
+                  Dirs.BOLD_resultsDir, ...
+                  [ResultsFile '.mat']), ...
+         'AllSubjects_Data');
 
     AllSubjects_Data_BOLD = AllSubjects_Data;
     clear AllSubjects_Data;
 
-    if exist(File2Load, 'file')
-        load(File2Load, 'SVM');
+    MvpaFile2Load = fullfile( ...
+                             Dirs.MVPA_resultsDir, ...
+                             [MvpaFile2Load, SaveSufix]);
+
+    if exist(MvpaFile2Load, 'file')
+        load(MvpaFile2Load, 'SVM');
     else
-        warning('This file %s does not exist', File2Load);
+        error('This file %s does not exist', MvpaFile2Load);
     end
 
     close all;
 
-    for iAnalysis = Analysis_to_plot
+    for iAnalysis = analysis_to_plot
 
         % init
         clear ToPlot ToPlot2;
@@ -165,16 +151,14 @@ function All_ROIs_BOLD_MVPA_surf_plot
         ToPlot.MVPA.beta = [];
         ToPlot.MVPA.grp = [];
 
+        ToPlot.plot_main = '';
         if plot_main
             ToPlot.plot_main = 'main';
-        else
-            ToPlot.plot_main = '';
         end
 
+        ToPlot.avg_hs = '';
         if avg_hs
             ToPlot.avg_hs = 'avg-hs';
-        else
-            ToPlot.avg_hs = '';
         end
 
         %% Get BOLD

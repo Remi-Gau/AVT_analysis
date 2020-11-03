@@ -1,78 +1,77 @@
 function MVPA_surf_grp_avg
 
+    % TODO
+    % - fix because this is broken: need to run MVPA in surf to generate input
+    % for this
+
     clc;
     clear;
 
-    StartDir = fullfile(pwd, '..', '..', '..');
-    cd (StartDir);
-
-    Get_dependencies('/home/rxg243/Dropbox');
-
-    ResultsDir = fullfile(StartDir, 'results', 'SVM');
-    [~, ~, ~] = mkdir(ResultsDir);
-
-    addpath(genpath(fullfile(StartDir, 'code', 'subfun')));
+    [Dirs] = set_dir('surf');
+    [SubLs, NbSub] = get_subject_list(Dirs.MVPA_resultsDir);
 
     NbLayers = 6;
 
+    % ROI
+    ROIs(1) = struct('name', 'V1');
+    ROIs(end + 1) = struct('name', 'V2');
+    ROIs(end + 1) = struct('name', 'A1');
+    ROIs(end + 1) = struct('name', 'PT');
+
+    % from one to 8 ; can be a vector ; see ChooseNorm()
+    norm_to_use = 6; % 6
+
     % Options for the SVM
     [opt, ~] = get_mvpa_options();
+    disp(opt);
+
+    SVM_Ori = get_mvpa_classification(ROIs);
+    SVM_Ori(10:end) = [];
+    disp(SVM_Ori);
 
     DesMat = set_design_mat_lam_GLM(NbLayers);
 
-    SubLs = dir('sub*');
-    NbSub = numel(SubLs);
+    for Norm = norm_to_use
 
-    for Norm = 6
-
-        clear ROIs SVM;
+        clear SVM;
 
         [opt] = ChooseNorm(Norm, opt);
 
         SaveSufix = CreateSaveSuffix(opt, [], NbLayers, 'surf');
 
-        % ROI
-        ROIs(1) = struct('name', 'V1');
-        ROIs(end + 1) = struct('name', 'V2');
-        ROIs(end + 1) = struct('name', 'V3');
-        ROIs(end + 1) = struct('name', 'V4');
-        ROIs(end + 1) = struct('name', 'V5');
-
-        ROIs(end + 1) = struct('name', 'A1');
-        ROIs(end + 1) = struct('name', 'PT');
-
-        % Analysis
-        SVM(1) = struct('name', 'A Ipsi VS Contra', 'ROI', 1:length(ROIs));
-        SVM(end + 1) = struct('name', 'V Ipsi VS Contra', 'ROI', 1:length(ROIs));
-        SVM(end + 1) = struct('name', 'T Ipsi VS Contra', 'ROI', 1:length(ROIs));
-
-        SVM(end + 1) = struct('name', 'A VS V Ipsi', 'ROI', 1:length(ROIs));
-        SVM(end + 1) = struct('name', 'A VS T Ipsi', 'ROI', 1:length(ROIs));
-        SVM(end + 1) = struct('name', 'V VS T Ipsi', 'ROI', 1:length(ROIs));
-
-        SVM(end + 1) = struct('name', 'A VS V Contra', 'ROI', 1:length(ROIs));
-        SVM(end + 1) = struct('name', 'A VS T Contra', 'ROI', 1:length(ROIs));
-        SVM(end + 1) = struct('name', 'V VS T Contra', 'ROI', 1:length(ROIs));
+        SVM = SVM_Ori;
 
         for i = 1:numel(SVM)
-            SVM(i).ROI = struct('name', {ROIs(SVM(i).ROI).name}); %#ok<*AGROW>
+            SVM(i).ROI = struct('name', {ROIs(SVM(i).ROI_2_analyse).name}); %#ok<*AGROW>
         end
 
         %% Gets data for each subject
         for iSubj = 1:NbSub
             fprintf('\n\nProcessing %s', SubLs(iSubj).name);
 
-            SubDir = fullfile(StartDir, SubLs(iSubj).name);
-            SaveDir = fullfile(SubDir, 'results', 'SVM');
+            SubDir = fullfile(Dirs.MVPA_resultsDir, SubLs(iSubj).name);
 
             for iSVM = 1:numel(SVM)
                 fprintf('\n Running SVM:  %s', SVM(iSVM).name);
 
                 for iROI = 1:numel(ROIs)
 
-                    File2Load = fullfile(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_no-pool-ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]));
+                    File2Load = fullfile( ...
+                                         SubDir, ...
+                                         strcat( ...
+                                                'SVM-', SVM(iSVM).name, ...
+                                                '_no-pool-ROI-', SVM(iSVM).ROI(iROI).name, ...
+                                                SaveSufix));
 
-                    if exist(File2Load, 'file')
+                    SVM(iSVM).ROI(iROI).grp = nan(1, NbLayers, 2);
+                    SVM(iSVM).ROI(iROI).DATA{iSubj} = [];
+                    SVM(iSVM).ROI(iROI).layers.DATA{iSubj} = [];
+
+                    if ~exist(File2Load, 'file')
+
+                        error('\nThe file %s was not found.', File2Load);
+
+                    else
 
                         load(File2Load, 'Results', 'Class_Acc', 'opt');
 
@@ -108,14 +107,6 @@ function MVPA_surf_grp_avg
 
                             end
                         end
-
-                    else
-                        warning('\nThe file %s was not found.', File2Load);
-
-                        SVM(iSVM).ROI(iROI).grp(iSubj, 1:NbLayers) = nan(1, NbLayers, 2);
-                        SVM(iSVM).ROI(iROI).DATA{iSubj} = [];
-                        SVM(iSVM).ROI(iROI).layers.DATA{iSubj} = [];
-
                     end
 
                     clear Results Class_Acc;

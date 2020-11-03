@@ -2,9 +2,7 @@ function MVPA_vol
     clc;
     clear;
 
-    StartDir = fullfile(pwd, '..', '..');
-    cd (StartDir);
-    addpath(genpath(fullfile(StartDir, 'code', 'subfun')));
+    [Dirs, SubLs, NbSub] = set_dir();
 
     NbLayers = 6;
     FWHM = 0;
@@ -91,9 +89,6 @@ function MVPA_vol
     % -------------------------%
     [KillGcpOnExit] = OpenParWorkersPool(NbWorkers);
 
-    SubLs = dir('sub*');
-    NbSub = numel(SubLs);
-
     for iSub = 1:NbSub
 
         % --------------------------------------------------------- %
@@ -103,7 +98,7 @@ function MVPA_vol
 
         Mask = Mask_Ori;
 
-        SubDir = fullfile(StartDir, SubLs(iSub).name);
+        SubDir = fullfile(Dirs.StartDir, SubLs(iSub).name);
         RoiFolder = fullfile(SubDir, 'roi', 'vol', 'mni', 'upsamp');
         AnalysisFolder = fullfile(SubDir, 'ffx_nat', 'betas');
         SaveDir = fullfile(SubDir, 'results', 'SVM');

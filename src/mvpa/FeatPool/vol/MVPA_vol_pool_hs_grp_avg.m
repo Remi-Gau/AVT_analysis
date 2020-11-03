@@ -1,33 +1,23 @@
 function MVPA_vol_pool_hs_grp_avg
+
+    % averages MVPA results in volume
+
+    % TODO
+    % - fix because this is broken: need to run MVPA in vol to generate input
+    % for this
+
     clc;
     clear;
 
-    StartDir = fullfile(pwd, '..', '..');
-    cd (StartDir);
-
-    ResultsDir = fullfile(StartDir, 'results', 'SVM');
-    [~, ~, ~] = mkdir(ResultsDir);
-
-    addpath(genpath(fullfile(StartDir, 'code', 'subfun')));
+    [Dirs] = set_dir('vol');
+    [SubLs, NbSub] = get_subject_list(Dirs.MVPA_resultsDir);
 
     NbLayers = 6;
 
     FWHM = 0;
 
-    % Options
-    opt.svm.log2c = 1;
-    opt.svm.dargs = '-s 0';
-    opt.fs.do = 0;
-    opt.rfe.do = 0;
-    opt.layersubsample.do = 0;
-    opt.permutation.test = 0;
-    opt.session.curve = 0;
-    opt.scaling.idpdt = 1;
-    opt.scaling.img.eucledian = 0;
-    opt.scaling.img.zscore = 1;
-    opt.scaling.feat.mean = 1;
-    opt.scaling.feat.range = 0;
-    opt.scaling.feat.sessmean = 0;
+    % Options for the SVM
+    [opt, ~] = get_mvpa_options();
 
     % ROI
     ROIs(1) = struct('name', 'V1_thres');
@@ -60,10 +50,7 @@ function MVPA_vol_pool_hs_grp_avg
         SVM(i).ROI = struct('name', {ROIs(SVM(i).ROI).name});
     end
 
-    SaveSufix = CreateSaveSufix(opt, FWHM, NbLayers);
-
-    SubLs = dir('sub*');
-    NbSub = numel(SubLs);
+    SaveSufix = CreateSaveSuffix(opt, FWHM, NbLayers, 'vol');
 
     %% Gets data for each subject
     for iSub = 1:NbSub
@@ -174,6 +161,10 @@ function MVPA_vol_pool_hs_grp_avg
 
         end
     end
+
+    return
+
+    %% TODO : save in group folder
 
     %% Saves
     fprintf('\nSaving\n');

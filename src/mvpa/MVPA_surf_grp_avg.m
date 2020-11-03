@@ -1,26 +1,11 @@
 function MVPA_surf_grp_avg
+    % takes data from each subjects and computes the group average
 
     clc;
     clear;
 
-    if isunix
-        CodeDir = '/home/remi/github/AVT_analysis';
-        StartDir = '/home/remi';
-    elseif ispc
-        CodeDir = 'D:\github\AVT-7T-code';
-        StartDir = 'D:\';
-    else
-        disp('Platform not supported');
-    end
-
-    addpath(genpath(fullfile(CodeDir, 'subfun')));
-
-    [Dirs] = set_dir();
-
-    Get_dependencies();
-
-    SubLs = dir(fullfile(Dirs.DerDir, 'sub*'));
-    NbSub = numel(SubLs);
+    [Dirs] = set_dir('surf');
+    [SubLs, NbSub] = get_subject_list(Dirs.MVPA_resultsDir);
 
     NbLayers = 6;
 
@@ -30,27 +15,35 @@ function MVPA_surf_grp_avg
                 'V1', ...
                 'V2'};
 
+    % Some data is missing for Avg and ROI
     ToPlot = {'Cst', 'Lin', 'Avg', 'ROI'};
+    to_plot = 1;
+
+    % from one to 8 ; can be a vector ; see ChooseNorm()
+    norm_to_use = 6; % 6
 
     % Options for the SVM
     [opt, ~] = get_mvpa_options();
+    disp(opt);
 
     SVM_Ori = get_mvpa_classification(ROIs_ori);
     SVM_Ori(10:end) = [];
+    disp(SVM_Ori);
 
     DesMat = set_design_mat_lam_GLM(NbLayers);
 
-    for iToPlot = 1
+    %%
+
+    for iToPlot = to_plot
 
         opt.toplot = ToPlot{iToPlot};
 
+        Do_layers = 0;
         if iToPlot == 4
             Do_layers = 1;
-        else
-            Do_layers = 0;
         end
 
-        for Norm = 6
+        for Norm = norm_to_use
 
             clear ROIs SVM;
 
@@ -70,24 +63,41 @@ function MVPA_surf_grp_avg
             for iSubj = 1:NbSub
                 fprintf('\n\nProcessing %s', SubLs(iSubj).name);
 
-                SubDir = fullfile(Dirs.DerDir, SubLs(iSubj).name);
-                SaveDir = fullfile(SubDir, 'results', 'SVM');
+                SubDir = fullfile(Dirs.MVPA_resultsDir, SubLs(iSubj).name);
 
                 for iSVM = 1:numel(SVM)
                     fprintf('\n Running SVM:  %s', SVM(iSVM).name);
 
                     for iROI = 1:numel(SVM(i).ROI_2_analyse)
 
-                        File2Load = fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]);
+                        File2Load = fullfile( ...
+                                             SubDir, ...
+                                             strcat( ...
+                                                    'SVM-', SVM(iSVM).name, ...
+                                                    '_ROI-', SVM(iSVM).ROI(iROI).name, ...
+                                                    SaveSufix));
 
-                        if exist(File2Load, 'file')
+                        % initialize
+                        SVM(iSVM).ROI(iROI).DATA{iSubj} = [];
+                        SVM(iSVM).ROI(iROI).grp(iSubj) = NaN;
+                        if Do_layers
+                            SVM(iSVM).ROI(iROI).layers.DATA{iSubj} = [];
+                            % SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = nan(NbLayers);
+                        end
+
+                        if ~exist(File2Load, 'file')
+                            error('\nThe file %s was not found.', File2Load);
+
+                        else
+
+                            fprintf('\n  Loading file: %s', File2Load);
 
                             load(File2Load, 'Results', 'Class_Acc', 'opt');
 
                             SVM(iSVM).ROI(iROI).grp(iSubj) = Class_Acc.TotAcc;
-                            %                     if Do_layers
-                            %                         SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = Class_Acc.TotAccLayers{1};
-                            %                     end
+                            % if Do_layers
+                            %   SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = Class_Acc.TotAccLayers{1};
+                            % end
 
                             % Extract results
                             CV = Results.session(end).rand.perm.CV;
@@ -109,17 +119,6 @@ function MVPA_surf_grp_avg
                                 end
 
                             end
-
-                        else
-                            warning('\nThe file %s was not found.', File2Load);
-
-                            SVM(iSVM).ROI(iROI).DATA{iSubj} = [];
-                            SVM(iSVM).ROI(iROI).grp(iSubj) = NaN;
-                            if Do_layers
-                                SVM(iSVM).ROI(iROI).layers.DATA{iSubj} = [];
-                                %                         SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = nan(NbLayers);
-                            end
-
                         end
                         clear Results Class_Acc;
 
@@ -137,7 +136,8 @@ function MVPA_surf_grp_avg
 
                     if Do_layers
                         for iSubj = 1:numel(SVM(iSVM).ROI(iROI).layers.DATA)
-                            tmp(iSubj, 1:NbLayers) = mean(SVM(iSVM).ROI(iROI).layers.DATA{iSubj}, 2);
+                            tmp(iSubj, 1:NbLayers) = ...
+                              mean(SVM(iSVM).ROI(iROI).layers.DATA{iSubj}, 2);
                         end
                         SVM(iSVM).ROI(iROI).layers.MEAN = mean(tmp);
                         SVM(iSVM).ROI(iROI).layers.STD = std(tmp);
@@ -161,6 +161,9 @@ function MVPA_surf_grp_avg
 
                             Blocks = SVM(iSVM).ROI(iROI).layers.DATA{iSub};
 
+                            SVM(iSVM).ROI(iROI).layers.Beta.DATA(:, iSub) = ...
+                              nan(size(DesMat, 2), 1);
+
                             if ~all(isnan(Blocks(:))) || ~isempty(Blocks)
 
                                 Y = Blocks - .5;
@@ -169,10 +172,6 @@ function MVPA_surf_grp_avg
                                 SVM(iSVM).ROI(iROI).layers.Beta.DATA(:, iSub) = B;
 
                                 clear Y B;
-
-                            else
-                                SVM(iSVM).ROI(iROI).layers.Beta.DATA(:, iSub) = nan(size(DesMat, 2), 1);
-
                             end
 
                         end
@@ -200,14 +199,24 @@ function MVPA_surf_grp_avg
             for iSVM = 1:numel(SVM)
                 for iROI = 1:numel(ROIs_ori)
                     Results = SVM(iSVM).ROI(iROI);
-                    save(fullfile(Dirs.MVPA_resultsDir, strcat('Grp_', SVM(iSVM).ROI(iROI).name, '_', strrep(SVM(iSVM).name, ' ', '-'), ...
-                                                               '_PoolQuadGLM',  SaveSufix, '.mat')), 'Results');
+                    Filename = fullfile( ...
+                                        Dirs.MVPA_resultsDir, ...
+                                        'group', ...
+                                        strcat( ...
+                                               'Grp_', SVM(iSVM).ROI(iROI).name, ...
+                                               '_', strrep(SVM(iSVM).name, ' ', '-'), ...
+                                               '_PoolQuadGLM',  SaveSufix));
+                    fprintf('Saving file: %s\n', Filename);
+                    save(Filename, 'Results');
                 end
             end
 
-            save(fullfile(Dirs.MVPA_resultsDir, strcat('GrpPoolQuadGLM', SaveSufix, '.mat')));
-
-            cd(StartDir);
+            Filename = fullfile( ...
+                                Dirs.MVPA_resultsDir, ...
+                                'group', ...
+                                ['GrpPoolQuadGLM', SaveSufix]);
+            fprintf('\n\nSaving file: %s\n', Filename);
+            save(Filename);
 
         end
     end

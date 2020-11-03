@@ -1,33 +1,27 @@
 function MVPA_vol_grp_avg
+    % averages MVPA results in volume
+
+    % TODO
+    % - fix because this is broken: need to run MVPA in vol to generate input
+    % for this
+
     clc;
     clear;
 
-    StartDir = fullfile(pwd, '..', '..');
-    cd (StartDir);
-
-    ResultsDir = fullfile(StartDir, 'results', 'SVM');
-    [~, ~, ~] = mkdir(ResultsDir);
-
-    addpath(genpath(fullfile(StartDir, 'code', 'subfun')));
+    [Dirs] = set_dir('vol');
+    [SubLs, NbSub] = get_subject_list(Dirs.MVPA_resultsDir);
 
     NbLayers = 6;
 
     FWHM = 0;
 
-    % Options
-    opt.svm.log2c = 1;
-    opt.svm.dargs = '-s 0';
-    opt.fs.do = 0;
-    opt.rfe.do = 0;
-    opt.layersubsample.do = 0;
-    opt.permutation.test = 0;
-    opt.session.curve = 0;
-    opt.scaling.idpdt = 1;
-    opt.scaling.img.eucledian = 0;
-    opt.scaling.img.zscore = 1;
-    opt.scaling.feat.mean = 1;
-    opt.scaling.feat.range = 0;
-    opt.scaling.feat.sessmean = 0;
+    % Options for the SVM
+    [opt, ~] = get_mvpa_options();
+    norm_to_use = 6;
+    [opt] = ChooseNorm(norm_to_use, opt);
+    disp(opt);
+
+    %% REFACTOR
 
     % ROI
     ROIs(1) = struct('name', 'V1');
@@ -73,6 +67,7 @@ function MVPA_vol_grp_avg
     % ROIs(end+1) = struct('name', 'V4_R');
     % ROIs(end+1) = struct('name', 'V5_R');
 
+    %% REFACTOR
     % Analysis
     SVM(1) = struct('name', 'A VS V', 'ROI', 1:length(ROIs));
     SVM(end + 1) = struct('name', 'A VS T', 'ROI', 1:length(ROIs));
@@ -94,10 +89,9 @@ function MVPA_vol_grp_avg
         SVM(i).ROI = struct('name', {ROIs(SVM(i).ROI).name});
     end
 
-    SaveSufix = CreateSaveSufix(opt, FWHM, NbLayers);
+    %%
 
-    SubLs = dir('sub*');
-    NbSub = numel(SubLs);
+    SaveSufix = CreateSaveSuffix(opt, FWHM, NbLayers, 'vol');
 
     NbWorkers = 4;
     [KillGcpOnExit] = OpenParWorkersPool(NbWorkers);
@@ -106,7 +100,7 @@ function MVPA_vol_grp_avg
     for iSub = 1:NbSub
         fprintf('\n\nProcessing %s', SubLs(iSub).name);
 
-        SubDir = fullfile(StartDir, SubLs(iSub).name);
+        SubDir = fullfile(Dirs.DerDir, SubLs(iSub).name);
         SaveDir = fullfile(SubDir, 'results', 'SVM');
 
         for iSVM = 1:numel(SVM)
@@ -114,9 +108,20 @@ function MVPA_vol_grp_avg
 
             for iROI = 1:numel(ROIs)
 
-                File2Load = fullfile(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]));
+                File2Load = fullfile( ...
+                                     SaveDir, ...
+                                     strcat( ...
+                                            'SVM-', SVM(iSVM).name, ...
+                                            '_ROI-', SVM(iSVM).ROI(iROI).name, ...
+                                            SaveSufix));
 
-                if exist(File2Load, 'file')
+                SVM(iSVM).ROI(iROI).grp(iSub, 1:NbLayers + 1) = nan(1, NbLayers + 1);
+                SVM(iSVM).ROI(iROI).DATA{iSub} = [];
+
+                if ~exist(File2Load, 'file')
+                    error('The file %s was not found.', File2Load);
+
+                else
 
                     load(File2Load, 'Results', 'Class_Acc');
 
@@ -138,12 +143,6 @@ function MVPA_vol_grp_avg
 
                         SVM(iSVM).ROI(iROI).DATA{iSub}(iLayer - 1, 1:NbCV) = TEMP;
                     end
-
-                else
-                    warning('The file %s was not found.', File2Load);
-
-                    SVM(iSVM).ROI(iROI).grp(iSub, 1:NbLayers + 1) = nan(1, NbLayers + 1);
-                    SVM(iSVM).ROI(iROI).DATA{iSub} = [];
 
                 end
 
@@ -168,12 +167,7 @@ function MVPA_vol_grp_avg
     %% Betas from profile fits
     fprintf('\n\n GETTING BETA VALUES FOR PROFILE FITS');
 
-    DesMat = (1:NbLayers) - mean(1:NbLayers);
-
-    DesMat = [ones(NbLayers, 1) DesMat' (DesMat.^2)'];
-    DesMat = spm_orth(DesMat);
-
-    % DesMat = [DesMat' ones(NbLayers,1)];
+    DesMat = set_design_mat_lam_GLM(NbLayers);
 
     for iSVM = 1:numel(SVM)
         fprintf('\n Running SVM:  %s', SVM(iSVM).name);
@@ -185,6 +179,7 @@ function MVPA_vol_grp_avg
 
                 Blocks = SVM(iSVM).ROI(iROI).DATA{iSub};
 
+                SVM(iSVM).ROI(iROI).Beta.DATA(:, iSub) = nan(size(DesMat, 2), 1);
                 if ~all(isnan(Blocks(:))) || ~isempty(Blocks)
 
                     Y = flipud(Blocks - .5);
@@ -193,10 +188,6 @@ function MVPA_vol_grp_avg
                     SVM(iSVM).ROI(iROI).Beta.DATA(:, iSub) = B;
 
                     clear Y B;
-
-                else
-                    SVM(iSVM).ROI(iROI).Beta.DATA(:, iSub) = nan(size(DesMat, 2), 1);
-
                 end
 
             end
@@ -216,20 +207,33 @@ function MVPA_vol_grp_avg
         end
     end
 
+    return
+
+    %% TODO : save in group folder
+
     %% Saves
     fprintf('\nSaving\n');
 
     for iSVM = 1:numel(SVM)
         for iROI = 1:numel(ROIs)
             Results = SVM(iSVM).ROI(iROI);
-            save(fullfile(ResultsDir, strcat('Results_', SVM(iSVM).ROI(iROI).name, '_', strrep(SVM(iSVM).name, ' ', '-'), ...
-                                             '_VolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
+            Filename = fullfile( ...
+                                Dirs.MVPA_resultsDir, ...
+                                strcat( ...
+                                       'Results_', SVM(iSVM).ROI(iROI).name, ...
+                                       '_', strrep(SVM(iSVM).name, ' ', '-'), ...
+                                       '_VolQuadGLM', SaveSufix));
+
+            fprintf('\n\nSaving file: %s\n', Filename);
+            save(Filename, 'Results');
         end
     end
 
-    save(fullfile(ResultsDir, strcat('ResultsVolQuadGLM_l-', num2str(NbLayers), '.mat')));
-
-    cd(StartDir);
+    Filename = fullfile( ...
+                        ResultDirs.MVPA_resultsDirs, ...
+                        strcat('ResultsVolQuadGLM', SaveSufix));
+    fprintf('\n\nSaving file: %s\n', Filename);
+    save(Filename);
 
     CloseParWorkersPool(KillGcpOnExit);
 
@@ -244,9 +248,8 @@ function [B] = ProfileGLM(X, Y)
         clear y;
     end
 
-    if isempty(Y)
-        B = nan(1, size(X, 2));
-    else
+    B = nan(1, size(X, 2));
+    if ~isempty(Y)
         X = repmat(X, size(Y, 2), 1);
         Y = Y(:);
         [B, ~, ~] = glmfit(X, Y, 'normal', 'constant', 'off');

@@ -14,24 +14,7 @@ function MVPA_surf
     clc;
     clear;
 
-    if isunix
-        CodeDir = '/home/remi/github/AVT_analysis';
-        StartDir = '/home/remi';
-    elseif ispc
-        CodeDir = 'D:\github\AVT-7T-code';
-        StartDir = 'D:\';
-    else
-        disp('Platform not supported');
-    end
-
-    addpath(genpath(fullfile(CodeDir, 'subfun')));
-
-    [Dirs] = set_dir();
-
-    Get_dependencies();
-
-    SubLs = dir(fullfile(Dirs.DerDir, 'sub*'));
-    NbSub = numel(SubLs);
+    [Dirs, SubLs, NbSub] = set_dir();
 
     NbLayers = 6;
 

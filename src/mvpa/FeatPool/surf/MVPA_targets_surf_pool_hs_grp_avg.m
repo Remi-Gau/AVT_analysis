@@ -1,17 +1,14 @@
 function MVPA_targets_surf_pool_hs_grp_avg
 
+    % TODO
+    % - fix because this is broken: need to run MVPA in vol to generate input
+    % for this
+
     clc;
     clear;
 
-    StartDir = fullfile(pwd, '..', '..', '..', '..');
-    cd (StartDir);
-
-    ResultsDir = fullfile(StartDir, 'results', 'SVM');
-    [~, ~, ~] = mkdir(ResultsDir);
-
-    addpath(genpath(fullfile(StartDir, 'code', 'subfun')));
-
-    Get_dependencies('/home/rxg243/Dropbox');
+    [Dirs] = set_dir('surf');
+    [SubLs, NbSub] = get_subject_list(Dirs.MVPA_resultsDir);
 
     NbLayers = 6;
 
@@ -19,9 +16,6 @@ function MVPA_targets_surf_pool_hs_grp_avg
     [opt, ~] = get_mvpa_options();
 
     DesMat = set_design_mat_lam_GLM(NbLayers);
-
-    SubLs = dir('sub*');
-    NbSub = numel(SubLs);
 
     for Norm = [6 8]
 
@@ -62,15 +56,14 @@ function MVPA_targets_surf_pool_hs_grp_avg
         for iSubj = 1:NbSub
             fprintf('\n\nProcessing %s', SubLs(iSubj).name);
 
-            SubDir = fullfile(StartDir, SubLs(iSubj).name);
-            SaveDir = fullfile(SubDir, 'results', 'SVM');
+            SubDir = fullfile(Dirs.MVPA_resultsDir, SubLs(iSubj).name);
 
             for iSVM = 1:numel(SVM)
                 fprintf('\n Running SVM:  %s', SVM(iSVM).name);
 
                 for iROI = 1:numel(ROIs)
 
-                    File2Load = fullfile(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]));
+                    File2Load = fullfile(fullfile(SubDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]));
 
                     if exist(File2Load, 'file')
 

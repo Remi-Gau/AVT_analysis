@@ -1,14 +1,16 @@
 function MVPA_stims_targets_vol_pool_hs_grp_avg
+
+    % averages MVPA results in volume
+
+    % TODO
+    % - fix because this is broken: need to run MVPA in vol to generate input
+    % for this
+
     clc;
     clear;
 
-    StartDir = fullfile(pwd, '..', '..');
-    cd (StartDir);
-
-    ResultsDir = fullfile(StartDir, 'results', 'SVM');
-    [~, ~, ~] = mkdir(ResultsDir);
-
-    addpath(genpath(fullfile(StartDir, 'code', 'subfun')));
+    [Dirs] = set_dir('vol');
+    [SubLs, NbSub] = get_subject_list(Dirs.MVPA_resultsDir);
 
     NbLayers = 6;
 
@@ -53,10 +55,7 @@ function MVPA_stims_targets_vol_pool_hs_grp_avg
         SVM(i).ROI = struct('name', {ROIs(SVM(i).ROI).name});
     end
 
-    SaveSufix = CreateSaveSufix(opt, FWHM, NbLayers);
-
-    SubLs = dir('sub*');
-    NbSub = numel(SubLs);
+    SaveSufix = CreateSaveSuffix(opt, FWHM, NbLayers, 'vol');
 
     %% Gets data for each subject
     for iSub = 1:NbSub
@@ -167,6 +166,10 @@ function MVPA_stims_targets_vol_pool_hs_grp_avg
 
         end
     end
+
+    return
+
+    %% TODO : save in group folder
 
     %% Saves
     fprintf('\nSaving\n');
