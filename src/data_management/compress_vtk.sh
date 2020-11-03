@@ -2,19 +2,19 @@
 
 clear
 
-StartDir=`pwd`
+data_dir=`pwd`
 
 SubList="$(ls | grep sub)"
 
-echo $StartDir
+echo $data_dir
 
-for Subject in $SubList;
+for iSubject in $SubList;
 do
 
-	echo "\nCompressing files for subject $Subject \n"
+	echo "\nCompressing files for subject $iSubject \n"
 
 
-	FileList="$(ls $StartDir/$Subject/ffx_nat/betas/6_surf/Beta_*.vtk)"
+	FileList="$(ls $data_dir/$iSubject/ffx_nat/betas/6_surf/Beta_*.vtk)"
 		
 	for File in $FileList;
 	do
@@ -30,7 +30,7 @@ do
 	done
 
 
-	FileList="$(ls $StartDir/$Subject/ffx_nat/betas/6_surf/targets/Beta_*.vtk)"
+	FileList="$(ls $data_dir/$iSubject/ffx_nat/betas/6_surf/targets/Beta_*.vtk)"
 		
 	for File in $FileList;
 	do
@@ -46,7 +46,7 @@ do
 	done
 
 
-	FileList="$(ls $StartDir/$Subject/ffx_rsa/betas/6_surf/Beta_*.vtk)"
+	FileList="$(ls $data_dir/$iSubject/ffx_rsa/betas/6_surf/Beta_*.vtk)"
 		
 	for File in $FileList;
 	do
