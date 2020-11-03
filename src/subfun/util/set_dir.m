@@ -1,4 +1,4 @@
-function [Dirs, SubLs, NbSub] = set_dir()
+function [Dirs] = set_dir(space)
     % Function used to define where the code and the data are
     %
 
@@ -11,7 +11,8 @@ function [Dirs, SubLs, NbSub] = set_dir()
     end
 
     % Derivatives Data
-    Dirs.DerDir = fullfile(StartDir, 'Dropbox', 'PhD', 'Experiments', 'AVT', 'derivatives');
+%     Dirs.DerDir = fullfile(StartDir, 'Dropbox', 'PhD', 'Experiments', 'AVT', 'derivatives');
+    Dirs.DerDir = fullfile(StartDir, 'gin', 'AVT', 'derivatives');
     if ~exist(Dirs.DerDir, 'dir')
         error('The data directory does not exist: %s', Dirs.DerDir);
     end
@@ -23,16 +24,13 @@ function [Dirs, SubLs, NbSub] = set_dir()
     Dirs.CodeDir = fullfile(fileparts(mfilename('fullpath')), '..');
 
     Dirs.FigureFolder = fullfile(Dirs.DerDir, 'figures');
+    
+    Dirs.MVPA_resultsDir = fullfile(Dirs.DerDir, ['libsvm-' space]);
 
-    Dirs.MVPA_resultsDir = fullfile(Dirs.DerDir, 'results', 'SVM');
-    Dirs.BOLD_resultsDir = fullfile(Dirs.DerDir, 'results', 'profiles', 'surf');
+%     Dirs.BOLD_resultsDir = fullfile(Dirs.DerDir, 'results', 'profiles', 'surf');
     
+    [~, ~, ~] = mkdir(fullfile(Dirs.DerDir, ['libsvm-' space]));
     [~, ~, ~] = mkdir(Dirs.FigureFolder);
-    [~, ~, ~] = mkdir(Dirs.MVPA_resultsDir);
-    [~, ~, ~] = mkdir(Dirs.BOLD_resultsDir);
-    
-    SubLs = dir(fullfile(Dirs.DerDir, 'sub*'));
-    NbSub = numel(SubLs);
     
     Get_dependencies(Dirs);
 
