@@ -1,4 +1,7 @@
 function Extract_data_for_PCM_stim_vol
+
+  % Extracts data from volume beta nifti data and saves in a mat file
+
   clc;
   clear;
 

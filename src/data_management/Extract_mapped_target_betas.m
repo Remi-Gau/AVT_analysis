@@ -1,3 +1,6 @@
+% Extract vtk files from a folder tree created by MIPAV/JIST
+% and copies it somewhere else
+
 clear;
 clc;
 
@@ -8,7 +11,7 @@ addpath(genpath(fullfile(StartDir, 'code', 'subfun')));
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
-opt.beta_mapping_pattern = '_target_beta-';
+% opt.beta_mapping_pattern = '_target_beta-';
 opt.beta_mapping_pattern = '_wbeta-';
 
 for iSub = NbSub % for each subject

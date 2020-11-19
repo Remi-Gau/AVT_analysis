@@ -1,3 +1,5 @@
+%% reads from mat file and saves to mat file
+
 clc;
 clear;
 

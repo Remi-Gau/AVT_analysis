@@ -1,6 +1,9 @@
 function Extract_mapped_betas_VTK(Subj, SrcDir, DestDir, opt, Debug)
-  % Extract smoothed vtk files from a folder tree created by MIPAV/JIST
-  %   Detailed explanation goes here
+  % Extract vtk files from a folder tree created by MIPAV/JIST
+  % and copies it somewher else
+  
+  % Debug == 1
+  % the function will look through folders and sub-folders but will not extract anything
 
   if nargin < 2
     error('Need to know where to look for...');
@@ -11,7 +14,7 @@ function Extract_mapped_betas_VTK(Subj, SrcDir, DestDir, opt, Debug)
   end
 
   if nargin < 5
-    Debug = 1; % the function will look through folders and sub-folders but will not extract anything
+    Debug = 1; 
   end
 
   StartDir = pwd;
@@ -37,35 +40,46 @@ function Extract_mapped_betas_VTK(Subj, SrcDir, DestDir, opt, Debug)
 
 end
 
-% Recursive function that explores all subdirectories
+
 function BetaName = ListSubDir(DirName, DestDir, BetaName, Subj, opt, debug)
+  % Recursive function that explores all subdirectories
+  
   cd(DirName);
   DirLs = dir;
+  
   if sum([DirLs(:).isdir]) - 2 > 0
+    
     IsDir = find([DirLs.isdir]);
+    
     for iDir = 3:length(IsDir)
-      if strcmp(DirLs(IsDir(iDir)).name, 'ProfileSampling') % SurfaceMeshMapping %SmoothSurfaceMeshData
+      
+      if strcmp(DirLs(IsDir(iDir)).name, 'ProfileSampling') 
         fprintf('  Analysing directory: %s\n', fullfile(DirName, 'ProfileSampling'));
         BetaName = ExtractBetaName(Subj, opt);
+        
       elseif exist(fullfile(DirLs(IsDir(iDir)).name, 'ProfileSampling.input'), 'file')
         fprintf('  Analysing directory: %s\n', fullfile(DirName, 'ProfileSampling'));
         cd(fullfile(DirLs(IsDir(iDir)).name));
         BetaName = ExtractBetaName(Subj, opt);
         cd ..;
-      elseif strcmp(DirLs(IsDir(iDir)).name, 'SurfaceMeshMapping') % SurfaceMeshMapping %SmoothSurfaceMeshData
+        
+      elseif strcmp(DirLs(IsDir(iDir)).name, 'SurfaceMeshMapping') 
         fprintf('  Analysing directory: %s\n', fullfile(DirName, 'SurfaceMeshMapping'));
         ExtractFile(DestDir, BetaName, Subj, opt, debug);
+        
       else
         fprintf(' Anaysing directory: %s\n', DirLs(IsDir(iDir)).name);
         BetaName = ListSubDir(DirLs(IsDir(iDir)).name, DestDir, BetaName, Subj, opt, debug);
+        
       end
     end
   end
   cd ..;
 end
 
-% Gets the information from the file and copies it and changes its name
+
 function ExtractFile(DestDir, BetaName, Subj, opt, debug)
+  % Gets the information from the file and copies it and changes its name
 
   FileContent = fileread('SurfaceMeshMapping.input');
   if isempty(BetaName)
@@ -85,12 +99,15 @@ function ExtractFile(DestDir, BetaName, Subj, opt, debug)
   tmp2 = strfind(FileContent, 'lcr_gm_avg.vtk');
   if ~isempty(tmp2)
     hs_sufix = 'l';
+    
   else
     tmp2 = strfind(FileContent, 'rcr_gm_avg.vtk');
     if ~isempty(tmp2)
       hs_sufix = 'r';
+      
     else
       error('Not sure which hemisphere this came from.');
+      
     end
   end
 
@@ -112,17 +129,21 @@ function BetaName = ExtractBetaName(Subj, opt, Catch)
 
   if nargin < 3 || Catch == 0 || isempty(Catch)
     FileContent = fileread('ProfileSampling.input');
+    
   else
     InputFile = dir(fullfile(pwd, '..', '*-A.input'));
     FileContent = fileread(fullfile(pwd, '..', InputFile.name));
+    
   end
 
   tmp = strfind(FileContent, ['r' Subj opt.beta_mapping_pattern]);
   pat_length = numel(['r' Subj opt.beta_mapping_pattern]);
   if isempty(tmp)
     BetaName = tmp;
+    
   else
     BetaName = FileContent(tmp(1) + pat_length:tmp(1) + pat_length + 3);
+    
   end
 
 end

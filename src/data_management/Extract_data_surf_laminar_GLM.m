@@ -1,3 +1,5 @@
+% Loads mat file and runs laminar GLM and saves results in another mat file
+
 clc;
 clear;
 

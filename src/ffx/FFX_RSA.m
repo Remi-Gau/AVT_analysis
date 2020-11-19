@@ -1,3 +1,5 @@
+% Runs the multivariate noise normalization on the output of a subject level GLM
+
 %%
 clear;
 clc;
