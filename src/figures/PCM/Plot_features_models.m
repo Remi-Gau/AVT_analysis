@@ -52,9 +52,9 @@ M.fitAlgorithm = 'NR';
 %             end;
 
 if isfield('theta0', M)
-    [G, dGdtheta] = pcm_calculateG(M, M.theta0);
+  [G, dGdtheta] = pcm_calculateG(M, M.theta0);
 else
-    [G, dGdtheta] = pcm_calculateG(M, ones(M.numGparams, 1));
+  [G, dGdtheta] = pcm_calculateG(M, ones(M.numGparams, 1));
 end
 
 %% plot
@@ -73,18 +73,18 @@ c = pcm_indicatorMatrix('allpairs', 1:size(M.Ac, 1));
 
 for iFeat = 1:M.numGparams
 
-    g = M.Ac(:, :, iFeat) * M.Ac(:, :, iFeat)';
-    RDM = diag(c * g * c');
-    %     RDM = diag(c*dGdtheta(:,:,iFeat)*c');
-    RDM = rsa.util.scale01(rsa.util.rankTransform_equalsStayEqual(RDM, 1));
+  g = M.Ac(:, :, iFeat) * M.Ac(:, :, iFeat)';
+  RDM = diag(c * g * c');
+  %     RDM = diag(c*dGdtheta(:,:,iFeat)*c');
+  RDM = rsa.util.scale01(rsa.util.rankTransform_equalsStayEqual(RDM, 1));
 
-    subplot(nVerPan, nHorPan, SubPlot);
-    imagesc(squareform(RDM));
-    axis square;
-    set(gca, 'Xtick', 1:size(M.Ac(:, :, iFeat), 2), 'Ytick', 1:size(M.Ac(:, :, iFeat), 1), ...
-        'Xticklabel', [], 'Yticklabel', [], 'tickdir', 'out', 'fontsize', 6);
+  subplot(nVerPan, nHorPan, SubPlot);
+  imagesc(squareform(RDM));
+  axis square;
+  set(gca, 'Xtick', 1:size(M.Ac(:, :, iFeat), 2), 'Ytick', 1:size(M.Ac(:, :, iFeat), 1), ...
+      'Xticklabel', [], 'Yticklabel', [], 'tickdir', 'out', 'fontsize', 6);
 
-    SubPlot = SubPlot + 1;
+  SubPlot = SubPlot + 1;
 
 end
 

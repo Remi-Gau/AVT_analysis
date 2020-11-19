@@ -1,6 +1,7 @@
-function Get_dependencies()
+function Get_dependencies(Dirs)
 
-    mpm_folder = fileparts(which('mpm'));
-    addpath(genpath(fullfile(mpm_folder, 'mpm-packages', 'mpm-collections', 'AVT')));
+  addpath(genpath(fullfile(Dirs.CodeDir, '..', 'lib')));
+
+  addpath(genpath(fullfile(Dirs.CodeDir, 'subfun')));
 
 end

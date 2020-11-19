@@ -35,7 +35,7 @@ cd (StartDir);
 SubLs = dir('sub*');
 
 for ranktrans = 0:1
-    for isplotranktrans = 0:1
-        plot_RSA_Cor_Reg_surf_pool_hs(StartDir, SubLs, ToPlot, ranktrans, isplotranktrans);
-    end
+  for isplotranktrans = 0:1
+    plot_RSA_Cor_Reg_surf_pool_hs(StartDir, SubLs, ToPlot, ranktrans, isplotranktrans);
+  end
 end
