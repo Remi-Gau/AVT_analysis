@@ -4,6 +4,7 @@ function [Dirs] = set_dir(space)
 
   if isunix
     StartDir = '/home/remi';
+    ExternalHD = '/media/remi/AVT_4TB/derivatives';
   elseif ispc
     StartDir = 'D:\';
   else
@@ -12,6 +13,7 @@ function [Dirs] = set_dir(space)
 
   % Derivatives Data
   %     Dirs.DerDir = fullfile(StartDir, 'Dropbox', 'PhD', 'Experiments', 'AVT', 'derivatives');
+  
   Dirs.DerDir = fullfile(StartDir, 'gin', 'AVT', 'derivatives');
   if ~exist(Dirs.DerDir, 'dir')
     error('The data directory does not exist: %s', Dirs.DerDir);
@@ -20,6 +22,8 @@ function [Dirs] = set_dir(space)
   %% DO NOT TOUCH
 
   Dirs.StartDir = StartDir;
+  
+  Dirs.ExternalHD = ExternalHD;
 
   Dirs.CodeDir = fullfile(fileparts(mfilename('fullpath')), '..');
 
