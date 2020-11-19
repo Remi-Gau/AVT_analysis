@@ -2,7 +2,7 @@ function All_ROIs_BOLD_MVPA_surf_plot
   % gets the BOLD laminar and MVPA decoding accuracy profile of the analysis on the
   % surface DATA of the AVT experimnet and plots them.
 
-  clc;
+%   clc;
   clear;
 
   analysis_to_plot = 1;
@@ -29,11 +29,9 @@ function All_ROIs_BOLD_MVPA_surf_plot
   bivariate_subplot = 2;
 
   %%
-  [Dirs] = set_dir();
-
-  SubLs = dir(fullfile(Dirs.DerDir, 'sub*'));
-  NbSub = numel(SubLs);
-
+  [Dirs] = set_dir('surf');
+  [~, NbSub] = get_subject_list(Dirs.MVPA_resultsDir);
+  
   NbLayers = 6;
 
   ROIs = {
@@ -41,6 +39,9 @@ function All_ROIs_BOLD_MVPA_surf_plot
           'PT'
           'V1'
           'V2'};
+        
+  ParamToPlot = {'Cst', 'Lin', 'Avg', 'ROI'};
+
   ROI_order_BOLD = [1 7 2:3];
   ROI_order_MVPA = [6 7 1:2];
 
@@ -57,6 +58,7 @@ function All_ROIs_BOLD_MVPA_surf_plot
   % Options for the SVM
   [opt, ~] = get_mvpa_options();
   opt.vol =  false;
+  opt.toplot = ParamToPlot{1};
 
   plot_pvalue = 0;
   if ~plot_main
@@ -65,8 +67,6 @@ function All_ROIs_BOLD_MVPA_surf_plot
 
   % multivariate noise normalisation
   if opt.MVNN
-    ParamToPlot = {'Cst', 'Lin', 'Avg', 'ROI'};
-    opt.toplot = ParamToPlot{4};
     ROI_order_MVPA = 1:4;
     ROIs_to_get = 1:4;
     SubSVM = [1:3; 4:6; 7:9; 10:12; 13:15; 16:18];
@@ -82,6 +82,7 @@ function All_ROIs_BOLD_MVPA_surf_plot
   [opt] = ChooseNorm(Norm, opt);
 
   SaveSufix = CreateSaveSuffix(opt, [], NbLayers, space_suffix);
+
 
   %% load BOLD and MVPA
 
@@ -107,17 +108,27 @@ function All_ROIs_BOLD_MVPA_surf_plot
     MvpaFile2Load = 'GrpTargetsPoolQuadGLM'; %#ok<*UNRCH>
 
   end
-
-  load(fullfile( ...
+  
+  % Load bold data
+  BoldFile2Load = fullfile( ...
                 Dirs.BOLD_resultsDir, ...
-                [ResultsFile '.mat']), ...
-       'AllSubjects_Data');
+                'group', ...
+                [ResultsFile '.mat']);
+  
+  
+  if exist(BoldFile2Load, 'file')
+    load(BoldFile2Load, 'AllSubjects_Data');
+  else
+    error('This file %s does not exist', BoldFile2Load);
+  end
 
   AllSubjects_Data_BOLD = AllSubjects_Data;
   clear AllSubjects_Data;
 
+  % Load mvpa data
   MvpaFile2Load = fullfile( ...
                            Dirs.MVPA_resultsDir, ...
+                           'group', ...
                            [MvpaFile2Load, SaveSufix]);
 
   if exist(MvpaFile2Load, 'file')

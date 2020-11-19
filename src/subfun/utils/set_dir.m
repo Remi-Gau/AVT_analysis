@@ -31,7 +31,7 @@ function [Dirs] = set_dir(space)
 
   Dirs.MVPA_resultsDir = fullfile(Dirs.DerDir, ['libsvm-' space]);
 
-  %     Dirs.BOLD_resultsDir = fullfile(Dirs.DerDir, 'results', 'profiles', 'surf');
+  Dirs.BOLD_resultsDir = fullfile(Dirs.DerDir, ['cbstools_extractProfiles-' space]);
 
   [~, ~, ~] = mkdir(fullfile(Dirs.DerDir, ['libsvm-' space], 'group'));
   [~, ~, ~] = mkdir(Dirs.FigureFolder);

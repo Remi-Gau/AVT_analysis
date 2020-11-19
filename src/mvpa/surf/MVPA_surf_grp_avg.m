@@ -9,6 +9,8 @@ function MVPA_surf_grp_avg
 
   [Dirs] = set_dir('surf');
   [SubLs, NbSub] = get_subject_list(Dirs.MVPA_resultsDir);
+  
+  ParamToPlot = {'Cst', 'Lin', 'Avg', 'ROI'};
 
   NbLayers = 6;
 
@@ -23,6 +25,7 @@ function MVPA_surf_grp_avg
 
   % Options for the SVM
   [opt, ~] = get_mvpa_options();
+  opt.toplot = ParamToPlot{1};
   disp(opt);
 
   SVM_Ori = get_mvpa_classification(ROIs);
