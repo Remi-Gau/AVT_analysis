@@ -67,27 +67,27 @@ for iSub = 1:NbSub
     NbBetas = numel(BetaOfInterest);
     NbRuns = numel(SPM.Sess);
     clear SPM;
-    
+
     tmp1 = cellstr(BetaNames(BetaOfInterest, :));
     tmp1 = deblank(tmp1);
-    
+
     % Create a vertical vector that identifies which run a row belongs to
     tmp2 = strfind(tmp1, 'Sn(');
     tmp3 = strfind(tmp1, ') ');
-    
-    RunVec = cellfun(@(x, y, z) x(y+3:z-1), tmp1, tmp2, tmp3, 'UniformOutput', false);
+
+    RunVec = cellfun(@(x, y, z) x(y + 3:z - 1), tmp1, tmp2, tmp3, 'UniformOutput', false);
     RunVec = cellfun(@str2num, RunVec);
     RunVec = RunVec';
     RunVec = repmat(RunVec, [NbLayers, 1]);
     RunVec = RunVec(:);
-    
+
     % Create a vertical vector that identifies which run a row belongs to
     tmp2 = strfind(tmp1, ') ');
     tmp3 = strfind(tmp1, '*bf(');
-    
-    tmp4 = cellfun(@(x, y, z) x(y+2:z-1), tmp1, tmp2, tmp3, 'UniformOutput', false);
-    
-    ConditionVec = nan(size(tmp4));   
+
+    tmp4 = cellfun(@(x, y, z) x(y + 2:z - 1), tmp1, tmp2, tmp3, 'UniformOutput', false);
+
+    ConditionVec = nan(size(tmp4));
     for iCond = 1:numel(CondNames)
         idx = strfind(tmp4, CondNames{iCond});
         idx = ~cellfun(@isempty, idx);
@@ -96,7 +96,7 @@ for iSub = 1:NbSub
     ConditionVec = ConditionVec';
     ConditionVec = repmat(ConditionVec, NbLayers, 1);
     ConditionVec = ConditionVec(:);
-    
+
     % Create a vertical vector that identifies which layer a row belongs to
     LayerVec = repmat((1:NbLayers)', [NbBetas, 1]);
 
@@ -154,12 +154,12 @@ for iSub = 1:NbSub
                                             ROI(iROI).name);
 
             RoiData = SurfaceData(:, ROI(iROI).VertOfInt{hs});
-            
+
             % remove any vertex with nan data
             A = isnan(RoiData);
             A = any(A);
-            RoiData(:,A) = [];
-            
+            RoiData(:, A) = [];
+
             RoiSaveFile = fullfile(SubDir, Filename);
 
             save(RoiSaveFile, ...

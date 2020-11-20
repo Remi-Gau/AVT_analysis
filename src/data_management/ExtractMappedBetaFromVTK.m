@@ -1,7 +1,7 @@
 % Extracts data (i.e. beta values for vertex in a
 % particular surface-layer) from all the VTK. Relies on parfor and brute force
 % but fast “textscan” rather than the slower read_vtk.m . Requires to know how
-% many vertices the VTK files have. 
+% many vertices the VTK files have.
 %
 % Saves the data for the whole surface and for each beta into a BIG mat file
 % Dimensions are [vertex, layer, beta]. Also saves the list of
@@ -35,7 +35,7 @@ Dirs = SetDir('surf', MVNN);
 
 [SubLs, NbSub] = GetSubjectList(Dirs.ExternalHD);
 
-for iSub = 8 : NbSub
+for iSub = 8:NbSub
 
     fprintf('Processing %s\n', SubLs(iSub).name);
 
