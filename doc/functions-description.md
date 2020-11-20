@@ -75,21 +75,31 @@ segmention and layering using the CBS tools
    structure created by the CBS tools. Renames them so that we know which vtk
    file corresponds to which beta image. Calls the recursive function
    Extract_mapped_betas_VTK.m.
-3. `ExtractFeatSurf.m` : extracts data (i.e. beta values for vertex in a
-   particular surface-layer) from all the VTK. Relies on parfor and brute force
-   but fast “textscan” rather than the slower read_vtk.m . Requires to know how
-   many vertices the VTK files have. Saves the data for the whole surface and
-   for each beta dimension are [vertex, layer, beta]. Also saves the list of
-   vertices that have data at each depth.
 
 ## Extracting Data
 
-`code/roi`
+### ROIs
 
-1. `Extract_vert_of_interest_ROI.m` : get the vertices of interest for each ROI
-   (reads them from the surface binary mask).
+`surf/roi`
+
+1. `ExtractVerticesOfInterestROI.m` :
+
+get the vertices of interest for each ROI (reads them from the surface binary
+mask).
 
 in the cbs folder to extract beta values mapped on surfaces
+
+### mapped betas
+
+```
+src/data_management/ExtractMappedBetaFromVTK.m
+```
+
+Extracts data (i.e. beta values for vertex in a particular surface-layer) from
+all the VTK. Relies on parfor and brute force but fast `textscan` rather than
+the slower `read_vtk.m`. Requires to know how many vertices the VTK files have.
+Saves the data for the whole surface and for each beta dimension are [vertex,
+layer, beta]. Also saves the list of vertices that have data at each depth.
 
 ## BOLD profiles
 
@@ -119,8 +129,8 @@ in the cbs folder to extract beta values mapped on surfaces
    Saves one mat file / subject / classification / ROI the accuracies for all
    cross-validation for the whole ROI and each layer.
 
-1. `MVPA_surf_pool_grp_avg.m` : averages accuracies across subjects and does
-   the laminar GLM over them.
+1. `MVPA_surf_pool_grp_avg.m` : averages accuracies across subjects and does the
+   laminar GLM over them.
 
 `code/figures/FeatPool/MVPA/surf/`
 
@@ -133,8 +143,7 @@ in the cbs folder to extract beta values mapped on surfaces
 
 folder : `src/mvpa/surf/`
 
-`MVPA_surf.m`
-`MVPA_surf_grp_avg.m`
+`MVPA_surf.m` `MVPA_surf_grp_avg.m`
 
 ## Surface registration
 
@@ -165,4 +174,3 @@ multivariate normalization done by the RSA toolbox).
 The scripts are all in the `mvpa` folder.
 
 Options for the MVPA are set in the `subfun/mvpa/get_mvpa_options.m`
-

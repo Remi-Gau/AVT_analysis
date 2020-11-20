@@ -16,14 +16,14 @@ opt.beta_mapping_pattern = '_wbeta-';
 
 for iSub = NbSub % for each subject
 
-  fprintf('Processing %s\n', SubLs(iSub).name);
+    fprintf('Processing %s\n', SubLs(iSub).name);
 
-  SubDir = fullfile(StartDir, SubLs(iSub).name);
+    SubDir = fullfile(StartDir, SubLs(iSub).name);
 
-  SrcDir = fullfile(SubDir, 'ffx_rsa', 'betas', '6_surf');
+    SrcDir = fullfile(SubDir, 'ffx_rsa', 'betas', '6_surf');
 
-  DestDir = fullfile(SubDir, 'ffx_rsa', 'betas', '6_surf');
+    DestDir = fullfile(SubDir, 'ffx_rsa', 'betas', '6_surf');
 
-  Extract_mapped_betas_VTK(SubLs(iSub).name, SrcDir, DestDir, opt, 0);
+    CopyMappedBetasVTK(SubLs(iSub).name, SrcDir, DestDir, opt, 0);
 
 end
