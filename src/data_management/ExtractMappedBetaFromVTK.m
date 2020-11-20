@@ -35,7 +35,7 @@ Dirs = SetDir('surf', MVNN);
 
 [SubLs, NbSub] = GetSubjectList(Dirs.ExternalHD);
 
-for iSub = 8:NbSub
+for iSub = 1:NbSub
 
     fprintf('Processing %s\n', SubLs(iSub).name);
 
