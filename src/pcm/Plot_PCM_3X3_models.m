@@ -155,7 +155,7 @@ for iToPlot = 1 % :numel(ToPlot)
                     load(fullfile(Save_dir, ls_files_2_load(end).name), ...
                          'M', 'T_group', 'G_hat', 'G', 'G_pred_gr', 'T_cross', 'G_pred_cr');
 
-                    M_all{iComp, 1} = M;
+                    {iComp, 1} = M;
                     T_group_all{iComp, 1} = T_group;
                     G_all{iComp, 1} = G;
                     G_hat_all{iComp, 1} = G_hat;
