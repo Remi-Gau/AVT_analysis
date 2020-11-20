@@ -1,23 +1,25 @@
 % Extracts data (i.e. beta values for vertex in a
 % particular surface-layer) from all the VTK. Relies on parfor and brute force
 % but fast “textscan” rather than the slower read_vtk.m . Requires to know how
-% many vertices the VTK files have. Saves the data for the whole surface and
-% for each beta dimension are [vertex, layer, beta]. Also saves the list of
+% many vertices the VTK files have. 
+%
+% Saves the data for the whole surface and for each beta into a BIG mat file
+% Dimensions are [vertex, layer, beta]. Also saves the list of
 % vertices that have data at each depth.
 %
-% Saves everything into a BIG mat file
 %
 % Only keeps the vertices with data: their indices is kept in the VertexWithData
 % variable
-
+%
+%
 % OUTPUT
 %
-% fullfile(OuputDir, [SubLs(iSub).name  '_features_' HsSufix 'hs_' NbLayers '_surf.mat]')
+% fullfile(OuputDir, [SubLs(iSub).name  '_features_hs-' HsSufix '_NbLayer-' NbLayers '.mat]')
 %
 % - VertexWithData
 % - AllMapping  with dimensions [NbVertices(hs), NbLayers, size(Betas, 1)];
-% - inf_vertex: vertices from the surface. see read_vtk
-% - inf_faces: faces from the surface. see read_vtk
+% - inf_vertex: vertices from the surface. see read_vtk()
+% - inf_faces: faces from the surface. see read_vtk()
 %
 % The last 2 are kept in cases surface needs to be reconstructed
 

@@ -3,7 +3,7 @@
 clc;
 clear;
 
-MVNN = false;
+MVNN = true;
 
 %%
 NbLayers = 6;
@@ -27,7 +27,7 @@ DesMat = SetDesignMatLamGlm(NbLayers, Quad);
 
 SurfParameters = {'Cst', 'Lin', 'Quad'};
 
-for iSub = 1 % 1:NbSub
+for iSub = 1:NbSub
   
   fprintf('\n\n\n');
   
@@ -67,10 +67,12 @@ for iSub = 1 % 1:NbSub
       load(RoiSaveFile);
       
       % Temp variable to store the surface parameter beta values
-      % - nb vertices, 
       % - nb of surface parameters to estimate
+      % - nb vertices, 
       % - nb beta from subject level GLM
       SurfParam = nan(size(DesMat, 2), size(RoiData, 2), NbBetas);
+      ConditionVec_tmp = nan(NbBetas,1);
+      RunVec_tmp = nan(NbBetas,1);
       
       iBeta = 1; 
       
@@ -86,6 +88,9 @@ for iSub = 1 % 1:NbSub
             X = DesMat;
             B = pinv(X) * Y;
             SurfParam(:, :, iBeta) = B;
+            
+            ConditionVec_tmp(iBeta) = iCdt;
+            RunVec_tmp(iBeta) = iRun;
             
             iBeta = iBeta + 1;
 
