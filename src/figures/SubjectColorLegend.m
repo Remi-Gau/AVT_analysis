@@ -34,7 +34,7 @@ COLOR_Subject = COLOR_Subject / 255;
 figure(1);
 hold on;
 for iSubj = 1:NbSub
-  plot([0 1], [iSubj iSubj], 'color', COLOR_Subject(iSubj, :), 'linewidth', 3);
+    plot([0 1], [iSubj iSubj], 'color', COLOR_Subject(iSubj, :), 'linewidth', 3);
 end
 axis([-.5 1.5 0  NbSub + 1]);
 axis off;

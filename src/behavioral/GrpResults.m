@@ -27,30 +27,30 @@ GrpRes.FalseAlarms.data = nan(20, 4, NbSub);
 
 for iSub = 1:NbSub % for each subject
 
-  fprintf('\n\nProcessing %s\n', SubLs(iSub).name);
+    fprintf('\n\nProcessing %s\n', SubLs(iSub).name);
 
-  % Subject directory
-  SubDir = fullfile(StartDir, SubLs(iSub).name);
+    % Subject directory
+    SubDir = fullfile(StartDir, SubLs(iSub).name);
 
-  %     copyfile(fullfile('E:\derivatives',SubLs(iSub).name,['Behavior_' SubLs(iSub).name '.mat']),...
-  %         fullfile(SubDir,['Behavior_' SubLs(iSub).name '.mat']))
-  %
-  load(fullfile(SubDir, ['Behavior_' SubLs(iSub).name '.mat']), 'D_prime', 'CorrectRejection', 'Miss', 'Hits', ...
-       'FalseAlarms');
+    %     copyfile(fullfile('E:\derivatives',SubLs(iSub).name,['Behavior_' SubLs(iSub).name '.mat']),...
+    %         fullfile(SubDir,['Behavior_' SubLs(iSub).name '.mat']))
+    %
+    load(fullfile(SubDir, ['Behavior_' SubLs(iSub).name '.mat']), 'D_prime', 'CorrectRejection', 'Miss', 'Hits', ...
+         'FalseAlarms');
 
-  Accuracy = round([(Hits + CorrectRejection) ./ (Hits + Miss + CorrectRejection + FalseAlarms)] * 100);
+    Accuracy = round([(Hits + CorrectRejection) ./ (Hits + Miss + CorrectRejection + FalseAlarms)] * 100);
 
-  FalseAlarmRate = FalseAlarms ./ (FalseAlarms + CorrectRejection) * 100;
-  CorrectRejectionRate = CorrectRejection ./ (FalseAlarms + CorrectRejection) * 100;
-  HitRate = Hits ./ (Hits + Miss) * 100;
-  MissRate = Miss ./ (Hits + Miss) * 100;
+    FalseAlarmRate = FalseAlarms ./ (FalseAlarms + CorrectRejection) * 100;
+    CorrectRejectionRate = CorrectRejection ./ (FalseAlarms + CorrectRejection) * 100;
+    HitRate = Hits ./ (Hits + Miss) * 100;
+    MissRate = Miss ./ (Hits + Miss) * 100;
 
-  GrpRes.D_prime.data(1:size(D_prime, 1), :, iSub) = D_prime;
-  GrpRes.Accuracy.data(1:size(D_prime, 1), :, iSub) = Accuracy;
-  GrpRes.CorrectRejection.data(1:size(CorrectRejection, 1), :, iSub) = CorrectRejectionRate;
-  GrpRes.Miss.data(1:size(Miss, 1), :, iSub) = MissRate;
-  GrpRes.Hits.data(1:size(Hits, 1), :, iSub) = HitRate;
-  GrpRes.FalseAlarms.data(1:size(FalseAlarms, 1), :, iSub) = FalseAlarmRate;
+    GrpRes.D_prime.data(1:size(D_prime, 1), :, iSub) = D_prime;
+    GrpRes.Accuracy.data(1:size(D_prime, 1), :, iSub) = Accuracy;
+    GrpRes.CorrectRejection.data(1:size(CorrectRejection, 1), :, iSub) = CorrectRejectionRate;
+    GrpRes.Miss.data(1:size(Miss, 1), :, iSub) = MissRate;
+    GrpRes.Hits.data(1:size(Hits, 1), :, iSub) = HitRate;
+    GrpRes.FalseAlarms.data(1:size(FalseAlarms, 1), :, iSub) = FalseAlarmRate;
 
 end
 
@@ -119,49 +119,49 @@ set(fig, 'Visible', 'on');
 
 for iCdt = 1:4
 
-  ToPlotMean = [ ...
-                GrpRes.Hits.MEAN(iCdt), ...
-                GrpRes.Miss.MEAN(iCdt), ...
-                GrpRes.FalseAlarms.MEAN(iCdt), ...
-                GrpRes.CorrectRejection.MEAN(iCdt), ...
-                GrpRes.Accuracy.MEAN(iCdt)];
+    ToPlotMean = [ ...
+                  GrpRes.Hits.MEAN(iCdt), ...
+                  GrpRes.Miss.MEAN(iCdt), ...
+                  GrpRes.FalseAlarms.MEAN(iCdt), ...
+                  GrpRes.CorrectRejection.MEAN(iCdt), ...
+                  GrpRes.Accuracy.MEAN(iCdt)];
 
-  ToPlotDispersion = [ ...
-                      GrpRes.Hits.STD(iCdt), ...
-                      GrpRes.Miss.STD(iCdt), ...
-                      GrpRes.FalseAlarms.STD(iCdt), ...
-                      GrpRes.CorrectRejection.STD(iCdt), ...
-                      GrpRes.Accuracy.STD(iCdt)];
+    ToPlotDispersion = [ ...
+                        GrpRes.Hits.STD(iCdt), ...
+                        GrpRes.Miss.STD(iCdt), ...
+                        GrpRes.FalseAlarms.STD(iCdt), ...
+                        GrpRes.CorrectRejection.STD(iCdt), ...
+                        GrpRes.Accuracy.STD(iCdt)];
 
-  SubjData = [ ...
-              GrpRes.Hits.mean(:, iCdt), ...
-              GrpRes.Miss.mean(:, iCdt), ...
-              GrpRes.FalseAlarms.mean(:, iCdt), ...
-              GrpRes.CorrectRejection.mean(:, iCdt), ...
-              GrpRes.Accuracy.mean(:, iCdt)];
+    SubjData = [ ...
+                GrpRes.Hits.mean(:, iCdt), ...
+                GrpRes.Miss.mean(:, iCdt), ...
+                GrpRes.FalseAlarms.mean(:, iCdt), ...
+                GrpRes.CorrectRejection.mean(:, iCdt), ...
+                GrpRes.Accuracy.mean(:, iCdt)];
 
-  subplot(4, 1, iCdt);
-  hold on;
+    subplot(4, 1, iCdt);
+    hold on;
 
-  h = errorbar(1:5, ToPlotMean, ToPlotDispersion, '.k');
+    h = errorbar(1:5, ToPlotMean, ToPlotDispersion, '.k');
 
-  for iSubj = 1:size(COLOR_Subject, 1)
-    plot((1.2:1:5.2) + Scatter(iSubj), SubjData(iSubj, :), ...
-         'linestyle', 'none', ...
-         'Marker', '.', 'MarkerEdgeColor', COLOR_Subject(iSubj, :), ...
-         'MarkerFaceColor', COLOR_Subject(iSubj, :), 'MarkerSize', 28);
-  end
+    for iSubj = 1:size(COLOR_Subject, 1)
+        plot((1.2:1:5.2) + Scatter(iSubj), SubjData(iSubj, :), ...
+             'linestyle', 'none', ...
+             'Marker', '.', 'MarkerEdgeColor', COLOR_Subject(iSubj, :), ...
+             'MarkerFaceColor', COLOR_Subject(iSubj, :), 'MarkerSize', 28);
+    end
 
-  axis([0.8 5.8 -5 105]);
-  set(gca, 'tickdir', 'out', ...
-      'xtick', 1:5, 'xticklabel', {'Hits', 'Miss', 'FA', 'CR', 'Accuracy'}, ...
-      'ytick', 0:25:100, 'yticklabel', 0:25:100, ...
-      'ticklength', [0.01 0.01], 'fontsize', 8);
-  box off;
-  grid on;
+    axis([0.8 5.8 -5 105]);
+    set(gca, 'tickdir', 'out', ...
+        'xtick', 1:5, 'xticklabel', {'Hits', 'Miss', 'FA', 'CR', 'Accuracy'}, ...
+        'ytick', 0:25:100, 'yticklabel', 0:25:100, ...
+        'ticklength', [0.01 0.01], 'fontsize', 8);
+    box off;
+    grid on;
 
-  t = ylabel(Titles{iCdt});
-  set(t, 'fontsize', 12);
+    t = ylabel(Titles{iCdt});
+    set(t, 'fontsize', 12);
 
 end
 
@@ -192,10 +192,10 @@ h = errorbar(1:4, ToPlotMean, ToPlotDispersion, '.k');
 SubjData = GrpRes.D_prime.mean;
 
 for iSubj = 1:size(COLOR_Subject, 1)
-  plot((1.2:1:4.2) + Scatter(iSubj), SubjData(iSubj, :), ...
-       'linestyle', 'none', ...
-       'Marker', '.', 'MarkerEdgeColor', COLOR_Subject(iSubj, :), ...
-       'MarkerFaceColor', COLOR_Subject(iSubj, :), 'MarkerSize', 28);
+    plot((1.2:1:4.2) + Scatter(iSubj), SubjData(iSubj, :), ...
+         'linestyle', 'none', ...
+         'Marker', '.', 'MarkerEdgeColor', COLOR_Subject(iSubj, :), ...
+         'MarkerFaceColor', COLOR_Subject(iSubj, :), 'MarkerSize', 28);
 end
 
 axis([0.8 4.8 2 4]);
@@ -219,34 +219,34 @@ fprintf (fid, 'Condition,,hit,,,,,miss,,,,,faslse alarm,,,,,correct rejection,,,
 
 for iCdt = 1:4
 
-  fprintf (fid, '\n');
+    fprintf (fid, '\n');
 
-  fprintf(fid, '%s,,', Titles{iCdt});
+    fprintf(fid, '%s,,', Titles{iCdt});
 
-  for Output = 1:6
-    switch Output
-      case 1
-        Data = GrpRes.Hits;
-      case 2
-        Data = GrpRes.Miss;
-      case 3
-        Data = GrpRes.FalseAlarms;
-      case 4
-        Data = GrpRes.CorrectRejection;
-      case 5
-        Data = GrpRes.Accuracy;
-      case 6
-        Data = GrpRes.D_prime;
+    for Output = 1:6
+        switch Output
+            case 1
+                Data = GrpRes.Hits;
+            case 2
+                Data = GrpRes.Miss;
+            case 3
+                Data = GrpRes.FalseAlarms;
+            case 4
+                Data = GrpRes.CorrectRejection;
+            case 5
+                Data = GrpRes.Accuracy;
+            case 6
+                Data = GrpRes.D_prime;
+        end
+
+        for i = 1:2
+            if i == 1
+                fprintf (fid, '%f,', Data.MEAN(iCdt));
+            else
+                fprintf (fid, '(,%f,),,', Data.STD(iCdt));
+            end
+        end
     end
-
-    for i = 1:2
-      if i == 1
-        fprintf (fid, '%f,', Data.MEAN(iCdt));
-      else
-        fprintf (fid, '(,%f,),,', Data.STD(iCdt));
-      end
-    end
-  end
 
 end
 

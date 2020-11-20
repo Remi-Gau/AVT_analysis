@@ -77,177 +77,177 @@ SVM = [ ...
 
 for iROI = 1:numel(ROIs)
 
-  fprintf([ROIs{iROI} '\n']);
+    fprintf([ROIs{iROI} '\n']);
 
-  Name = [strrep(ROIs{iROI}, '_', '-') '-' strrep(SVM(iROI, :), ' ', '-')];
+    Name = [strrep(ROIs{iROI}, '_', '-') '-' strrep(SVM(iROI, :), ' ', '-')];
 
-  % Open figure
-  fig = figure('Name', Name, 'Position', [100, 100, 1500, 1000], ...
-               'Color', [1 1 1], 'Visible', Visible);
+    % Open figure
+    fig = figure('Name', Name, 'Position', [100, 100, 1500, 1000], ...
+                 'Color', [1 1 1], 'Visible', Visible);
 
-  box off;
+    box off;
 
-  set(gca, 'units', 'centimeters');
-  pos = get(gca, 'Position');
-  ti = get(gca, 'TightInset');
+    set(gca, 'units', 'centimeters');
+    pos = get(gca, 'Position');
+    ti = get(gca, 'TightInset');
 
-  set(fig, 'PaperUnits', 'centimeters');
-  set(fig, 'PaperSize', [pos(3) + ti(1) + ti(3) pos(4) + ti(2) + ti(4)]);
-  set(fig, 'PaperPositionMode', 'manual');
-  set(fig, 'PaperPosition', [0 0 pos(3) + ti(1) + ti(3) pos(4) + ti(2) + ti(4)]);
+    set(fig, 'PaperUnits', 'centimeters');
+    set(fig, 'PaperSize', [pos(3) + ti(1) + ti(3) pos(4) + ti(2) + ti(4)]);
+    set(fig, 'PaperPositionMode', 'manual');
+    set(fig, 'PaperPosition', [0 0 pos(3) + ti(1) + ti(3) pos(4) + ti(2) + ti(4)]);
 
-  set(fig, 'Visible', Visible);
+    set(fig, 'Visible', Visible);
 
-  %% Get BOLD Data
+    %% Get BOLD Data
 
-  ResultsDir = fullfile(StartDir, 'results', 'profiles');
+    ResultsDir = fullfile(StartDir, 'results', 'profiles');
 
-  % Contrasts against sensory modalities pooled over the whole ROI
-  if WithQuad
-    load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, ...
-                                     '_VolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
-  else
-    load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, ...
-                                     '_VolNoQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results'); %#ok<*UNRCH>
-  end
+    % Contrasts against sensory modalities pooled over the whole ROI
+    if WithQuad
+        load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, ...
+                                         '_VolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
+    else
+        load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, ...
+                                         '_VolNoQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results'); %#ok<*UNRCH>
+    end
 
-  ToPlot.Data.MEAN(:, 1) = Results.ContSensMod.MEAN(:, BOLD_Cdt(iROI));
-  ToPlot.Data.SEM(:, 1) = Results.ContSensMod.SEM(:, BOLD_Cdt(iROI));
-  ToPlot.Data.grp(:, 1, :) = Results.ContSensMod.grp(:, BOLD_Cdt(iROI), :);
-  ToPlot.Data.Beta.DATA(:, 1, :) = Results.ContSensMod.Beta.DATA(:, BOLD_Cdt(iROI), :);
+    ToPlot.Data.MEAN(:, 1) = Results.ContSensMod.MEAN(:, BOLD_Cdt(iROI));
+    ToPlot.Data.SEM(:, 1) = Results.ContSensMod.SEM(:, BOLD_Cdt(iROI));
+    ToPlot.Data.grp(:, 1, :) = Results.ContSensMod.grp(:, BOLD_Cdt(iROI), :);
+    ToPlot.Data.Beta.DATA(:, 1, :) = Results.ContSensMod.Beta.DATA(:, BOLD_Cdt(iROI), :);
 
-  clear Results;
+    clear Results;
 
-  % Contrasts against sensory modalities pooled for ipsi and contra
-  if WithQuad
-    load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, ...
-                                     '_VolPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
-  else
-    load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, ...
-                                     '_VolPoolNoQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
-  end
+    % Contrasts against sensory modalities pooled for ipsi and contra
+    if WithQuad
+        load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, ...
+                                         '_VolPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
+    else
+        load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, ...
+                                         '_VolPoolNoQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
+    end
 
-  ToPlot.Data.MEAN(:, 2) = Results.ContSensModIpsi.MEAN(:, BOLD_Cdt(iROI));
-  ToPlot.Data.SEM(:, 2) = Results.ContSensModIpsi.SEM(:, BOLD_Cdt(iROI));
-  ToPlot.Data.grp(:, 2, :) = Results.ContSensModIpsi.grp(:, BOLD_Cdt(iROI), :);
-  ToPlot.Data.Beta.DATA(:, 2, :) = Results.ContSensModIpsi.Beta.DATA(:, BOLD_Cdt(iROI), :);
+    ToPlot.Data.MEAN(:, 2) = Results.ContSensModIpsi.MEAN(:, BOLD_Cdt(iROI));
+    ToPlot.Data.SEM(:, 2) = Results.ContSensModIpsi.SEM(:, BOLD_Cdt(iROI));
+    ToPlot.Data.grp(:, 2, :) = Results.ContSensModIpsi.grp(:, BOLD_Cdt(iROI), :);
+    ToPlot.Data.Beta.DATA(:, 2, :) = Results.ContSensModIpsi.Beta.DATA(:, BOLD_Cdt(iROI), :);
 
-  ToPlot.Data.MEAN(:, 3) = Results.ContSensModContra.MEAN(:, BOLD_Cdt(iROI));
-  ToPlot.Data.SEM(:, 3) = Results.ContSensModContra.SEM(:, BOLD_Cdt(iROI));
-  ToPlot.Data.grp(:, 3, :) = Results.ContSensModContra.grp(:, BOLD_Cdt(iROI), :);
-  ToPlot.Data.Beta.DATA(:, 3, :) = Results.ContSensModContra.Beta.DATA(:, BOLD_Cdt(iROI), :);
+    ToPlot.Data.MEAN(:, 3) = Results.ContSensModContra.MEAN(:, BOLD_Cdt(iROI));
+    ToPlot.Data.SEM(:, 3) = Results.ContSensModContra.SEM(:, BOLD_Cdt(iROI));
+    ToPlot.Data.grp(:, 3, :) = Results.ContSensModContra.grp(:, BOLD_Cdt(iROI), :);
+    ToPlot.Data.Beta.DATA(:, 3, :) = Results.ContSensModContra.Beta.DATA(:, BOLD_Cdt(iROI), :);
 
-  clear Results;
+    clear Results;
 
-  %% Plot BOLD DATA
+    %% Plot BOLD DATA
 
-  ToPlot.SubPlotOrder = [1 2 3];
-  ToPlot.PlotSub = 1;
-  ToPlot.WithQuad = WithQuad;
-  ToPlot.SubplotGroup = [ ...
-                         1 3; ...
-                         7 9; ...
-                         13 15];
-  ToPlot.mn = [9 2];
-  ToPlot.XYs = [ ...
-                0.13 0.65; ...
-                0.13 0.37; ...
-                0.13 0.09 ...
-               ];
-  ToPlot.Legend = { ...
-                   {'Whole', 'BOLD'}; ...
-                   {'Ipsi', ''}; ...
-                   {'Contra', ''} ...
-                  };
-  ToPlot.MVPA = 0;
+    ToPlot.SubPlotOrder = [1 2 3];
+    ToPlot.PlotSub = 1;
+    ToPlot.WithQuad = WithQuad;
+    ToPlot.SubplotGroup = [ ...
+                           1 3; ...
+                           7 9; ...
+                           13 15];
+    ToPlot.mn = [9 2];
+    ToPlot.XYs = [ ...
+                  0.13 0.65; ...
+                  0.13 0.37; ...
+                  0.13 0.09 ...
+                 ];
+    ToPlot.Legend = { ...
+                     {'Whole', 'BOLD'}; ...
+                     {'Ipsi', ''}; ...
+                     {'Contra', ''} ...
+                    };
+    ToPlot.MVPA = 0;
 
-  Plot_BOLD_MVPA(ToPlot);
+    Plot_BOLD_MVPA(ToPlot);
 
-  clear ToPlot;
+    clear ToPlot;
 
-  %% Get MVPA Data
+    %% Get MVPA Data
 
-  ResultsDir = fullfile(StartDir, 'results', 'SVM');
+    ResultsDir = fullfile(StartDir, 'results', 'SVM');
 
-  % Contrasts against sensory modalities pooled over the whole ROI
-  if WithQuad
-    load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI},  '_', strrep(SVM(iROI, :), ' ', '-'), ...
-                                     '_VolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
-  else
-    load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, strrep(SVM(iROI, :), ' ', '-'), ...
-                                     '_VolNoQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
-  end
+    % Contrasts against sensory modalities pooled over the whole ROI
+    if WithQuad
+        load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI},  '_', strrep(SVM(iROI, :), ' ', '-'), ...
+                                         '_VolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
+    else
+        load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, strrep(SVM(iROI, :), ' ', '-'), ...
+                                         '_VolNoQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
+    end
 
-  ToPlot.Data.MEAN(:, 1) = Results.MEAN(2:end);
-  ToPlot.Data.SEM(:, 1) = Results.SEM(2:end);
-  ToPlot.Data.grp(:, 1, :) = Results.grp(:, 2:end)';
-  ToPlot.Data.Beta.DATA(:, 1, :) = Results.Beta.DATA;
+    ToPlot.Data.MEAN(:, 1) = Results.MEAN(2:end);
+    ToPlot.Data.SEM(:, 1) = Results.SEM(2:end);
+    ToPlot.Data.grp(:, 1, :) = Results.grp(:, 2:end)';
+    ToPlot.Data.Beta.DATA(:, 1, :) = Results.Beta.DATA;
 
-  clear Results;
+    clear Results;
 
-  % Contrasts against sensory modalities pooled for ipsi
-  if WithQuad
-    load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, '_', strrep(SVM(iROI, :), ' ', '-'), '-Ipsi', ...
-                                     '_VolPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
-  else
-    load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, '_', strrep(SVM(iROI, :), ' ', '-'), '-Ipsi', ...
-                                     '_VolPoolNoQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
-  end
+    % Contrasts against sensory modalities pooled for ipsi
+    if WithQuad
+        load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, '_', strrep(SVM(iROI, :), ' ', '-'), '-Ipsi', ...
+                                         '_VolPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
+    else
+        load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, '_', strrep(SVM(iROI, :), ' ', '-'), '-Ipsi', ...
+                                         '_VolPoolNoQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
+    end
 
-  ToPlot.Data.MEAN(:, 2) = Results.MEAN(2:end);
-  ToPlot.Data.SEM(:, 2) = Results.SEM(2:end);
-  ToPlot.Data.grp(:, 2, :) = Results.grp(:, 2:end)';
-  ToPlot.Data.Beta.DATA(:, 2, :) = Results.Beta.DATA;
+    ToPlot.Data.MEAN(:, 2) = Results.MEAN(2:end);
+    ToPlot.Data.SEM(:, 2) = Results.SEM(2:end);
+    ToPlot.Data.grp(:, 2, :) = Results.grp(:, 2:end)';
+    ToPlot.Data.Beta.DATA(:, 2, :) = Results.Beta.DATA;
 
-  clear Results;
+    clear Results;
 
-  % Contrasts against sensory modalities pooled for ipsi
-  if WithQuad
-    load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, '_', strrep(SVM(iROI, :), ' ', '-'), '-Contra', ...
-                                     '_VolPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
-  else
-    load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, '_', strrep(SVM(iROI, :), ' ', '-'), '-Contra', ...
-                                     '_VolPoolNoQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
-  end
+    % Contrasts against sensory modalities pooled for ipsi
+    if WithQuad
+        load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, '_', strrep(SVM(iROI, :), ' ', '-'), '-Contra', ...
+                                         '_VolPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
+    else
+        load(fullfile(ResultsDir, strcat('Results_', ROIs{iROI}, '_', strrep(SVM(iROI, :), ' ', '-'), '-Contra', ...
+                                         '_VolPoolNoQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
+    end
 
-  ToPlot.Data.MEAN(:, 3) = Results.MEAN(2:end);
-  ToPlot.Data.SEM(:, 3) = Results.SEM(2:end);
-  ToPlot.Data.grp(:, 3, :) = Results.grp(:, 2:end)';
-  ToPlot.Data.Beta.DATA(:, 3, :) = Results.Beta.DATA;
+    ToPlot.Data.MEAN(:, 3) = Results.MEAN(2:end);
+    ToPlot.Data.SEM(:, 3) = Results.SEM(2:end);
+    ToPlot.Data.grp(:, 3, :) = Results.grp(:, 2:end)';
+    ToPlot.Data.Beta.DATA(:, 3, :) = Results.Beta.DATA;
 
-  clear Results;
+    clear Results;
 
-  %% Plot BOLD DATA
+    %% Plot BOLD DATA
 
-  ToPlot.SubPlotOrder = [1 2 3];
-  ToPlot.PlotSub = 1;
-  ToPlot.WithQuad = WithQuad;
-  ToPlot.SubplotGroup = [ ...
-                         2 4; ...
-                         8 10; ...
-                         14 16];
-  ToPlot.mn = [9 2];
-  ToPlot.XYs = [ ...
-                0.57 0.65; ...
-                0.57 0.37; ...
-                0.57 0.09 ...
-               ];
-  ToPlot.Legend = { ...
-                   {'', 'MVPA'}; ...
-                   {'', ''}; ...
-                   {'', ''} ...
-                  };
-  ToPlot.MVPA = 1;
+    ToPlot.SubPlotOrder = [1 2 3];
+    ToPlot.PlotSub = 1;
+    ToPlot.WithQuad = WithQuad;
+    ToPlot.SubplotGroup = [ ...
+                           2 4; ...
+                           8 10; ...
+                           14 16];
+    ToPlot.mn = [9 2];
+    ToPlot.XYs = [ ...
+                  0.57 0.65; ...
+                  0.57 0.37; ...
+                  0.57 0.09 ...
+                 ];
+    ToPlot.Legend = { ...
+                     {'', 'MVPA'}; ...
+                     {'', ''}; ...
+                     {'', ''} ...
+                    };
+    ToPlot.MVPA = 1;
 
-  Plot_BOLD_MVPA(ToPlot);
+    Plot_BOLD_MVPA(ToPlot);
 
-  %%
-  mtit(Name, 'xoff', 0, 'yoff', +0.03, 'fontsize', 16);
-  set(fig, 'Visible', Visible);
+    %%
+    mtit(Name, 'xoff', 0, 'yoff', +0.03, 'fontsize', 16);
+    set(fig, 'Visible', Visible);
 
-  %     print(fig, fullfile(FigureFolder, strcat(Name, '_', num2str(NbLayers), 'Layers.pdf')), '-dpdf')
-  print(fig, fullfile(FigureFolder, strcat(Name, '_', num2str(NbLayers), 'Layers.tif')), '-dtiff');
+    %     print(fig, fullfile(FigureFolder, strcat(Name, '_', num2str(NbLayers), 'Layers.pdf')), '-dpdf')
+    print(fig, fullfile(FigureFolder, strcat(Name, '_', num2str(NbLayers), 'Layers.tif')), '-dtiff');
 
-  clear ToPlot;
+    clear ToPlot;
 
 end

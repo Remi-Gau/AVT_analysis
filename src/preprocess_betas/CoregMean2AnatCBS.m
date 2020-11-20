@@ -21,33 +21,33 @@ NbSub = numel(SubLs);
 
 for iSub = NbSub % for each subject
 
-  fprintf('\n\nProcessing %s\n', SubLs(iSub).name);
+    fprintf('\n\nProcessing %s\n', SubLs(iSub).name);
 
-  % Subject directory
-  SubDir = fullfile(StartDir, SubLs(iSub).name);
+    % Subject directory
+    SubDir = fullfile(StartDir, SubLs(iSub).name);
 
-  Img2Process = {};
-  TargetScan = []; %#ok<NASGU>
-  SourceScan = []; %#ok<NASGU>
+    Img2Process = {};
+    TargetScan = []; %#ok<NASGU>
+    SourceScan = []; %#ok<NASGU>
 
-  TargetScan = dir(fullfile(SubDir, 'anat', 'cbs', ...
-                            [SubLs(iSub).name '*_bound.nii']));
-  TargetScan = fullfile(SubDir, 'anat', 'cbs', ...
-                        TargetScan.name);
+    TargetScan = dir(fullfile(SubDir, 'anat', 'cbs', ...
+                              [SubLs(iSub).name '*_bound.nii']));
+    TargetScan = fullfile(SubDir, 'anat', 'cbs', ...
+                          TargetScan.name);
 
-  cd(fullfile(SubDir, 'ffx_nat', 'betas'));
+    cd(fullfile(SubDir, 'ffx_nat', 'betas'));
 
-  SourceScan = dir(fullfile(SubDir, 'ffx_nat', 'betas', ...
-                            'mean*.nii'));
-  SourceScan = fullfile(SubDir, 'ffx_nat', 'betas', ...
-                        SourceScan.name);
+    SourceScan = dir(fullfile(SubDir, 'ffx_nat', 'betas', ...
+                              'mean*.nii'));
+    SourceScan = fullfile(SubDir, 'ffx_nat', 'betas', ...
+                          SourceScan.name);
 
-  tmp = dir([SubLs(iSub).name  '_beta-*.nii']);
-  for FileInd = 1:length(tmp)
-    Img2Process{end + 1, 1} = fullfile(SubDir, 'ffx_nat', 'betas', tmp(FileInd).name); %#ok<SAGROW>
-  end
+    tmp = dir([SubLs(iSub).name  '_beta-*.nii']);
+    for FileInd = 1:length(tmp)
+        Img2Process{end + 1, 1} = fullfile(SubDir, 'ffx_nat', 'betas', tmp(FileInd).name); %#ok<SAGROW>
+    end
 
-  spm_coreg_reorient_save(TargetScan, SourceScan, Img2Process, flags);
+    spm_coreg_reorient_save(TargetScan, SourceScan, Img2Process, flags);
 
 end
 

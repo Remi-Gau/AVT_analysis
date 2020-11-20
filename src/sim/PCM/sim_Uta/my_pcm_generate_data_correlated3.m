@@ -8,11 +8,11 @@ clear all;
 % using Model2: Model with a flexible correlation for each finger
 num_conds = 10;
 for i = 1:5
-  A = zeros(5);
-  A(i, i) = 1;
-  Ac(:, 1:5, i)    = [A; zeros(5)];       % Contralateral finger patterns   (theta_a)
-  Ac(:, 1:5, 5 + i)  = [zeros(5); A];       % Mirrored Contralateralpatterns  (theta_b)
-  Ac(:, 6:10, 10 + i) = [zeros(5); A];       % Unique Ipsilateral pattterns    (theta_c)
+    A = zeros(5);
+    A(i, i) = 1;
+    Ac(:, 1:5, i)    = [A; zeros(5)];       % Contralateral finger patterns   (theta_a)
+    Ac(:, 1:5, 5 + i)  = [zeros(5); A];       % Mirrored Contralateralpatterns  (theta_b)
+    Ac(:, 6:10, 10 + i) = [zeros(5); A];       % Unique Ipsilateral pattterns    (theta_c)
 end
 Ac(:, 11, 16)  = [ones(5, 1); zeros(5, 1)];  % Hand-specific component contra  (theta_d)
 Ac(:, 12, 17)  = [zeros(5, 1); ones(5, 1)];  % Hand-specific component ipsi    (theta_e)
@@ -22,7 +22,7 @@ theta_orig = [1 2 1 -1  1 2 4 5 6 1 1 2 2 4 5 7 2];
 % Define M matrix and original G matrix
 M = zeros(10, 12);
 for i = 1:17
-  M = M + theta_orig(i) * Ac(:, :, i);
+    M = M + theta_orig(i) * Ac(:, :, i);
 end
 
 G_orig = M * M';
@@ -42,10 +42,10 @@ W = randn(num_feature, num_voxels); %  weights for each feature and voxel
 
 w_corr = 0;
 if w_corr == 1
-  my_w1 = randn(num_feature, num_voxels / 2);
-  my_w2 = ones(num_feature, 500);
-  W = [my_w1 my_w2];
-  %     W = repmat([my_w1 my_w1]',1,num_feature)';
+    my_w1 = randn(num_feature, num_voxels / 2);
+    my_w2 = ones(num_feature, 500);
+    W = [my_w1 my_w2];
+    %     W = repmat([my_w1 my_w1]',1,num_feature)';
 end
 
 U = M * W;  % U(num_conds,num_vox)
@@ -67,14 +67,14 @@ my_corr_part = 1;
 my_corr1 = 0;
 spat_smooth = 100;
 if my_corr_part == 1
-  B_init = repmat([1:20 + my_corr1]', 1, num_voxels + spat_smooth); % mean activation increases over runs
-  B_more = B_init + randn(num_partitions + my_corr1, num_voxels + spat_smooth);
-  for i = 1:size(B, 1)
-    B1(i, :) = mean(B_more(i:i + my_corr1, :), 1);
-  end
-  for i = 1:size(B, 2)
-    B(:, i) = mean(B1(:, i:i + spat_smooth), 2); % mean effects are correlated over voxels
-  end
+    B_init = repmat([1:20 + my_corr1]', 1, num_voxels + spat_smooth); % mean activation increases over runs
+    B_more = B_init + randn(num_partitions + my_corr1, num_voxels + spat_smooth);
+    for i = 1:size(B, 1)
+        B1(i, :) = mean(B_more(i:i + my_corr1, :), 1);
+    end
+    for i = 1:size(B, 2)
+        B(:, i) = mean(B1(:, i:i + spat_smooth), 2); % mean effects are correlated over voxels
+    end
 
 end
 
@@ -86,15 +86,15 @@ S2 = 10;  % positively correlated error within a run
 e_spat_smooth = 100;
 
 if my_corr_e == 1
-  part_e = randn(num_partitions, num_voxels + e_spat_smooth) * S2;
-  for i = 1:num_partitions
-    for k = 1:num_voxels + e_spat_smooth
-      e1((i - 1) * num_conds + 1:i * num_conds, k) = repmat(part_e(i, k), num_conds, 1) + randn(num_conds, 1) * S;
+    part_e = randn(num_partitions, num_voxels + e_spat_smooth) * S2;
+    for i = 1:num_partitions
+        for k = 1:num_voxels + e_spat_smooth
+            e1((i - 1) * num_conds + 1:i * num_conds, k) = repmat(part_e(i, k), num_conds, 1) + randn(num_conds, 1) * S;
+        end
     end
-  end
-  for i = 1:num_voxels
-    e(:, i) = mean(e1(:, i:i + spat_smooth), 2); % errors are correlated over voxels
-  end
+    for i = 1:num_voxels
+        e(:, i) = mean(e1(:, i:i + spat_smooth), 2); % errors are correlated over voxels
+    end
 
 end
 % figure;imagesc(e)

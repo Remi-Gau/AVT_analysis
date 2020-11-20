@@ -20,33 +20,33 @@ NbSub = numel(SubLs);
 
 for iSub = [2 4] % 1:NbSub % for each subject
 
-  fprintf('\n\nProcessing %s\n', SubLs(iSub).name);
+    fprintf('\n\nProcessing %s\n', SubLs(iSub).name);
 
-  % Subject directory
-  SubDir = fullfile(StartDir, SubLs(iSub).name);
+    % Subject directory
+    SubDir = fullfile(StartDir, SubLs(iSub).name);
 
-  Img2Process = {};
-  TargetScan = []; %#ok<NASGU>
-  SourceScan = []; %#ok<NASGU>
+    Img2Process = {};
+    TargetScan = []; %#ok<NASGU>
+    SourceScan = []; %#ok<NASGU>
 
-  TargetScan = dir(fullfile(SubDir, 'anat', 'spm', ...
-                            'msub-*_ses-*_MP2RAGE_T1w.nii'));
-  TargetScan = fullfile(SubDir, 'anat', 'spm', ...
-                        TargetScan.name);
+    TargetScan = dir(fullfile(SubDir, 'anat', 'spm', ...
+                              'msub-*_ses-*_MP2RAGE_T1w.nii'));
+    TargetScan = fullfile(SubDir, 'anat', 'spm', ...
+                          TargetScan.name);
 
-  cd(fullfile(SubDir, 'ffx_nat_smooth', 'con'));
+    cd(fullfile(SubDir, 'ffx_nat_smooth', 'con'));
 
-  SourceScan = dir(fullfile(SubDir, 'ffx_nat_smooth', 'con', ...
-                            'mean*.nii'));
-  SourceScan = fullfile(SubDir, 'ffx_nat_smooth', 'con', ...
-                        SourceScan.name);
+    SourceScan = dir(fullfile(SubDir, 'ffx_nat_smooth', 'con', ...
+                              'mean*.nii'));
+    SourceScan = fullfile(SubDir, 'ffx_nat_smooth', 'con', ...
+                          SourceScan.name);
 
-  tmp = dir('con*.nii');
-  for FileInd = 1:length(tmp)
-    Img2Process{end + 1, 1} = fullfile(SubDir, 'ffx_nat_smooth', 'con', tmp(FileInd).name); %#ok<SAGROW>
-  end
+    tmp = dir('con*.nii');
+    for FileInd = 1:length(tmp)
+        Img2Process{end + 1, 1} = fullfile(SubDir, 'ffx_nat_smooth', 'con', tmp(FileInd).name); %#ok<SAGROW>
+    end
 
-  spm_coreg_reorient_save(TargetScan, SourceScan, Img2Process, flags);
+    spm_coreg_reorient_save(TargetScan, SourceScan, Img2Process, flags);
 
 end
 

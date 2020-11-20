@@ -54,9 +54,9 @@ Scale_noise =  [ ...
 % mean)
 % take absolute values to make sure we get positive matrices in the end
 for sm = 1:size(Scale_noise, 1)
-  theta_subj(sm, :, :) =  [ ...
-                           abs(Scale_noise(sm, 1) + randn(1, 1, NbSubj) * .1) ...
-                           abs(Scale_noise(sm, 2) + rand(1, 1, NbSubj) * 0)];
+    theta_subj(sm, :, :) =  [ ...
+                             abs(Scale_noise(sm, 1) + randn(1, 1, NbSubj) * .1) ...
+                             abs(Scale_noise(sm, 2) + rand(1, 1, NbSubj) * 0)];
 end
 
 FigDim = [100, 100, 1000, 1500];
@@ -76,15 +76,15 @@ FigDim = [100, 100, 1000, 1500];
 
 [Components, h] = Set_PCM_components_RDM(1, FigDim);
 if ~isempty(h)
-  print(h(1), fullfile(Fig_dir, 'Pattern_components_RDM.tif'), '-dtiff');
-  print(h(2), fullfile(Fig_dir, 'Pattern_components_G_matrices.tif'), '-dtiff');
+    print(h(1), fullfile(Fig_dir, 'Pattern_components_RDM.tif'), '-dtiff');
+    print(h(2), fullfile(Fig_dir, 'Pattern_components_G_matrices.tif'), '-dtiff');
 end
 
 %% get the typical models
 [Models_A, Models_V, h] = Set_PCM_models(Components, 1, FigDim);
 if ~isempty(h)
-  print(h(1), fullfile(Fig_dir, 'Models_for_auditory_ROIs.tif'), '-dtiff');
-  print(h(2), fullfile(Fig_dir, 'Models_for_visual_ROIs.tif'), '-dtiff');
+    print(h(1), fullfile(Fig_dir, 'Models_for_auditory_ROIs.tif'), '-dtiff');
+    print(h(2), fullfile(Fig_dir, 'Models_for_visual_ROIs.tif'), '-dtiff');
 end
 
 Models = Models_A;
@@ -103,20 +103,20 @@ M{1}.name       = 'null';
 % add each model
 for iMod = 1:numel(Models)
 
-  M{end + 1}.type       = 'component';
+    M{end + 1}.type       = 'component';
 
-  M{end}.numGparams = numel(Models(iMod).Cpts);
+    M{end}.numGparams = numel(Models(iMod).Cpts);
 
-  M{end}.Gc         = cat(3, Components(Models(iMod).Cpts).G);
+    M{end}.Gc         = cat(3, Components(Models(iMod).Cpts).G);
 
-  tmp = strrep(num2str(Models(iMod).Cpts), '  ', ' ');
-  tmp = strrep(tmp, '  ', ' ');
-  M{end}.name       = strrep(tmp, ' ', '+');
-  clear tmp;
+    tmp = strrep(num2str(Models(iMod).Cpts), '  ', ' ');
+    tmp = strrep(tmp, '  ', ' ');
+    M{end}.name       = strrep(tmp, ' ', '+');
+    clear tmp;
 
-  M{end}.fitAlgorithm = 'minimize';
+    M{end}.fitAlgorithm = 'minimize';
 
-  colors{end + 1} = 'b';
+    colors{end + 1} = 'b';
 
 end
 
@@ -142,7 +142,7 @@ M{end}           = pcm_prepFreeModel(M{end});
 
 theta_real = ones(numel(Models_A), numel(Components)) * -inf;
 for iMod = 1:numel(Models_A)
-  theta_real(iMod, Models_A(iMod).Cpts) = 0;
+    theta_real(iMod, Models_A(iMod).Cpts) = 0;
 end
 % stronger correlation between auditory patterns
 theta_real(2, 2) = 5;
@@ -164,13 +164,13 @@ theta_real(11, 9) = 3;
 % Gtotal = SUM_ii [exp(theta_ii)*G_ii]
 for tr = 1:size(theta_real, 1)
 
-  tmp = zeros(NbCdt);
+    tmp = zeros(NbCdt);
 
-  for iG = 1:size(theta_real, 2)
-    tmp = tmp + exp(theta_real(tr, iG)) * Components(iG).G;
-  end
+    for iG = 1:size(theta_real, 2)
+        tmp = tmp + exp(theta_real(tr, iG)) * Components(iG).G;
+    end
 
-  G_sum(:, :, tr) = tmp; %#ok<*SAGROW>
+    G_sum(:, :, tr) = tmp; %#ok<*SAGROW>
 
 end
 
@@ -183,18 +183,18 @@ save(fullfile(Save_dir, 'sim_pcm_models_components_weights.mat'), ...
 %% Generate data
 for ss = 1:NbSubj
 
-  for tr = 1:size(theta_real, 1)
+    for tr = 1:size(theta_real, 1)
 
-    for sm = 1:size(Scale_noise, 1)
+        for sm = 1:size(Scale_noise, 1)
 
-      s = theta_subj(sm, 1, ss);
-      sig = theta_subj(sm, 2, ss);
-      G = G_sum(:, :, tr);
+            s = theta_subj(sm, 1, ss);
+            sig = theta_subj(sm, 2, ss);
+            G = G_sum(:, :, tr);
 
-      [Y0{tr, sm}{ss}, Y1{tr, sm}{ss}] = Generate_PCM_data(Z, G, s, sig, NbFeatures, X, B);
+            [Y0{tr, sm}{ss}, Y1{tr, sm}{ss}] = Generate_PCM_data(Z, G, s, sig, NbFeatures, X, B);
 
+        end
     end
-  end
 
 end % ss
 
@@ -206,21 +206,21 @@ condVec = condVec(:);
 
 fprintf('\n\n\nRunning simulation on demeaned data.\n');
 for sm = 1:size(Scale_noise, 1)
-  fprintf('\n\n\n Running on noise level %i.\n', sm);
-  fprintf('\n\n\n  Running with no CV.\n');
-  for tr = 1:size(Y0, 1)
-    [ms_mr{tr, sm}.Tgroup, ms_mr{tr, sm}.theta, ms_mr{tr, sm}.G_pred] = ...
-        pcm_fitModelGroup(Y0{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', 'fitScale', 1);
-  end
-  save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_demean_noise_%i.mat', sm)), 'ms_mr');
+    fprintf('\n\n\n Running on noise level %i.\n', sm);
+    fprintf('\n\n\n  Running with no CV.\n');
+    for tr = 1:size(Y0, 1)
+        [ms_mr{tr, sm}.Tgroup, ms_mr{tr, sm}.theta, ms_mr{tr, sm}.G_pred] = ...
+            pcm_fitModelGroup(Y0{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', 'fitScale', 1);
+    end
+    save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_demean_noise_%i.mat', sm)), 'ms_mr');
 
-  fprintf('\n\n\n  Running with CV\n');
-  parfor tr = 1:size(Y0, 1)
-    [ms_mr{tr, sm}.Tcross, ms_mr{tr, sm}.thetaCr, ms_mr{tr, sm}.G_predcv] = ...
-        pcm_fitModelGroupCrossval(Y0{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', ...
-                                  'groupFit', ms_mr{tr, sm}.theta, 'fitScale', 1, 'MaxIteration', MaxIteration);
-  end
-  save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_demean_noise_%i.mat', sm)), 'ms_mr');
+    fprintf('\n\n\n  Running with CV\n');
+    parfor tr = 1:size(Y0, 1)
+        [ms_mr{tr, sm}.Tcross, ms_mr{tr, sm}.thetaCr, ms_mr{tr, sm}.G_predcv] = ...
+            pcm_fitModelGroupCrossval(Y0{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', ...
+                                      'groupFit', ms_mr{tr, sm}.theta, 'fitScale', 1, 'MaxIteration', MaxIteration);
+    end
+    save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_demean_noise_%i.mat', sm)), 'ms_mr');
 end
 
 %% Fit the models on the group level on data with fixed effect
@@ -231,37 +231,37 @@ condVec = condVec(:);
 
 fprintf('\n\n\nRunning simulation on data with mean.\n');
 for sm = 1:size(Scale_noise, 1)
-  fprintf('\n\n\n Running on noise level %i.\n', sm);
-  fprintf('\n\n\n  Running with no CV.\n');
-  for tr = 1:size(Y1, 1)
-    [ms_mc{tr, sm}.Tgroup, ms_mc{tr, sm}.theta, ms_mc{tr, sm}.G_pred] = ...
-        pcm_fitModelGroup(Y1{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', 'fitScale', 1);
-  end
-  save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_noise_%i.mat', sm)), 'ms_mc');
+    fprintf('\n\n\n Running on noise level %i.\n', sm);
+    fprintf('\n\n\n  Running with no CV.\n');
+    for tr = 1:size(Y1, 1)
+        [ms_mc{tr, sm}.Tgroup, ms_mc{tr, sm}.theta, ms_mc{tr, sm}.G_pred] = ...
+            pcm_fitModelGroup(Y1{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', 'fitScale', 1);
+    end
+    save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_noise_%i.mat', sm)), 'ms_mc');
 
-  fprintf('\n\n\n  Running with CV.\n');
-  parfor tr = 1:size(Y1, 1)
-    [ms_mc{tr, sm}.Tcross, ms_mc{tr, sm}.thetaCr, ms_mc{tr, sm}.G_predcv] = ...
-        pcm_fitModelGroupCrossval(Y1{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', ...
-                                  'groupFit', ms_mc{tr, sm}.theta, 'fitScale', 1, 'MaxIteration', MaxIteration);
-  end
-  save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_noise_%i.mat', sm)), 'ms_mc');
+    fprintf('\n\n\n  Running with CV.\n');
+    parfor tr = 1:size(Y1, 1)
+        [ms_mc{tr, sm}.Tcross, ms_mc{tr, sm}.thetaCr, ms_mc{tr, sm}.G_predcv] = ...
+            pcm_fitModelGroupCrossval(Y1{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', ...
+                                      'groupFit', ms_mc{tr, sm}.theta, 'fitScale', 1, 'MaxIteration', MaxIteration);
+    end
+    save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_noise_%i.mat', sm)), 'ms_mc');
 end
 
 %% replace 2 subjects with a different pattern
 for ss = 1:2
 
-  for tr = 1:size(theta_real, 1)
+    for tr = 1:size(theta_real, 1)
 
-    for sm = 1:size(Scale_noise, 1)
+        for sm = 1:size(Scale_noise, 1)
 
-      s = Scale_noise(sm, 1);
-      sig = Scale_noise(sm, 2);
-      G = G_null;
+            s = Scale_noise(sm, 1);
+            sig = Scale_noise(sm, 2);
+            G = G_null;
 
-      [Y0{tr, sm}{end - 2 + ss}, Y1{tr, sm}{end - 2 + ss}] = Generate_PCM_data(Z, G, s, sig, NbFeatures, X, B);
+            [Y0{tr, sm}{end - 2 + ss}, Y1{tr, sm}{end - 2 + ss}] = Generate_PCM_data(Z, G, s, sig, NbFeatures, X, B);
+        end
     end
-  end
 
 end % ss
 
@@ -273,21 +273,21 @@ condVec = condVec(:);
 
 fprintf('\n\n\nRunning simulation on demeaned data.\n');
 for sm = 1:size(Scale_noise, 1)
-  fprintf('\n\n\n Running on noise level %i.\n', sm);
-  fprintf('\n\n\n  Running with no CV.\n');
-  for tr = 1:size(Y0, 1)
-    [ms_mr{tr, sm}.Tgroup, ms_mr{tr, sm}.theta, ms_mr{tr, sm}.G_pred] = ...
-        pcm_fitModelGroup(Y0{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', 'fitScale', 1);
-  end
-  save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_demean_noise_%i_with_weird_subjects.mat', sm)), 'ms_mr');
+    fprintf('\n\n\n Running on noise level %i.\n', sm);
+    fprintf('\n\n\n  Running with no CV.\n');
+    for tr = 1:size(Y0, 1)
+        [ms_mr{tr, sm}.Tgroup, ms_mr{tr, sm}.theta, ms_mr{tr, sm}.G_pred] = ...
+            pcm_fitModelGroup(Y0{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', 'fitScale', 1);
+    end
+    save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_demean_noise_%i_with_weird_subjects.mat', sm)), 'ms_mr');
 
-  fprintf('\n\n\n  Running with CV\n');
-  parfor tr = 1:size(Y0, 1)
-    [ms_mr{tr, sm}.Tcross, ms_mr{tr, sm}.thetaCr, ms_mr{tr, sm}.G_predcv] = ...
-        pcm_fitModelGroupCrossval(Y0{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', ...
-                                  'groupFit', ms_mr{tr, sm}.theta, 'fitScale', 1, 'MaxIteration', MaxIteration);
-  end
-  save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_demean_noise_%i_with_weird_subjects.mat', sm)), 'ms_mr');
+    fprintf('\n\n\n  Running with CV\n');
+    parfor tr = 1:size(Y0, 1)
+        [ms_mr{tr, sm}.Tcross, ms_mr{tr, sm}.thetaCr, ms_mr{tr, sm}.G_predcv] = ...
+            pcm_fitModelGroupCrossval(Y0{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', ...
+                                      'groupFit', ms_mr{tr, sm}.theta, 'fitScale', 1, 'MaxIteration', MaxIteration);
+    end
+    save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_demean_noise_%i_with_weird_subjects.mat', sm)), 'ms_mr');
 end
 
 %% Fit the models on the group level on data with fixed effect
@@ -298,19 +298,19 @@ condVec = condVec(:);
 
 fprintf('\n\n\nRunning simulation on data with mean.\n');
 for sm = 1:size(Scale_noise, 1)
-  fprintf('\n\n\n Running on noise level %i.\n', sm);
-  fprintf('\n\n\n  Running with no CV.\n');
-  for tr = 1:size(Y1, 1)
-    [ms_mc{tr, sm}.Tgroup, ms_mc{tr, sm}.theta, ms_mc{tr, sm}.G_pred] = ...
-        pcm_fitModelGroup(Y1{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', 'fitScale', 1);
-  end
-  save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_noise_%i_with_weird_subjects.mat', sm)), 'ms_mc');
+    fprintf('\n\n\n Running on noise level %i.\n', sm);
+    fprintf('\n\n\n  Running with no CV.\n');
+    for tr = 1:size(Y1, 1)
+        [ms_mc{tr, sm}.Tgroup, ms_mc{tr, sm}.theta, ms_mc{tr, sm}.G_pred] = ...
+            pcm_fitModelGroup(Y1{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', 'fitScale', 1);
+    end
+    save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_noise_%i_with_weird_subjects.mat', sm)), 'ms_mc');
 
-  fprintf('\n\n\n  Running with CV.\n');
-  parfor tr = 1:size(Y1, 1)
-    [ms_mc{tr, sm}.Tcross, ms_mc{tr, sm}.thetaCr, ms_mc{tr, sm}.G_predcv] = ...
-        pcm_fitModelGroupCrossval(Y1{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', ...
-                                  'groupFit', ms_mc{tr, sm}.theta, 'fitScale', 1, 'MaxIteration', MaxIteration);
-  end
-  save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_noise_%i_with_weird_subjects.mat', sm)), 'ms_mc');
+    fprintf('\n\n\n  Running with CV.\n');
+    parfor tr = 1:size(Y1, 1)
+        [ms_mc{tr, sm}.Tcross, ms_mc{tr, sm}.thetaCr, ms_mc{tr, sm}.G_predcv] = ...
+            pcm_fitModelGroupCrossval(Y1{tr, sm}, M, partVec, condVec, 'runEffect', 'fixed', ...
+                                      'groupFit', ms_mc{tr, sm}.theta, 'fitScale', 1, 'MaxIteration', MaxIteration);
+    end
+    save(fullfile(Save_dir, sprintf('sim_pcm_output_cv_noise_%i_with_weird_subjects.mat', sm)), 'ms_mc');
 end

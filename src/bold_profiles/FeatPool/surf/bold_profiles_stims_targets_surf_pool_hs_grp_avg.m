@@ -1,240 +1,240 @@
 function bold_profiles_stims_targets_surf_pool_hs_grp_avg
-  clc;
-  clear;
+    clc;
+    clear;
 
-  StartDir = fullfile(pwd, '..', '..', '..', '..');
-  cd (StartDir);
+    StartDir = fullfile(pwd, '..', '..', '..', '..');
+    cd (StartDir);
 
-  ResultsDir = fullfile(StartDir, 'results', 'profiles', 'surf');
-  [~, ~, ~] = mkdir(ResultsDir);
+    ResultsDir = fullfile(StartDir, 'results', 'profiles', 'surf');
+    [~, ~, ~] = mkdir(ResultsDir);
 
-  SubLs = dir('sub*');
-  NbSub = numel(SubLs);
+    SubLs = dir('sub*');
+    NbSub = numel(SubLs);
 
-  addpath(genpath(fullfile(StartDir, 'code', 'subfun')));
+    addpath(genpath(fullfile(StartDir, 'code', 'subfun')));
 
-  NbLayers = 6;
+    NbLayers = 6;
 
-  CondNames = { ...
-               'AStimL', 'AStimR'; ...
-               'VStimL', 'VStimR'; ...
-               'TStimL', 'TStimR'; ...
-               'ATargL', 'ATargR'; ...
-               'VTargL', 'VTargR'; ...
-               'TTargL', 'TTargR' ...
-              };
+    CondNames = { ...
+                 'AStimL', 'AStimR'; ...
+                 'VStimL', 'VStimR'; ...
+                 'TStimL', 'TStimR'; ...
+                 'ATargL', 'ATargR'; ...
+                 'VTargL', 'VTargR'; ...
+                 'TTargL', 'TTargR' ...
+                };
 
-  ROIs = { ...
-          'A1', ...
-          'V1', ...
-          'V2', ...
-          'V3', ...
-          'V4', ...
-          'V5', ...
-          'PT'};
+    ROIs = { ...
+            'A1', ...
+            'V1', ...
+            'V2', ...
+            'V3', ...
+            'V4', ...
+            'V5', ...
+            'PT'};
 
-  DesMat = (1:NbLayers) - mean(1:NbLayers);
-  DesMat = [ones(NbLayers, 1) DesMat' (DesMat.^2)'];
-  % DesMat = [DesMat' ones(NbLayers,1)];
-  DesMat = spm_orth(DesMat);
+    DesMat = (1:NbLayers) - mean(1:NbLayers);
+    DesMat = [ones(NbLayers, 1) DesMat' (DesMat.^2)'];
+    % DesMat = [DesMat' ones(NbLayers,1)];
+    DesMat = spm_orth(DesMat);
 
-  for iROI = 1:length(ROIs)
-    AllSubjects_Data(iROI) = struct( ...
-                                    'name', ROIs{iROI}); %#ok<*AGROW>
-  end
+    for iROI = 1:length(ROIs)
+        AllSubjects_Data(iROI) = struct( ...
+                                        'name', ROIs{iROI}); %#ok<*AGROW>
+    end
 
-  Median = 1;
+    Median = 1;
 
-  %% Gets data for each subject
-  for iSub = 1:NbSub
+    %% Gets data for each subject
+    for iSub = 1:NbSub
 
-    SubDir = fullfile(StartDir, SubLs(iSub).name);
-    SaveDir = fullfile(SubDir, 'results', 'profiles', 'surf');
+        SubDir = fullfile(StartDir, SubLs(iSub).name);
+        SaveDir = fullfile(SubDir, 'results', 'profiles', 'surf');
 
-    for iROI = 1:numel(ROIs)
+        for iROI = 1:numel(ROIs)
 
-      File2Load = fullfile(SaveDir, strcat('Data_stims_targets_Pooled_Surf_', AllSubjects_Data(iROI).name, '_l-', ...
-                                           num2str(NbLayers), '.mat'));
+            File2Load = fullfile(SaveDir, strcat('Data_stims_targets_Pooled_Surf_', AllSubjects_Data(iROI).name, '_l-', ...
+                                                 num2str(NbLayers), '.mat'));
 
-      if exist(File2Load, 'file')
+            if exist(File2Load, 'file')
 
-        load(File2Load, 'Data_ROI');
+                load(File2Load, 'Data_ROI');
 
-        if Median
+                if Median
 
-          AllSubjects_Data(iROI).StimTargIpsi.DATA{iSub} = Data_ROI.StimTargIpsi.LayerMedian;
-          AllSubjects_Data(iROI).StimTargIpsi.grp(:, :, iSub) = squeeze(nanmean(Data_ROI.StimTargIpsi.LayerMedian, 2));
+                    AllSubjects_Data(iROI).StimTargIpsi.DATA{iSub} = Data_ROI.StimTargIpsi.LayerMedian;
+                    AllSubjects_Data(iROI).StimTargIpsi.grp(:, :, iSub) = squeeze(nanmean(Data_ROI.StimTargIpsi.LayerMedian, 2));
 
-          AllSubjects_Data(iROI).StimTargContra.DATA{iSub} = Data_ROI.StimTargContra.LayerMedian;
-          AllSubjects_Data(iROI).StimTargContra.grp(:, :, iSub) = squeeze(nanmean(Data_ROI.StimTargContra.LayerMedian, 2));
+                    AllSubjects_Data(iROI).StimTargContra.DATA{iSub} = Data_ROI.StimTargContra.LayerMedian;
+                    AllSubjects_Data(iROI).StimTargContra.grp(:, :, iSub) = squeeze(nanmean(Data_ROI.StimTargContra.LayerMedian, 2));
 
-          % whole ROI
-          AllSubjects_Data(iROI).StimTargIpsi.whole_roi_grp(iSub, :) = nanmean(Data_ROI.StimTargIpsi.WholeROI.MEDIAN);
-          AllSubjects_Data(iROI).StimTargContra.whole_roi_grp(iSub, :) = nanmean(Data_ROI.StimTargContra.WholeROI.MEDIAN);
+                    % whole ROI
+                    AllSubjects_Data(iROI).StimTargIpsi.whole_roi_grp(iSub, :) = nanmean(Data_ROI.StimTargIpsi.WholeROI.MEDIAN);
+                    AllSubjects_Data(iROI).StimTargContra.whole_roi_grp(iSub, :) = nanmean(Data_ROI.StimTargContra.WholeROI.MEDIAN);
 
-        else
+                else
 
-          AllSubjects_Data(iROI).StimTargIpsi.DATA{iSub} = Data_ROI.StimTargIpsi.LayerMean;
-          AllSubjects_Data(iROI).StimTargIpsi.grp(:, :, iSub) = squeeze(nanmean(Data_ROI.StimTargIpsi.LayerMean, 2));
+                    AllSubjects_Data(iROI).StimTargIpsi.DATA{iSub} = Data_ROI.StimTargIpsi.LayerMean;
+                    AllSubjects_Data(iROI).StimTargIpsi.grp(:, :, iSub) = squeeze(nanmean(Data_ROI.StimTargIpsi.LayerMean, 2));
 
-          AllSubjects_Data(iROI).StimTargContra.DATA{iSub} = Data_ROI.StimTargContra.LayerMean;
-          AllSubjects_Data(iROI).StimTargContra.grp(:, :, iSub) = squeeze(nanmean(Data_ROI.StimTargContra.LayerMean, 2));
+                    AllSubjects_Data(iROI).StimTargContra.DATA{iSub} = Data_ROI.StimTargContra.LayerMean;
+                    AllSubjects_Data(iROI).StimTargContra.grp(:, :, iSub) = squeeze(nanmean(Data_ROI.StimTargContra.LayerMean, 2));
 
-          % whole ROI
-          AllSubjects_Data(iROI).StimTargIpsi.whole_roi_grp(iSub, :) = nanmean(Data_ROI.StimTargIpsi.WholeROI.MEAN);
-          AllSubjects_Data(iROI).StimTargContra.whole_roi_grp(iSub, :) = nanmean(Data_ROI.StimTargContra.WholeROI.MEAN);
+                    % whole ROI
+                    AllSubjects_Data(iROI).StimTargIpsi.whole_roi_grp(iSub, :) = nanmean(Data_ROI.StimTargIpsi.WholeROI.MEAN);
+                    AllSubjects_Data(iROI).StimTargContra.whole_roi_grp(iSub, :) = nanmean(Data_ROI.StimTargContra.WholeROI.MEAN);
+
+                end
+
+            else
+                warning('The file %s does not exit.', File2Load);
+
+                AllSubjects_Data(iROI).StimTargIpsi.DATA{iSub} = nan(NbLayers, 20, size(CondNames, 1) / 2);
+                AllSubjects_Data(iROI).StimTargIpsi.grp(:, :, iSub) = nan(NbLayers, size(CondNames, 1) / 2);
+
+                AllSubjects_Data(iROI).StimTargContra.DATA{iSub} = nan(NbLayers, 20, size(CondNames, 1) / 2);
+                AllSubjects_Data(iROI).StimTargContra.grp(:, :, iSub) = nan(NbLayers, size(CondNames, 1) / 2);
+
+                % whole roi
+                AllSubjects_Data(iROI).StimTargIpsi.whole_roi_grp(iSub, :) = nan(1, size(CondNames, 1) / 2);
+                AllSubjects_Data(iROI).StimTargContra.whole_roi_grp(iSub, :) = nan(1, size(CondNames, 1) / 2);
+
+            end
+
+            clear Data_ROI;
 
         end
+    end
 
-      else
-        warning('The file %s does not exit.', File2Load);
+    %% Averages over subjects
+    for iROI = 1:length(AllSubjects_Data)
 
-        AllSubjects_Data(iROI).StimTargIpsi.DATA{iSub} = nan(NbLayers, 20, size(CondNames, 1) / 2);
-        AllSubjects_Data(iROI).StimTargIpsi.grp(:, :, iSub) = nan(NbLayers, size(CondNames, 1) / 2);
+        fprintf(' Processing %s\n', AllSubjects_Data(iROI).name);
 
-        AllSubjects_Data(iROI).StimTargContra.DATA{iSub} = nan(NbLayers, 20, size(CondNames, 1) / 2);
-        AllSubjects_Data(iROI).StimTargContra.grp(:, :, iSub) = nan(NbLayers, size(CondNames, 1) / 2);
+        AllSubjects_Data(iROI).StimTargIpsi.MEAN = nanmean(AllSubjects_Data(iROI).StimTargIpsi.grp(:, :, :), 3);
+        AllSubjects_Data(iROI).StimTargIpsi.STD = nanstd(AllSubjects_Data(iROI).StimTargIpsi.grp(:, :, :), 3);
+        AllSubjects_Data(iROI).StimTargIpsi.SEM = nansem(AllSubjects_Data(iROI).StimTargIpsi.grp(:, :, :), 3);
+
+        AllSubjects_Data(iROI).StimTargContra.MEAN = nanmean(AllSubjects_Data(iROI).StimTargContra.grp(:, :, :), 3);
+        AllSubjects_Data(iROI).StimTargContra.STD = nanstd(AllSubjects_Data(iROI).StimTargContra.grp(:, :, :), 3);
+        AllSubjects_Data(iROI).StimTargContra.SEM = nansem(AllSubjects_Data(iROI).StimTargContra.grp(:, :, :), 3);
 
         % whole roi
-        AllSubjects_Data(iROI).StimTargIpsi.whole_roi_grp(iSub, :) = nan(1, size(CondNames, 1) / 2);
-        AllSubjects_Data(iROI).StimTargContra.whole_roi_grp(iSub, :) = nan(1, size(CondNames, 1) / 2);
+        AllSubjects_Data(iROI).StimTargIpsi.whole_roi_MEAN = nanmean(AllSubjects_Data(iROI).StimTargIpsi.whole_roi_grp);
+        AllSubjects_Data(iROI).StimTargIpsi.whole_roi_STD = nanstd(AllSubjects_Data(iROI).StimTargIpsi.whole_roi_grp);
+        AllSubjects_Data(iROI).StimTargIpsi.whole_roi_SEM = nansem(AllSubjects_Data(iROI).StimTargIpsi.whole_roi_grp);
 
-      end
-
-      clear Data_ROI;
+        AllSubjects_Data(iROI).StimTargContra.whole_roi_MEAN = nanmean(AllSubjects_Data(iROI).StimTargContra.whole_roi_grp);
+        AllSubjects_Data(iROI).StimTargContra.whole_roi_STD = nanstd(AllSubjects_Data(iROI).StimTargContra.whole_roi_grp);
+        AllSubjects_Data(iROI).StimTargContra.whole_roi_SEM = nansem(AllSubjects_Data(iROI).StimTargContra.whole_roi_grp);
 
     end
-  end
 
-  %% Averages over subjects
-  for iROI = 1:length(AllSubjects_Data)
+    %% Betas from profile fits
+    fprintf('\n');
 
-    fprintf(' Processing %s\n', AllSubjects_Data(iROI).name);
+    for iROI = 1:length(AllSubjects_Data)
 
-    AllSubjects_Data(iROI).StimTargIpsi.MEAN = nanmean(AllSubjects_Data(iROI).StimTargIpsi.grp(:, :, :), 3);
-    AllSubjects_Data(iROI).StimTargIpsi.STD = nanstd(AllSubjects_Data(iROI).StimTargIpsi.grp(:, :, :), 3);
-    AllSubjects_Data(iROI).StimTargIpsi.SEM = nansem(AllSubjects_Data(iROI).StimTargIpsi.grp(:, :, :), 3);
+        Name = AllSubjects_Data(iROI).name;
 
-    AllSubjects_Data(iROI).StimTargContra.MEAN = nanmean(AllSubjects_Data(iROI).StimTargContra.grp(:, :, :), 3);
-    AllSubjects_Data(iROI).StimTargContra.STD = nanstd(AllSubjects_Data(iROI).StimTargContra.grp(:, :, :), 3);
-    AllSubjects_Data(iROI).StimTargContra.SEM = nansem(AllSubjects_Data(iROI).StimTargContra.grp(:, :, :), 3);
+        fprintf('Computing betas for ROI %s\n', Name);
 
-    % whole roi
-    AllSubjects_Data(iROI).StimTargIpsi.whole_roi_MEAN = nanmean(AllSubjects_Data(iROI).StimTargIpsi.whole_roi_grp);
-    AllSubjects_Data(iROI).StimTargIpsi.whole_roi_STD = nanstd(AllSubjects_Data(iROI).StimTargIpsi.whole_roi_grp);
-    AllSubjects_Data(iROI).StimTargIpsi.whole_roi_SEM = nansem(AllSubjects_Data(iROI).StimTargIpsi.whole_roi_grp);
+        for i = 1:2
 
-    AllSubjects_Data(iROI).StimTargContra.whole_roi_MEAN = nanmean(AllSubjects_Data(iROI).StimTargContra.whole_roi_grp);
-    AllSubjects_Data(iROI).StimTargContra.whole_roi_STD = nanstd(AllSubjects_Data(iROI).StimTargContra.whole_roi_grp);
-    AllSubjects_Data(iROI).StimTargContra.whole_roi_SEM = nansem(AllSubjects_Data(iROI).StimTargContra.whole_roi_grp);
+            %% Actually compute betas
+            for iSub = 1:NbSub
 
-  end
+                switch i
+                    case 1
+                        Blocks = AllSubjects_Data(iROI).StimTargIpsi.DATA{iSub};
+                    case 2
+                        Blocks = AllSubjects_Data(iROI).StimTargContra.DATA{iSub};
+                end
 
-  %% Betas from profile fits
-  fprintf('\n');
+                if ~all(isnan(Blocks(:))) || ~isempty(Blocks)
 
-  for iROI = 1:length(AllSubjects_Data)
+                    for iCond = 1:size(Blocks, 3)
 
-    Name = AllSubjects_Data(iROI).name;
+                        Y = flipud(Blocks(:, :, iCond));
+                        [B] = ProfileGLM(DesMat, Y);
 
-    fprintf('Computing betas for ROI %s\n', Name);
+                        switch i
+                            case 1
+                                AllSubjects_Data(iROI).StimTargIpsi.Beta.DATA(:, iCond, iSub) = B;
+                            case 2
+                                AllSubjects_Data(iROI).StimTargContra.Beta.DATA(:, iCond, iSub) = B;
+                        end
+                        clear Y B;
 
-    for i = 1:2
+                    end
 
-      %% Actually compute betas
-      for iSub = 1:NbSub
+                end
 
-        switch i
-          case 1
-            Blocks = AllSubjects_Data(iROI).StimTargIpsi.DATA{iSub};
-          case 2
-            Blocks = AllSubjects_Data(iROI).StimTargContra.DATA{iSub};
-        end
-
-        if ~all(isnan(Blocks(:))) || ~isempty(Blocks)
-
-          for iCond = 1:size(Blocks, 3)
-
-            Y = flipud(Blocks(:, :, iCond));
-            [B] = ProfileGLM(DesMat, Y);
-
-            switch i
-              case 1
-                AllSubjects_Data(iROI).StimTargIpsi.Beta.DATA(:, iCond, iSub) = B;
-              case 2
-                AllSubjects_Data(iROI).StimTargContra.Beta.DATA(:, iCond, iSub) = B;
             end
-            clear Y B;
 
-          end
+            %% Group stat on betas
+            switch i
+                case 1
+                    tmp = AllSubjects_Data(iROI).StimTargIpsi.Beta.DATA(:, iCond, iSub);
+                    AllSubjects_Data(iROI).StimTargIpsi.Beta.MEAN = nanmean(tmp, 3);
+                    AllSubjects_Data(iROI).StimTargIpsi.Beta.STD = nanstd(tmp, 3);
+                    AllSubjects_Data(iROI).StimTargIpsi.Beta.SEM = nansem(tmp, 3);
+                case 2
+                    tmp = AllSubjects_Data(iROI).StimTargContra.Beta.DATA(:, iCond, iSub);
+                    AllSubjects_Data(iROI).StimTargContra.Beta.MEAN = nanmean(tmp, 3);
+                    AllSubjects_Data(iROI).StimTargContra.Beta.STD = nanstd(tmp, 3);
+                    AllSubjects_Data(iROI).StimTargContra.Beta.SEM = nansem(tmp, 3);
+            end
+
+            % T-Test
+            for iCond = 1:size(tmp, 2)
+                for BetaInd = 1:size(tmp, 1)
+                    [~, P] = ttest(tmp(BetaInd, iCond, :));
+                    switch i
+                        case 1
+                            AllSubjects_Data(iROI).StimTargIpsi.Beta.P(BetaInd, iCond) = P;
+                        case 2
+                            AllSubjects_Data(iROI).StimTargContra.Beta.P(BetaInd, iCond) = P;
+                    end
+                end
+            end
+
+            clear tmp P;
 
         end
-
-      end
-
-      %% Group stat on betas
-      switch i
-        case 1
-          tmp = AllSubjects_Data(iROI).StimTargIpsi.Beta.DATA(:, iCond, iSub);
-          AllSubjects_Data(iROI).StimTargIpsi.Beta.MEAN = nanmean(tmp, 3);
-          AllSubjects_Data(iROI).StimTargIpsi.Beta.STD = nanstd(tmp, 3);
-          AllSubjects_Data(iROI).StimTargIpsi.Beta.SEM = nansem(tmp, 3);
-        case 2
-          tmp = AllSubjects_Data(iROI).StimTargContra.Beta.DATA(:, iCond, iSub);
-          AllSubjects_Data(iROI).StimTargContra.Beta.MEAN = nanmean(tmp, 3);
-          AllSubjects_Data(iROI).StimTargContra.Beta.STD = nanstd(tmp, 3);
-          AllSubjects_Data(iROI).StimTargContra.Beta.SEM = nansem(tmp, 3);
-      end
-
-      % T-Test
-      for iCond = 1:size(tmp, 2)
-        for BetaInd = 1:size(tmp, 1)
-          [~, P] = ttest(tmp(BetaInd, iCond, :));
-          switch i
-            case 1
-              AllSubjects_Data(iROI).StimTargIpsi.Beta.P(BetaInd, iCond) = P;
-            case 2
-              AllSubjects_Data(iROI).StimTargContra.Beta.P(BetaInd, iCond) = P;
-          end
-        end
-      end
-
-      clear tmp P;
 
     end
 
-  end
+    %% Saves
+    fprintf('\nSaving\n');
 
-  %% Saves
-  fprintf('\nSaving\n');
+    for iROI = 1:numel(AllSubjects_Data)
+        Results = AllSubjects_Data(iROI);
+        save(fullfile(ResultsDir, strcat('Results_', AllSubjects_Data(iROI).name, ...
+                                         '_SurfStimsTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
+    end
 
-  for iROI = 1:numel(AllSubjects_Data)
-    Results = AllSubjects_Data(iROI);
-    save(fullfile(ResultsDir, strcat('Results_', AllSubjects_Data(iROI).name, ...
-                                     '_SurfStimsTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'Results');
-  end
+    save(fullfile(ResultsDir, strcat('ResultsSurfStimsTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')));
 
-  save(fullfile(ResultsDir, strcat('ResultsSurfStimsTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')));
-
-  cd(StartDir);
+    cd(StartDir);
 
 end
 
 function [B] = ProfileGLM(X, Y)
 
-  if any(isnan(Y(:)))
-    [~, y] = find(isnan(Y));
-    y = unique(y);
-    Y(:, y) = [];
-    clear y;
-  end
+    if any(isnan(Y(:)))
+        [~, y] = find(isnan(Y));
+        y = unique(y);
+        Y(:, y) = [];
+        clear y;
+    end
 
-  if isempty(Y)
-    B = nan(1, size(X, 2));
-  else
-    X = repmat(X, size(Y, 2), 1);
-    Y = Y(:);
-    [B, ~, ~] = glmfit(X, Y, 'normal', 'constant', 'off');
-  end
+    if isempty(Y)
+        B = nan(1, size(X, 2));
+    else
+        X = repmat(X, size(Y, 2), 1);
+        Y = Y(:);
+        [B, ~, ~] = glmfit(X, Y, 'normal', 'constant', 'off');
+    end
 
 end

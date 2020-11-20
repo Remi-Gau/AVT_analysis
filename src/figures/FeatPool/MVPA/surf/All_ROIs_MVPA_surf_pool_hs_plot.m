@@ -1,143 +1,143 @@
 function All_ROIs_MVPA_surf_pool_hs_plot
-  clc;
-  clear;
+    clc;
+    clear;
 
-  StartDir = fullfile(pwd, '..', '..', '..', '..');
-  cd (StartDir);
+    StartDir = fullfile(pwd, '..', '..', '..', '..');
+    cd (StartDir);
 
-  addpath(genpath(fullfile(StartDir, 'code', 'subfun')));
-  Get_dependencies('/home/rxg243/Dropbox/');
+    addpath(genpath(fullfile(StartDir, 'code', 'subfun')));
+    Get_dependencies('/home/rxg243/Dropbox/');
 
-  ResultsDir = fullfile(StartDir, 'results', 'SVM');
-  FigureFolder = fullfile(StartDir, 'figures', 'SVM', 'surf');
+    ResultsDir = fullfile(StartDir, 'results', 'SVM');
+    FigureFolder = fullfile(StartDir, 'figures', 'SVM', 'surf');
 
-  SubLs = dir('sub*');
-  NbSub = numel(SubLs);
+    SubLs = dir('sub*');
+    NbSub = numel(SubLs);
 
-  NbLayers = 6;
+    NbLayers = 6;
 
-  SubSVM = [1:3; 4:6; 7:9];
+    SubSVM = [1:3; 4:6; 7:9];
 
-  TitSuf = {
-            'Contra_vs_Ipsi'; ...
-            'Between_Senses_Ipsi'; ...
-            'Between_Senses_Contra'};
+    TitSuf = {
+              'Contra_vs_Ipsi'; ...
+              'Between_Senses_Ipsi'; ...
+              'Between_Senses_Contra'};
 
-  % Options for the SVM
-  [opt, ~] = get_mvpa_options();
+    % Options for the SVM
+    [opt, ~] = get_mvpa_options();
 
-  for WithPerm = 1
+    for WithPerm = 1
 
-    sets = {};
-    for iSub = 1:NbSub
-      sets{iSub} = [-1 1];
-    end
-    [a, b, c, d, e, f, g, h, i, j] = ndgrid(sets{:});
-    ToPermute = [a(:), b(:), c(:), d(:), e(:), f(:), g(:), h(:), i(:), j(:)];
+        sets = {};
+        for iSub = 1:NbSub
+            sets{iSub} = [-1 1];
+        end
+        [a, b, c, d, e, f, g, h, i, j] = ndgrid(sets{:});
+        ToPermute = [a(:), b(:), c(:), d(:), e(:), f(:), g(:), h(:), i(:), j(:)];
 
-    if ~WithPerm
-      ToPermute = [];
-    end
-
-    for Norm = [5 7]
-
-      [opt] = ChooseNorm(Norm, opt);
-
-      SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
-
-      %% Plot Stim and targets alone
-      close all;
-
-      for IsStim = [1]
-
-        if IsStim
-          Stim_prefix = 'Stimuli-';
-          File2Load = fullfile(ResultsDir, strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
-        else
-          Stim_prefix = 'Target-';
-          File2Load = fullfile(ResultsDir, strcat('GrpTargetsPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
+        if ~WithPerm
+            ToPermute = [];
         end
 
-        if exist(File2Load, 'file')
-          load(File2Load, 'SVM', 'opt');
-        else
-          warning('This file %s does not exist', File2Load);
-        end
+        for Norm = [5 7]
 
-        %% Regorganize data
+            [opt] = ChooseNorm(Norm, opt);
 
-        for iSubSVM = 1:numel(TitSuf)
+            SaveSufix = CreateSaveSufixSurf(opt, [], NbLayers);
 
-          for iROI = 1:numel(SVM(1).ROI)
+            %% Plot Stim and targets alone
+            close all;
 
-            AllSubjects_Data(iROI).name = SVM(1).ROI(iROI).name;
+            for IsStim = [1]
 
-            tmp = {SVM.name}';
-            Legend = cell(3, 1);
+                if IsStim
+                    Stim_prefix = 'Stimuli-';
+                    File2Load = fullfile(ResultsDir, strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
+                else
+                    Stim_prefix = 'Target-';
+                    File2Load = fullfile(ResultsDir, strcat('GrpTargetsPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
+                end
 
-            for iSVM = SubSVM(iSubSVM, :)
+                if exist(File2Load, 'file')
+                    load(File2Load, 'SVM', 'opt');
+                else
+                    warning('This file %s does not exist', File2Load);
+                end
 
-              Legend{iSVM + 1 - SubSVM(iSubSVM, 1)} = {tmp{iSVM}};
+                %% Regorganize data
 
-              AllSubjects_Data(iROI).whole_roi_grp(:, iSVM + 1 - SubSVM(iSubSVM, 1)) = SVM(iSVM).ROI(iROI).grp;
+                for iSubSVM = 1:numel(TitSuf)
 
-              AllSubjects_Data(iROI).MEAN(:, iSVM + 1 - SubSVM(iSubSVM, 1)) = flipud(SVM(iSVM).ROI(iROI).layers.MEAN(1:end)');
-              AllSubjects_Data(iROI).SEM(:, iSVM + 1 - SubSVM(iSubSVM, 1)) = flipud(SVM(iSVM).ROI(iROI).layers.SEM(1:end)');
-              AllSubjects_Data(iROI).Beta.DATA(:, iSVM + 1 - SubSVM(iSubSVM, 1), :) = ...
-                  reshape(SVM(iSVM).ROI(iROI).layers.Beta.DATA, [3, 1, size(SVM(iSVM).ROI(iROI).layers.Beta.DATA, 2)]);
+                    for iROI = 1:numel(SVM(1).ROI)
+
+                        AllSubjects_Data(iROI).name = SVM(1).ROI(iROI).name;
+
+                        tmp = {SVM.name}';
+                        Legend = cell(3, 1);
+
+                        for iSVM = SubSVM(iSubSVM, :)
+
+                            Legend{iSVM + 1 - SubSVM(iSubSVM, 1)} = {tmp{iSVM}};
+
+                            AllSubjects_Data(iROI).whole_roi_grp(:, iSVM + 1 - SubSVM(iSubSVM, 1)) = SVM(iSVM).ROI(iROI).grp;
+
+                            AllSubjects_Data(iROI).MEAN(:, iSVM + 1 - SubSVM(iSubSVM, 1)) = flipud(SVM(iSVM).ROI(iROI).layers.MEAN(1:end)');
+                            AllSubjects_Data(iROI).SEM(:, iSVM + 1 - SubSVM(iSubSVM, 1)) = flipud(SVM(iSVM).ROI(iROI).layers.SEM(1:end)');
+                            AllSubjects_Data(iROI).Beta.DATA(:, iSVM + 1 - SubSVM(iSubSVM, 1), :) = ...
+                                reshape(SVM(iSVM).ROI(iROI).layers.Beta.DATA, [3, 1, size(SVM(iSVM).ROI(iROI).layers.Beta.DATA, 2)]);
+                        end
+
+                    end
+
+                    %% Plot
+                    disp({AllSubjects_Data.name}');
+
+                    NbROI = length(AllSubjects_Data);
+                    ROI_order = [NbROI - 1 NbROI 1:NbROI - 2];
+
+                    ROI_idx = 1;
+                    for iROI = ROI_order
+                        ToPlot.ROIs_name{ROI_idx} = AllSubjects_Data(iROI).name;
+                        ROI_idx = ROI_idx + 1;
+                    end
+                    ToPlot.Name = ['MVPA-' Stim_prefix TitSuf{iSubSVM} '\n' SaveSufix(15:end - 12)];
+                    ToPlot.SubPlotOrder = [1 2 3];
+
+                    ToPlot.Legend = Legend;
+                    ToPlot.YLabel = 'Decoding accuracy';
+                    ToPlot.Visible = 'on';
+                    ToPlot.FigureFolder = FigureFolder;
+                    ToPlot.MVPA = 1;
+                    ToPlot.ToPermute = ToPermute;
+                    ToPlot.OneSideTTest = {'both' 'both' 'both'};
+
+                    ToPlot = GetData(ToPlot, AllSubjects_Data, ROI_order);
+
+                    plot_all_ROIs(ToPlot);
+
+                end
+
             end
 
-          end
-
-          %% Plot
-          disp({AllSubjects_Data.name}');
-
-          NbROI = length(AllSubjects_Data);
-          ROI_order = [NbROI - 1 NbROI 1:NbROI - 2];
-
-          ROI_idx = 1;
-          for iROI = ROI_order
-            ToPlot.ROIs_name{ROI_idx} = AllSubjects_Data(iROI).name;
-            ROI_idx = ROI_idx + 1;
-          end
-          ToPlot.Name = ['MVPA-' Stim_prefix TitSuf{iSubSVM} '\n' SaveSufix(15:end - 12)];
-          ToPlot.SubPlotOrder = [1 2 3];
-
-          ToPlot.Legend = Legend;
-          ToPlot.YLabel = 'Decoding accuracy';
-          ToPlot.Visible = 'on';
-          ToPlot.FigureFolder = FigureFolder;
-          ToPlot.MVPA = 1;
-          ToPlot.ToPermute = ToPermute;
-          ToPlot.OneSideTTest = {'both' 'both' 'both'};
-
-          ToPlot = GetData(ToPlot, AllSubjects_Data, ROI_order);
-
-          plot_all_ROIs(ToPlot);
-
         end
 
-      end
-
     end
-
-  end
-  cd(StartDir);
+    cd(StartDir);
 
 end
 
 function ToPlot = GetData(ToPlot, Data, ROI_order)
-  ROI_idx = 1;
-  for iROI = ROI_order
-    ToPlot.profile.MEAN(:, ROI_idx, :) = Data(iROI).MEAN; %#ok<*SAGROW>
-    ToPlot.profile.SEM(:, ROI_idx, :) = Data(iROI).SEM;
-    % Do not plot quadratic
-    % 1rst dimension: subject
-    % 2nd dimension: ROI
-    % 3rd dimension: Cst, Lin
-    % 4th dimension : different conditions (e.g A, V, T)
-    ToPlot.profile.beta(:, ROI_idx, :, :) = shiftdim(Data(iROI).Beta.DATA(1:2, :, :), 2);
-    ToPlot.ROI.grp(:, ROI_idx, :) = Data(iROI).whole_roi_grp;
-    ROI_idx = ROI_idx + 1;
-  end
+    ROI_idx = 1;
+    for iROI = ROI_order
+        ToPlot.profile.MEAN(:, ROI_idx, :) = Data(iROI).MEAN; %#ok<*SAGROW>
+        ToPlot.profile.SEM(:, ROI_idx, :) = Data(iROI).SEM;
+        % Do not plot quadratic
+        % 1rst dimension: subject
+        % 2nd dimension: ROI
+        % 3rd dimension: Cst, Lin
+        % 4th dimension : different conditions (e.g A, V, T)
+        ToPlot.profile.beta(:, ROI_idx, :, :) = shiftdim(Data(iROI).Beta.DATA(1:2, :, :), 2);
+        ToPlot.ROI.grp(:, ROI_idx, :) = Data(iROI).whole_roi_grp;
+        ROI_idx = ROI_idx + 1;
+    end
 end

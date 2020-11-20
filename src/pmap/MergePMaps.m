@@ -16,27 +16,27 @@ ROIs = {
 
 for i = 1:size(ROIs, 1)
 
-  Files1 = spm_select('FPList', fullfile(StartDir, 'pmap', 'ret'), ...
-                      ['^perc_VTPM_vol_roi' ROIs{i, 1} '_.h.nii$']);
-  Files2 = spm_select('FPList', fullfile(StartDir, 'pmap', 'ret'), ...
-                      ['^perc_VTPM_vol_roi' ROIs{i, 2} '_.h.nii$']);
+    Files1 = spm_select('FPList', fullfile(StartDir, 'pmap', 'ret'), ...
+                        ['^perc_VTPM_vol_roi' ROIs{i, 1} '_.h.nii$']);
+    Files2 = spm_select('FPList', fullfile(StartDir, 'pmap', 'ret'), ...
+                        ['^perc_VTPM_vol_roi' ROIs{i, 2} '_.h.nii$']);
 
-  Files = cat(1, Files1, Files2);
+    Files = cat(1, Files1, Files2);
 
-  Files;
+    Files;
 
-  Hdr = spm_vol(Files);
-  Vol = spm_read_vols(Hdr);
+    Hdr = spm_vol(Files);
+    Vol = spm_read_vols(Hdr);
 
-  Vol = sum(Vol, 4);
+    Vol = sum(Vol, 4);
 
-  Hdr = Hdr(1);
+    Hdr = Hdr(1);
 
-  disp(['V' num2str(i) '_Pmap_Ret.nii']);
+    disp(['V' num2str(i) '_Pmap_Ret.nii']);
 
-  Hdr.fname = (['V' num2str(i) '_Pmap_Ret.nii']);
+    Hdr.fname = (['V' num2str(i) '_Pmap_Ret.nii']);
 
-  spm_write_vol(Hdr, Vol);
+    spm_write_vol(Hdr, Vol);
 
 end
 
@@ -56,22 +56,22 @@ ROIs = { ...
 
 for i = 1:size(ROIs, 1)
 
-  Files = spm_select('FPList', fullfile(StartDir, 'pmap', 'BT'), ...
-                     ['^' ROIs{i} '$']);
+    Files = spm_select('FPList', fullfile(StartDir, 'pmap', 'BT'), ...
+                       ['^' ROIs{i} '$']);
 
-  Files;
+    Files;
 
-  Hdr = spm_vol(Files);
-  Vol = spm_read_vols(Hdr);
+    Hdr = spm_vol(Files);
+    Vol = spm_read_vols(Hdr);
 
-  Vol = sum(Vol, 4);
+    Vol = sum(Vol, 4);
 
-  Hdr = Hdr(1);
+    Hdr = Hdr(1);
 
-  disp([ROIs{i}(8:10) ROIs{i}(13:end)]);
+    disp([ROIs{i}(8:10) ROIs{i}(13:end)]);
 
-  Hdr.fname = ([ROIs{i}(8:10) ROIs{i}(13:end)]);
+    Hdr.fname = ([ROIs{i}(8:10) ROIs{i}(13:end)]);
 
-  spm_write_vol(Hdr, Vol);
+    spm_write_vol(Hdr, Vol);
 
 end
