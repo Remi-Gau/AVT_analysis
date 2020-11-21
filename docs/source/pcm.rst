@@ -11,7 +11,7 @@ Scripts and functions related to pattern component modelling.
 
 
 3 X 3 model 
-**********
+===========
 
 .. automodule:: src.pcm
 
