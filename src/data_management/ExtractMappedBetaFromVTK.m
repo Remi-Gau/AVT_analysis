@@ -23,6 +23,7 @@
 % - inf_faces: faces from the surface. see read_vtk()
 %
 % The last 2 are kept in cases surface needs to be reconstructed
+%
 
 clc;
 clear;
@@ -81,7 +82,7 @@ for iSub = 1:NbSub
 
         tic;
 
-        for iBeta = 1:size(Betas, 1)
+        parfor iBeta = 1:size(Betas, 1)
 
             % reads file quickly
             A = fileread(Betas(iBeta, :));
@@ -93,7 +94,7 @@ for iSub = 1:NbSub
             C = textscan(B, Spec, 'returnOnError', 0);
             Mapping = cell2mat(C); % clear C
 
-            if size(Mapping, 1) ~= (NbVertices(hs)) %#ok<PFBNS>
+            if size(Mapping, 1) ~= (NbVertices(hs))
                 error('A VTK file has wrong number of vertices:\n%s', ...
                       Betas(iBeta, :));
             end

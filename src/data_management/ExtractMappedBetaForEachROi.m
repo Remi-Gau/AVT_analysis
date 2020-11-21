@@ -36,14 +36,7 @@ MVNN = true;
 %%
 NbLayers = 6;
 
-CondNames = { ...
-             'AStimL', 'AStimR', ...
-             'VStimL', 'VStimR', ...
-             'TStimL', 'TStimR', ...
-             'ATargL', 'ATargR', ...
-             'VTargL', 'VTargR', ...
-             'TTargL', 'TTargR' ...
-            };
+CondNames = GetConditionList();
 
 Dirs = SetDir('surf', MVNN);
 
@@ -159,6 +152,8 @@ for iSub = 1:NbSub
             A = isnan(RoiData);
             A = any(A);
             RoiData(:, A) = [];
+
+            CheckSizeOutput(RoiData, ConditionVec, RunVec, LayerVec);
 
             RoiSaveFile = fullfile(SubDir, Filename);
 

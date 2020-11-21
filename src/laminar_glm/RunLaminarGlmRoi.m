@@ -1,23 +1,25 @@
 % (C) Copyright 2020 Remi Gau
 
+% Runs the laminar GLM on each beta by looping through runs and
+% conditions.
+% Stores the results in a separate matrix that will be reshape into a tidy 2D
+% before saving.
+% Also creates new condition and run vector to pass on to the next
+% analysis stage.
+% After that we check that we have processed all the betas we had: no
+% more, no less
+
 clc;
 clear;
 
-MVNN = true;
+MVNN = false;
+
+Quad = true;
 
 %%
 NbLayers = 6;
 
-CondNames = { ...
-             'AStimL', 'AStimR', ...
-             'VStimL', 'VStimR', ...
-             'TStimL', 'TStimR', ...
-             'ATargL', 'ATargR', ...
-             'VTargL', 'VTargR', ...
-             'TTargL', 'TTargR' ...
-            };
-
-Quad = true;
+CondNames = GetConditionList();
 
 Dirs = SetDir('surf', MVNN);
 
@@ -102,9 +104,12 @@ for iSub = 1:NbSub
 
             if iBeta ~= (NbBetas + 1)
 
-                error('We are either missing or have too much data compare to what we should have.');
+                error('Missing or too much data compare to what we should have.');
 
             end
+
+            ConditionVec = ConditionVec_tmp;
+            RunVec = RunVec_tmp;
 
             % save data for each ROI, hs and for Cst / Lin / Avg
             for iSurfParameters = 1:size(SurfParam, 1)
@@ -112,8 +117,10 @@ for iSub = 1:NbSub
                 % each surface parameter is in a variable n X m
                 % n = nb cdt * nb runs = nb betas
                 % m = nb vertices
-                RoiDataSurfParam = squeeze(SurfParam(iSurfParameters, :, :));
-                RoiDataSurfParam = RoiDataSurfParam';
+                RoiData = squeeze(SurfParam(iSurfParameters, :, :));
+                RoiData = RoiData';
+
+                CheckSizeOutput(RoiData, ConditionVec, RunVec);
 
                 [~, ~, ~] = mkdir(Dirs.LaminarGlm, SubLs(iSub).name);
 
@@ -127,7 +134,7 @@ for iSub = 1:NbSub
                 RoiSurfParamFile = fullfile(Dirs.LaminarGlm, SubLs(iSub).name, Filename);
 
                 save(RoiSurfParamFile, ...
-                     'RoiDataSurfParam', 'ConditionVec', 'RunVec', ...
+                     'RoiData', 'ConditionVec', 'RunVec', ...
                      '-v7.3');
 
             end

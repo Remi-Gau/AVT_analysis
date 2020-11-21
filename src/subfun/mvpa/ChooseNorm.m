@@ -11,7 +11,6 @@ function [opt] = ChooseNorm(Norm, opt)
             opt.scaling.img.eucledian = 1;
             opt.scaling.img.zscore = 0;
             opt.scaling.feat.mean = 0;
-            opt.scaling.feat.range = 1;
             opt.scaling.feat.sessmean = 0;
         case 3
             opt.scaling.img.eucledian = 1;
