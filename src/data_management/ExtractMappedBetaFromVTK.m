@@ -82,7 +82,7 @@ for iSub = 1:NbSub
 
         tic;
 
-        parfor iBeta = 1:size(Betas, 1)
+        for iBeta = 1:size(Betas, 1)
 
             % reads file quickly
             A = fileread(Betas(iBeta, :));

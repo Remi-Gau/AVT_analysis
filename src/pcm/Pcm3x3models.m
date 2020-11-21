@@ -3,7 +3,7 @@
 % Runs the PCM on the 3 sensory modalities (A, V and T) but separately for
 % ipsi and contra
 %
-% Tt has 12 models that represent all the different ways that those 3
+% It has 12 models that represent all the different ways that those 3
 % conditions can be either:
 %
 % - scaled

@@ -27,8 +27,8 @@ function [Data, ConditionVec, RunVec] = CombineIpsiAndContra(Data, ConditionVec,
                     Data_tmp(end + 1, :) = mean(Data(ConditionsToCombine, :)); %#ok<*AGROW>
 
                 case 'pool'
-                    tmp = transp(Data(ConditionsToCombine, :));
-                    tmp = transp(tmp(:));
+                    tmp = Data(ConditionsToCombine, :)';
+                    tmp = tmp(:)'';
                     Data_tmp(end + 1, :) = tmp;
 
             end
