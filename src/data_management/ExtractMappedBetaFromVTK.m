@@ -13,9 +13,9 @@
 % variable
 %
 %
-% OUTPUT
+% OUTPUT::
 %
-% fullfile(OuputDir, [SubLs(iSub).name  '_features_hs-' HsSufix '_NbLayer-' NbLayers '.mat]')
+%   fullfile(OuputDir, [SubLs(iSub).name  '_features_hs-' HsSufix '_NbLayer-' NbLayers '.mat]')
 %
 % - VertexWithData
 % - AllMapping  with dimensions [NbVertices(hs), NbLayers, size(Betas, 1)];
@@ -75,6 +75,10 @@ for iSub = 1:NbSub
         NbVertices(hs) = size(inf_vertex, 2);
 
         Betas = spm_select('FPList', InputDir, ['^Beta.*' HsSufix 'cr.vtk$']);
+
+        %TODO
+        % add an extra check to make sure we got as many files as there are
+        % betas of interest in the GLM
 
         AllMapping = nan(NbVertices(hs), NbLayers, size(Betas, 1));
 

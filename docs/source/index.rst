@@ -14,9 +14,11 @@ AVT documentation
    processing_betas
    surface_registration
    extracting_data
+   laminar_glm
    bold_profiles
    mvpa
    pcm
+   utilities
 
 Indices and tables
 ==================
