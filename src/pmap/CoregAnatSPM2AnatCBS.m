@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 clear;
 clc;
 
@@ -20,27 +21,27 @@ NbSub = numel(SubLs);
 
 for iSub = 1:NbSub
 
-  fprintf('\n\nProcessing %s\n', SubLs(iSub).name);
+    fprintf('\n\nProcessing %s\n', SubLs(iSub).name);
 
-  % Subject directory
-  SubDir = fullfile(StartDir, SubLs(iSub).name);
+    % Subject directory
+    SubDir = fullfile(StartDir, SubLs(iSub).name);
 
-  Img2Process = {};
-  TargetScan = []; %#ok<NASGU>
-  SourceScan = []; %#ok<NASGU>
+    Img2Process = {};
+    TargetScan = []; %#ok<NASGU>
+    SourceScan = []; %#ok<NASGU>
 
-  TargetScan = spm_select('FPList', fullfile(SubDir, 'anat', 'cbs'), ...
-                          ['^' SubLs(iSub).name '.*_bound.nii$']);
+    TargetScan = spm_select('FPList', fullfile(SubDir, 'anat', 'cbs'), ...
+                            ['^' SubLs(iSub).name '.*_bound.nii$']);
 
-  cd(fullfile(SubDir, 'pmap'));
+    cd(fullfile(SubDir, 'pmap'));
 
-  SourceScan = spm_select('FPList', fullfile(SubDir, 'pmap'), ...
-                          '^msub.*.nii$');
+    SourceScan = spm_select('FPList', fullfile(SubDir, 'pmap'), ...
+                            '^msub.*.nii$');
 
-  Img2Process = cellstr(spm_select('FPList', fullfile(SubDir, 'pmap'), ...
-                                   '^w.*.nii$'));
+    Img2Process = cellstr(spm_select('FPList', fullfile(SubDir, 'pmap'), ...
+                                     '^w.*.nii$'));
 
-  spm_coreg_reorient_save(TargetScan, SourceScan, Img2Process, flags);
+    spm_coreg_reorient_save(TargetScan, SourceScan, Img2Process, flags);
 
 end
 

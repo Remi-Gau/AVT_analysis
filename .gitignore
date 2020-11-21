@@ -7,3 +7,6 @@
 *.sh~
 *.wav
 *.m~
+
+avt/**
+docs/build/**

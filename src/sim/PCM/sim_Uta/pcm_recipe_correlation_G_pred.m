@@ -81,7 +81,7 @@ colorbar;
 
 %%
 for p = sub
-  G_emp(:, :, p) = pcm_estGCrossval(data{p}, partVec{p}, condVec{p});
+    G_emp(:, :, p) = pcm_estGCrossval(data{p}, partVec{p}, condVec{p});
 end
 subplot(1, num_fig, 3);
 imagesc(G_emp);

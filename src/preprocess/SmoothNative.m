@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 % Smooths the data. They will only be used to create an inclusive mask for
 % the subject level GLM
 
@@ -41,78 +42,78 @@ NbSub = numel(SubLs);
 
 for iSub = NbSub % for each subject
 
-  fprintf('\n\nProcessing %s\n', SubLs(iSub).name);
+    fprintf('\n\nProcessing %s\n', SubLs(iSub).name);
 
-  % Subject directory
-  SubDir = fullfile(StartDir, SubLs(iSub).name);
-  cd(SubDir);
+    % Subject directory
+    SubDir = fullfile(StartDir, SubLs(iSub).name);
+    cd(SubDir);
 
-  % Identify the number of sessions
-  SesLs = dir('ses*');
-  NbSes = numel(SesLs);
+    % Identify the number of sessions
+    SesLs = dir('ses*');
+    NbSes = numel(SesLs);
 
-  % Defines batch
-  matlabbatch = {};
-  matlabbatch{1}.spm.spatial.smooth.fwhm = [6 6 6];
-  matlabbatch{1}.spm.spatial.smooth.dtype = 0;
-  matlabbatch{1}.spm.spatial.smooth.im = 0;
-  matlabbatch{1}.spm.spatial.smooth.prefix = 's';
-  matlabbatch{1}.spm.spatial.smooth.data = {};
+    % Defines batch
+    matlabbatch = {};
+    matlabbatch{1}.spm.spatial.smooth.fwhm = [6 6 6];
+    matlabbatch{1}.spm.spatial.smooth.dtype = 0;
+    matlabbatch{1}.spm.spatial.smooth.im = 0;
+    matlabbatch{1}.spm.spatial.smooth.prefix = 's';
+    matlabbatch{1}.spm.spatial.smooth.data = {};
 
-  for iSes = 1:NbSes % for each session
+    for iSes = 1:NbSes % for each session
 
-    % Gets all the runs for that session
-    cd(fullfile(SubDir, SesLs(iSes).name, 'func'));
+        % Gets all the runs for that session
+        cd(fullfile(SubDir, SesLs(iSes).name, 'func'));
 
-    % Identify all the EPI files of interest
+        % Identify all the EPI files of interest
 
-    % If the file are zipped uncomment the following lines
-    %         Runs = spm_select('FPList', fullfile(pwd),...
-    %             ['^auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-.*_bold.nii.gz$']);
-    %         fprintf(' Unzipping files\n')
-    %         gunzip(cellstr(Runs))
+        % If the file are zipped uncomment the following lines
+        %         Runs = spm_select('FPList', fullfile(pwd),...
+        %             ['^auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-.*_bold.nii.gz$']);
+        %         fprintf(' Unzipping files\n')
+        %         gunzip(cellstr(Runs))
 
-    Runs = spm_select('FPList', fullfile(pwd), ...
-                      ['^auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-.*_bold.nii$']);
+        Runs = spm_select('FPList', fullfile(pwd), ...
+                          ['^auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-.*_bold.nii$']);
 
-    for iRuns = 1:size(Runs, 1)
+        for iRuns = 1:size(Runs, 1)
 
-      % Gets all the images in each 4D volume
-      Files = spm_vol(Runs(iRuns, :));
-      for j = 1:length(Files)
-        matlabbatch{1}.spm.spatial.smooth.data{end + 1, 1} = ...
-            [Files(j).fname, ',', num2str(j)];
-      end
-      clear Files;
+            % Gets all the images in each 4D volume
+            Files = spm_vol(Runs(iRuns, :));
+            for j = 1:length(Files)
+                matlabbatch{1}.spm.spatial.smooth.data{end + 1, 1} = ...
+                    [Files(j).fname, ',', num2str(j)];
+            end
+            clear Files;
+
+        end
+
+        % Just display to make sure that we got everything right
+        disp(matlabbatch{1}.spm.spatial.smooth.data);
 
     end
 
-    % Just display to make sure that we got everything right
-    disp(matlabbatch{1}.spm.spatial.smooth.data);
+    SaveMatLabBatch(fullfile(SubDir, ['SmoothNat_', SubLs(iSub).name, '_', datestr(now, DateFormat), '_matlabbatch.mat']), matlabbatch);
 
-  end
+    fprintf('\n');
+    disp('%%%%%%%%%%%%');
+    disp('   SMOOTH   ');
+    disp('%%%%%%%%%%%%');
 
-  SaveMatLabBatch(fullfile(SubDir, ['SmoothNat_', SubLs(iSub).name, '_', datestr(now, DateFormat), '_matlabbatch.mat']), matlabbatch);
+    if Do
+        spm_jobman('run', matlabbatch);
+    end
 
-  fprintf('\n');
-  disp('%%%%%%%%%%%%');
-  disp('   SMOOTH   ');
-  disp('%%%%%%%%%%%%');
+    fprintf(' Cleaning');
+    for iSes = 1:NbSes
+        cd(fullfile(SubDir, SesLs(iSes).name, 'func'));
+        % Uncomment if you want to remove the slice timed EPIs and only
+        % keep the compressed one. Be careful if you have no gunzipped
+        % version of the data this might just delete it.
+        %         delete(['auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-*_bold.nii'])
+    end
 
-  if Do
-    spm_jobman('run', matlabbatch);
-  end
-
-  fprintf(' Cleaning');
-  for iSes = 1:NbSes
-    cd(fullfile(SubDir, SesLs(iSes).name, 'func'));
-    % Uncomment if you want to remove the slice timed EPIs and only
-    % keep the compressed one. Be careful if you have no gunzipped
-    % version of the data this might just delete it.
-    %         delete(['auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-*_bold.nii'])
-  end
-
-  cd (StartDir);
+    cd (StartDir);
 
 end
 

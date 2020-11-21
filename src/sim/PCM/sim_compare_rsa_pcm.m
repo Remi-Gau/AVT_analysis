@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 %%
 clear;
 clc;
@@ -49,9 +50,9 @@ M{end + 1}.type       = 'feature';
 M{end}.Ac = [];
 Col = [1 1 2 2 3 3];
 for i = 1:2:numel(CondNames)
-  A = zeros(1, numel(CondNames));
-  A(i:i + 1) = 1;
-  M{end}.Ac(:, Col(i), Col(i)) = A;
+    A = zeros(1, numel(CondNames));
+    A(i:i + 1) = 1;
+    M{end}.Ac(:, Col(i), Col(i)) = A;
 end
 M{end}.name       = 'A+V+T';
 M{end}.numGparams = size(M{end}.Ac, 3);

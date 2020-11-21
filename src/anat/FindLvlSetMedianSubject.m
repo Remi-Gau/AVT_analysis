@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 clear;
 clc;
 
@@ -22,22 +23,22 @@ SubjectList = [ ...
 
 for SubjInd = 1:size(SubjectList, 1)
 
-  SubjID = SubjectList(SubjInd, :);
+    SubjID = SubjectList(SubjInd, :);
 
-  SubjectFolder = fullfile(StartFolder, 'Subjects_Data', ['Subject_' SubjID], 'Structural', 'CBS');
+    SubjectFolder = fullfile(StartFolder, 'Subjects_Data', ['Subject_' SubjID], 'Structural', 'CBS');
 
-  LevelSetFile = dir(fullfile(SubjectFolder, ...
-                              ['T1_' SubjID '_thresh_clone_transform_strip_clone_transform_bound_mems_cr_gm_avg.nii']));
+    LevelSetFile = dir(fullfile(SubjectFolder, ...
+                                ['T1_' SubjID '_thresh_clone_transform_strip_clone_transform_bound_mems_cr_gm_avg.nii']));
 
-  if ~exist(fullfile(SubjectFolder, LevelSetFile.name), 'file')
-    gunzip(fullfile(SubjectFolder, [LevelSetFile.name '.gz']));
-  end
+    if ~exist(fullfile(SubjectFolder, LevelSetFile.name), 'file')
+        gunzip(fullfile(SubjectFolder, [LevelSetFile.name '.gz']));
+    end
 
-  tmp = spm_read_vols(spm_vol(fullfile(SubjectFolder, LevelSetFile.name)));
+    tmp = spm_read_vols(spm_vol(fullfile(SubjectFolder, LevelSetFile.name)));
 
-  LevetSetVols(:, SubjInd) = tmp(:);
+    LevetSetVols(:, SubjInd) = tmp(:);
 
-  clear LevelSetFile SubjectFolder SubjID tmp;
+    clear LevelSetFile SubjectFolder SubjID tmp;
 
 end
 clear SubjInd;
