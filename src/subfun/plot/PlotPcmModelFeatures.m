@@ -1,4 +1,4 @@
-function fig_h = Plot_PCM_models_feature(M)
+function fig_h = PlotPcmModelFeatures(M)
 
     ColorMap = brain_colour_maps('hot_increasing');
 
@@ -27,12 +27,14 @@ function fig_h = Plot_PCM_models_feature(M)
             imagesc(sum(M{iM}.Ac, 3));
             t = title('feature');
             set(t, 'fontsize', 6);
+
             SubPlot = SetAxis(SubPlot, ColorMap);
             t = ylabel('sum(features)');
             set(t, 'fontsize', 6);
 
             subplot(nVerPan, nHorPan, SubPlot);
             imagesc(G);
+
             SubPlot = SetAxis(SubPlot, ColorMap);
             axis square;
             t = title('dG dtheta');
@@ -42,6 +44,7 @@ function fig_h = Plot_PCM_models_feature(M)
             RDM = diag(c * G * c');
             RDM = rsa.util.scale01(rsa.util.rankTransform_equalsStayEqual(RDM, 1));
             imagesc(squareform(RDM));
+
             SubPlot = SetAxis(SubPlot, ColorMap);
             axis square;
             t = title('RDM');
@@ -51,14 +54,20 @@ function fig_h = Plot_PCM_models_feature(M)
 
                 subplot(nVerPan, nHorPan, SubPlot);
                 imagesc(M{iM}.Ac(:, :, iFeat));
+
                 SubPlot = SetAxis(SubPlot, ColorMap);
                 t = ylabel(num2str(iFeat));
-                set(gca, 'Xtick', 1:size(M{iM}.Ac(:, :, iFeat), 2), 'Ytick', 1:size(M{iM}.Ac(:, :, iFeat), 1), ...
-                    'Xticklabel', [], 'Yticklabel', [], 'tickdir', 'out');
+                set(gca, ...
+                    'Xtick', 1:size(M{iM}.Ac(:, :, iFeat), 2), ...
+                    'Ytick', 1:size(M{iM}.Ac(:, :, iFeat), 1), ...
+                    'Xticklabel', [], ...
+                    'Yticklabel', [], ...
+                    'tickdir', 'out');
                 set(t, 'fontsize', 6);
 
                 subplot(nVerPan, nHorPan, SubPlot);
                 imagesc(dGdtheta(:, :, iFeat));
+
                 SubPlot = SetAxis(SubPlot, ColorMap);
                 axis square;
 
@@ -66,12 +75,16 @@ function fig_h = Plot_PCM_models_feature(M)
                 RDM = diag(c * dGdtheta(:, :, iFeat) * c');
                 RDM = rsa.util.scale01(rsa.util.rankTransform_equalsStayEqual(RDM, 1));
                 imagesc(squareform(RDM));
+
                 SubPlot = SetAxis(SubPlot, ColorMap);
                 axis square;
 
             end
 
-            mtit(M{iM}.name, 'fontsize', 12, 'xoff', 0, 'yoff', .035);
+            mtit(M{iM}.name, ...
+                 'fontsize', 12, ...
+                 'xoff', 0, ...
+                 'yoff', .035);
 
         end
 
@@ -80,8 +93,13 @@ function fig_h = Plot_PCM_models_feature(M)
 end
 
 function SubPlot = SetAxis(SubPlot, ColorMap)
-    set(gca, 'Xtick', [], 'Ytick', []);
+
+    set(gca, ...
+        'Xtick', [], ...
+        'Ytick', []);
     colormap(ColorMap);
+
     % colorbar
     SubPlot = SubPlot + 1;
+
 end

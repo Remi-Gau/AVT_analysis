@@ -1,4 +1,10 @@
-function filename = returnOutputFilename(FileType, SubjectName, HemiSphere, NbLayers, ROI, SurfParam)
+% (C) Copyright 2020 Remi Gau
+
+function filename = ReturnFilename(FileType, SubjectName, HemiSphere, NbLayers, ROI, SurfParam)
+  
+  if isempty(NbLayers)
+    NbLayers = 6;
+  end
 
     switch lower(FileType)
         case 'hs_run_cdt_layer'

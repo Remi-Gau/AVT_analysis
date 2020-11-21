@@ -1,4 +1,10 @@
 function [Y0, Y1] = Generate_PCM_data(Z, G, s, sig, NbFeatures, X, B)
+    %
+    % USAGE::
+    %
+    %  [Y0, Y1] = Generate_PCM_data(Z, G, s, sig, NbFeatures, X, B)
+    %
+
     if nargin < 6 || nargin < 7 || isempty(X) || isempty(B)
         Do_fixed_effect = 0;
     else
@@ -20,6 +26,7 @@ function [Y0, Y1] = Generate_PCM_data(Z, G, s, sig, NbFeatures, X, B)
     % y_{.j} ~ N( X*b_{.j}, V(theta) )
     % V(theta) =  Z*G*s*Z' + I*(sig_{eps})^2
     % theta = { s , (sig_{eps})^2 }
+
     V = Z * G * s * Z';
     V = V + eye(size(V)) * sig;
 

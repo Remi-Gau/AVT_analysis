@@ -115,7 +115,7 @@ for iSub = 1:NbSub
                 RoiDataSurfParam = squeeze(SurfParam(iSurfParameters, :, :));
                 RoiDataSurfParam = RoiDataSurfParam';
 
-                [~, ~, ~] = mkdir(Dirs.SurfaceGlm, SubLs(iSub).name);
+                [~, ~, ~] = mkdir(Dirs.LaminarGlm, SubLs(iSub).name);
 
                 Filename = returnOutputFilename('hs_roi_run_cdt_s-param', ...
                                                 SubLs(iSub).name, ...
@@ -124,7 +124,7 @@ for iSub = 1:NbSub
                                                 ROI(iROI).name, ...
                                                 SurfParameters{iSurfParameters});
 
-                RoiSurfParamFile = fullfile(Dirs.SurfaceGlm, SubLs(iSub).name, Filename);
+                RoiSurfParamFile = fullfile(Dirs.LaminarGlm, SubLs(iSub).name, Filename);
 
                 save(RoiSurfParamFile, ...
                      'RoiDataSurfParam', 'ConditionVec', 'RunVec', ...

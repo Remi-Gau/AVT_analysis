@@ -1,7 +1,14 @@
-function GetDependencies(Dirs)
+% (C) Copyright 2020 Remi Gau
 
-    addpath(genpath(fullfile(Dirs.CodeDir, '..', '..', 'lib')));
+function Dirs = GetDependencies(Dirs)
+  %
+  % Adds folders to the path
+  %
+  
+    Dirs.CodeDir = abspath(fullfile(fileparts(mfilename('fullpath')),  '..', '..'));
 
-    addpath(genpath(fullfile(Dirs.CodeDir)));
+    addpath(genpath(abspath(fullfile(Dirs.CodeDir, '..', 'lib'))));
+
+    addpath(genpath(fullfile(Dirs.CodeDir, 'subfun')));
 
 end

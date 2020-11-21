@@ -1,23 +1,34 @@
-function M = Set_PCM_3X3_models
-    % Generates the 12 models that represent all the different ways that those 3
-    % conditions can be either
-    % - scaled
-    % - scaled and independent
-    % - independent
-    % used to run on the 3 sensory modalities (A, V and T) but separately for
-    % ipsi and contra
-    % You don't have 3^3 models because of
-    % - transitivity issues where if T is a scaled version of V and V is a
-    % scaled version of A, then how can T be independent from A?
-    % - similarly some models can have 2 possible interpretations: e.g the 2 following can be
-    % described by the same model
-    % - V is scaled to A
-    % - T is scaled and independent from A
-    % - T is scaled to V
+% (C) Copyright 2020 Remi Gau
+
+function M = SetPcm3X3models()
     %
-    % - V is scaled to A
-    % - T is scaled to A
-    % - T is scaled and independent from V
+    % Generates the 12 models that represent all the different ways that those 3
+    % conditions can be either:
+    %
+    % - scaled
+    %
+    % - scaled and independent
+    %
+    % - independent
+    %
+    % Used to run on the 3 sensory modalities (A, V and T) but separately for
+    % ipsi and contra
+    %
+    % You don't have 3*3 models because of
+    %
+    % - transitivity issues where if T is a scaled version of V and V is a
+    %   scaled version of A, then how can T be independent from A?
+    % 
+    % - similarly some models can have 2 possible interpretations: e.g the 2 following can be
+    %   described by the same model
+    %
+    %   - V is scaled to A
+    %   - T is scaled and independent from A
+    %   - T is scaled to V
+    %
+    %   - V is scaled to A
+    %   - T is scaled to A
+    %   - T is scaled and independent from V
 
     CondNames = { ...
                  'A ipsi', 'A contra', ...
@@ -34,7 +45,6 @@ function M = Set_PCM_3X3_models
     M{1}.Ac = [];
     M{1}.Ac = zeros(3, 1);
     M{1}.numGparams = size(M{1}.Ac, 3);
-    % M{1}.theta0=ones(size(M{1}.Ac,3),1);
     M{1}.name       = 'null';
     M{1}.fitAlgorithm = 'minimize';
 

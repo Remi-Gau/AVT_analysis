@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 function [Dirs] = SetDir(space, MVNN)
     % Function used to define where the code and the data are
 
@@ -35,22 +37,23 @@ function [Dirs] = SetDir(space, MVNN)
 
     Dirs.ExternalHD = ExternalHD;
 
-    Dirs.CodeDir = fullfile(fileparts(mfilename('fullpath')), '..', '..');
-
-    Dirs.FigureFolder = fullfile(Dirs.DerDir, 'figures');
+    Dirs.Figures = fullfile(Dirs.DerDir, 'figures');
 
     Dirs.ExtractedBetas = fullfile(Dirs.DerDir, ['extractedBetas'...
                                                  '_space-', space, ...
                                                  '_MVNN-', MVNN]);
 
-    Dirs.SurfaceGlm = fullfile(Dirs.DerDir, ['laminarGlm'...
+    Dirs.LaminarGlm = fullfile(Dirs.DerDir, ['laminarGlm'...
                                              '_space-', space, ...
                                              '_MVNN-', MVNN]);
+
+    Dirs.PCM = fullfile(Dirs.DerDir, ['pcm'...
+                                      '_space-', space]);
 
     Dirs.MvpaResultsDir = fullfile(Dirs.DerDir, ['libsvm', ...
                                                  '_space-', space, ...
                                                  '_MVNN-', MVNN]);
 
-    GetDependencies(Dirs);
-
+    Dirs = GetDependencies(Dirs);
+    
 end
