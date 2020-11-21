@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function [RoiData, RunVec, ConditionVec] = CheckInput(RoiData, RunVec, ConditionVec, IsTarget)
 
     % Remove target data

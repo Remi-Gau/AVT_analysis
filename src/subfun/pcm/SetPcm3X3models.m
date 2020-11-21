@@ -1,5 +1,4 @@
 % (C) Copyright 2020 Remi Gau
-% (C) Copyright 2020 Remi Gau
 
 function M = SetPcm3X3models()
     %
@@ -30,6 +29,7 @@ function M = SetPcm3X3models()
     %   - V is scaled to A
     %   - T is scaled to A
     %   - T is scaled and independent from V
+    %
 
     CondNames = { ...
                  'A ipsi', 'A contra', ...

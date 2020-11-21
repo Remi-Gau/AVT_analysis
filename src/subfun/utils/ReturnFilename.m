@@ -1,6 +1,11 @@
 % (C) Copyright 2020 Remi Gau
 
 function filename = ReturnFilename(FileType, SubjectName, HemiSphere, NbLayers, ROI, SurfParam)
+    %
+    % USAGE::
+    %
+    %   filename = ReturnFilename(FileType, SubjectName, HemiSphere, NbLayers, ROI, SurfParam)
+    %
 
     if isempty(NbLayers)
         NbLayers = 6;

@@ -1,6 +1,12 @@
+% (C) Copyright 2020 Remi Gau
 function [BetaOfInterest, BetaNames] = GetBOI(SPM, CondNames)
-    % GETBOI Gets the numbers of the betas of interest
-    %   Detailed explanation goes here
+    %
+    %  Gets the indices of some betas of interest.
+    %
+    % USAGE::
+    %
+    %    [BetaOfInterest, BetaNames] = GetBOI(SPM, CondNames)
+    %
 
     BetaNames = char(SPM.xX.name'); % list regressor names
 

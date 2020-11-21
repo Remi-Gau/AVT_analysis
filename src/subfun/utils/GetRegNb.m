@@ -1,10 +1,19 @@
+% (C) Copyright 2020 Remi Gau
 function RegNumbers = GetRegNb(SPM)
-    % GETREGNB Gets the bumber oeach regressor of the SPM design matrix
-    %   Returns an n by m matrix with n being the number of session and m the
-    %   maximum number of regressors per session.
-    %   This matrix is NaN padded.
+    %
+    % Gets the number each regressor of the SPM design matrix.
+    %
+    % USAGE::
+    %
+    %   RegNumbers = GetRegNb(SPM)
+    %
+    % :returns:
+    %           :RegNumbers: [n X m] matrix with n being the number of session and m the
+    %                        maximum number of regressors per session.
+    %                        This matrix is NaN padded.
+    %
+    %
 
-    % Regressor numbers
     MAX = 0;
     for i = 1:size(SPM.Sess, 2)
         MAX = max([MAX, length(SPM.Sess(i).col)]);

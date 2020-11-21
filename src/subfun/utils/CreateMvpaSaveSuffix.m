@@ -1,5 +1,12 @@
+% (C) Copyright 2020 Remi Gau
 function SaveSufix = CreateMvpaSaveSuffix(opt, FWHM, NbLayers, space)
-    % creates save suffixes from MVPA
+    %
+    % Creates save suffixes from MVPA save files
+    %
+    % USAGE::
+    %
+    %   SaveSufix = CreateMvpaSaveSuffix(opt, FWHM, NbLayers, space)
+    %
 
     if isempty(FWHM)
         FWHM = 0;

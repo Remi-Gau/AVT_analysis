@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function CheckSizeOutput(RoiData, ConditionVec, RunVec, LayerVec)
     %
     % Makes sure that the 2D data matrix and its "data dictionary" vector are

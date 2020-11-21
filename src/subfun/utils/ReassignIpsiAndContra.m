@@ -5,6 +5,10 @@ function RoiData = ReassignIpsiAndContra(RoiData, ConditionVec, Hemisphere, DoFe
     % Swap left and right for the right hemisphere, so that we have everything
     % in terms of contra and ispi
     %
+    % USAGE::
+    %
+    %   RoiData = ReassignIpsiAndContra(RoiData, ConditionVec, Hemisphere, DoFeaturePooling)
+    %
     % In practice this list of condition:
     %
     %     % CondNames = { ...

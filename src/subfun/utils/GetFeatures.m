@@ -1,5 +1,11 @@
 % (C) Copyright 2020 Remi Gau
+
 function FeaturesAll = GetFeatures(Mask, FilesList, AnalysisFolder, NbLayers)
+    %
+    % USAGE::
+    %
+    %   FeaturesAll = GetFeatures(Mask, FilesList, AnalysisFolder, NbLayers)
+    %
 
     FeaturesAll = cell(1, length(Mask));
 

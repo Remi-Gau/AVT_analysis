@@ -1,9 +1,18 @@
+% (C) Copyright 2020 Remi Gau
 function CopyMappedBetasVTK(Subj, SrcDir, DestDir, opt, Debug)
+    %
     % Extract vtk files from a folder tree created by MIPAV/JIST
-    % and copies it somewher else
-
-    % Debug == 1
-    % the function will look through folders and sub-folders but will not extract anything
+    % and copies it somewhere else
+    %
+    % USAGE::
+    %
+    %   CopyMappedBetasVTK(Subj, SrcDir, DestDir, opt [, Debug == 1])
+    %
+    % :param Debug: If true, the function will look through folders and sub-folders
+    %               but will not extract anything.
+    % :type Debug: boolean
+    %
+    %
 
     if nargin < 2
         error('Need to know where to look for...');
@@ -14,7 +23,7 @@ function CopyMappedBetasVTK(Subj, SrcDir, DestDir, opt, Debug)
     end
 
     if nargin < 5
-        Debug = 1;
+        Debug = true;
     end
 
     StartDir = pwd;

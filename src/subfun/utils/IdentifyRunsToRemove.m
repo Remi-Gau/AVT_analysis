@@ -1,7 +1,12 @@
+% (C) Copyright 2020 Remi Gau
 function RunsToRemove = IdentifyRunsToRemove(RunVec, ConditionVec)
     %
-    % Check that we have the same number of rows (conditions) in each run
-    % It returns the runs that do not have all conditions
+    % Check that the is the same number of rows (conditions) in each run.
+    % It returns the runs that do not have all conditions.
+    %
+    % USAGE::
+    %
+    %   RunsToRemove = IdentifyRunsToRemove(RunVec, ConditionVec)
     %
 
     RunsToRemove = [];

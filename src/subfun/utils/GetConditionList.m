@@ -1,6 +1,13 @@
 % (C) Copyright 2020 Remi Gau
 
 function  [CondNames, CondNamesIpsiContra] = GetConditionList()
+    %
+    % Returns the names of the conditions used in analysis
+    %
+    % USAGE::
+    %
+    %    [CondNames, CondNamesIpsiContra] = GetConditionList()
+    %
 
     CondNames = { ...
                  'AStimL', 'AStimR', ...
