@@ -1,4 +1,6 @@
-function Extract_data_for_PCM_stim_vol
+% (C) Copyright 2020 Remi Gau
+
+function ExtractVolBeta
 
     % Extracts data from volume beta nifti data and saves in a mat file
 

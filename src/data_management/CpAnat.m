@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 clear;
 clc;
 
@@ -7,7 +9,7 @@ cd (StartDir);
 SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
-for iSub = 2:NbSub % for each subject
+for iSub = 1:NbSub % for each subject
 
     [~, ~, ~] = mkdir(fullfile(StartDir, SubLs(iSub).name, 'anat', 'spm'));
     copyfile(fullfile(StartDir, SubLs(iSub).name, 'anat', 'sub-*_MP2RAGE_T1w.nii.gz'), ...

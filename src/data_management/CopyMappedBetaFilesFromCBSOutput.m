@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 % Extract vtk files from a folder tree created by MIPAV/JIST
 % and copies it somewhere else
 

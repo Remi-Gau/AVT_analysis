@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 % Extracts data (i.e. beta values for vertex in a
 % particular surface-layer) from all the VTK. Relies on parfor and brute force
 % but fast “textscan” rather than the slower read_vtk.m . Requires to know how
@@ -118,7 +120,7 @@ for iSub = 1:NbSub
         %%
         fprintf('  Saving\n');
 
-        Filename = returnOutputFilename('hs_run_cdt_layer', SubLs(iSub).name, HsSufix, NbLayers);
+        Filename = ReturnFilename('hs_run_cdt_layer', SubLs(iSub).name, HsSufix, NbLayers);
 
         FeatureSaveFile = fullfile(OuputDir, Filename);
 
