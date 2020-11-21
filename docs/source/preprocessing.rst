@@ -5,11 +5,6 @@ List of functions in the ``src`` folder.
 
 ----
 
-.. automodule:: src 
-
-.. autofunction:: convertSourceToRaw
-
-
 ## Preprocessing of EPIs
 
 `code/preprocess/`

@@ -1,6 +1,10 @@
 Data analysis workflow
 **********************
   
+.. automodule:: src 
+
+.. autofunction:: convertSourceToRaw
+
 
 I indicate here the different folders where the code is kept. 
 

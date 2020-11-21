@@ -5,12 +5,6 @@ Scripts and functions related to subject level models.
 
 ----
 
-.. automodule:: src 
-
-.. autofunction:: convertSourceToRaw
-
-
-
 ## Running subject level GLM
 
 `code/ffx/`

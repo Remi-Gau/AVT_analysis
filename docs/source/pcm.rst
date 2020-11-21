@@ -5,18 +5,21 @@ Scripts and functions related to pattern component modelling.
 
 ----
 
-.. automodule:: pcm 
+.. automodule:: src.subfun.pcm
 
-.. autofunction:: convertSourceToRaw
+.. autofunction:: RunPcm
 
 
-## Pattern component model
+3 X 3 model 
+**********
 
-Run by the script: `pcm/bold_PCM_3X3Models.m`
+.. automodule:: src.pcm
 
-The `surf` and `vol` contains the scripts to extract the data from the ROI in
-the volume data or in the surface data before or after whitening (spatial
-multivariate normalization done by the RSA toolbox).
+.. autoscript:: Pcm3x3models
+
+.. automodule:: src.subfun.pcm
+
+.. autofunction:: SetPcm3X3models
 
 
 

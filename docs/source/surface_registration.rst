@@ -1,7 +1,5 @@
 Surface registration
 ********************
-  
-## Surface registration
 
 `code/surfreg` For the surface registration, a lot of the JIST layouts use .txt
 files as inputs that list with their fullpath the files to use. Those .txt files

@@ -1,4 +1,5 @@
-# Data structures
+Data structures
+***************
 
 Left and right hemisphere can be denoted by:
 

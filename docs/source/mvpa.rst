@@ -5,19 +5,11 @@ Scripts and functions related to MVPA.
 
 ----
 
-.. automodule:: src 
-
-.. autofunction:: convertSourceToRaw
-
-
-
 The scripts are all in the `mvpa` folder.
 
 Options for the MVPA are set in the `subfun/mvpa/get_mvpa_options.m`
 
 
-
-## MVPA
 
 `code/mvpa/FeatPool/surf`
 

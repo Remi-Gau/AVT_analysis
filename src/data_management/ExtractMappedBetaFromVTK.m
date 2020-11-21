@@ -28,6 +28,7 @@
 clc;
 clear;
 
+% To work on the beta values that have undergone multivariate noise normalization
 MVNN = false;
 
 %%

@@ -1,10 +1,10 @@
 % (C) Copyright 2020 Remi Gau
-
+%
 % Loads output ExtractMappedBetaFromVTK with data for all betas, layers,
 % vertices for each hemisphere and extracts the data for each ROI
 %
 %
-% OUTPUT
+% OUTPUT::
 %
 %   filename = [ ...
 %               SubjectName, ...
@@ -14,8 +14,11 @@
 %              ];
 %
 % - RoiData: a n X m array with
+%
 %   - n = nb layers * nb betas
 %   - m = nb vertices
+%
+%  ::
 %
 %     data(1,:) = beta 1, layer 1
 %     data(2,:) = beta 1, layer 2

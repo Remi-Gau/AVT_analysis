@@ -9,3 +9,4 @@
 *.m~
 
 avt/**
+docs/build/**
