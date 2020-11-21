@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function [B] = laminar_glm(X, Y)
     % runs a laminar GLM to decompose a laminar profile into a constant, a
     % linear (and a quadratic component).

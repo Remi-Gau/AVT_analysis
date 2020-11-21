@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function recipient = matlabmail(recipient, message, subject, attachments, sender, psswd)
     % MATLABMAIL Send an email from a predefined gmail account.
     %

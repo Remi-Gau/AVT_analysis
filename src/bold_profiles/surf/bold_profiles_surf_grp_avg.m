@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function bold_profiles_surf_grp_avg
     clc;
     clear;

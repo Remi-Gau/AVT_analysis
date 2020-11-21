@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 % Realign and unwarp the EPIs: can use the VDM created from the fieldmap
 
 clear;

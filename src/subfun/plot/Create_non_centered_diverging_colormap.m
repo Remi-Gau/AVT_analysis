@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function [NewColorMap] = Create_non_centered_diverging_colormap(Mat2Plot, ColorMap)
     % Takes a diverging colormap and truncates it to remove useless values
 

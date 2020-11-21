@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function PlotRectangle(NbLayers, Fontsize, LabelDepth)
 
     if nargin < 3 || isempty(LabelDepth)

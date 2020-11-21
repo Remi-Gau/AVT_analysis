@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function COLOR_Subject = ColorSubject()
 
     % Color for Subjects

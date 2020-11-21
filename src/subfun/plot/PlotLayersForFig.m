@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function PlotLayersForFig(DATA)
 
     if nargin < 1

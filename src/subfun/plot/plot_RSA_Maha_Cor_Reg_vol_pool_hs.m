@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function plot_RSA_Maha_Cor_Reg_vol_pool_hs(StartDir, SubLs, beta_type, ranktrans, isplotranktrans)
 
     Do_hs_Idpdtly = 1;

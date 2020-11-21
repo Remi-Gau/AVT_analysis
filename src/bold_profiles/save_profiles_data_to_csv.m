@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 %%
 % This script computes the bold profile for for each condition, session,
 % subject and saves it in a different file for each ROI

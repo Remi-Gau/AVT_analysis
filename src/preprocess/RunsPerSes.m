@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 % Quickly checks how many sessions (days) and run per session there was for
 % each subject store the results in mat file in the root folder
 

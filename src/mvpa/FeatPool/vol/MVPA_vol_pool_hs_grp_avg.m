@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function MVPA_vol_pool_hs_grp_avg
 
     % averages MVPA results in volume

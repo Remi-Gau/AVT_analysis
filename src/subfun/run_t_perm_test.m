@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function [TestSide, P, STATS] = run_t_perm_test(ToPrint, iCdt, iROI, S_param, Data)
 
     if isfield(ToPrint, 'OneSideTTest')

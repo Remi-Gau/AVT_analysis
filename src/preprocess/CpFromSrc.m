@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 % Gets the file from the BIDS and unzips some of them
 
 clear;

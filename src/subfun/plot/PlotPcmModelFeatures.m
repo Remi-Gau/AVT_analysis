@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function fig_h = PlotPcmModelFeatures(M)
 
     ColorMap = brain_colour_maps('hot_increasing');

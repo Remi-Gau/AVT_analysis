@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function plot_RSA_Cor_Reg_surf_pool_hs(StartDir, SubLs, ToPlot, ranktrans, isplotranktrans)
 
     if nargin < 4 || isempty(ranktrans)

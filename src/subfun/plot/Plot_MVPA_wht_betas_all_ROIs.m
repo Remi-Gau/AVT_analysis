@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function Plot_MVPA_wht_betas_all_ROIs(ToPlot)
 
     fontsize = 9;

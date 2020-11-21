@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 % for 3X3 models
 % - computes likelihood of each model
 % - computes exceedance probabilities by performing 2 family comparison with spm_compare_families

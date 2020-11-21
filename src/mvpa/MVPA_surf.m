@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function MVPA_surf
     % very generic function to run MVPA on surface data
     % - either on B parameters layer by layer (or on the whole ROI)

@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 % Runs the multivariate noise normalization on the output of a subject level GLM
 
 %%

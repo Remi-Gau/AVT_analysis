@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function set_tight_figure()
 
     set(gca, 'units', 'centimeters');

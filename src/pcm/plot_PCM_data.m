@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function plot_PCM_data
 
     clc;

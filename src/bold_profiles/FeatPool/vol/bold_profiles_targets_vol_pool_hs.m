@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function bold_profiles_targets_vol_pool_hs
     clc;
     clear;

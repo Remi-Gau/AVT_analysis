@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function print_PCM_table(Mat2Save, Mat2Save_struct, ROI, NbROI, save_dir, opt)
     for iROI = 1:NbROI
         ROI_name  = ROI(iROI).name;

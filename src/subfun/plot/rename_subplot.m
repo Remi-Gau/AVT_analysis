@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function rename_subplot(Subplots, subplots_names, title_names)
     for iSubplot = 1:length(title_names)
         subplot(Subplots(1), Subplots(2), iSubplot);

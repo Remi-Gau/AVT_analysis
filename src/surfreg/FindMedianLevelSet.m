@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 % this script will that the mid-cortical depth level sets of all the
 % subject and for each hemisphere identify which subject is the median
 % subject and should be used as a target for the first round of surface

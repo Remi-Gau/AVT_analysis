@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function rgb = seismic(n)
 
     % seismic(n) creates a colormap, ranging from dark blue via white to dark red.

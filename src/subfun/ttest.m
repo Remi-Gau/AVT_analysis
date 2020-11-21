@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function [h, p, ci, stats] = ttest(x, m, varargin)
     % TTEST  One-sample and paired-sample t-test.
     %

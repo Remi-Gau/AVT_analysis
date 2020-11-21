@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function MVPA_surf_grp_avg
     % takes data from each subjects and computes the group average
 

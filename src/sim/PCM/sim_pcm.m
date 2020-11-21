@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 %% Simulated data dataset for PCM
 % Remi Gau adapted from Johanna Zumer, 2017
 

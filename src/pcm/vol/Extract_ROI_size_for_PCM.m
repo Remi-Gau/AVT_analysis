@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function Extract_ROI_size_for_PCM_vol
     clc;
     clear;

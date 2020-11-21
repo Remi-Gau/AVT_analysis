@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function [rho, slope] = CorRegRaster(Profiles, DesMat, iToPlot, X_sort)
     for iPerc = 1:size(Profiles, 1)
         Y = squeeze(Profiles(iPerc, :, :));

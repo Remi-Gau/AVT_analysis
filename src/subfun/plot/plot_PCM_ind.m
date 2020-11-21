@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function  fig_h = plot_PCM_ind(M, G, G_hat, T_ind, D, T_ind_cross, theta_ind, theta_ind_cross, G_pred_ind, G_pred_ind_CV, RDMs_CV, opt)
 
     COLOR_Subject = [

@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 %%
 Ls = dir('ROI_auditory_Te*_MNI.nii');
 for iROI = 1:numel(Ls)

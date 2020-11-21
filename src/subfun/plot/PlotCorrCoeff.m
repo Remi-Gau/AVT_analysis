@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function PlotCorrCoeff(ax, Values2Plot, XTickLabel, XOffSet, YOffSet, XDim, YDim, Axis, ToPermute)
 
     if nargin < 9

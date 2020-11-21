@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 for i = 1:10
     pause(10);
     sprintf('Loop %i', i);

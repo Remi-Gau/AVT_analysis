@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function [m, n] = OptimizeSubplotNumber(mn)
     % UNTITLED Optimizes the number of subplot to have on a figure
     n  = round(mn^0.4);

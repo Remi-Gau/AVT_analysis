@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 % print vtk files of daily averaged S-parameters surface mapping for each
 % subject
 

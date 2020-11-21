@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 % Plot the results of the 3X3 PCM
 % First plots the G matrices: empirical, free model and then all the fitted of all the models
 % Then gives the bar plot of the likelihoods of the different models

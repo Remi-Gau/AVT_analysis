@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 % Smooths the data. They will only be used to create an inclusive mask for
 % the subject level GLM
 

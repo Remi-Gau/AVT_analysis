@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function Plot_BOLD_MVPA_all_ROIs(ToPlot)
 
     fontsize = 9;

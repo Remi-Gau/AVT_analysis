@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function nb_voxels_roi
     clc;
     clear;

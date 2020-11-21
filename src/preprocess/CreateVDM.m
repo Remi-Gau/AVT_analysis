@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 %% Phase enconded lines (PELines) and ReadOutTime
 % PELines = ((BaseResolution * PartialFourier)/iPat) + ((iPat-1)/iPAT) * ReferenceLines) =
 % ReadoutDuration = PELines * InterEchoSpacing

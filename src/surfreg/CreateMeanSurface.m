@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 %% Creates one mean surface across sessions for each condition and each layer
 
 clc;

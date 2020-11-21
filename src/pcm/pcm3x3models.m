@@ -1,4 +1,5 @@
 % (C) Copyright 2020 Remi Gau
+% (C) Copyright 2020 Remi Gau
 
 % Runs the PCM on the 3 sensory modalities (A, V and T) but separately for
 % ipsi and contra

@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function Plot_one_raster(Profiles, Title, FontSize, CLIM)
     % UNTITLED Plots one raster
 

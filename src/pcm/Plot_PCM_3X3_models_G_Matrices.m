@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 % Plot the results of the 3X3 empirical G matrices for both ipsi and contra in one matrix
 clc;
 clear;

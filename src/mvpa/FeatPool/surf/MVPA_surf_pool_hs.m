@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function MVPA_surf_pool_hs
     clc;
     clear;

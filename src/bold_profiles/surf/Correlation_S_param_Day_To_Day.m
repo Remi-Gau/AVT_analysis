@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 % computes for each subject the correlation between one session and all the
 % others for all ROIs
 

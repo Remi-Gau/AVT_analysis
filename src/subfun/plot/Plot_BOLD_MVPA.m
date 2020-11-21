@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function Plot_BOLD_MVPA(DATA)
 
     if nargin < 1

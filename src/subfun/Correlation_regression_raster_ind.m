@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function [rho, slope] = Correlation_regression_raster_ind(Profiles, DesMat, iToPlot, X_sort)
 
     Y = Profiles';
