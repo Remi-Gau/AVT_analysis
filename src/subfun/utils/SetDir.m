@@ -55,5 +55,5 @@ function [Dirs] = SetDir(space, MVNN)
                                                  '_MVNN-', MVNN]);
 
     Dirs = GetDependencies(Dirs);
-    
+
 end

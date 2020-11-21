@@ -111,7 +111,7 @@ for iSub = 1:NbSub
             HsSufix = 'r';
         end
 
-        Filename = returnOutputFilename('hs_run_cdt_layer', SubLs(iSub).name, HsSufix, NbLayers);
+        Filename = ReturnFilename('hs_run_cdt_layer', SubLs(iSub).name, HsSufix, NbLayers);
 
         FeatureSaveFile = fullfile(SubDir, Filename);
 
@@ -148,10 +148,10 @@ for iSub = 1:NbSub
         for iROI = 1:numel(ROI)
 
             Filename = ReturnFilename('hs_roi_run_cdt_layer', ...
-                                            SubLs(iSub).name, ...
-                                            HsSufix, ...
-                                            NbLayers, ...
-                                            ROI(iROI).name);
+                                      SubLs(iSub).name, ...
+                                      HsSufix, ...
+                                      NbLayers, ...
+                                      ROI(iROI).name);
 
             RoiData = SurfaceData(:, ROI(iROI).VertOfInt{hs});
 

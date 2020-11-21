@@ -18,7 +18,7 @@ function M = SetPcm3X3models()
     %
     % - transitivity issues where if T is a scaled version of V and V is a
     %   scaled version of A, then how can T be independent from A?
-    % 
+    %
     % - similarly some models can have 2 possible interpretations: e.g the 2 following can be
     %   described by the same model
     %
