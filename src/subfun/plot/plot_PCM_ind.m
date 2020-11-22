@@ -1,18 +1,7 @@
 % (C) Copyright 2020 Remi Gau
 function  fig_h = plot_PCM_ind(M, G, G_hat, T_ind, D, T_ind_cross, theta_ind, theta_ind_cross, G_pred_ind, G_pred_ind_CV, RDMs_CV, opt)
 
-    COLOR_Subject = [
-                     31, 120, 180
-                     178, 223, 138
-                     51, 160, 44
-                     251, 154, 153
-                     227, 26, 28
-                     253, 191, 111
-                     255, 127, 0
-                     202, 178, 214
-                     106, 61, 154
-                     0, 0, 130];
-    COLOR_Subject = COLOR_Subject / 255;
+    COLOR_SUBJECTS = SubjectColours();
 
     ColorMap = brain_colour_maps('hot_increasing');
 

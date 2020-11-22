@@ -5,14 +5,7 @@ function PlotRectangle(NbLayers, Fontsize, LabelDepth)
         LabelDepth = 1;
     end
 
-    COLOR_Layer = flipud([
-                          254, 229, 217
-                          252, 187, 161
-                          252, 146, 114
-                          251, 106, 74
-                          222, 45, 38
-                          165, 15, 21]);
-    COLOR_Layer = COLOR_Layer / 255;
+    COLOR_LAYERS = LayerColours();
 
     ax = gca;
     axPos = ax.Position;
@@ -26,8 +19,8 @@ function PlotRectangle(NbLayers, Fontsize, LabelDepth)
 
     RecPos = linspace(0, 0.9, NbLayers + 1);
 
-    for i = 1:size(COLOR_Layer, 1)
-        rectangle('Position', [RecPos(i) 0 diff(RecPos(1:2)) 1], 'facecolor', COLOR_Layer(i, :), 'edgecolor', 'w');
+    for i = 1:size(COLOR_LAYERS, 1)
+        rectangle('Position', [RecPos(i) 0 diff(RecPos(1:2)) 1], 'facecolor', COLOR_LAYERS(i, :), 'edgecolor', 'w');
         if LabelDepth
             t = text(RecPos(i) + diff(RecPos(1:2)) / 2 - .026, 0.5, num2str(TEXT(i)));
             set(t, 'fontsize', Fontsize);

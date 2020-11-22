@@ -19,7 +19,7 @@ function [color_map] = brain_colour_maps(map2load)
         error('Not sure which color map to load.');
     end
 
-    path = fileparts(which('brain_colour_maps.m'));
-    color_map = load(fullfile(path, 'brain_colour_maps', [map2load '.csv']));
+    path = fileparts(mfilename('fullath'));
+    color_map = load(fullfile(path, [map2load '.csv']));
 
 end
