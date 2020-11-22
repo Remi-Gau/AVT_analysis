@@ -34,7 +34,7 @@
 clc;
 clear;
 
-MVNN = true;
+MVNN = false;
 
 %%
 NbLayers = 6;
@@ -112,7 +112,7 @@ for iSub = 1:NbSub
         FeatureSaveFile = fullfile(SubDir, Filename);
 
         % Load data or extract them
-        fprintf('  Reading VTKs\n');
+        fprintf('  Reading data\n');
         if exist(FeatureSaveFile, 'file')
 
             load(FeatureSaveFile);
@@ -161,7 +161,7 @@ for iSub = 1:NbSub
             RoiSaveFile = fullfile(SubDir, Filename);
 
             save(RoiSaveFile, ...
-                 'RoiData', 'ConditionVec', 'RunVec', 'LayerVec', ...
+                 'RoiData', 'ConditionVec', 'RunVec', 'LayerVec', 'CondNames', ...
                  '-v7.3');
 
         end

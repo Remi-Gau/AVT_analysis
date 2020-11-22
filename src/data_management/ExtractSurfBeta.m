@@ -29,10 +29,12 @@ clc;
 clear;
 
 % To work on the beta values that have undergone multivariate noise normalization
-MVNN = false;
+MVNN = true;
 
 %%
 NbLayers = 6;
+
+CondNames = GetConditionList();
 
 Dirs = SetDir('surf', MVNN);
 
@@ -46,13 +48,19 @@ for iSub = 1:NbSub
     [~, ~, ~] = mkdir(OuputDir);
 
     SubDir = fullfile(Dirs.ExternalHD, SubLs(iSub).name);
-
+    
     InputDir = fullfile(SubDir, 'ffx_nat', 'betas', '6_surf');
     if MVNN
         InputDir = fullfile(SubDir, 'ffx_rsa', 'betas', '6_surf');
     end
 
     %% Load data or extract them
+    
+    % Get number of sessions, regressors of interest numbers, and names of conditions
+    load(fullfile(SubDir, 'ffx_nat', 'SPM.mat'));
+    [BetaOfInterest, BetaNames] =  GetBOI(SPM, CondNames);
+    NbBetas = numel(BetaOfInterest);
+    clear SPM;
 
     % Format for reading the vertices from the VTK file
     Spec = repmat('%f ', 1, NbLayers);
@@ -76,11 +84,10 @@ for iSub = 1:NbSub
         NbVertices(hs) = size(inf_vertex, 2);
 
         Betas = spm_select('FPList', InputDir, ['^Beta.*' HsSufix 'cr.vtk$']);
-
-        %TODO
-        % add an extra check to make sure we got as many files as there are
-        % betas of interest in the GLM
-
+        if size(Betas, 1) ~= NbBetas
+          error('We are missing some mapped beta files.')
+        end
+        
         AllMapping = nan(NbVertices(hs), NbLayers, size(Betas, 1));
 
         fprintf(1, '   [%s]\n   [ ', repmat('.', 1, size(Betas, 1)));
@@ -130,7 +137,9 @@ for iSub = 1:NbSub
         FeatureSaveFile = fullfile(OuputDir, Filename);
 
         save(FeatureSaveFile, ...
-             'inf_vertex', 'inf_faces', 'AllMapping', 'VertexWithData', ...
+             'inf_vertex', 'inf_faces', ...
+             'AllMapping', 'VertexWithData', ...
+             'BetaOfInterest', 'BetaNames', 'CondNames', ...
              '-v7.3');
 
         clear Betas Mapping A B C vtk AllMapping Face;
