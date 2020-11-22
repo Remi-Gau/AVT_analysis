@@ -7,7 +7,7 @@ function varargout = RunPcm(Y, M, partVec, condVec)
     % USAGE::
     %
     %  [T_grp, theta_grp, G_pred_grp, T_cr, theta_cr, G_pred_cr] = RunPcm(Y, M, partVec, condVec)
-    % 
+    %
 
     MaxIteration = 50000;
     runEffect  = 'fixed';

@@ -54,6 +54,10 @@ function [Dirs] = SetDir(space, MVNN)
                                                  '_space-', space, ...
                                                  '_MVNN-', MVNN]);
 
+    Dirs.CodeDir = abspath(fullfile(fileparts(mfilename('fullpath')),  '..', '..'));
+                                               
     Dirs = GetDependencies(Dirs);
 
 end
+
+

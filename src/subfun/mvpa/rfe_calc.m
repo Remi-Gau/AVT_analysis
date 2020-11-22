@@ -35,7 +35,7 @@ function [idfeat, acc] = rfe_calc(data, idfeat, label, session, nsplits, args, o
 
             % Train machine and make predictions
             model = svmtrain(trlabel, trdata, args);
-            [predlabel, accuracy, decvalue] = svmpredict(telabel, tedata,  model);
+            predlabel = svmpredict(telabel, tedata,  model);
 
             % Compute the weights of features (voxels)
             w = model.SVs' * model.sv_coef;
@@ -55,9 +55,11 @@ function [idfeat, acc] = rfe_calc(data, idfeat, label, session, nsplits, args, o
         % Calculate accuracy
         try
             acc(i, :) = mean(reshape(mean(pred, 2), [], 2), 1);
+
         catch
             acc(i, :) = [mean(pred(repmat(telabel == 1, 1, size(pred, 2)))) ...
                          mean(pred(repmat(telabel == -1, 1, size(pred, 2))))];
+
         end
 
     end

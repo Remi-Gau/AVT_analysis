@@ -26,9 +26,12 @@ function idfeat = feat_select(trdata, trlabel, opt)
             t = (mean(c1data) - mean(c2data)) ./ sqrt((var(c1data) + var(c2data)) / n);
 
             % Select features
-            score = sort(abs(t), 'descend'); % abs for 2-sided selection
-            idfeat = t > score(round(m * threshold)) | t <= -score(round(m * threshold)); % voxels with greatest t-values
+            % abs for 2-sided selection
+            score = sort(abs(t), 'descend');
+            % voxels with greatest t-values
+            idfeat = t > score(round(m * threshold)) | t <= -score(round(m * threshold));
 
         case 'wilcoxon'
             % not implemented yet...
+
     end

@@ -2,12 +2,8 @@ function [trdata, tedata] =  norm_calc(trdata, tedata, cvmat, tr, te, opt)
 
     % Eucledian image normalization
     if opt.scaling.img.eucledian
-        for i = 1:size(trdata, 1)
-            trdata(i, :) = trdata(i, :) / norm(trdata(i, :));
-        end
-        for i = 1:size(tedata, 1)
-            tedata(i, :) = tedata(i, :) / norm(tedata(i, :));
-        end
+        trdata = euclidian_normalization(trdata);
+        tedata = euclidian_normalization(tedata);
     end
 
     % Image mean centering and normalization (std=1)
@@ -19,45 +15,30 @@ function [trdata, tedata] =  norm_calc(trdata, tedata, cvmat, tr, te, opt)
     % Feature mean centering
     if opt.scaling.feat.mean
         mnval = mean(trdata);
-        for i = 1:size(trdata, 1)
-            trdata(i, :) = trdata(i, :) - mnval;
-        end
-        for i = 1:size(tedata, 1)
-            tedata(i, :) = tedata(i, :) - mnval;
-        end
+        trdata = mean_centering(trdata, mnval);
+        tedata = mean_centering(tedata, mnval);
     end
 
     % Feature scaling into [-1 1] range
     if opt.scaling.feat.range
         minval = min(trdata);
         maxval = max(trdata);
-        for i = 1:size(trdata, 1)
-            trdata(i, :) = 2 * (trdata(i, :) - minval) ./ (maxval - minval) - 1;
-        end
-        for i = 1:size(tedata, 1)
-            tedata(i, :) = 2 * (tedata(i, :) - minval) ./ (maxval - minval) - 1;
-        end
+        trdata = range_scaling(trdata, maxval, minval);
+        tedata = range_scaling(tedata, maxval, minval);
     end
 
     % Feature session mean centering
     if opt.scaling.feat.sessmean
+
         tr_sess =  cvmat(tr, 2);
         tr_sess_list = unique(tr_sess);
-        for isess = 1:numel(tr_sess_list)
-            tr_sess_to_center = find(tr_sess == tr_sess_list(isess));
-            mnval = mean(trdata(tr_sess_to_center, :));
-            for i = 1:numel(tr_sess_to_center)
-                trdata(tr_sess_to_center(i), :) = trdata(tr_sess_to_center(i), :) - mnval;
-            end
-        end
+
+        trdata = fold_mean_centering(trdata, tr_sess_list, tr_sess);
 
         te_sess = cvmat(te, 2);
         te_sess_list = unique(te_sess);
-        for isess = 1:numel(te_sess_list)
-            te_sess_to_center = find(te_sess == te_sess_list(isess));
-            mnval = mean(tedata(te_sess_to_center, :));
-            for i = 1:numel(te_sess_to_center)
-                tedata(te_sess_to_center(i), :) = tedata(te_sess_to_center(i), :) - mnval;
-            end
-        end
+
+        tedata = fold_mean_centering(tedata, te_sess_list, te_sess);
     end
+
+end

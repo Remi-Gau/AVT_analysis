@@ -1,16 +1,24 @@
-function [opt, file2load_suffix] = get_mvpa_options()
+function opt = get_mvpa_options(MVNN, Norm)
 
     % Options for the SVM
-    opt.fs.do = false; % feature selection
-    opt.rfe.do = false; % recursive feature elimination
-    opt.scaling.idpdt = true; % scale test and training sets independently
-    opt.permutation.test = false;  % do permutation test
-    opt.session.curve = false; % learning curves on a subsample of all the sessions
-    opt.session.proptest = 0.2; % proportion of all sessions to keep as a test set
+
+    % feature selection
+    opt.fs.do = false;
+    % recursive feature elimination
+    opt.rfe.do = false;
+    % scale test and training sets independently
+    opt.scaling.idpdt = true;
+    % do permutation test
+    opt.permutation.test = false;
+    % learning curves on a subsample of all the runs
+    opt.runs.curve = false;
+    % proportion of all runs to keep as a test set
+    opt.runs.proptest = 0.2;
+
     opt.verbose = false;
     opt.layersubsample.do = false;
-    opt.session.loro = true;
-    opt.MVNN = false;
+    opt.runs.loro = true;
+    opt.MVNN = MVNN;
 
     % --------------------------------------------------------- %
     %          Data pre-processing and SVM parameters           %
@@ -28,40 +36,40 @@ function [opt, file2load_suffix] = get_mvpa_options()
     if strcmp(opt.svm.machine, 'C-SVC')
         opt.svm.log2c = 1;
         opt.svm.dargs = '-s 0';
+
     elseif strcmp(opt.svm.machine, 'nu-SVC')
         opt.svm.nu = [0.0001 0.001 0.01 0.1:0.1:1];
         opt.svm.dargs = '-s 1';
+
     end
 
-    opt.svm.kernel = 0;
+    opt.svm.kernel = false;
     if opt.svm.kernel
         % should be implemented
     else
-        opt.svm.dargs = [opt.svm.dargs ' -t 0 -q']; % inherent linear kernel, quiet mode
+        % inherent linear kernel, quiet mode
+        opt.svm.dargs = [opt.svm.dargs ' -t 0 -q'];
     end
 
     % Randomization options
     if opt.permutation.test
-        opt.permutation.nreps = 1000; %#repetitions for permutation test
+        opt.permutation.nreps = 1000; % nb repetitions for permutation test
     else
         opt.permutation.nreps = 1;
     end
 
     % Learning curve
-    %#repetitions for session subsampling if needed
-    opt.session.subsample.nreps = 30;
+    %#nb repetitions for session subsampling if needed
+    opt.runs.subsample.nreps = 30;
 
     % Maximum numbers of CVs
-    opt.session.maxcv = 25;
-
-    % Multivariate noise normalization
-    if opt.MVNN
-        file2load_suffix = 'MVNN';
-    else
-        file2load_suffix = 'raw';
-    end
+    opt.runs.maxcv = 25;
 
     % this should be for volume only
     opt.layersubsample.repscheme = [20 2];
+
+    opt = choose_norm(opt, Norm);
+    
+    opt = orderfields(opt);
 
 end

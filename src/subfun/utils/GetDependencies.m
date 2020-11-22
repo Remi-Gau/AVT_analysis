@@ -9,10 +9,8 @@ function Dirs = GetDependencies(Dirs)
     %   Dirs = GetDependencies(Dirs)
     %
 
-    Dirs.CodeDir = abspath(fullfile(fileparts(mfilename('fullpath')),  '..', '..'));
-
     addpath(genpath(abspath(fullfile(Dirs.CodeDir, '..', 'lib'))));
 
-    addpath(genpath(fullfile(Dirs.CodeDir, 'subfun')));
-
 end
+
+
