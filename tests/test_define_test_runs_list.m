@@ -18,8 +18,8 @@ function test_define_test_runs_listBasic()
 
     TestSessList = define_test_runs_list(opt, iSub);
 
-    assertEqual(TestSessList, {(1:20)'})
-    
+    assertEqual(TestSessList, {(1:20)'});
+
     %%
     iSub = 1;
     opt.runs.curve = false;
@@ -28,8 +28,8 @@ function test_define_test_runs_listBasic()
 
     TestSessList = define_test_runs_list(opt, iSub, listValidRuns);
 
-    assertEqual(TestSessList, {([1:8, 10, 12:19])'})
-    
+    assertEqual(TestSessList, {([1:8, 10, 12:19])'});
+
     %%
 
     iSub = 1;
@@ -37,7 +37,7 @@ function test_define_test_runs_listBasic()
     opt.runs.loro = false;
     opt.permutation.test = false;
     opt.runs.maxcv = 10;
-    
+
     TestSessList = define_test_runs_list(opt, iSub);
 
     % TODO

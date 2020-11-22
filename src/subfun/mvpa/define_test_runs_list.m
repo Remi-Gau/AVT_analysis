@@ -5,14 +5,14 @@ function varargout = define_test_runs_list(opt, iSub, listValidRuns)
     % - the simplest is a leave-one-run-out and assumes that all runs are
     %   equivalent, no matter what session they were acquired in.
     % - a more complicated cross-validation scheme leaves out one run from
-    %   each session. 
+    %   each session.
     %
-    
+
     RunPerSes = ReturnNbRunsPerSession();
     RunPerSes = RunPerSes.RunsPerSes(iSub, :);
-    
+
     if nargin < 3 || isempty(listValidRuns)
-      listValidRuns = 1:sum(RunPerSes);
+        listValidRuns = 1:sum(RunPerSes);
     end
 
     % Test sets for the different CVs
@@ -20,21 +20,21 @@ function varargout = define_test_runs_list(opt, iSub, listValidRuns)
 
         error('learning curves are not implemented');
 
-%         for i = 1:size(CV_id, 1)
-%             % Limits to CV max;
-%             TestSessList{i, 1} = nchoosek(...
-%               CV_id(i, :), ...
-%               floor(opt.runs.proptest * NbSess2Incl));
-%             
-%             TestSessList{i, 1} = TestSessList{i, 1}(randperm(size(TestSessList{i, 1}, 1)), :);
-%             
-%             if size(TestSessList{i, 1}, 1) >  opt.runs.maxcv
-%                 TestSessList{i, 1} = TestSessList{i, 1}(1:opt.runs.maxcv, :);
-%             end
-%             if opt.permutation.test
-%                 TestSessList{i, 1} = cartProd;
-%             end
-%         end
+        %         for i = 1:size(CV_id, 1)
+        %             % Limits to CV max;
+        %             TestSessList{i, 1} = nchoosek(...
+        %               CV_id(i, :), ...
+        %               floor(opt.runs.proptest * NbSess2Incl));
+        %
+        %             TestSessList{i, 1} = TestSessList{i, 1}(randperm(size(TestSessList{i, 1}, 1)), :);
+        %
+        %             if size(TestSessList{i, 1}, 1) >  opt.runs.maxcv
+        %                 TestSessList{i, 1} = TestSessList{i, 1}(1:opt.runs.maxcv, :);
+        %             end
+        %             if opt.permutation.test
+        %                 TestSessList{i, 1} = cartProd;
+        %             end
+        %         end
 
     else
 
@@ -64,10 +64,10 @@ function varargout = define_test_runs_list(opt, iSub, listValidRuns)
         end
 
     end
-    
+
     RunsToRemove = setxor(unique(RunsList(:)), listValidRuns);
     RunsList(any(ismember(RunsList, RunsToRemove), 2), :) = [];
-    
+
     varargout{1} = {RunsList};
 
 end

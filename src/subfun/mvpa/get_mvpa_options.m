@@ -69,7 +69,7 @@ function opt = get_mvpa_options(MVNN, Norm)
     opt.layersubsample.repscheme = [20 2];
 
     opt = choose_norm(opt, Norm);
-    
+
     opt = orderfields(opt);
 
 end

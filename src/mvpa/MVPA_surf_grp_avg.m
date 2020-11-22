@@ -1,225 +1,214 @@
 % (C) Copyright 2020 Remi Gau
-function MVPA_surf_grp_avg
-    % takes data from each subjects and computes the group average
 
-    clc;
-    clear;
+% takes data from each subjects and computes the group average
 
-    [Dirs] = set_dir('surf');
-    [SubLs, NbSub] = get_subject_list(Dirs.MVPA_resultsDir);
+clc;
+clear;
 
-    NbLayers = 6;
+[Dirs] = set_dir('surf');
+[SubLs, NbSub] = get_subject_list(Dirs.MVPA_resultsDir);
 
-    ROIs_ori = {
-                'A1', ...
-                'PT', ...
-                'V1', ...
-                'V2'};
+NbLayers = 6;
 
-    % Some data is missing for Avg and ROI
-    ToPlot = {'Cst', 'Lin', 'Avg', 'ROI'};
-    to_plot = 1;
+ROIs_ori = {
+            'A1', ...
+            'PT', ...
+            'V1', ...
+            'V2'};
 
-    % from one to 8 ; can be a vector ; see ChooseNorm()
-    norm_to_use = 6; % 6
+% Some data is missing for Avg and ROI
+ToPlot = {'Cst', 'Lin', 'Avg', 'ROI'};
+to_plot = 1;
 
-    % Options for the SVM
-    [opt, ~] = get_mvpa_options();
-    disp(opt);
+% from one to 8 ; can be a vector ; see ChooseNorm()
+norm_to_use = 6; % 6
 
-    SVM_Ori = get_mvpa_classification(ROIs_ori);
-    SVM_Ori(10:end) = [];
-    disp(SVM_Ori);
+% Options for the SVM
+[opt, ~] = get_mvpa_options();
+disp(opt);
 
-    DesMat = set_design_mat_lam_GLM(NbLayers);
+SVM_Ori = get_mvpa_classification(ROIs_ori);
+SVM_Ori(10:end) = [];
+disp(SVM_Ori);
 
-    %%
+DesMat = set_design_mat_lam_GLM(NbLayers);
 
-    for iToPlot = to_plot
+%%
 
-        opt.toplot = ToPlot{iToPlot};
+Do_layers = 0;
+if iToPlot == 4
+    Do_layers = 1;
+end
 
-        Do_layers = 0;
-        if iToPlot == 4
-            Do_layers = 1;
-        end
+clear ROIs SVM;
 
-        for Norm = norm_to_use
+[opt] = ChooseNorm(Norm, opt);
 
-            clear ROIs SVM;
+SaveSufix = CreateSaveSuffix(opt, [], NbLayers, 'surf');
 
-            [opt] = ChooseNorm(Norm, opt);
+SVM = SVM_Ori;
 
-            SaveSufix = CreateSaveSuffix(opt, [], NbLayers, 'surf');
+for i = 1:numel(SVM)
+    for j = 1:numel(SVM(i).ROI_2_analyse)
+        SVM(i).ROI(j).name = ROIs_ori{SVM(i).ROI_2_analyse(j)}; %#ok<*AGROW>
+    end
+end
 
-            SVM = SVM_Ori;
+%% Gets data for each subject
+for iSubj = 1:NbSub
+    fprintf('\n\nProcessing %s', SubLs(iSubj).name);
 
-            for i = 1:numel(SVM)
-                for j = 1:numel(SVM(i).ROI_2_analyse)
-                    SVM(i).ROI(j).name = ROIs_ori{SVM(i).ROI_2_analyse(j)}; %#ok<*AGROW>
-                end
+    SubDir = fullfile(Dirs.MVPA_resultsDir, SubLs(iSubj).name);
+
+    for iSVM = 1:numel(SVM)
+        fprintf('\n Running SVM:  %s', SVM(iSVM).name);
+
+        for iROI = 1:numel(SVM(i).ROI_2_analyse)
+
+            File2Load = fullfile( ...
+                                 SubDir, ...
+                                 strcat( ...
+                                        'SVM-', SVM(iSVM).name, ...
+                                        '_ROI-', SVM(iSVM).ROI(iROI).name, ...
+                                        SaveSufix));
+
+            % initialize
+            SVM(iSVM).ROI(iROI).DATA{iSubj} = [];
+            SVM(iSVM).ROI(iROI).grp(iSubj) = NaN;
+            if Do_layers
+                SVM(iSVM).ROI(iROI).layers.DATA{iSubj} = [];
+                % SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = nan(NbLayers);
             end
 
-            %% Gets data for each subject
-            for iSubj = 1:NbSub
-                fprintf('\n\nProcessing %s', SubLs(iSubj).name);
+            if ~exist(File2Load, 'file')
+                error('\nThe file %s was not found.', File2Load);
 
-                SubDir = fullfile(Dirs.MVPA_resultsDir, SubLs(iSubj).name);
+            else
 
-                for iSVM = 1:numel(SVM)
-                    fprintf('\n Running SVM:  %s', SVM(iSVM).name);
+                fprintf('\n  Loading file: %s', File2Load);
 
-                    for iROI = 1:numel(SVM(i).ROI_2_analyse)
+                load(File2Load, 'Results', 'Class_Acc', 'opt');
 
-                        File2Load = fullfile( ...
-                                             SubDir, ...
-                                             strcat( ...
-                                                    'SVM-', SVM(iSVM).name, ...
-                                                    '_ROI-', SVM(iSVM).ROI(iROI).name, ...
-                                                    SaveSufix));
+                SVM(iSVM).ROI(iROI).grp(iSubj) = Class_Acc.TotAcc;
+                % if Do_layers
+                %   SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = Class_Acc.TotAccLayers{1};
+                % end
 
-                        % initialize
-                        SVM(iSVM).ROI(iROI).DATA{iSubj} = [];
-                        SVM(iSVM).ROI(iROI).grp(iSubj) = NaN;
-                        if Do_layers
-                            SVM(iSVM).ROI(iROI).layers.DATA{iSubj} = [];
-                            % SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = nan(NbLayers);
-                        end
+                % Extract results
+                CV = Results.session(end).rand.perm.CV;
+                NbCV = size(CV, 1); %#ok<*NODEF>
 
-                        if ~exist(File2Load, 'file')
-                            error('\nThe file %s was not found.', File2Load);
+                for iCV = 1:NbCV
 
-                        else
-
-                            fprintf('\n  Loading file: %s', File2Load);
-
-                            load(File2Load, 'Results', 'Class_Acc', 'opt');
-
-                            SVM(iSVM).ROI(iROI).grp(iSubj) = Class_Acc.TotAcc;
-                            % if Do_layers
-                            %   SVM(iSVM).ROI(iROI).layers.grp(:,:,iSubj) = Class_Acc.TotAccLayers{1};
-                            % end
-
-                            % Extract results
-                            CV = Results.session(end).rand.perm.CV;
-                            NbCV = size(CV, 1); %#ok<*NODEF>
-
-                            for iCV = 1:NbCV
-
-                                % For the whole ROI
-                                SVM(iSVM).ROI(iROI).DATA{iSubj}(iCV) = CV(iCV).acc;
-
-                                if Do_layers
-                                    for iLayer = 1:NbLayers
-                                        label = CV(iCV).layers.results{1}{iLayer}.label;
-                                        pred = CV(iCV).layers.results{1}{iLayer}.pred(:, iLayer);
-
-                                        SVM(iSVM).ROI(iROI).layers.DATA{iSubj}(iLayer, iCV) = mean(pred == label);
-                                        clear pred label;
-                                    end
-                                end
-
-                            end
-                        end
-                        clear Results Class_Acc;
-
-                    end
-                end
-            end
-
-            %% Averages over subjects
-            for iSVM = 1:numel(SVM)
-                for iROI = 1:numel(ROIs_ori)
-
-                    SVM(iSVM).ROI(iROI).MEAN = nanmean(SVM(iSVM).ROI(iROI).grp);
-                    SVM(iSVM).ROI(iROI).STD = nanstd(SVM(iSVM).ROI(iROI).grp);
-                    SVM(iSVM).ROI(iROI).SEM = nansem(SVM(iSVM).ROI(iROI).grp);
+                    % For the whole ROI
+                    SVM(iSVM).ROI(iROI).DATA{iSubj}(iCV) = CV(iCV).acc;
 
                     if Do_layers
-                        for iSubj = 1:numel(SVM(iSVM).ROI(iROI).layers.DATA)
-                            tmp(iSubj, 1:NbLayers) = ...
-                              mean(SVM(iSVM).ROI(iROI).layers.DATA{iSubj}, 2);
+                        for iLayer = 1:NbLayers
+                            label = CV(iCV).layers.results{1}{iLayer}.label;
+                            pred = CV(iCV).layers.results{1}{iLayer}.pred(:, iLayer);
+
+                            SVM(iSVM).ROI(iROI).layers.DATA{iSubj}(iLayer, iCV) = mean(pred == label);
+                            clear pred label;
                         end
-                        SVM(iSVM).ROI(iROI).layers.MEAN = mean(tmp);
-                        SVM(iSVM).ROI(iROI).layers.STD = std(tmp);
-                        SVM(iSVM).ROI(iROI).layers.SEM = nansem(tmp);
                     end
 
                 end
             end
+            clear Results Class_Acc;
 
-            %% Betas from profile fits
-            if Do_layers
-                fprintf('\n\n GETTING BETA VALUES FOR PROFILE FITS');
+        end
+    end
+end
 
-                for iSVM = 1:numel(SVM)
-                    fprintf('\n Running SVM:  %s', SVM(iSVM).name);
+%% Averages over subjects
+for iSVM = 1:numel(SVM)
+    for iROI = 1:numel(ROIs_ori)
 
-                    for iROI = 1:numel(ROIs_ori)
+        SVM(iSVM).ROI(iROI).MEAN = nanmean(SVM(iSVM).ROI(iROI).grp);
+        SVM(iSVM).ROI(iROI).STD = nanstd(SVM(iSVM).ROI(iROI).grp);
+        SVM(iSVM).ROI(iROI).SEM = nansem(SVM(iSVM).ROI(iROI).grp);
 
-                        %% Actually compute betas
-                        for iSub = 1:NbSub
+        if Do_layers
+            for iSubj = 1:numel(SVM(iSVM).ROI(iROI).layers.DATA)
+                tmp(iSubj, 1:NbLayers) = ...
+                  mean(SVM(iSVM).ROI(iROI).layers.DATA{iSubj}, 2);
+            end
+            SVM(iSVM).ROI(iROI).layers.MEAN = mean(tmp);
+            SVM(iSVM).ROI(iROI).layers.STD = std(tmp);
+            SVM(iSVM).ROI(iROI).layers.SEM = nansem(tmp);
+        end
 
-                            Blocks = SVM(iSVM).ROI(iROI).layers.DATA{iSub};
+    end
+end
 
-                            SVM(iSVM).ROI(iROI).layers.Beta.DATA(:, iSub) = ...
-                              nan(size(DesMat, 2), 1);
+%% Betas from profile fits
+if Do_layers
+    fprintf('\n\n GETTING BETA VALUES FOR PROFILE FITS');
 
-                            if ~all(isnan(Blocks(:))) || ~isempty(Blocks)
+    for iSVM = 1:numel(SVM)
+        fprintf('\n Running SVM:  %s', SVM(iSVM).name);
 
-                                Y = Blocks - .5;
-                                [B] = laminar_glm(DesMat, Y);
+        for iROI = 1:numel(ROIs_ori)
 
-                                SVM(iSVM).ROI(iROI).layers.Beta.DATA(:, iSub) = B;
+            %% Actually compute betas
+            for iSub = 1:NbSub
 
-                                clear Y B;
-                            end
+                Blocks = SVM(iSVM).ROI(iROI).layers.DATA{iSub};
 
-                        end
+                SVM(iSVM).ROI(iROI).layers.Beta.DATA(:, iSub) = ...
+                  nan(size(DesMat, 2), 1);
 
-                        %% Group stat on betas
-                        tmp = SVM(iSVM).ROI(iROI).layers.Beta.DATA;
-                        SVM(iSVM).ROI(iROI).layers.Beta.MEAN = nanmean(tmp, 2);
-                        SVM(iSVM).ROI(iROI).layers.Beta.Beta.STD = nanstd(tmp, 2);
-                        SVM(iSVM).ROI(iROI).layers.Beta.Beta.SEM = nansem(tmp, 2);
+                if ~all(isnan(Blocks(:))) || ~isempty(Blocks)
 
-                        % T-Test
-                        [~, P] = ttest(tmp');
-                        SVM(iSVM).ROI(iROI).Beta.P = P;
+                    Y = Blocks - .5;
+                    [B] = laminar_glm(DesMat, Y);
 
-                        clear tmp P;
+                    SVM(iSVM).ROI(iROI).layers.Beta.DATA(:, iSub) = B;
 
-                    end
+                    clear Y B;
                 end
 
             end
 
-            %% Saves
-            fprintf('\n\nSaving\n');
+            %% Group stat on betas
+            tmp = SVM(iSVM).ROI(iROI).layers.Beta.DATA;
+            SVM(iSVM).ROI(iROI).layers.Beta.MEAN = nanmean(tmp, 2);
+            SVM(iSVM).ROI(iROI).layers.Beta.Beta.STD = nanstd(tmp, 2);
+            SVM(iSVM).ROI(iROI).layers.Beta.Beta.SEM = nansem(tmp, 2);
 
-            for iSVM = 1:numel(SVM)
-                for iROI = 1:numel(ROIs_ori)
-                    Results = SVM(iSVM).ROI(iROI);
-                    Filename = fullfile( ...
-                                        Dirs.MVPA_resultsDir, ...
-                                        'group', ...
-                                        strcat( ...
-                                               'Grp_', SVM(iSVM).ROI(iROI).name, ...
-                                               '_', strrep(SVM(iSVM).name, ' ', '-'), ...
-                                               '_PoolQuadGLM',  SaveSufix));
-                    fprintf('Saving file: %s\n', Filename);
-                    save(Filename, 'Results');
-                end
-            end
+            % T-Test
+            [~, P] = ttest(tmp');
+            SVM(iSVM).ROI(iROI).Beta.P = P;
 
-            Filename = fullfile( ...
-                                Dirs.MVPA_resultsDir, ...
-                                'group', ...
-                                ['GrpPoolQuadGLM', SaveSufix]);
-            fprintf('\n\nSaving file: %s\n', Filename);
-            save(Filename);
+            clear tmp P;
 
         end
     end
 
 end
+
+%% Saves
+fprintf('\n\nSaving\n');
+
+for iSVM = 1:numel(SVM)
+    for iROI = 1:numel(ROIs_ori)
+        Results = SVM(iSVM).ROI(iROI);
+        Filename = fullfile( ...
+                            Dirs.MVPA_resultsDir, ...
+                            'group', ...
+                            strcat( ...
+                                   'Grp_', SVM(iSVM).ROI(iROI).name, ...
+                                   '_', strrep(SVM(iSVM).name, ' ', '-'), ...
+                                   '_PoolQuadGLM',  SaveSufix));
+        fprintf('Saving file: %s\n', Filename);
+        save(Filename, 'Results');
+    end
+end
+
+Filename = fullfile( ...
+                    Dirs.MVPA_resultsDir, ...
+                    'group', ...
+                    ['GrpPoolQuadGLM', SaveSufix]);
+fprintf('\n\nSaving file: %s\n', Filename);
+save(Filename);
