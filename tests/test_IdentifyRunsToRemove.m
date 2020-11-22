@@ -28,6 +28,6 @@ function test_IdentifyRunsToRemoveBasic()
 
     RunsToRemove = IdentifyRunsToRemove(RunVec, ConditionVec);
 
-    assertEqual(RunsToRemove, [2; 3]);
+    assertEqual(RunsToRemove, [2 3]);
 
 end
