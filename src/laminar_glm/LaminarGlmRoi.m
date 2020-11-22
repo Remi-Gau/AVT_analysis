@@ -28,7 +28,7 @@ DesMat = SetDesignMatLamGlm(NbLayers, Quad);
 
 SurfParameters = {'Cst', 'Lin', 'Quad'};
 
-for iSub = 1:NbSub
+for iSub = 1:5 % NbSub
 
     fprintf('\n\n\n');
 
@@ -133,7 +133,7 @@ for iSub = 1:NbSub
                 RoiSurfParamFile = fullfile(Dirs.LaminarGlm, SubLs(iSub).name, Filename);
 
                 save(RoiSurfParamFile, ...
-                     'RoiData', 'ConditionVec', 'RunVec', ...
+                     'RoiData', 'ConditionVec', 'RunVec', 'CondNames', ...
                      '-v7.3');
 
             end
