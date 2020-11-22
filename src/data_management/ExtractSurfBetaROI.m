@@ -45,7 +45,7 @@ Dirs = SetDir('surf', MVNN);
 
 [SubLs, NbSub] = GetSubjectList(Dirs.ExtractedBetas);
 
-for iSub = 1:NbSub
+for iSub = 8 %1:NbSub
 
     fprintf('\n\n\n');
 
