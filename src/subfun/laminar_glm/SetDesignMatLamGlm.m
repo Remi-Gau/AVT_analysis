@@ -10,7 +10,7 @@ function DesMat = SetDesignMatLamGlm(NbLayers, Quad)
     %
     % :param NbLayers: number of layers in the model
     % :type NbLayers: positive integer
-    % :param Quad: Indicates if a quadratic component should be included in the 
+    % :param Quad: Indicates if a quadratic component should be included in the
     %              model.
     % :type Quad: boolean
     %

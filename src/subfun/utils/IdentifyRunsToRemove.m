@@ -10,14 +10,19 @@ function RunsToRemove = IdentifyRunsToRemove(RunVec, ConditionVec)
     %
 
     RunsToRemove = [];
+    
+    RunsList = unique(RunVec);
+    
+    Count = [];
+    for i = RunsList
+      Count(end+1) = sum(RunVec==RunsList(i));
+    end  
 
-    A = tabulate(RunVec);
-
-    if numel(unique(A(:, 2))) > 1
+    if numel(unique(Count)) > 1
 
         warning('We have different numbers of conditions in one run compare to the others.');
 
-        RunsToRemove = find(A(:, 2) < numel(unique(ConditionVec)));
+        RunsToRemove = find(Count < numel(unique(ConditionVec)));
 
     end
 

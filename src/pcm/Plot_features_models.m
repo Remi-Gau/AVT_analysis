@@ -1,6 +1,7 @@
 % (C) Copyright 2020 Remi Gau
-clear;
-clc;
+
+clear
+clc
 
 % % Scaled
 % M.type       = 'feature';
@@ -82,8 +83,13 @@ for iFeat = 1:M.numGparams
     subplot(nVerPan, nHorPan, SubPlot);
     imagesc(squareform(RDM));
     axis square;
-    set(gca, 'Xtick', 1:size(M.Ac(:, :, iFeat), 2), 'Ytick', 1:size(M.Ac(:, :, iFeat), 1), ...
-        'Xticklabel', [], 'Yticklabel', [], 'tickdir', 'out', 'fontsize', 6);
+    set(gca, ...
+    'Xtick', 1:size(M.Ac(:, :, iFeat), 2), ..
+    'Ytick', 1:size(M.Ac(:, :, iFeat), 1), ...
+        'Xticklabel', [], ...
+        'Yticklabel', [], ...
+        'tickdir', 'out', ...
+        'fontsize', 6);
 
     SubPlot = SubPlot + 1;
 
