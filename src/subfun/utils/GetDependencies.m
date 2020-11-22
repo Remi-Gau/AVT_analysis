@@ -12,5 +12,3 @@ function Dirs = GetDependencies(Dirs)
     addpath(genpath(abspath(fullfile(Dirs.CodeDir, '..', 'lib'))));
 
 end
-
-

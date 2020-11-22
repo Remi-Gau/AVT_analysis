@@ -11,6 +11,11 @@
 % - independent
 %
 % See also `SetPcm3X3models()`
+%
+
+% TODO
+% - Make it run on the b parameters
+% - MAke it run on volume
 
 clc;
 clear;
@@ -27,7 +32,7 @@ close all;
 % 'Cst', 'Lin', 'Quad'
 %
 
-Parameter = 'Cst';
+InputType = 'Cst';
 
 % Region of interest:
 %  possible choices: A1, PT, V1-5
@@ -125,9 +130,8 @@ for iROI =  1:numel(ROIs)
 
     for ihs = 1:2
 
-        if ihs == 1
-            HsSufix = 'l';
-        else
+        HsSufix = 'l';
+        if ihs == 2
             HsSufix = 'r';
         end
 
@@ -137,12 +141,16 @@ for iROI =  1:numel(ROIs)
 
             fprintf('   Loading %s\n', SubLs(iSub).name);
 
+            % TODO
+            %
+            % - load files for whole roi
+
             Filename = ReturnFilename('hs_roi_run_cdt_s-param', ...
                                       SubLs(iSub).name, ...
                                       HsSufix, ...
                                       [], ... % NbLayers
                                       ROIs{iROI}, ...
-                                      Parameter);
+                                      InputType);
 
             Filename = fullfile(InputDir, SubLs(iSub).name, Filename);
 
@@ -195,7 +203,7 @@ for iROI =  1:numel(ROIs)
         filename = ['pcm_results', ...
                     '_roi-', ROIs{iROI}, ...
                     '_cdt-', ConditionType, ...
-                    '_param-', lower(Parameter), ...
+                    '_param-', lower(InputType), ...
                     '_analysis-', Analysis(iAnalysis).name, ...
                     '.mat'];
         filename = fullfile(Dirs.PCM, '3X3', filename);
