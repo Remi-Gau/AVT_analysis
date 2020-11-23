@@ -32,7 +32,7 @@ close all;
 % 'Cst', 'Lin', 'Quad'
 %
 
-InputType = 'Cst';
+InputType = 'ROI';
 
 % Region of interest:
 %  possible choices: A1, PT, V1-5
@@ -70,6 +70,8 @@ PrintModels = false;
 
 %%
 
+NbLayers = 6;
+
 ConditionType = 'stim';
 if IsTarget
     ConditionType = 'target';
@@ -79,7 +81,10 @@ Dirs = SetDir(Space, MVNN);
 
 % TODO
 % This input dir might have to change if we are dealing with volume data
-InputDir = Dirs.LaminarGlm;
+InputDir = Dirs.ExtractedBetas;
+if any(ismember(InputType, {'Cst', 'Lin', 'Quad'}))
+    InputDir = Dirs.LaminarGlm;
+end
 
 [SubLs, NbSub] = GetSubjectList(InputDir);
 
@@ -141,24 +146,37 @@ for iROI =  1:numel(ROIs)
 
             fprintf('   Loading %s\n', SubLs(iSub).name);
 
-            % TODO
-            %
-            % - load files for whole roi
-
-            Filename = ReturnFilename('hs_roi_run_cdt_s-param', ...
-                                      SubLs(iSub).name, ...
-                                      HsSufix, ...
-                                      [], ... % NbLayers
-                                      ROIs{iROI}, ...
-                                      InputType);
-
-            Filename = fullfile(InputDir, SubLs(iSub).name, Filename);
-
+            SubDir = fullfile(InputDir, SubLs(iSub).name);
+            
+                Filename = GetNameFileToLoad( ...
+                                             SubDir, SubLs(iSub).name, ...
+                                             HsSufix, ...
+                                             NbLayers, ...
+                                             ROIs{iROI}, ...
+                                             InputType);
+                                           
             load(Filename, 'RoiData', 'ConditionVec', 'RunVec');
+            LayerVec = ones(size(ConditionVec));
+            if strcmp(InputType, 'ROI')
+              load(Filename, 'LayerVec');
+            end
 
-            [RoiData, RunVec, ConditionVec] = CheckInput(RoiData, RunVec, ConditionVec, IsTarget);
+            [RoiData, RunVec, ConditionVec, LayerVec] = CheckInput(RoiData, ...
+              RunVec, ...
+              ConditionVec, ...
+              IsTarget, ...
+              LayerVec);
 
             RoiData = ReassignIpsiAndContra(RoiData, ConditionVec, HsSufix, DoFeaturePooling);
+            
+            % If we have the layers data on several rows of the data
+            % matrix we put them back on a single row
+            CvMat = [ConditionVec RunVec LayerVec];
+            if strcmpi(InputType, 'roi') && strcmpi(Space, 'surf')
+              [RoiData, CvMat] = LineariseLaminarData(RoiData, CvMat);
+            end
+            ConditionVec = CvMat(:,1);
+            RunVec = CvMat(:,2);
 
             GrpData{iSub, ihs} = RoiData; %#ok<*SAGROW>
             GrpConditionVec{iSub} = ConditionVec;
@@ -173,7 +191,10 @@ for iROI =  1:numel(ROIs)
     for iSub = 1:NbSub
         tmp{iSub, 1} = [GrpData{iSub, 1} GrpData{iSub, 2}];
     end
+    
     GrpData = tmp;
+    
+    
 
     %% Run the PCM
 

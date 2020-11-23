@@ -10,13 +10,13 @@ function RunsToRemove = IdentifyRunsToRemove(RunVec, ConditionVec)
     %
 
     RunsToRemove = [];
-    
+
     RunsList = unique(RunVec);
-    
+
     Count = [];
-    for i = RunsList
-      Count(end+1) = sum(RunVec==RunsList(i));
-    end  
+    for i = 1:numel(RunsList)
+        Count(end + 1) = sum(RunVec == RunsList(i));
+    end
 
     if numel(unique(Count)) > 1
 
