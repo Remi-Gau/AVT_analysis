@@ -147,36 +147,36 @@ for iROI =  1:numel(ROIs)
             fprintf('   Loading %s\n', SubLs(iSub).name);
 
             SubDir = fullfile(InputDir, SubLs(iSub).name);
-            
-                Filename = GetNameFileToLoad( ...
-                                             SubDir, SubLs(iSub).name, ...
-                                             HsSufix, ...
-                                             NbLayers, ...
-                                             ROIs{iROI}, ...
-                                             InputType);
-                                           
+
+            Filename = GetNameFileToLoad( ...
+                                         SubDir, SubLs(iSub).name, ...
+                                         HsSufix, ...
+                                         NbLayers, ...
+                                         ROIs{iROI}, ...
+                                         InputType);
+
             load(Filename, 'RoiData', 'ConditionVec', 'RunVec');
             LayerVec = ones(size(ConditionVec));
             if strcmp(InputType, 'ROI')
-              load(Filename, 'LayerVec');
+                load(Filename, 'LayerVec');
             end
 
             [RoiData, RunVec, ConditionVec, LayerVec] = CheckInput(RoiData, ...
-              RunVec, ...
-              ConditionVec, ...
-              IsTarget, ...
-              LayerVec);
+                                                                   RunVec, ...
+                                                                   ConditionVec, ...
+                                                                   IsTarget, ...
+                                                                   LayerVec);
 
             RoiData = ReassignIpsiAndContra(RoiData, ConditionVec, HsSufix, DoFeaturePooling);
-            
+
             % If we have the layers data on several rows of the data
             % matrix we put them back on a single row
             CvMat = [ConditionVec RunVec LayerVec];
             if strcmpi(InputType, 'roi') && strcmpi(Space, 'surf')
-              [RoiData, CvMat] = LineariseLaminarData(RoiData, CvMat);
+                [RoiData, CvMat] = LineariseLaminarData(RoiData, CvMat);
             end
-            ConditionVec = CvMat(:,1);
-            RunVec = CvMat(:,2);
+            ConditionVec = CvMat(:, 1);
+            RunVec = CvMat(:, 2);
 
             GrpData{iSub, ihs} = RoiData; %#ok<*SAGROW>
             GrpConditionVec{iSub} = ConditionVec;
@@ -191,10 +191,8 @@ for iROI =  1:numel(ROIs)
     for iSub = 1:NbSub
         tmp{iSub, 1} = [GrpData{iSub, 1} GrpData{iSub, 2}];
     end
-    
+
     GrpData = tmp;
-    
-    
 
     %% Run the PCM
 

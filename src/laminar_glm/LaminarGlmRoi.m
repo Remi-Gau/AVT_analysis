@@ -28,7 +28,7 @@ DesMat = SetDesignMatLamGlm(NbLayers, Quad);
 
 SurfParameters = {'Cst', 'Lin', 'Quad'};
 
-for iSub = 1:5 % NbSub
+for iSub = 1:NbSub
 
     fprintf('\n\n\n');
 
