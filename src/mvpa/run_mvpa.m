@@ -53,6 +53,8 @@ NbWorkers = 3;
 
 FWHM = 0;
 
+% To run the analysis on dummy noise data
+% see GenerateNoiseData()
 DummyData = true;
 
 %% Set up
