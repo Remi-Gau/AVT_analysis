@@ -15,7 +15,8 @@
 
 % TODO
 % - Make it run on the b parameters
-% - MAke it run on volume
+% - Make it run on volume
+%
 
 clc;
 clear;
@@ -26,6 +27,8 @@ close all;
 % Choose on what type of data the analysis will be run
 %
 % b-parameters
+%
+% 'ROI'
 %
 % s-parameters
 %
@@ -228,6 +231,7 @@ for iROI =  1:numel(ROIs)
         filename = fullfile(Dirs.PCM, '3X3', filename);
 
         save(filename, ...
+             'Analysis', ...
              'Models', ...
              'GrpRunVec', 'GrpConditionVec', ...
              'G_hat', ...

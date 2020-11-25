@@ -13,12 +13,14 @@ close all;
 %
 % b-parameters
 %
+% 'ROI'
+%
 % s-parameters
 %
 % 'Cst', 'Lin', 'Quad'
 %
 
-InputType = 'Cst';
+InputType = 'ROI';
 
 % Region of interest:
 %  possible choices: A1, PT, V1-5
@@ -30,14 +32,15 @@ ROIs = { ...
   'PT'
   };
 
+% This needs to be adapted or even saved with the PCM results
 Analysis(1).name = 'Ipsi';
 Analysis(2).name = 'Contra';
 Analysis(3).name = 'ContraIpsi';
 
-PlotSubject = false;
+PlotSubject = true;
 
 FigDim = [50, 50, 1400, 750];
-visible = 'on';
+Visible = 'on';
 
 %% Other parameters
 % Unlikely to change
@@ -114,7 +117,7 @@ for iROI = 1:numel(ROIs)
     'name', strrep(filename, '_', ' '), ...
     'Position', FigDim, ...
     'Color', [1 1 1], ...
-    'visible', visible);
+    'visible', Visible);
   
   Subplot = 1;
   
@@ -229,7 +232,7 @@ for iROI = 1:numel(ROIs)
     'fontsize', 12, ...
     'xoff', 0, ...
     'yoff', .035);
-  set(gcf, 'visible', visible');
+  set(gcf, 'visible', Visible');
   
   filename = fullfile(FigureDir, [filename '.tif']);
   disp(filename)
