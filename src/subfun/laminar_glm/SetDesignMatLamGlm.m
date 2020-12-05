@@ -17,6 +17,10 @@ function DesMat = SetDesignMatLamGlm(NbLayers, Quad)
     % :returns:
     %           :DesMat: (array) design matrix with dimension (NbLayers x m)
     %
+    
+    if nargin < 1 || isempty(NbLayers)
+        NbLayers = 6;
+    end
 
     DesMat = (1:NbLayers) - mean(1:NbLayers);
 
