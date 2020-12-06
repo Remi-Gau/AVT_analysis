@@ -1,5 +1,5 @@
 % (C) Copyright 2020 Remi Gau
-function [betaHat] = RunLaminarGlm(Data, DesignMatrix)
+function [BetaHat] = RunLaminarGlm(Data, DesignMatrix)
     %
     % Runs a laminar GLM to decompose a laminar profile into a constant, a
     % linear and a quadratic component.
@@ -35,12 +35,12 @@ function [betaHat] = RunLaminarGlm(Data, DesignMatrix)
     Data = Data';
     Data(:, isnan(Data)) = [];
 
-    betaHat = nan(1, size(DesignMatrix, 2));
+    BetaHat = nan(1, size(DesignMatrix, 2));
     if ~isempty(Data)
-        betaHat = pinv(DesignMatrix) * Data;
+        BetaHat = pinv(DesignMatrix) * Data;
 
     end
 
-    betaHat = betaHat';
+    BetaHat = BetaHat';
 
 end

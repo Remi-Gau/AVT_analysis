@@ -1,5 +1,5 @@
 % (C) Copyright 2020 Remi Gau
-function [TestSide, P, STATS] = ComputePValue(Opt, Data)
+function [P, STATS, TestSide] = ComputePValue(Data, Opt)
 
     TestSide = 'both';
 
@@ -7,13 +7,13 @@ function [TestSide, P, STATS] = ComputePValue(Opt, Data)
         TestSide = Opt.SideOfTtest;
     end
 
-    if ~isempty(Opt.ToPermute)
+    if Opt.PermutationTest.Do
 
         STATS = [];
 
         % get the permutations
-        for iPerm = 1:size(Opt.ToPermute, 1)
-            tmp2 = Opt.ToPermute(iPerm, :);
+        for iPerm = 1:size(Opt.PermutationTest.Permutations, 1)
+            tmp2 = Opt.PermutationTest.Permutations(iPerm, :);
             tmp2 = repmat(tmp2', 1, size(Data, 2));
             Perms(iPerm, :) = mean(Data .* tmp2);  %#ok<*AGROW>
         end

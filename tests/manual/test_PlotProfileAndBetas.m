@@ -11,21 +11,14 @@ Opt.IsMvpa = false;
 
 Opt.ErrorBarType = 'STD';
 Opt.Alpha = 0.05;
+Opt.PlotPValue = true;
+Opt.SideOfTtest = 'both';
+Opt.PermutationTest.Do = true;
 
 Opt.PlotSubjects = true;
 Opt.ShadedErrorBar = true;
-Opt.PlotQuadratic = false;
+Opt.PlotQuadratic = true;
 
-Opt.FigDim = [50, 50, 600, 600];
-
-%     switch size(SubPlots, 2)
-%         case 3
-%             figdim = [50, 50, 1800, 800];
-%         case 2
-%             figdim = [50, 50, 1200, 600];
-%         case 1
-%             figdim = [50, 50, 600, 600];
-%     end
 
 %% Plot one ROI / Condition
 Cst = 1;
@@ -33,22 +26,28 @@ Lin = 0.5;
 Quad = 0.1;
 
 Opt.Betas = [Cst; Lin; Quad];
-Opt.StdDevBetweenSubject = 0.5;
-Opt.StdDevWithinSubject = 1;
+Opt.StdDevBetweenSubject = 0.2;
+Opt.StdDevWithinSubject = 0.1;
 
-Opt.Titles{1} = 'ROI name - Condition Name';
+Opt.Titles{1} = 'ROI 1 - Condition Name';
+
+Opt.RoiNames = {'ROI 1'};
 
 [Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt);
+
 PlotProfileAndBetas(Data, SubjectVec, Opt)
+
 
 %% Plot several ROIs
 
-Opt.Titles{1} = 'Condition 1';
+Opt.Titles{1,1} = 'Condition 1';
 
-DataAllRois{1} = Data;
-SubjectVecAllRois{1} = SubjectVec;
+Opt.RoiNames = {'ROI 1', 'ROI 2'};
 
-Cst = 2;
+DataAllRois{1,1,1} = Data;
+SubjectVecAllRois{1,1,1} = SubjectVec;
+
+Cst = -2;
 Lin = 0.8;
 Quad = 0.1;
 
@@ -58,7 +57,43 @@ Opt.StdDevWithinSubject = 1;
 
 [Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt);
 
-DataAllRois{:,:,2} = Data;
-SubjectVecAllRois{:,:,2} = SubjectVec;
+DataAllRois{1,1,2} = Data;
+SubjectVecAllRois{1,1,2} = SubjectVec;
+
+PlotProfileAndBetas(DataAllRois, SubjectVecAllRois, Opt)
+
+
+%% Plot several ROIs and several conditions
+
+Opt.Titles{1,2} = 'Condition 2';
+
+Opt.RoiNames = {'ROI 1', 'ROI 2'};
+
+Cst = -2;
+Lin = -0.8;
+Quad = 0.1;
+
+Opt.Betas = [Cst; Lin; Quad];
+Opt.StdDevBetweenSubject = 0.8;
+Opt.StdDevWithinSubject = 1;
+
+[Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt);
+
+DataAllRois{:,2,1} = Data;
+SubjectVecAllRois{:,2,1} = SubjectVec;
+
+Cst = 2;
+Lin = -0.4;
+Quad = 0.1;
+
+Opt.Betas = [Cst; Lin; Quad];
+Opt.StdDevBetweenSubject = 0.8;
+Opt.StdDevWithinSubject = 1;
+
+[Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt);
+
+DataAllRois{:,2,2} = Data;
+SubjectVecAllRois{:,2,2} = SubjectVec;
+
 
 PlotProfileAndBetas(DataAllRois, SubjectVecAllRois, Opt)
