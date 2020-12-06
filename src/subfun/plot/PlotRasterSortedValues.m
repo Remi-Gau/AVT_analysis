@@ -1,5 +1,5 @@
 % (C) Copyright 2020 Remi Gau
-function PlotSortedValues(ax, X_sort, NbBin, Profiles, YLabel, PlotScale, Sorting_Raster, CLIM, plot_sub_zero)
+function PlotRasterSortedValues(ax, X_sort, NbBin, Profiles, YLabel, PlotScale, Sorting_Raster, CLIM, plot_sub_zero)
 
     if nargin < 7
         Sorting_Raster = [];

@@ -18,10 +18,14 @@
 %   fullfile(OuputDir, [SubLs(iSub).name  '_features_hs-' HsSufix '_NbLayer-' NbLayers '.mat]')
 %
 % - VertexWithData
+
 % - AllMapping  with dimensions [NbVertices(hs), NbLayers, size(Betas, 1)];
 % - inf_vertex: vertices from the surface. see read_vtk()
 % - inf_faces: faces from the surface. see read_vtk()
 %
+
+% 'BetaOfInterest', 'BetaNames', 'CondNames',
+
 % The last 2 are kept in cases surface needs to be reconstructed
 %
 

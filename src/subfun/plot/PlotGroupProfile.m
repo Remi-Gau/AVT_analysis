@@ -85,7 +85,7 @@ function PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iLine)
     LINE_WIDTH = 2;
     MARKER = 'o';
     MARKER_SIZE = 4;
-    
+
     LINE_STYLE = '-';
     MARKER_FACE_COLOR = LINE_COLOR;
 

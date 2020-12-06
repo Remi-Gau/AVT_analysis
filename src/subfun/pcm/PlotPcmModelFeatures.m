@@ -1,47 +1,54 @@
 % (C) Copyright 2020 Remi Gau
-function fig_h = PlotPcmModelFeatures(M)
+
+function fig_handles = PlotPcmModelFeatures(M)
 
     ColorMap = brain_colour_maps('hot_increasing');
 
     FigDim = [100, 50, 1300, 700];
+    FONTSIZE = 6;
 
     for iM = 1:numel(M)
 
         if strcmp(M{iM}.type, 'feature')
 
-            if isfield('theta0', M{iM})
-                [G, dGdtheta] = pcm_calculateG(M{iM}, M{iM}.theta0);
-            else
-                [G, dGdtheta] = pcm_calculateG(M{iM}, ones(M{iM}.numGparams, 1));
-            end
-
-            c = pcm_indicatorMatrix('allpairs', 1:size(M{iM}.Ac, 1));
-
-            fig_h(iM) = figure('name', M{iM}.name, 'Position', FigDim);
+            fig_handles(iM) = figure('name', M{iM}.name, 'Position', FigDim);
 
             SubPlot = 1;
 
             nVerPan = M{iM}.numGparams + 1;
             nHorPan = 3;
 
+            %% plot sum features
             subplot(nVerPan, nHorPan, SubPlot);
+
             imagesc(sum(M{iM}.Ac, 3));
             t = title('feature');
-            set(t, 'fontsize', 6);
+            set(t, 'fontsize', FONTSIZE);
 
             SubPlot = SetAxis(SubPlot, ColorMap);
             t = ylabel('sum(features)');
-            set(t, 'fontsize', 6);
+            set(t, 'fontsize', FONTSIZE);
+
+            %% plot G matrix
+            [G, dGdtheta] = pcm_calculateG(M{iM}, ones(M{iM}.numGparams, 1));
+            if isfield('theta0', M{iM})
+                [G, dGdtheta] = pcm_calculateG(M{iM}, M{iM}.theta0);
+            end
 
             subplot(nVerPan, nHorPan, SubPlot);
+
             imagesc(G);
 
             SubPlot = SetAxis(SubPlot, ColorMap);
             axis square;
             t = title('dG dtheta');
-            set(t, 'fontsize', 6);
+            set(t, 'fontsize', FONTSIZE);
+
+            %% RDM
+            c = pcm_indicatorMatrix('allpairs', 1:size(M{iM}.Ac, 1));
 
             subplot(nVerPan, nHorPan, SubPlot);
+
             RDM = diag(c * G * c');
             RDM = rsa.util.scale01(rsa.util.rankTransform_equalsStayEqual(RDM, 1));
             imagesc(squareform(RDM));
@@ -49,11 +56,14 @@ function fig_h = PlotPcmModelFeatures(M)
             SubPlot = SetAxis(SubPlot, ColorMap);
             axis square;
             t = title('RDM');
-            set(t, 'fontsize', 6);
+            set(t, 'fontsize', FONTSIZE);
 
+            %%
             for iFeat = 1:nVerPan - 1
 
+                %%
                 subplot(nVerPan, nHorPan, SubPlot);
+
                 imagesc(M{iM}.Ac(:, :, iFeat));
 
                 SubPlot = SetAxis(SubPlot, ColorMap);
@@ -64,15 +74,19 @@ function fig_h = PlotPcmModelFeatures(M)
                     'Xticklabel', [], ...
                     'Yticklabel', [], ...
                     'tickdir', 'out');
-                set(t, 'fontsize', 6);
+                set(t, 'fontsize', FONTSIZE);
 
+                %%
                 subplot(nVerPan, nHorPan, SubPlot);
+
                 imagesc(dGdtheta(:, :, iFeat));
 
                 SubPlot = SetAxis(SubPlot, ColorMap);
                 axis square;
 
+                %%
                 subplot(nVerPan, nHorPan, SubPlot);
+
                 RDM = diag(c * dGdtheta(:, :, iFeat) * c');
                 RDM = rsa.util.scale01(rsa.util.rankTransform_equalsStayEqual(RDM, 1));
                 imagesc(squareform(RDM));
@@ -100,7 +114,6 @@ function SubPlot = SetAxis(SubPlot, ColorMap)
         'Ytick', []);
     colormap(ColorMap);
 
-    % colorbar
     SubPlot = SubPlot + 1;
 
 end
