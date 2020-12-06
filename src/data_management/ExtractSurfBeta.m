@@ -18,10 +18,14 @@
 %   fullfile(OuputDir, [SubLs(iSub).name  '_features_hs-' HsSufix '_NbLayer-' NbLayers '.mat]')
 %
 % - VertexWithData
+
 % - AllMapping  with dimensions [NbVertices(hs), NbLayers, size(Betas, 1)];
 % - inf_vertex: vertices from the surface. see read_vtk()
 % - inf_faces: faces from the surface. see read_vtk()
 %
+
+% 'BetaOfInterest', 'BetaNames', 'CondNames',
+
 % The last 2 are kept in cases surface needs to be reconstructed
 %
 
@@ -29,7 +33,7 @@ clc;
 clear;
 
 % To work on the beta values that have undergone multivariate noise normalization
-MVNN = true;
+MVNN = false;
 
 %%
 NbLayers = 6;
@@ -48,14 +52,14 @@ for iSub = 1:NbSub
     [~, ~, ~] = mkdir(OuputDir);
 
     SubDir = fullfile(Dirs.ExternalHD, SubLs(iSub).name);
-    
+
     InputDir = fullfile(SubDir, 'ffx_nat', 'betas', '6_surf');
     if MVNN
         InputDir = fullfile(SubDir, 'ffx_rsa', 'betas', '6_surf');
     end
 
     %% Load data or extract them
-    
+
     % Get number of sessions, regressors of interest numbers, and names of conditions
     load(fullfile(SubDir, 'ffx_nat', 'SPM.mat'));
     [BetaOfInterest, BetaNames] =  GetBOI(SPM, CondNames);
@@ -85,9 +89,9 @@ for iSub = 1:NbSub
 
         Betas = spm_select('FPList', InputDir, ['^Beta.*' HsSufix 'cr.vtk$']);
         if size(Betas, 1) ~= NbBetas
-          error('We are missing some mapped beta files.')
+            error('We are missing some mapped beta files.');
         end
-        
+
         AllMapping = nan(NbVertices(hs), NbLayers, size(Betas, 1));
 
         fprintf(1, '   [%s]\n   [ ', repmat('.', 1, size(Betas, 1)));

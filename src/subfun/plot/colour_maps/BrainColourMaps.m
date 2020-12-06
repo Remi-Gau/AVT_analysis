@@ -1,5 +1,5 @@
 % (C) Copyright 2020 Remi Gau
-function [color_map] = brain_colour_maps(map2load)
+function [color_map] = BrainColourMaps(map2load)
     % BRAIN_COLOUR_MAPS laods of the color maps from the brain color maps
 
     color_map_lists = {

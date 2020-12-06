@@ -18,12 +18,16 @@ function [Data, CvMat] = LineariseLaminarData(Data, CvMat)
 
             idx = all(CvMat(:, 1:2) == repmat([iCdt iRun], size(CvMat, 1), 1), 2);
 
-            tmp = Data(idx, :);
+            if sum(idx) > 0
 
-            NewData(Row, :) = tmp(:)';
-            NewCvMat(Row, 1:2) = [iCdt iRun];
+                tmp = Data(idx, :);
 
-            Row = Row + 1;
+                NewData(Row, :) = tmp(:)';
+                NewCvMat(Row, 1:2) = [iCdt iRun];
+
+                Row = Row + 1;
+
+            end
 
         end
 

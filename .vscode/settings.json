@@ -1,5 +1,5 @@
 {
     "compile-hero.disable-compile-files-on-did-save-code": false,
     "restructuredtext.confPath": "${workspaceFolder}/doc/source",
-    "python.pythonPath": "/home/remi/github/AVT_analysis/avt/bin/python3.8"
+    "python.pythonPath": "avt/bin/python"
 }

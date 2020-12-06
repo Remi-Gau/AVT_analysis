@@ -1,12 +1,11 @@
 
 *.xlsx
-*.xlsx
-*.xlsx
-*.xlsx
+*.tif
 *.out
 *.sh~
 *.wav
 *.m~
 
 avt/**
-docs/build/**
+docs/build/*
+.vscode/*.json
