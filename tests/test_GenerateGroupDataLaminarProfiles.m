@@ -18,15 +18,15 @@ Quad = 0.1;
 Opt.NbSubject = 2;
 Opt.NbRuns = 4;
 Opt.Betas = [Cst; Lin; Quad];
-Opt.StdDevBetweenSubject = 0.2;
-Opt.StdDevWithinSubject = 0.2;
+Opt.StdDevBetweenSubject = 0;
+Opt.StdDevWithinSubject = 0;
 Opt.NbLayers = 6;
 
-[Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt)
+[Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt);
 
-betaHat = RunLaminarGlm(Data)
+BetaHat = RunLaminarGlm(Data);
 
-[GroupData] = ComputeSubjectAverage(Data, SubjectVec)
-[GroupDetaHatData, SubjectVec] = ComputeSubjectAverage(betaHat, SubjectVec)
+[GroupData] = ComputeSubjectAverage(Data, SubjectVec);
+[GroupDetaHatData, SubjectVec] = ComputeSubjectAverage(betaHat, SubjectVec);
 
 end
