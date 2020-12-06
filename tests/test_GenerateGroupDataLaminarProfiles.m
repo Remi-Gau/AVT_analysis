@@ -22,11 +22,11 @@ Opt.StdDevBetweenSubject = 0;
 Opt.StdDevWithinSubject = 0;
 Opt.NbLayers = 6;
 
-[Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt);
+[Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt)
 
-BetaHat = RunLaminarGlm(Data);
+BetaHat = RunLaminarGlm(Data)
 
-[GroupData] = ComputeSubjectAverage(Data, SubjectVec);
-[GroupDetaHatData, SubjectVec] = ComputeSubjectAverage(betaHat, SubjectVec);
+[GroupData] = ComputeSubjectAverage(Data, SubjectVec)
+[GroupDetaHatData, SubjectVec] = ComputeSubjectAverage(BetaHat, SubjectVec)
 
 end
