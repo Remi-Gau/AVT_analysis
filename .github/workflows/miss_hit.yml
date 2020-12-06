@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - dev
+      - remi-dev
   pull_request:
     branches: '*'
 
