@@ -8,7 +8,7 @@ function [SubLs, NbSub] = GetSubjectList(folder)
     %
 
     if nargin < 1 || isempty(folder)
-    
+
         SubLs(1).name = 'sub-02';
         SubLs(2).name = 'sub-03';
         SubLs(3).name = 'sub-04';

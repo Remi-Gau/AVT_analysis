@@ -1,32 +1,19 @@
 % (C) Copyright 2020 Remi Gau
-function [TestSide, P, STATS] = run_t_perm_test(ToPrint, iCdt, iROI, S_param, Data)
+function [TestSide, P, STATS] = ComputePValue(Opt, Data)
 
-    if isfield(ToPrint, 'OneSideTTest')
-        if isempty(ToPrint.OneSideTTest)
-            Side = 2;
-        else
-            Side = ToPrint.OneSideTTest(iCdt, iROI, S_param);
-        end
-    else
-        Side = 2;
+    TestSide = 'both';
+
+    if isfield(Opt, 'SideOfTtest') && ~isempty(Opt.SideOfTtest)
+        TestSide = Opt.SideOfTtest;
     end
 
-    switch Side
-        case 1
-            TestSide = 'left';
-        case 2
-            TestSide = 'both';
-        case 3
-            TestSide = 'right';
-    end
-
-    if ~isempty(ToPrint.ToPermute)
+    if ~isempty(Opt.ToPermute)
 
         STATS = [];
 
         % get the permutations
-        for iPerm = 1:size(ToPrint.ToPermute, 1)
-            tmp2 = ToPrint.ToPermute(iPerm, :);
+        for iPerm = 1:size(Opt.ToPermute, 1)
+            tmp2 = Opt.ToPermute(iPerm, :);
             tmp2 = repmat(tmp2', 1, size(Data, 2));
             Perms(iPerm, :) = mean(Data .* tmp2);  %#ok<*AGROW>
         end
@@ -46,6 +33,7 @@ function [TestSide, P, STATS] = run_t_perm_test(ToPrint, iCdt, iROI, S_param, Da
 
     else
         % or ttest
-        [~, P, ~, STATS] = ttest(Data, 0, 'alpha', 0.05, 'tail', TestSide);
+        [~, P, ~, STATS] = ttest(Data, 0, 'alpha', Opt.Alpha, 'tail', TestSide);
+
     end
 end

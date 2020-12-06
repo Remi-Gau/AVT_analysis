@@ -1,7 +1,10 @@
 % (C) Copyright 2020 Remi Gau
-function COLOR_SUBJECTS = SubjectColours()
 
-    % Color for Subjects
+function COLOR_SUBJECTS = SubjectColours()
+    %
+    % Returns the color for each subject
+    %
+
     COLOR_SUBJECTS = [
                       0, 0, 0
                       31, 120, 180
