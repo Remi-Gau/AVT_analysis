@@ -2,6 +2,10 @@
 
 function  PlotGroupProfile(Data, SubjectVec, Opt, iCondtion)
 
+    if nargin < 4 || isempty(iCondtion)
+        iCondtion = 1;
+    end
+
     ThisSubplot = GetSubplotIndices(iCondtion, Opt);
 
     subplot(Opt.n, Opt.m, ThisSubplot);
@@ -36,7 +40,7 @@ function  PlotGroupProfile(Data, SubjectVec, Opt, iCondtion)
     plot([0, Opt.NbLayers + 0.5], Baseline, '-k', 'LineWidth', 1);
 
     %% Set tighet axes with margin
-    [Min, Max] = ComputeMinMax(Data, SubjectVec, Opt, iCondtion);
+    [Min, Max] = ComputeMinMax(Opt.PlotMinMaxType, Data, SubjectVec, Opt, iCondtion);
     [Min, Max] = ComputeMargin(Min, Max);
 
     axis([0.5, Opt.NbLayers + .5, Min, Max]);

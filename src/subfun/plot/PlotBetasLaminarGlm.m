@@ -1,102 +1,76 @@
 % (C) Copyright 2020 Remi Gau
 
-function PlotBetasLaminarGlm(Data, SubjectVec, Opt, iCondtion)
+function PlotBetasLaminarGlm(Data, Opt, MinMax, iParameter, iCondtion)
 
-    DesignMatrix = SetDesignMatLamGlm(Opt.NbLayers, true);
+    if nargin < 5 || isempty(iCondtion)
+        iCondtion = 1;
+    end
 
     ParameterNames = {'Constant', 'Linear', 'Quadratic'};
 
-    if Opt.PlotQuadratic
-        NbParametersToPlot = 3;
-    else
-        NbParametersToPlot = 2;
-    end
+    ThisSubplot = GetSubplotIndex(iCondtion, iParameter, Opt);
 
-    for iParameter = 1:NbParametersToPlot
+    subplot(Opt.n, Opt.m, ThisSubplot);
 
-        ThisSubplot = GetSubplotIndex(iCondtion, iParameter, Opt);
+    hold on;
+    grid on;
 
-        subplot(Opt.n, Opt.m, ThisSubplot);
+    AllGroupBetas = [];
 
-        hold on;
-        grid on;
+    % for each ROI or Condition depending on how the input data is formated
+    for iLine = 1:size(Data, 3)
 
-        Min = 0;
-        Max = 0;
+        DataToPlot = Data{:, :, iLine}(:, iParameter);
 
-        AllGroupBetas = [];
+        % Store to compute p values and max min
+        AllGroupBetas(:, iLine) = DataToPlot; %#ok<*AGROW>
 
-        % for each ROI or Condition depending on how the input data is formated
-        for iLine = 1:size(Data, 3)
+        %% Main plot
+        ViolinPlot(DataToPlot, Opt, iLine);
 
-            BetaHat = RunLaminarGlm(Data{:, iCondtion, iLine}, DesignMatrix);
-
-            GroupData = ComputeSubjectAverage( ...
-                                              BetaHat, ...
-                                              SubjectVec{:, iCondtion, iLine});
-
-            % Store to compute p values and max min
-            AllGroupBetas(:, iLine) = GroupData(:, iParameter); %#ok<*AGROW>
-
-            %% Main plot
-            ViolinPlot(GroupData, iParameter, Opt, iLine);
-
-            %% Plot mean + dispersion
-            PlotMeanAndDispersion(GroupData, Opt, iParameter, iLine);
-
-            %% Get min and max over subjects for this s parameter
-            % TODO : - try to refactor and reuse the same approach as for P
-            %        values.
-            %        - make it possible to set min and max across conditions (columns of a figure)
-            [ThisMin, ThisMax] = ComputeMinMax( ...
-                                               {BetaHat(:, iParameter)}, ...
-                                               SubjectVec, ...
-                                               Opt);
-            Max = max([Max, ThisMax]);
-            Min = min([Min, ThisMin]);
-
-        end
-
-        %% plot zero line
-        Baseline = [0, 0];
-        if Opt.IsMvpa
-            Baseline = [0.5, 0.5];
-        end
-        Xpos = ReturnXpositionViolinPlot();
-        plot([0, max(Xpos) + 0.5], Baseline, '-k', 'LineWidth', 1);
-
-        %% Tight fight with some vertical margin
-        [Min, Max, Margin] = ComputeMargin(Min, Max, 3);
-
-        axis([0, Xpos(numel(Opt.RoiNames)) + .5, Min, Max]);
-
-        %% Labels
-        set(gca, ...
-            'tickdir', 'out', ...
-            'xtick', Xpos - 0.25, ...
-            'xticklabel', Opt.RoiNames, ...
-            'xgrid', 'off', ...
-            'ticklength', [0.01 0.01], ...
-            'fontsize', Opt.Fontsize);
-
-        YLabel = '\nS Param. est. [a u]';
-        YLabel = [ParameterNames{iParameter}, YLabel];
-        t = ylabel(sprintf(YLabel));
-        set(t, ...
-            'fontweight', 'bold', ...
-            'fontsize', Opt.Fontsize);
-
-        %% Compute p values and print them
-        % offset values for oncoming stats: accuracy tested against null = 0.5
-        if Opt.IsMvpa
-            % Data = Data - .5;
-        end
-
-        [P, ~, ~] = ComputePValue(AllGroupBetas, Opt);
-
-        PrintPValue(P, Xpos - 0.25, Max - Margin / 2, Opt);
+        %% Plot mean + dispersion
+        PlotMeanAndDispersion(DataToPlot, Opt, iLine);
 
     end
+
+    %% plot zero line
+    Baseline = [0, 0];
+    if Opt.IsMvpa
+        Baseline = [0.5, 0.5];
+    end
+    Xpos = ReturnXpositionViolinPlot();
+    plot([0, max(Xpos) + 0.5], Baseline, '-k', 'LineWidth', 1);
+
+    %% Tight fight with some vertical margin
+    [Min, Max, Margin] = ComputeMargin(MinMax(1), MinMax(2), 3);
+
+    axis([0, Xpos(numel(Opt.RoiNames)) + .5, Min, Max]);
+
+    %% Labels
+    set(gca, ...
+        'tickdir', 'out', ...
+        'xtick', Xpos - 0.25, ...
+        'xticklabel', Opt.RoiNames, ...
+        'xgrid', 'off', ...
+        'ticklength', [0.01 0.01], ...
+        'fontsize', Opt.Fontsize);
+
+    YLabel = '\nS Param. est. [a u]';
+    YLabel = [ParameterNames{iParameter}, YLabel];
+    t = ylabel(sprintf(YLabel));
+    set(t, ...
+        'fontweight', 'bold', ...
+        'fontsize', Opt.Fontsize);
+
+    %% Compute p values and print them
+    % offset values for oncoming stats: accuracy tested against null = 0.5
+    if Opt.IsMvpa
+        % Data = Data - .5;
+    end
+
+    [P, ~] = ComputePValue(AllGroupBetas, Opt);
+
+    PrintPValue(P, Xpos - 0.25, Max - Margin / 2, Opt);
 
 end
 
@@ -132,7 +106,7 @@ function  ThisSubplot = GetSubplotIndex(iCondtion, iParameter, Opt)
 
 end
 
-function ViolinPlot(GroupData, iParameter, Opt, iLine)
+function ViolinPlot(GroupData, Opt, iLine)
 
     DIST_WIDTH = 0.5;
     SHOW_MEAN_MEDIAN = 0;
@@ -151,7 +125,7 @@ function ViolinPlot(GroupData, iParameter, Opt, iLine)
     Xpos = ReturnXpositionViolinPlot();
 
     distributionPlot( ...
-                     GroupData(:, iParameter), ...
+                     GroupData, ...
                      'xValues', Xpos(iLine), ...
                      'color', Color, ...
                      'distWidth', DIST_WIDTH, ...
@@ -159,7 +133,7 @@ function ViolinPlot(GroupData, iParameter, Opt, iLine)
                      'globalNorm', GLOBAL_NORM);
 
     h = plotSpread( ...
-                   GroupData(:, iParameter), ...
+                   GroupData, ...
                    'xValues', Xpos(iLine), ...
                    'distributionMarkers', {MARKER}, ...
                    'binWidth', BIN_WIDTH, ...
@@ -187,7 +161,7 @@ function ViolinPlot(GroupData, iParameter, Opt, iLine)
 
 end
 
-function PlotMeanAndDispersion(GroupData, Opt, iParameter, iLine)
+function PlotMeanAndDispersion(GroupData, Opt, iLine)
     %
     % Plots a thin error bar and a thick line across data points
     %
@@ -199,8 +173,8 @@ function PlotMeanAndDispersion(GroupData, Opt, iParameter, iLine)
     Color = Opt.LineColors(iLine, :);
     Xpos = ReturnXpositionViolinPlot();
 
-    GroupMean =  mean(GroupData(:, iParameter));
-    [LowerError, UpperError] = ComputeDispersionIndex(GroupData(:, iParameter), Opt);
+    GroupMean =  mean(GroupData);
+    [LowerError, UpperError] = ComputeDispersionIndex(GroupData, Opt);
 
     l = errorbar( ...
                  Xpos(iLine) - 0.5, ...

@@ -10,28 +10,8 @@ clc;
 Do = 1;
 
 DateFormat = 'yyyy_mm_dd_HH_MM';
-diary(['diary_smooth_native_' datestr(now, DateFormat) '.out']);
 
 spm_jobman('initcfg');
-spm_get_defaults;
-global defaults %#ok<NUSED>
-
-% To speed things up and use parallel computing
-% NbWorkers = 3;
-% MatlabVer = version('-release');
-% if str2double(MatlabVer(1:4))>2013
-%     pool = gcp('nocreate');
-%     if isempty(pool)
-%         parpool(NbWorkers);
-%     end
-% else
-%     if matlabpool('size') == 0 %#ok<*DPOOL>
-%         matlabpool(NbWorkers)
-%     elseif matlabpool('size') ~= NbWorkers
-%         matlabpool close
-%         matlabpool(NbWorkers)
-%     end
-% end
 
 StartDir = fullfile(pwd, '..', '..');
 cd (StartDir);
@@ -116,12 +96,3 @@ for iSub = NbSub % for each subject
     cd (StartDir);
 
 end
-
-diary off;
-
-% uncomment if you use parallel computing
-% if str2double(MatlabVer(1:4))>2013
-%     delete(gcp);
-% else
-%     matlabpool close
-% end

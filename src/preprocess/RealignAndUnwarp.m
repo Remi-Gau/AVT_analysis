@@ -5,7 +5,6 @@ clear;
 clc;
 
 DateFormat = 'yyyy_mm_dd_HH_MM';
-diary(['diary_realign_' datestr(now, DateFormat) '.out']);
 
 % In case you want to run the realign and unwarp without the field map
 % correction
@@ -105,7 +104,7 @@ for iSub = NbSub % for each subject
                 matlabbatch{1, 1}.spm.spatial.realignunwarp.data(1, RunInd).pmscan = {''};
             end
 
-            disp(matlabbatch{1, 1}.spm.spatial.realignunwarp.data(1, RunInd).pmscan);
+            disp(madiary(['diary_realign_' datestr(now, DateFormat) '.out']);tlabbatch{1, 1}.spm.spatial.realignunwarp.data(1, RunInd).pmscan);
 
             RunInd = RunInd + 1;
 
@@ -157,4 +156,3 @@ cd (StartDir);
 
 % CloseParWorkersPool(KillGcpOnExit)
 
-diary off;

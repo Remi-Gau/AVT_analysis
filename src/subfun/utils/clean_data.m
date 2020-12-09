@@ -1,4 +1,5 @@
 % (C) Copyright 2020 Remi Gau
+
 function [data, idx] = clean_data(data, dim, idx)
 
     if nargin < 3

@@ -1,4 +1,5 @@
 % (C) Copyright 2020 Remi Gau
+
 function CopyMappedBetasVTK(Subj, SrcDir, DestDir, opt, Debug)
     %
     % Extract vtk files from a folder tree created by MIPAV/JIST

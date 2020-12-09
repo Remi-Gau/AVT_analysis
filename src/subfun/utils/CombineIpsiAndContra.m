@@ -1,4 +1,5 @@
 % (C) Copyright 2020 Remi Gau
+
 function [Data, ConditionVec, RunVec] = CombineIpsiAndContra(Data, ConditionVec, RunVec, Type)
     %
     % Collapse across ipsi and contra stimuli by either pooling or averaging (mean)

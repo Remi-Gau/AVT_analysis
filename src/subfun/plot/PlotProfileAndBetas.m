@@ -21,9 +21,49 @@ function PlotProfileAndBetas(Data, SubjectVec, Opt)
 
     SetFigureDefaults(Opt);
 
+    % compute S parameter betas
+    DesignMatrix = SetDesignMatLamGlm(Opt.NbLayers, true);
+    for iColumn = 1:size(Data, 2)
+        for iLine = 1:size(Data, 3)
+
+            BetaHat{:, iColumn, iLine} = RunLaminarGlm(Data{:, iColumn, iLine}, DesignMatrix);
+
+            GroupData{:, iColumn, iLine} = ComputeSubjectAverage( ...
+                                                                 BetaHat{:, iColumn, iLine}, ...
+                                                                 SubjectVec{:, iColumn, iLine});
+
+        end
+    end
+
     for iCondtion = 1:Opt.m
+
         PlotGroupProfile(Data, SubjectVec, Opt, iCondtion);
-        PlotBetasLaminarGlm(Data, SubjectVec, Opt, iCondtion);
+
+        %         PlotBetasLaminarGlm(Data, SubjectVec, Opt, iCondtion);
+
+        %% Get min and max over subjects for this s parameter
+        % TODO : - try to refactor and reuse the same approach as for P
+        %        values.
+        %        - make it possible to set min and max across conditions (columns of a figure)
+        %         [ThisMin, ThisMax] = ComputeMinMax(Opt.PlotMinMaxType, ...
+        %             BetaHat{:, iCondtion, iLine}(:, iParameter), ...
+        %             SubjectVec, ...
+        %             Opt);
+        %         Max = max([Max, ThisMax]);
+        %         Min = min([Min, ThisMin]);
+
+        MinMax = [-5 5];
+
+        DataToPlot = GroupData(:, iCondtion, :);
+
+        PlotBetasLaminarGlm(DataToPlot, Opt, MinMax, 1, iCondtion);
+
+        PlotBetasLaminarGlm(DataToPlot, Opt, MinMax, 2, iCondtion);
+
+        if Opt.PlotQuadratic
+            PlotBetasLaminarGlm(DataToPlot, Opt, MinMax, 3, iCondtion);
+        end
+
     end
 
 end
@@ -38,7 +78,7 @@ function Opt = CheckPlottingOptions(Opt, Data)
     end
 
     if ~isfield(Opt, 'PermutationTest')
-        Opt.PermutationTest.Do = false;
+        Opt.Ttest.PermutationTest.Do = false;
     end
 
     if ~isfield(Opt, 'PlotPValue')
@@ -76,7 +116,7 @@ function Opt = CheckPlottingOptions(Opt, Data)
         Opt.FigDim(4) = 1000;
     end
 
-    if Opt.PermutationTest.Do
+    if Opt.Ttest.PermutationTest.Do
         Opt = CreatePermutationList(Opt);
     end
 

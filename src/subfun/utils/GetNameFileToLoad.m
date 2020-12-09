@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 function Filename = GetNameFileToLoad(SubDir, SubjName, HsSufix, NbLayers, RoiName, InputType)
 
     if any(ismember(InputType, {'Cst', 'Lin', 'Quad'}))

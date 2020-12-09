@@ -47,7 +47,9 @@ for iSub = 1:NbSub % for each subject
     end
 
     try
-        %         movefile(fullfile(SubDir,'GLM_mask.nii'), fullfile(SubDir,[SubLs(iSub).name '-GLM_mask.nii']))
+        % movefile(...
+        %    fullfile(SubDir,'GLM_mask.nii'), ...
+        %    fullfile(SubDir,[SubLs(iSub).name '-GLM_mask.nii']))
         copyfile(fullfile(SubDir, 'ses-1', 'func', 'mean*.nii'), ...
                  fullfile(SubDir));
     catch

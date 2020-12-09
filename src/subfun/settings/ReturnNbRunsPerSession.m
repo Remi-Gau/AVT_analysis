@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 function RunPerSes = ReturnNbRunsPerSession()
 
     RunPerSes.Subject = [

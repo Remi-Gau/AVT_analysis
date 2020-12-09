@@ -7,11 +7,8 @@ clc;
 Do = 1;
 
 DateFormat = 'yyyy_mm_dd_HH_MM';
-diary(['diary_slicetime_' datestr(now, DateFormat) '.out']);
 
 spm_jobman('initcfg');
-spm_get_defaults;
-global defaults %#ok<*NUSED>
 
 StartDir = fullfile(pwd, '..', '..');
 cd (StartDir);
@@ -97,5 +94,3 @@ for iSub = NbSub % for each subject
 end
 
 cd (StartDir);
-
-diary off;

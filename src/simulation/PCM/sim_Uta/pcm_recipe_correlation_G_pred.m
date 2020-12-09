@@ -172,12 +172,4 @@ colorbar;
 % title('G_{free}-gr-CV')
 %
 %
-%
-%
-%
-%
-%
-%
-%
-%
-%
+

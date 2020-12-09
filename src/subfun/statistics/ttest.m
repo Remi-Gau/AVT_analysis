@@ -2,7 +2,9 @@
 function [h, p, ci, stats] = ttest(x, m, varargin)
     % TTEST  One-sample and paired-sample t-test.
     %
-    %   Modified to fucntion witht the nan-suite
+    %
+    %   Modified to function with the nan-suite
+    %
     %
     %   H = TTEST(X) performs a t-test of the hypothesis that the data in the
     %   vector X come from a distribution with mean zero, and returns the
