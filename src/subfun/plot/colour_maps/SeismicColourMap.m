@@ -1,10 +1,12 @@
 % (C) Copyright 2020 Remi Gau
-function rgb = seismic(n)
 
+function rgb = SeismicColourMap(n)
+    %
     % seismic(n) creates a colormap, ranging from dark blue via white to dark red.
     %
     % Nico Sneeuw
     % Munich, 31/08/94
+    %
 
     if nargin == 0
         n = size(get(gcf, 'colormap'), 1);
@@ -27,8 +29,8 @@ function rgb = seismic(n)
     xblue = round(xlarge / 2);
     xred = xlarge - xblue;
     rgb([1:xblue 4 * m - xred + 2:4 * m + 1], :) = [];
-
-    % SavedTxt = '/home/rxg243/Programs/Paraview/ParaView-4.1.0-Linux-64bit/bin/seismic.xml';
+    
+    
     % SavedTxt = 'D:\Dropbox\PhD\Experiments\MVPA_A_V_T\derivatives\code\subfun\plot\seismic.xml';
     % fid = fopen (SavedTxt, 'w');
     %
@@ -48,3 +50,5 @@ function rgb = seismic(n)
     %     <NaN r="0.247059" g="0" b="0"/>
     %   </ColorMap>
     % </ColorMaps>
+    
+end
