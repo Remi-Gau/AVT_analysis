@@ -1,6 +1,10 @@
 % (C) Copyright 2020 Remi Gau
 
 function  PlotGroupProfile(Data, SubjectVec, Opt, iCondtion)
+    
+    if nargin < 4 || isempty(iCondtion)
+        iCondtion = 1;
+    end
 
     ThisSubplot = GetSubplotIndices(iCondtion, Opt);
 

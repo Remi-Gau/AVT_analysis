@@ -17,7 +17,7 @@ Opt.Ttest.PermutationTest.Do = true;
 
 Opt.PlotSubjects = true;
 Opt.ShadedErrorBar = true;
-Opt.PlotQuadratic = true;
+Opt.PlotQuadratic = false;
 
 
 %% Plot one ROI / Condition
@@ -28,7 +28,7 @@ Quad = 0.1;
 Opt.PlotMinMaxType = 'all';
 
 Opt.Betas = [Cst; Lin; Quad];
-Opt.StdDevBetweenSubject = 0.2;
+Opt.StdDevBetweenSubject = 0.5;
 Opt.StdDevWithinSubject = 0.1;
 
 Opt.Titles{1} = 'ROI 1 - Condition Name';
@@ -41,6 +41,8 @@ PlotProfileAndBetas(Data, SubjectVec, Opt)
 
 
 %% Plot several ROIs
+
+Opt.PlotMinMaxType = 'group';
 
 Opt.Titles{1,1} = 'Condition 1';
 
@@ -67,6 +69,8 @@ PlotProfileAndBetas(DataAllRois, SubjectVecAllRois, Opt)
 
 %% Plot several ROIs and several conditions
 
+Opt.PlotMinMaxType = 'group';
+
 Opt.Titles{1,2} = 'Condition 2';
 
 Opt.RoiNames = {'ROI 1', 'ROI 2'};
@@ -76,7 +80,7 @@ Lin = -0.8;
 Quad = 0.1;
 
 Opt.Betas = [Cst; Lin; Quad];
-Opt.StdDevBetweenSubject = 0.8;
+Opt.StdDevBetweenSubject = 1.5;
 Opt.StdDevWithinSubject = 1;
 
 [Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt);
