@@ -1,12 +1,13 @@
 % (C) Copyright 2020 Remi Gau
-function [P, STATS, TestSide] = ComputePValue(Data, Opt)
+
+function [P, STATS] = ComputePValue(Data, Opt)
     %
-    % Computes p value of a one sample t-test using either a regular parametric t-test 
+    % Computes p value of a one sample t-test using either a regular parametric t-test
     % or an exact sign permutation test.
     %
     % USAGE::
     %
-    %   [P, STATS, TestSide] = ComputePValue(Data, Opt)
+    %   [P, STATS, TestSide] = ComputePValue(Data, Opt, ValueToTest == 0)
     %
     % :param Data: (m X n) with m = number of subjects and n = number of
     %              variables measured
@@ -16,6 +17,8 @@ function [P, STATS, TestSide] = ComputePValue(Data, Opt)
     %             are running a one sided (``left``, ``right``) or 2-sided test
     %             (``both``)
     % :type Opt: structure
+    % :param ValueToTest: mean of the null distribution to test against
+    % :type ValueToTest: scalar    
     %
     % :returns:
     %           :P: (array) (dimension)
@@ -24,22 +27,29 @@ function [P, STATS, TestSide] = ComputePValue(Data, Opt)
     %           :TestSide: (string)
     %
     
-    TestSide = 'both';
+    if ~isfield(Opt.Ttest, 'ValueToTest') || isempty(Opt.Ttest.ValueToTest)
+        Opt.Ttest.ValueToTest = 0;
+    end
 
-    if isfield(Opt, 'SideOfTtest') && ~isempty(Opt.SideOfTtest)
-        TestSide = Opt.SideOfTtest;
+    if ~isfield(Opt.Ttest, 'SideOfTtest') && isempty(Opt.Ttest.SideOfTtest)
+        Opt.Ttest.SideOfTtest = 'both';
     end
 
     % sing permutation test
-    if Opt.PermutationTest.Do
+    if Opt.Ttest.PermutationTest.Do
 
         STATS = [];
 
-        P = RunSignPermutationTest(Data, Opt.PermutationTest.Permutations, TestSide);
+        P = RunSignPermutationTest(Data, Opt);
 
     else
+        
         % or ttest
-        [~, P, ~, STATS] = ttest(Data, 0, 'alpha', Opt.Alpha, 'tail', TestSide);
+        [~, P, ~, STATS] = ttest(...
+            Data, ...
+            Opt.Ttest.ValueToTest, ...
+            'alpha', Opt.Alpha, ...
+            'tail', Opt.Ttest.TestSide);
 
     end
 end

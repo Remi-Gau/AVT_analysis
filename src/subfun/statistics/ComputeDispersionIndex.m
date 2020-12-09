@@ -1,8 +1,32 @@
 % (C) Copyright 2020 Remi Gau
 
 function [DispersionIndexLower, DispersionIndexUpper] = ComputeDispersionIndex(Data, Opt)
+    %
+    % Returns a "dispersion index" for some given data. This can be the standard
+    % deviation, SEM or a confidence interval. As this is mostly used for
+    % plotting it will return 2 values the "positive" and "negative" values
+    % around the mean of the data.
+    %
+    % USAGE::
+    %
+    %   [DispersionIndexLower, DispersionIndexUpper] = ComputeDispersionIndex(Data, Opt)
+    %
+    % :param Data:
+    % :type Data: array
+    % :param Opt: ``Opt.ErrorBarType`` defines what output to return. The default is ``STD``.
+    %             Values can be: ``SEM``, ``CI`` for an accelerated bootstrap confidence
+    %             interval around the mean value, ``CI-BC`` for an accelerated bootstrap confidence
+    %             interval around a bias corrected value of the effect size.
+    % :type Opt: structure
+    %
+    % :returns:
+    %           :DispersionIndexLower: If you want to recover the lower bound
+    %                                  then do ``mean(Data) - DispersionIndexLower``
+    %           :DispersionIndexUpper: If you want to recover the upper bound
+    %                                  then do ``mean(Data) - DispersionIndexUpper``
 
     switch Opt.ErrorBarType
+
         case 'SEM'
             DispersionIndex = nansem(Data);
 

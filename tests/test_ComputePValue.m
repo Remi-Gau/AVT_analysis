@@ -8,16 +8,15 @@ function test_suite = test_ComputePValue %#ok<*STOUT>
     initTestSuite;
 end
 
-
-function test_ComputePValuePermutationBoth
+function test_ComputePValuePermutation
     
-    TestTolerance = 3*1e-3;
+    TestTolerance = 5*1e-3;
     NbVariables = 10000;
     
     % will only work with 10 subjects for now
     NbSubjects = 10;
     
-    Opt.PermutationTest.Do = true();
+    Opt.Ttest.PermutationTest.Do = true();
     
     % create dummy data
     Data = randn(10, NbVariables);
@@ -25,15 +24,15 @@ function test_ComputePValuePermutationBoth
     Opt = CreatePermutationList(Opt);
     
     % run tests and make sure that we have tolerable false positive rate
-    Opt.SideOfTtest =  'both';
+    Opt.Ttest.SideOfTtest =  'both';
     P = ComputePValue(Data, Opt);
     CheckFalsePositiveRate(P, TestTolerance);
     
-    Opt.SideOfTtest =  'right';
+    Opt.Ttest.SideOfTtest =  'right';
     P = ComputePValue(Data, Opt);
     CheckFalsePositiveRate(P, TestTolerance);
     
-    Opt.SideOfTtest =  'left';
+    Opt.Ttest.SideOfTtest =  'left';
     P = ComputePValue(Data, Opt);
     CheckFalsePositiveRate(P, TestTolerance);
     

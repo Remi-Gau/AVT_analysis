@@ -10,26 +10,26 @@ function  Opt = CreatePermutationList(Opt)
     %
     %   Opt = CreatePermutationList(Opt)
     %
-    % :param Opt: Will only run if ``Opt.PermutationTest.do`` is ``true``
+    % :param Opt: Will only run if ``Opt.Ttest.PermutationTest.do`` is ``true``
     % :type Opt: structure
     %
     % :returns:
     %           :Opt: (structure) with extrafield
-    %                 ``Opt.PermutationTest.Permutations`` containing the array
+    %                 ``Opt.Ttest.PermutationTest.Permutations`` containing the array
     %                 of sign changes to apply.
     %
     %
-    
+
     Permutations = [];
-    if Opt.PermutationTest.Do
+    if Opt.Ttest.PermutationTest.Do
 
         sets = {};
         for iSub = 1:10
             sets{iSub} = [-1 1]; %#ok<*AGROW>
         end
 
-        % Gets all the possible permutations possible (via cartesian product): 
-        % might no be necessary if you have "a lot" of subjects 
+        % Gets all the possible permutations possible (via cartesian product):
+        % might no be necessary if you have "a lot" of subjects
         % then you can just randomly permutate X number of times
         % but with 10 subjects that's only 1024 permutations
         % and that gives you an exact permutation test
@@ -39,6 +39,6 @@ function  Opt = CreatePermutationList(Opt)
 
     end
 
-    Opt.PermutationTest.Permutations = Permutations;
+    Opt.Ttest.PermutationTest.Permutations = Permutations;
 
 end
