@@ -48,7 +48,7 @@ function PlotBetasLaminarGlm(Data, SubjectVec, Opt, iCondtion)
             % TODO : - try to refactor and reuse the same approach as for P
             %        values.
             %        - make it possible to set min and max across conditions (columns of a figure)
-            [ThisMin, ThisMax] = ComputeMinMax( ...
+            [ThisMin, ThisMax] = ComputeMinMax(Opt.PlotMinMaxType, ...
                                                {BetaHat(:, iParameter)}, ...
                                                SubjectVec, ...
                                                Opt);
@@ -92,7 +92,7 @@ function PlotBetasLaminarGlm(Data, SubjectVec, Opt, iCondtion)
             % Data = Data - .5;
         end
 
-        [P, ~, ~] = ComputePValue(AllGroupBetas, Opt);
+        [P, ~] = ComputePValue(AllGroupBetas, Opt);
 
         PrintPValue(P, Xpos - 0.25, Max - Margin / 2, Opt);
 

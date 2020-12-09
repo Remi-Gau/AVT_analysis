@@ -1,4 +1,4 @@
-% (C) Copyright 2020 Remi Gau
+%% (C) Copyright 2020 Remi Gau
 
 clear
 close all
@@ -12,8 +12,8 @@ Opt.IsMvpa = false;
 Opt.ErrorBarType = 'STD';
 Opt.Alpha = 0.05;
 Opt.PlotPValue = true;
-Opt.SideOfTtest = 'both';
-Opt.PermutationTest.Do = true;
+Opt.Ttest.SideOfTtest = 'both';
+Opt.Ttest.PermutationTest.Do = true;
 
 Opt.PlotSubjects = true;
 Opt.ShadedErrorBar = true;
@@ -24,6 +24,8 @@ Opt.PlotQuadratic = true;
 Cst = 1;
 Lin = 0.5;
 Quad = 0.1;
+
+Opt.PlotMinMaxType = 'all';
 
 Opt.Betas = [Cst; Lin; Quad];
 Opt.StdDevBetweenSubject = 0.2;

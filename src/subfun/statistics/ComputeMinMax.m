@@ -17,13 +17,13 @@ function [Min, Max] = ComputeMinMax(Type, Data, SubjectVec, Opt, iColumn)
     Min = 0;
     Max = 0;
     
-    % get subject average for each parts of the cell
+    %% get subject average for each parts of the cell
     for iCondtion = 1:size(Data, 2)
         for iLine = 1:size(Data, 3)
             
             GroupData{:, iCondtion, iLine} = ComputeSubjectAverage( ...
                 Data{:, iCondtion, iLine}, ...
-                SubjectVec{:, iCondtion, iLine});
+                SubjectVec{:, iCondtion, iLine}); %#ok<*AGROW>
             
         end
     end
@@ -33,8 +33,8 @@ function [Min, Max] = ComputeMinMax(Type, Data, SubjectVec, Opt, iColumn)
         AllMax = cellfun(@(x) max(x), GroupData, 'UniformOutput', false);
         AllMin = cellfun(@(x) min(x), GroupData, 'UniformOutput', false);
         
-        ThisMax = max(cellfun(@(x) max(x), AllMax));
-        ThisMin = min(cellfun(@(x) min(x), AllMin));
+        ThisMax = max(squeeze(cellfun(@(x) max(x), AllMax)));
+        ThisMin = min(squeeze(cellfun(@(x) min(x), AllMin)));
         
         Max = max([Max, ThisMax]);
         Min = min([Min, ThisMin]);
@@ -44,7 +44,7 @@ function [Min, Max] = ComputeMinMax(Type, Data, SubjectVec, Opt, iColumn)
     end
     
     
-    % get subject average for each parts of the cell
+    %% get subject average for each parts of the cell
     for iCondtion = 1:size(Data, 2)
         for iLine = 1:size(Data, 3)
             

@@ -38,7 +38,7 @@ function Opt = CheckPlottingOptions(Opt, Data)
     end
 
     if ~isfield(Opt, 'PermutationTest')
-        Opt.PermutationTest.Do = false;
+        Opt.Ttest.PermutationTest.Do = false;
     end
 
     if ~isfield(Opt, 'PlotPValue')
@@ -76,7 +76,7 @@ function Opt = CheckPlottingOptions(Opt, Data)
         Opt.FigDim(4) = 1000;
     end
 
-    if Opt.PermutationTest.Do
+    if Opt.Ttest.PermutationTest.Do
         Opt = CreatePermutationList(Opt);
     end
 

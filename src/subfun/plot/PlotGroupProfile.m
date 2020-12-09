@@ -36,7 +36,7 @@ function  PlotGroupProfile(Data, SubjectVec, Opt, iCondtion)
     plot([0, Opt.NbLayers + 0.5], Baseline, '-k', 'LineWidth', 1);
 
     %% Set tighet axes with margin
-    [Min, Max] = ComputeMinMax(Data, SubjectVec, Opt, iCondtion);
+    [Min, Max] = ComputeMinMax(Opt.PlotMinMaxType, Data, SubjectVec, Opt, iCondtion);
     [Min, Max] = ComputeMargin(Min, Max);
 
     axis([0.5, Opt.NbLayers + .5, Min, Max]);
