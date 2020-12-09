@@ -9,32 +9,32 @@ function test_suite = test_RunSignPermutationTest %#ok<*STOUT>
 end
 
 function test_RunSignPermutationTestBasic
-    
-    TestTolerance = 5*1e-3;
-    
+
+    TestTolerance = 5 * 1e-3;
+
     NbVariables = 10000;
     NbSubjects = 10;
 
     Data = randn(10, NbVariables);
-    
+
     Opt.Ttest.PermutationTest.Do = true;
     Opt = CreatePermutationList(Opt);
-    
+
     Opt.Ttest.PermutationTest.Plot = true();
-    
+
     % run tests and make sure that we have tolerable false positive rate
     Opt.Ttest.SideOfTtest =  'both';
     P = RunSignPermutationTest(Data, Opt);
     CheckFalsePositiveRate(P, TestTolerance);
-    
+
     Opt.Ttest.SideOfTtest =  'right';
     P = RunSignPermutationTest(Data, Opt);
     CheckFalsePositiveRate(P, TestTolerance);
-    
+
     Opt.Ttest.SideOfTtest =  'left';
     P = RunSignPermutationTest(Data, Opt);
     CheckFalsePositiveRate(P, TestTolerance);
-    
+
 end
 
 % function test_ComputePValuePermutationShift
@@ -62,11 +62,8 @@ end
 % end
 
 function CheckFalsePositiveRate(P, TestTolerance)
-    assertElementsAlmostEqual(...
-        sum(P<0.05) / numel(P),...
-        0.05,...
-        'absolute',TestTolerance);
+    assertElementsAlmostEqual( ...
+                              sum(P < 0.05) / numel(P), ...
+                              0.05, ...
+                              'absolute', TestTolerance);
 end
-
-
-

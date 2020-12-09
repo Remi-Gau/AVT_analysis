@@ -1,4 +1,5 @@
 % (C) Copyright 2020 Remi Gau
+
 function CheckSizeOutput(Data, Conditions, Runs, Layers)
     %
     % Makes sure that the 2D data matrix and its "data dictionary" vector are

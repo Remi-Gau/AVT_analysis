@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 function [Data, CvMat] = LineariseLaminarData(Data, CvMat)
 
     % CvMat = [ConditionVec RunVec LayerVec];

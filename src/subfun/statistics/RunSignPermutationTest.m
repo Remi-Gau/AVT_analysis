@@ -11,11 +11,11 @@ function P = RunSignPermutationTest(Data, Opt)
     % :param Data: (m X n) with m = number of subjects and n = number of
     %              variables measured
     % :type Data: array
-    % :type Opt: structure  
-    % :param Opt: 
+    % :type Opt: structure
+    % :param Opt:
     %
     %
-    %   - ``Opt.Ttest.PermutationTest.Permutations`` Indicates the sign that must taken 
+    %   - ``Opt.Ttest.PermutationTest.Permutations`` Indicates the sign that must taken
     %     by each each value on each permutation.
     %     Dimensions are (m X n) with m = number of permutation and n = number of subjects.
     %
@@ -26,7 +26,7 @@ function P = RunSignPermutationTest(Data, Opt)
     %   ``size(Data,2) == 1`` this will plot the null distribution and the
     %   mean of the data.
     %
-    %   NOT IMPLEMENTED YET 
+    %   NOT IMPLEMENTED YET
     %   - ``Opt.Ttest.ValueToTest`` if you want to shift the n,ull distribution
     %     in case you don't want to test against ``mean == 0``.
     %
@@ -34,12 +34,12 @@ function P = RunSignPermutationTest(Data, Opt)
     %           :P: (array) p value for each variable
     %
     % EXAMPLE::
-    % 
+    %
     %     NbVariables = 1;
     %     NbSubjects = 10;
-    % 
+    %
     %     Data = randn(10, NbVariables);
-    % 
+    %
     %     Opt.Ttest.PermutationTest.Do = true;
     %     Opt = CreatePermutationList(Opt);
     %
@@ -48,22 +48,20 @@ function P = RunSignPermutationTest(Data, Opt)
     %     P = RunSignPermutationTest(Data, Opt);
     %
 
-    
     if ~isfield(Opt.Ttest, 'ValueToTest') || isempty(Opt.Ttest.ValueToTest)
         Opt.Ttest.ValueToTest = 0;
     elseif Opt.Ttest.ValueToTest == 0
     else
-        error('test against other values than 0 not yet implemented.')
+        error('test against other values than 0 not yet implemented.');
     end
 
     if ~isfield(Opt.Ttest, 'SideOfTtest') && isempty(Opt.Ttest.SideOfTtest)
         Opt.Ttest.SideOfTtest = 'both';
     end
-    
+
     Permutations = Opt.Ttest.PermutationTest.Permutations;
     ValueToTest = Opt.Ttest.ValueToTest;
     SideOfTtest = Opt.Ttest.SideOfTtest;
-    
 
     if ~(size(Data, 1) == size(Permutations, 2))
         error('number of data points must match that in the sign permutation matrix.');
@@ -77,7 +75,7 @@ function P = RunSignPermutationTest(Data, Opt)
         tmp2 = repmat(tmp2', 1, size(Data, 2));
         NullDistribution(iPerm, :) = mean(Data .* tmp2);  %#ok<*AGROW>
     end
-    
+
     % shift null distribution
     NullDistribution = NullDistribution + ValueToTest;
 
@@ -98,13 +96,13 @@ function P = RunSignPermutationTest(Data, Opt)
         otherwise
             error('unknown test side: must be left, right or both');
     end
-    
-    if size(Data,2)==1 && Opt.Ttest.PermutationTest.Plot
-        figure()
-        hold on
-        hist(NullDistribution, 20)
+
+    if size(Data, 2) == 1 && Opt.Ttest.PermutationTest.Plot
+        figure();
+        hold on;
+        hist(NullDistribution, 20);
         MAX = max(hist(NullDistribution, 20));
-        plot([mean(Data) mean(Data)], [0 MAX], '-r')
+        plot([mean(Data) mean(Data)], [0 MAX], '-r');
     end
 
 end

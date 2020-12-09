@@ -9,21 +9,21 @@ function test_suite = test_ComputeSubjectAverage %#ok<*STOUT>
 end
 
 function test_ComputeSubjectAverageBasic()
-    
-    SubjectVec = [1 1 2 2];
-    
-    Data = [
-        1 1; % subject 1
-        1 1; % subject 1
-        2 2; % subject 2
-        1 1; % subject 2
-        3 3; % subject 3
-        2 2; % subject 3
-        ];
-    
-[GroupData, SubjectVec] = ComputeSubjectAverage(Data, SubjectVec);
 
-assertEqual(GroupData, [1, 1; 1.5, 1.5]);
-assertEqual(SubjectVec, [1;2]);
+    SubjectVec = [1 1 2 2];
+
+    Data = [
+            1 1  % subject 1
+            1 1  % subject 1
+            2 2  % subject 2
+            1 1  % subject 2
+            3 3  % subject 3
+            2 2  % subject 3
+           ];
+
+    [GroupData, SubjectVec] = ComputeSubjectAverage(Data, SubjectVec);
+
+    assertEqual(GroupData, [1, 1; 1.5, 1.5]);
+    assertEqual(SubjectVec, [1; 2]);
 
 end

@@ -29,8 +29,7 @@ function rgb = SeismicColourMap(n)
     xblue = round(xlarge / 2);
     xred = xlarge - xblue;
     rgb([1:xblue 4 * m - xred + 2:4 * m + 1], :) = [];
-    
-    
+
     % SavedTxt = 'D:\Dropbox\PhD\Experiments\MVPA_A_V_T\derivatives\code\subfun\plot\seismic.xml';
     % fid = fopen (SavedTxt, 'w');
     %
@@ -50,5 +49,5 @@ function rgb = SeismicColourMap(n)
     %     <NaN r="0.247059" g="0" b="0"/>
     %   </ColorMap>
     % </ColorMaps>
-    
+
 end

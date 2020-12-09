@@ -18,7 +18,7 @@ function [P, STATS] = ComputePValue(Data, Opt)
     %             (``both``)
     % :type Opt: structure
     % :param ValueToTest: mean of the null distribution to test against
-    % :type ValueToTest: scalar    
+    % :type ValueToTest: scalar
     %
     % :returns:
     %           :P: (array) (dimension)
@@ -26,7 +26,7 @@ function [P, STATS] = ComputePValue(Data, Opt)
     %                   (only for parametric t-test)
     %           :TestSide: (string)
     %
-    
+
     if ~isfield(Opt.Ttest, 'ValueToTest') || isempty(Opt.Ttest.ValueToTest)
         Opt.Ttest.ValueToTest = 0;
     end
@@ -43,13 +43,13 @@ function [P, STATS] = ComputePValue(Data, Opt)
         P = RunSignPermutationTest(Data, Opt);
 
     else
-        
+
         % or ttest
-        [~, P, ~, STATS] = ttest(...
-            Data, ...
-            Opt.Ttest.ValueToTest, ...
-            'alpha', Opt.Alpha, ...
-            'tail', Opt.Ttest.SideOfTtest);
+        [~, P, ~, STATS] = ttest( ...
+                                 Data, ...
+                                 Opt.Ttest.ValueToTest, ...
+                                 'alpha', Opt.Alpha, ...
+                                 'tail', Opt.Ttest.SideOfTtest);
 
     end
 end

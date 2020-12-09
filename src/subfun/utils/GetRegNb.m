@@ -1,4 +1,5 @@
 % (C) Copyright 2020 Remi Gau
+
 function RegNumbers = GetRegNb(SPM)
     %
     % Gets the number each regressor of the SPM design matrix.

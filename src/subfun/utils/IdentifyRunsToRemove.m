@@ -1,4 +1,5 @@
 % (C) Copyright 2020 Remi Gau
+
 function RunsToRemove = IdentifyRunsToRemove(RunVec, ConditionVec)
     %
     % Check that the is the same number of rows (conditions) in each run.
