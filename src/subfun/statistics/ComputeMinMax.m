@@ -17,6 +17,7 @@ function [Min, Max] = ComputeMinMax(Type, Data, SubjectVec, Opt, iColumn)
     Min = 0;
     Max = 0;
     
+    GroupData = cell(size(Data));
     %% get subject average for each parts of the cell
     for iCondtion = 1:size(Data, 2)
         for iLine = 1:size(Data, 3)
