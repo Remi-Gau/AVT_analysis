@@ -2,13 +2,11 @@
 %
 % plots the PCM models
 
-
-
 clc;
 clear;
 close all;
 
-ModelType = '3X3';
+ModelType = '6X6';
 
 Space = 'surf';
 
@@ -20,9 +18,9 @@ FigureDir = fullfile(Dirs.PCM, ModelType, 'figures');
 
 switch lower(ModelType)
     case '3x3'
-    Models = Set3X3models();
+        Models = Set3X3models();
     case '6x6'
-    Models = Set6X6models();
+        Models = Set6X6models();
 end
 
 mkdir(FigureDir);
@@ -42,8 +40,8 @@ for iFig = 1:numel(fig_h)
                                                        ''), ...
                   '.tif'];
 
-    %     print(fig_h(iFig), ...
-    %         fullfile(FigureDir, 'models', FigureName), ...
-    %         '-dtiff');
+    print(fig_h(iFig), ...
+          fullfile(FigureDir, 'models', FigureName), ...
+          '-dtiff');
 
 end

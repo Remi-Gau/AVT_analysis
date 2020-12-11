@@ -33,14 +33,30 @@ Now we do it factorially:
     -   `I(A, V, T)`
 
 -   Factor 3: Do we have additional ipsi vs. contra expression?
+    -   yes
+    -   no
 
-| factor 1 \ factor 2 | `S(A, V T)`  | `S+I(A, V, T)` | <p>`S+I(V vs. (A,T))` <br> `S(A, T)`</p> | <p>`I(V vs. (A,T))` <br> `S(A, T)`</p> | <p>`I(V vs. (A,T))` <br> `S+I(A, T)`</p> | `I(A, V, T)` |
-| ------------------- | ------------ | -------------- | ---------------------------------------- | -------------------------------------- | ---------------------------------------- | ------------ |
-| `S(Ipsi, Contra)`   | model(1,1,1) | model(1,2,1)   | model(1,3,1)                             | model(1,4,1)                           | model(1,5,1)                             | model(1,6,1) |
-| `S+I(Ipsi, Contra)` |              |                | model(2,3,1)                             |                                        |                                          |              |
-| `I(Ipsi, Contra)`   |              |                |                                          |                                        |                                          | model(3,6,1) |
+## Model specification
 
-<!-- So we test 30 models!
+model 1: null model
+
+## Factor 1 & 2:
+
+| factor 1 \ factor 2 | `S(A,V,T)`     | `S+I(A,V,T)`   | <p>`S+I(V vs. (A,T))` <br> `S(A,T)`</p> | <p>`I(V vs. (A,T))` <br> `S(A,T)`</p> | <p>`I(V vs. (A,T))` <br> `S+I(A,T)`</p> | `I(A,V,T)`      |
+| ------------------- | -------------- | -------------- | --------------------------------------- | ------------------------------------- | --------------------------------------- | --------------- |
+| `S(Ipsi, Contra)`   | model 2: 1,1,1 | model 3: 1,2,1 | model 4: 1,3,1                          |                                       |                                         |                 |
+| `S+I(Ipsi, Contra)` |                |                | model 10: 2,3,1                         |                                       |                                         |                 |
+| `I(Ipsi, Contra)`   |                |                |                                         |                                       |                                         | model 19: 3,6,1 |
+
+## Factor 3: Non-specific effects of ipsi and contra
+
+```matlab
+% if true
+M{mm}.Ac(:, end+1, end+1) = [1 0 1 0 1 0]';
+M{mm}.Ac(:, end+1, end+1) = [0 1 0 1 0 1]';
+```
+
+<!-- So we test 36 models!
 But importantly, plotting the model evidence factorially (e.g. using imagesc)
 provides a more clear picture of what really influence those pattern
 

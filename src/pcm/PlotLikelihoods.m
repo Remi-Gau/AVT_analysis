@@ -1,4 +1,4 @@
- % (C) Copyright 2020 Remi Gau
+% (C) Copyright 2020 Remi Gau
 % Plot the results of the 3X3 PCM
 % First plots the G matrices: empirical, free model and then all the fitted of all the models
 % Then gives the bar plot of the likelihoods of the different models
@@ -34,31 +34,31 @@ ROIs = { ...
         'PT'
        };
 
+PlotSubject = false;
+
 % This needs to be adapted or even saved with the PCM results
 switch lower(ModelType)
     case '3x3'
-        
+
         Models = Set3X3models();
-        
+
         %% Analysis name condition to use for it
-        
+
         Analysis(1).name = 'Ipsi';
         Analysis(1).CdtToSelect = 1:2:5;
-        
+
         Analysis(2).name = 'Contra';
         Analysis(2).CdtToSelect = 2:2:6;
-        
+
         Analysis(3).name = 'ContraIpsi';
         Analysis(3).CdtToSelect = 1:6;
-        
+
     case '6x6'
         Models = Set6X6models();
-        
+
         Analysis(1).name = 'AllConditions';
         Analysis(1).CdtToSelect = 1:6;
 end
-
-PlotSubject = false;
 
 FigDim = [50, 50, 1400, 750];
 Visible = 'on';
@@ -143,9 +143,9 @@ for iROI = 1:numel(ROIs)
     for iAnalysis = 1:numel(Models_all)
 
         for Normalize = 0:1
-            
+
             NbModels = numel(Models_all{iAnalysis});
-            
+
             colors =  cellstr(repmat('b', NbModels, 1));
 
             subplot(numel(Models_all), 2, Subplot);
@@ -200,8 +200,8 @@ for iROI = 1:numel(ROIs)
             ylabel('');
 
             set(gca, 'fontsize', 8, ...
-                'xtick', 1:(NbModels-2), ...
-                'xticklabel', 1:(NbModels-2));
+                'xtick', 1:(NbModels - 2), ...
+                'xticklabel', 2:(NbModels - 1));
 
             Data = T.likelihood_norm(:, 2:end - 1);
 
@@ -241,7 +241,7 @@ for iROI = 1:numel(ROIs)
                 set(t, 'fontsize', 14);
             end
 
-            axis([0.5 (NbModels-2) + 0.5 0 MAX]);
+            axis([0.5 (NbModels - 2) + 0.5 0 MAX]);
 
             Subplot = Subplot + 1;
 

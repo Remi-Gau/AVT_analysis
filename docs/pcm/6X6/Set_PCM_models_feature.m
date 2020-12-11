@@ -22,24 +22,6 @@ M{1}.numGparams = size(M{1}.Ac,3);
 M{1}.name       = 'null';
 M{1}.fitAlgorithm = 'minimize';
 
-
-
-% 1rst column: Ipsi-contra
-%   1 --> scaled
-%   2 --> independent and scaled.
-%   3 --> independent
-% 2nd column: condition
-%   1 --> all scaled
-%   2 --> preferred and non-preferred are scaled and independe;non-prefered as scaled versions of each other
-%   3 --> preferred and non prefered are independent, non prefered are
-%   scaled versions of each other
-%   4 --> preferred and non prefered are independent, non prefered are
-%   scaled versions of each other but also indepedent
-%   5 --> all independent
-% 3rd column: one feature for ipsi of all condition + one feature for contra of all condition
-%   1 --> no
-%   2 --> yes
-
 sets = {1:3,1:5,1:2};
 [x, y, z] = ndgrid(sets{:});
 Features_to_add = [x(:) y(:) z(:)];
