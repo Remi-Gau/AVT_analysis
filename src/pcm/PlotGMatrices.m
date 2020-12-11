@@ -63,9 +63,9 @@ InputDir = fullfile(Dirs.PCM, '3X3');
 FigureDir = fullfile(InputDir, 'figures');
 mkdir(FigureDir);
 
-for iROI = 1:NbROI
+for iROI = 1:numel(ROIs)
 
-    for ihs = 1:NbHS
+    for ihs = 1:2
 
         for iAnalysis = 1:numel(Analysis)
 
@@ -88,7 +88,7 @@ for iROI = 1:NbROI
 
         end
 
-        c = pcm_indicatorMatrix('allpairs', 1:size(M_all{1}{1}.Ac, 1));
+        c = pcm_indicatorMatrix('allpairs', 1:size(Models_all{1}{1}.Ac, 1));
         % H = eye(size(M{1}.Ac,1))-ones(size(M{1}.Ac,1))/size(M{1}.Ac,1);
         H = 1;
 
@@ -98,7 +98,7 @@ for iROI = 1:NbROI
 
         close all;
 
-        for iComp = 1:numel(M_all)
+        for iComp = 1:numel(Models_all)
 
             switch iComp
                 case 1
@@ -118,6 +118,7 @@ for iROI = 1:NbROI
                    'Color', [1 1 1], ...
                    'visible', visible);
 
+            ColorMap = BrainColourMaps('hot_increasing');
             colormap(ColorMap);
 
             Subplot = 1;

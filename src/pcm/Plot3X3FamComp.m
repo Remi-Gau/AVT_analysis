@@ -78,10 +78,10 @@ end
 Dirs = SetDir(Space, MVNN);
 InputDir = fullfile(Dirs.PCM, '3X3');
 
+[Families, Families2] = SetPcm3X3modelsFamily();
+
 FigureDir = fullfile(InputDir, 'figures');
 mkdir(FigureDir);
-
-[Families, Families2] = SetPcm3X3modelsFamily();
 
 NbROIs = numel(ROIs);
 
