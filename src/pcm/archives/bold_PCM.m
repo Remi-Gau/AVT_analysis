@@ -131,63 +131,12 @@ for iToPlot = 1:numel(ToPlot)
 
     for Target = 1
 
-        if Target == 2
-            Stim_suffix = 'targ';
-            CondNames = { ...
-                         'ATargL', 'ATargR', ...
-                         'VTargL', 'VTargR', ...
-                         'TTargL', 'TTargR' ...
-                        };
-        else
-            Stim_suffix = 'stim';
-            CondNames = { ...
-                         'A ipsi', 'A contra', ...
-                         'V ipsi', 'V contra', ...
-                         'T ipsi', 'T contra' ...
-                        };
-        end
-
         %% Create partition and condition vector
         for iSub = 1:NbSub
 
             Sub_dir = fullfile(StartDir, SubLs(iSub).name);
 
             load(fullfile(Sub_dir, 'ffx_nat', 'SPM.mat'));
-            Nb_sess(iSub) = numel(SPM.Sess);   %#ok<*SAGROW>
-            clear SPM;
-
-            conditionVec = repmat(1:numel(CondNames) * 2, Nb_sess(iSub), 1);
-            conditionVec = conditionVec(:);
-
-            partitionVec = repmat((1:Nb_sess(iSub))', numel(CondNames) * 2, 1);
-
-            if ~surf && iSub == 5
-                % remove lines corresponding to auditory stim and
-                % targets for sub-06
-                ToRemove = all([any([conditionVec < 3 conditionVec == 7 conditionVec == 8], 2) partitionVec == 17], 2);
-
-                partitionVec(ToRemove) = [];
-                conditionVec(ToRemove) = [];
-            end
-
-            if surf && iSub == 5 && iToPlot == 4
-                % remove lines corresponding to auditory stim and
-                % targets for sub-06
-                ToRemove = all([any([conditionVec < 3 conditionVec == 7 conditionVec == 8], 2) partitionVec == 17], 2);
-
-                partitionVec(ToRemove) = [];
-                conditionVec(ToRemove) = [];
-            end
-
-            if Target == 1
-                conditionVec(conditionVec > 6) = 0;
-            else
-                conditionVec(conditionVec < 7) = 0;
-                conditionVec(conditionVec > 6) = conditionVec(conditionVec > 6) - 6;
-            end
-
-            partitionVec_ori{iSub} = partitionVec;
-            conditionVec_ori{iSub} = conditionVec;
         end
 
         %%
@@ -215,105 +164,6 @@ for iToPlot = 1:numel(ToPlot)
                     conditionVec = conditionVec_ori{iSub};
 
                     %% load data
-                    if surf == 1 && raw == 0 && iToPlot < 4
-                        load(fullfile(Sub_dir, 'results', 'profiles', 'surf', 'PCM', 'Data_PCM.mat'), 'PCM_data');
-                        tmp = PCM_data{iToPlot, iROI, 2};
-                        for i = 1:2:12
-                            tmp(conditionVec == i, :) = PCM_data{iToPlot, iROI, 2}(conditionVec == (i + 1), :);
-                        end
-                        for i = 2:2:12
-                            tmp(conditionVec == i, :) = PCM_data{iToPlot, iROI, 2}(conditionVec == (i - 1), :);
-                        end
-                        Data = [PCM_data{iToPlot, iROI, 1} tmp];
-                        clear tmp;
-
-                        if Split_half
-                            Nb_vert_L = size(PCM_data{iToPlot, iROI, 1}, 2);
-                            Nb_vert_R = size(PCM_data{iToPlot, iROI, 2}, 2);
-                        end
-
-                    elseif surf == 1 && raw == 0 && iToPlot == 4
-                        load(fullfile(Sub_dir, 'results', 'profiles', 'surf', 'PCM', 'Data_PCM_whole_ROI.mat'), 'PCM_data');
-                        tmp = PCM_data{iROI, 2};
-                        for i = 1:2:12
-                            tmp(conditionVec == i, :) = PCM_data{iROI, 2}(conditionVec == (i + 1), :);
-                        end
-                        for i = 2:2:12
-                            tmp(conditionVec == i, :) = PCM_data{iROI, 2}(conditionVec == (i - 1), :);
-                        end
-                        Data = [PCM_data{iROI, 1} tmp];
-
-                    elseif surf == 1 && raw == 1
-                        error('not implemented');
-
-                    else
-                        load(fullfile(Sub_dir, 'results', 'rsa', 'vol', [SubLs(iSub).name '_data_' Save_suffix '.mat']), 'Features');
-                        if hs_idpdt
-                            Data = Features{iROI, ihs};
-                        else
-                            tmp = Features{iROI, 2};
-                            for i = 1:2:12
-                                tmp(conditionVec == i, :) = Features{iROI, 2}(conditionVec == (i + 1), :);
-                            end
-                            for i = 2:2:12
-                                tmp(conditionVec == i, :) = Features{iROI, 2}(conditionVec == (i - 1), :);
-                            end
-                            Data = [Features{iROI, 1} tmp];
-                        end
-                        clear Features;
-                    end
-
-                    %% Get just the right data
-                    X_temp = Data;
-                    clear Data;
-                    X_temp(conditionVec == 0, :) = [];
-                    partitionVec(conditionVec == 0, :) = [];
-                    conditionVec(conditionVec == 0, :) = [];
-
-                    %% Remove nans
-                    ToRemove = find(any(isnan(X_temp)));
-                    X_temp(:, ToRemove) = [];
-
-                    if Split_half
-                        Nb_vert_L = Nb_vert_L - numel(ToRemove(ToRemove <= Nb_vert_L));
-                        Nb_vert_R = Nb_vert_R - numel(ToRemove(ToRemove > Nb_vert_L));
-
-                        tmp = 1:Nb_vert_L;
-                        tmp = tmp(randperm(numel(tmp)));
-                        VertL{iSub, 1} = tmp(1:floor(numel(tmp) / 2));
-                        VertL{iSub, 2} = tmp((1 + floor(numel(tmp) / 2)):end);
-                        clear tmp;
-
-                        tmp = (1:Nb_vert_R) + Nb_vert_L;
-                        tmp = tmp(randperm(numel(tmp)));
-                        VertR{iSub, 1} = tmp(1:floor(numel(tmp) / 2));
-                        VertR{iSub, 2} = tmp((1 + floor(numel(tmp) / 2)):end);
-                        clear tmp;
-                    end
-
-                    if any(all(isnan(X_temp), 2)) || any(all(X_temp == 0, 2))
-                        warning('We have some NaNs issue.');
-                        ToRemove = any([all(isnan(X_temp), 2) all(X_temp == 0, 2)], 2);
-                        partitionVec(ToRemove) = [];
-                        conditionVec(ToRemove) = [];
-                        X_temp(ToRemove, :) = [];
-                    end
-
-                    %% check that we have the same number of conditions in each  partition
-                    A = tabulate(partitionVec);
-                    A = A(:, 1:2);
-                    if numel(unique(A(:, 2))) > 1
-                        warning('We have different numbers of conditions in at least one partition.');
-                        Sess2Remove = find(A(:, 2) < numel(unique(conditionVec)));
-                        conditionVec(ismember(partitionVec, Sess2Remove)) = [];
-                        X_temp(ismember(partitionVec, Sess2Remove), :) = [];
-                        partitionVec(ismember(partitionVec, Sess2Remove)) = [];
-                        Sess2Remove = [];
-                    end
-
-                    if any([numel(conditionVec) numel(partitionVec)] ~= size(X_temp, 1))
-                        error('Data matrix or condition or partition vector might be off.');
-                    end
 
                     %% Stores each subject
 
@@ -331,60 +181,11 @@ for iToPlot = 1:numel(ToPlot)
 
                     clear X_temp X_temp_avg;
 
-                    %% plot data
-                    if print_figs
-                        fprintf('  Plotting data\n');
-
-                        fig_h = figure('name', [SubLs(iSub).name '-' strrep(ROI(iROI).name, '_', ' ') '-' hs_suffix{ihs}], ...
-                                       'Position', FigDim, 'Color', [1 1 1]);
-
-                        colormap(ColorMap);
-
-                        Subplot = 1;
-
-                        subplot(1, 2, Subplot);
-
-                        Data = Y{iSub};
-                        [~, I] = sort(mean(Data));
-                        Data = Data(:, I);
-                        imagesc(imgaussfilt(Data, [.001 50]), [-.5 .5]);
-                        title('Y as f(mean(act))');
-                        colorbar;
-                        set(gca, 'Xtick', [], 'Yticklabel', [], 'tickdir', 'out');
-
-                        Subplot = Subplot + 1;
-
-                        subplot(1, 2, Subplot);
-                        YY = Data * Data';
-                        MAX = min(abs([max(YY(:)) min(YY(:))]));
-                        imagesc(YY, [MAX * -1 MAX]);
-                        hold on;
-                        title('Y*Y^T');
-                        colorbar;
-                        set(gca, 'Xtick', [], 'Yticklabel', [], 'tickdir', 'out');
-
-                        Subplot = Subplot + 1;
-
-                        mtit(fig_h.Name, 'fontsize', 12, 'xoff', 0, 'yoff', .05);
-
-                        print(fig_h, fullfile(Save_dir, ...
-                                              sprintf('Data_%s_%s_%s_%s.tif', ...
-                                                      ToPlot{iToPlot}, Stim_suffix, Beta_suffix, strrep(fig_h.Name, ' ', '_'))), ...
-                              '-dtiff');
-
-                        clear Data;
-                    end
-                    clear fig_h;
-
                     %% Get RSA
                     fprintf('  Computing RDM and empirical G matrices\n\n');
 
                     for iSplit = 1:NbSplits
-                        if Split_half
-                            Vert2Take = [VertL{iSub, iSplit} VertR{iSub, iSplit}];
-                        else
-                            Vert2Take = 1:size(Y{iSub}, 2);
-                        end
+
                         % compute RSA distances (A --> B) in a cross validated fashion
                         A =  rsa.distanceLDC(Y{iSub}(:, Vert2Take), partVec{iSub}, condVec{iSub});
 
@@ -420,16 +221,6 @@ for iToPlot = 1:numel(ToPlot)
                 Y_ori = Y;
 
                 for iSplit = 1:NbSplits
-                    if Split_half
-                        clear Y Vert2Take;
-                        for iSub = 1:NbSub
-                            Vert2Take = [VertL{iSub, iSplit} VertR{iSub, iSplit}];
-                            Y{iSub} = Y_ori{iSub}(:, Vert2Take);
-                        end
-                        Split_suffix = ['Split_' num2str(iSplit)];
-                    else
-                        Split_suffix = '';
-                    end
 
                     if Do_ind
                         fprintf('\n\n  Running PCM_ind\n\n');
@@ -444,28 +235,6 @@ for iToPlot = 1:numel(ToPlot)
                                  'D', 'T_ind_cross', 'theta_ind_cross');
                         catch
                             save(fullfile(Save_dir, sprintf('Failed_PCM_individual_features_%s_%s_%s_%s_%s_%s_%s.mat', Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs}, ...
-                                                            ToPlot{iToPlot}, datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
-                                 'M', 'partVec', 'condVec', 'Y');
-                        end
-                    end
-
-                    if Do_group
-                        % Fit the models on the group level
-                        fprintf('\n\n  Running PCM_grp\n\n');
-                        try
-                            [T_group, theta_gr, G_pred_gr] = pcm_fitModelGroup(Y, M, partVec, condVec, 'runEffect', runEffect, 'fitScale', 1);
-                            [T_cross, theta_cr, G_pred_cr] = pcm_fitModelGroupCrossval(Y, M, partVec, condVec, 'runEffect', runEffect, 'groupFit', ...
-                                                                                       theta_gr, 'fitScale', 1, 'MaxIteration', MaxIteration);
-
-                            % Save
-                            save(fullfile(Save_dir, sprintf('PCM_group_features_%s_%s_%s_%s_%s_%s_%s%s.mat', Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs}, ...
-                                                            ToPlot{iToPlot}, Split_suffix, Add_models_suffix, datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
-                                 'M', 'partVec', 'condVec', 'G', 'G_hat', 'RDMs_CV', ...
-                                 'T_group', 'theta_gr', 'G_pred_gr', ...
-                                 'T_cross', 'theta_cr', 'G_pred_cr');
-
-                        catch
-                            save(fullfile(Save_dir, sprintf('Failed_PCM_group_features_%s_%s_%s_%s_%s_%s_%s.mat', Stim_suffix, Beta_suffix, ROI(iROI).name, hs_suffix{ihs}, ...
                                                             ToPlot{iToPlot}, datestr(now, 'yyyy_mm_dd_HH_MM'))), ...
                                  'M', 'partVec', 'condVec', 'Y');
                         end

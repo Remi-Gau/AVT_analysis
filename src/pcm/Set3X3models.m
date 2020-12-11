@@ -1,6 +1,6 @@
 % (C) Copyright 2020 Remi Gau
 
-function M = SetPcm3X3models()
+function M = Set3X3models()
     %
     % Generates the 12 models that represent all the different ways that those 3
     % conditions can be either:
@@ -29,6 +29,20 @@ function M = SetPcm3X3models()
     %   - V is scaled to A
     %   - T is scaled to A
     %   - T is scaled and independent from V
+    %
+
+    % 3X3 models
+    % the 3 sensory modalities (A, V and T) but separately for
+    % ipsi and contra
+    %
+    % It has 12 models that represent all the different ways that those 3
+    % conditions can be either:
+    %
+    % - scaled
+    % - scaled and independent
+    % - independent
+    %
+    % See also `Set3X3models()`
     %
 
     CondNames = { ...

@@ -1,6 +1,9 @@
 % (C) Copyright 2020 Remi Gau
 %
-% Runs the PCM on the 3 sensory modalities (A, V and T) but separately for
+% Runs the PCM
+
+% 3X3 models
+% on the 3 sensory modalities (A, V and T) but separately for
 % ipsi and contra
 %
 % It has 12 models that represent all the different ways that those 3
@@ -10,7 +13,7 @@
 % - scaled and independent
 % - independent
 %
-% See also `SetPcm3X3models()`
+% See also `Set3X3models()`
 %
 
 % TODO
@@ -24,6 +27,8 @@ close all;
 
 %% Main parameters
 
+ModelType = '6X6';
+
 % Choose on what type of data the analysis will be run
 %
 % b-parameters
@@ -35,7 +40,7 @@ close all;
 % 'Cst', 'Lin', 'Quad'
 %
 
-InputType = 'ROI';
+InputType = 'Cst';
 
 % Region of interest:
 %  possible choices: A1, PT, V1-5
@@ -47,17 +52,6 @@ ROIs = { ...
         'PT'
        };
 
-%% Analysis name condition to use for it
-
-Analysis(1).name = 'Ipsi';
-Analysis(1).CdtToSelect = 1:2:5;
-
-Analysis(2).name = 'Contra';
-Analysis(2).CdtToSelect = 2:2:6;
-
-Analysis(3).name = 'ContraIpsi';
-Analysis(3).CdtToSelect = 1:6;
-
 %% Other parameters
 % Unlikely to change
 
@@ -68,8 +62,6 @@ DoFeaturePooling = true;
 Space = 'surf';
 
 MVNN = true;
-
-PrintModels = false;
 
 %%
 
@@ -91,36 +83,33 @@ end
 
 [SubLs, NbSub] = GetSubjectList(InputDir);
 
-FigureDir = fullfile(Dirs.PCM, '3X3', 'figures');
+FigureDir = fullfile(Dirs.PCM, ModelType, 'figures');
 mkdir(FigureDir);
 
 %% Build the models
 fprintf('Building models\n');
-Models = SetPcm3X3models();
 
-if PrintModels
+switch lower(ModelType)
+    case '3x3'
 
-    [~, ~, ~] = mkdir(fullfile(FigureDir, 'models')); %#ok<*UNRCH>
+        Models = Set3X3models();
 
-    fig_h = PlotPcmModelFeatures(Models);
+        %% Analysis name condition to use for it
 
-    for iFig = 1:numel(fig_h)
+        Analysis(1).name = 'Ipsi';
+        Analysis(1).CdtToSelect = 1:2:5;
 
-        FigureName = ['Model-', num2str(iFig), '-', strrep( ...
-                                                           strrep( ...
-                                                                  fig_h(iFig).Name, ...
-                                                                  ',', ...
-                                                                  ''), ...
-                                                           ' ', ...
-                                                           ''), ...
-                      '.tif'];
+        Analysis(2).name = 'Contra';
+        Analysis(2).CdtToSelect = 2:2:6;
 
-        print(fig_h(iFig), ...
-              fullfile(FigureDir, 'models', FigureName), ...
-              '-dtiff');
+        Analysis(3).name = 'ContraIpsi';
+        Analysis(3).CdtToSelect = 1:6;
 
-    end
+    case '6x6'
+        Models = Set6X6models();
 
+        Analysis(1).name = 'AllConditions';
+        Analysis(1).CdtToSelect = 1:6;
 end
 
 %% Start
@@ -197,6 +186,17 @@ for iROI =  1:numel(ROIs)
 
     GrpData = tmp;
 
+    switch lower(ModelType)
+        case '3x3'
+            Models = Set3X3models();
+        case '6x6'
+            AuditoryOrVisual = 'auditory';
+            if any(strcmp(ROIs{iROI}, {'V1', 'V2', 'V3', 'V4', 'V5'}))
+                AuditoryOrVisual = 'visual';
+            end
+            Models = Set6X6models(AuditoryOrVisual);
+    end
+
     %% Run the PCM
 
     GrpDataSource = GrpData;
@@ -228,7 +228,7 @@ for iROI =  1:numel(ROIs)
                     '_param-', lower(InputType), ...
                     '_analysis-', Analysis(iAnalysis).name, ...
                     '.mat'];
-        filename = fullfile(Dirs.PCM, '3X3', filename);
+        filename = fullfile(Dirs.PCM, ModelType, filename);
 
         save(filename, ...
              'Analysis', ...

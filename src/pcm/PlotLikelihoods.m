@@ -9,6 +9,8 @@ close all;
 
 %% Main parameters
 
+ModelType = '6X6';
+
 % Choose on what type of data the analysis will be run
 %
 % b-parameters
@@ -20,7 +22,7 @@ close all;
 % 'Cst', 'Lin', 'Quad'
 %
 
-InputType = 'ROI';
+InputType = 'Cst';
 
 % Region of interest:
 %  possible choices: A1, PT, V1-5
@@ -32,12 +34,31 @@ ROIs = { ...
         'PT'
        };
 
-% This needs to be adapted or even saved with the PCM results
-Analysis(1).name = 'Ipsi';
-Analysis(2).name = 'Contra';
-Analysis(3).name = 'ContraIpsi';
+PlotSubject = false;
 
-PlotSubject = true;
+% This needs to be adapted or even saved with the PCM results
+switch lower(ModelType)
+    case '3x3'
+
+        Models = Set3X3models();
+
+        %% Analysis name condition to use for it
+
+        Analysis(1).name = 'Ipsi';
+        Analysis(1).CdtToSelect = 1:2:5;
+
+        Analysis(2).name = 'Contra';
+        Analysis(2).CdtToSelect = 2:2:6;
+
+        Analysis(3).name = 'ContraIpsi';
+        Analysis(3).CdtToSelect = 1:6;
+
+    case '6x6'
+        Models = Set6X6models();
+
+        Analysis(1).name = 'AllConditions';
+        Analysis(1).CdtToSelect = 1:6;
+end
 
 FigDim = [50, 50, 1400, 750];
 Visible = 'on';
@@ -61,9 +82,8 @@ if IsTarget
 end
 
 Dirs = SetDir(Space, MVNN);
-% TODO
-% Change hard coding of model types
-InputDir = fullfile(Dirs.PCM, '3X3');
+
+InputDir = fullfile(Dirs.PCM, ModelType);
 
 if PlotSubject
     [SubLs, NbSub] = GetSubjectList();
@@ -124,7 +144,9 @@ for iROI = 1:numel(ROIs)
 
         for Normalize = 0:1
 
-            colors = {'b'; 'b'; 'b'; 'b'; 'b'; 'b'; 'b'; 'b'; 'b'; 'b'; 'b'; 'b'};
+            NbModels = numel(Models_all{iAnalysis});
+
+            colors =  cellstr(repmat('b', NbModels, 1));
 
             subplot(numel(Models_all), 2, Subplot);
 
@@ -178,8 +200,8 @@ for iROI = 1:numel(ROIs)
             ylabel('');
 
             set(gca, 'fontsize', 8, ...
-                'xtick', 1:12, ...
-                'xticklabel', 1:12);
+                'xtick', 1:(NbModels - 2), ...
+                'xticklabel', 2:(NbModels - 1));
 
             Data = T.likelihood_norm(:, 2:end - 1);
 
@@ -219,7 +241,7 @@ for iROI = 1:numel(ROIs)
                 set(t, 'fontsize', 14);
             end
 
-            axis([0.5 12.5 0 MAX]);
+            axis([0.5 (NbModels - 2) + 0.5 0 MAX]);
 
             Subplot = Subplot + 1;
 

@@ -1,4 +1,4 @@
-function [Families, Families2] = SetPcm3X3modelsFamily()
+function [Families, Families2] = Set3X3modelsFamily()
 
     % These are the 12 models from the PCM
     % M{1}.name = 'all_scaled';
