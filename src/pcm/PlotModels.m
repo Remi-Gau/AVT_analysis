@@ -1,23 +1,14 @@
 % (C) Copyright 2020 Remi Gau
 %
-% Runs the PCM on the 3 sensory modalities (A, V and T) but separately for
-% ipsi and contra
-%
-% It has 12 models that represent all the different ways that those 3
-% conditions can be either:
-%
-% - scaled
-% - scaled and independent
-% - independent
-%
-% See also `Set3X3models()`
-%
+% plots the PCM models
+
+
 
 clc;
 clear;
 close all;
 
-ModelType = '6X6';
+ModelType = '3X3';
 
 Space = 'surf';
 

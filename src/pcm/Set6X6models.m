@@ -1,23 +1,46 @@
 function M = Set6X6models(AuditoryOrVisual)
     
+    % AuditoryOrVisual: determines if this is for an auditory or visual ROI
+    
+    % To get the conditions this based on::
+    %
+    %   [~, CondNamesIpsiContra] = GetConditionList()
+    %
+    % This will run only on the Stimulus or the Target conditions
+    % That's why ``NbConditions = 6``
+    
+    % Relies on ``FeaturesToAdd`` to decide on the features that will make up
+    % the mode
+    %
     % 1rst column: Ipsi-contra
     %   1 --> scaled
     %   2 --> independent and scaled.
     %   3 --> independent
     %
-    % 2nd column: condition
+    % 2nd column: Condition
     %   1 --> all scaled
     %   2 --> all scaled + non-prefered as scaled versions of each other
     %   3 -->
-    %   4 --> preferred and non prefered are independent, non prefered are
-    %         scaled versions of each other
-    %   5 --> preferred and non prefered are independent, non prefered are
-    %         scaled versions of each other but also indepedent
+    %   4 --> preferred and non prefered are independent, 
+    %         non prefered are scaled versions of each other
+    %   5 --> preferred and non prefered are independent, 
+    %         non prefered are scaled & independent versions of each other
     %   6 --> all independent
-    %
+    
+    % ------------------
+    % older version
+    %   1 --> all scaled
+    %   2 --> preferred and non-preferred are scaled and independe;non-prefered as scaled versions of each other
+    %   3 --> preferred and non prefered are independent, non prefered are
+    %   scaled versions of each other
+    %   4 --> preferred and non prefered are independent, non prefered are
+    %   scaled versions of each other but also indepedent
+    %   5 --> all independent
+    % ------------------
+    
     % 3rd column: one feature for ipsi of all condition + one feature for contra of all condition
-    %   1 --> no
-    %   2 --> yes
+    %   0 --> no
+    %   1 --> yes
     
     % TODO
     % compare to in the docs/pcm/6X6/Set_PCM_models_feature.m
@@ -80,8 +103,8 @@ function M = Set6X6models(AuditoryOrVisual)
         end
         
         switch FeaturesToAdd(iModel, 3)
+            case 0
             case 1
-            case 2
                 M = GeneralIpsiContra(M);
         end
         
@@ -93,6 +116,9 @@ function M = Set6X6models(AuditoryOrVisual)
         M{end}.numGparams = size(M{end}.Ac, 3);
         M{end}.fitAlgorithm = Alg;
         
+        % Model name
+        % These numbers refer to the table of models in the doc.
+        % Each number indicates the level of this model factor.
         M{end}.name = [ ...
             num2str(FeaturesToAdd(iModel, 1)) ',' ...
             num2str(FeaturesToAdd(iModel, 2)) ',' ...
@@ -265,9 +291,11 @@ function M = AllIdpdt(M, NbConditions, IpsiContraScaled)
     end
     
     for i = 1:NbConditions
+        
         A = zeros(1, NbConditions);
         A(i) = 1;
         M{end}.Ac(:, col_num(i), end + 1) = A;
+        
         if IpsiContraScaled == 2 && mod(i, 2) == 0
             A = zeros(1, NbConditions);
             A(i) = 1;
@@ -278,7 +306,12 @@ function M = AllIdpdt(M, NbConditions, IpsiContraScaled)
 end
 
 function M = GeneralIpsiContra(M)
-    
+    % 
+    % Adds:
+    %   - one feature for ipsi of all condition
+    %   - one feature for contra of all condition
+    %
+
     M{end}.Ac(:, end + 1, end + 1) = [1 0 1 0 1 0];
     M{end}.Ac(:, end + 1, end + 1) = [0 1 0 1 0 1];
     
