@@ -10,7 +10,7 @@
 % - scaled and independent
 % - independent
 %
-% See also `SetPcm3X3models()`
+% See also `Set3X3models()`
 %
 
 % TODO
@@ -96,32 +96,7 @@ mkdir(FigureDir);
 
 %% Build the models
 fprintf('Building models\n');
-Models = SetPcm3X3models();
-
-if PrintModels
-
-    [~, ~, ~] = mkdir(fullfile(FigureDir, 'models')); %#ok<*UNRCH>
-
-    fig_h = PlotPcmModelFeatures(Models);
-
-    for iFig = 1:numel(fig_h)
-
-        FigureName = ['Model-', num2str(iFig), '-', strrep( ...
-                                                           strrep( ...
-                                                                  fig_h(iFig).Name, ...
-                                                                  ',', ...
-                                                                  ''), ...
-                                                           ' ', ...
-                                                           ''), ...
-                      '.tif'];
-
-        print(fig_h(iFig), ...
-              fullfile(FigureDir, 'models', FigureName), ...
-              '-dtiff');
-
-    end
-
-end
+Models = Set3X3models();
 
 %% Start
 fprintf('Get started\n');
