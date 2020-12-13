@@ -18,7 +18,7 @@ function M = NonPrefIdpdt(M, IpsiContraScaled)
 
     for i = 1:2
 
-        M = SetFeatureThisCondition(M, col_num, Cdt(i));
+        M = SetFeatureThisCondition(M, col_num(i), Cdt(i));
 
         M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, col_num, i, Cdt(i));
 

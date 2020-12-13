@@ -12,7 +12,7 @@ function M = AllScaled(M, IpsiContraScaled)
 
     for i = 1:numel(NbConditions)
 
-        M = SetFeatureThisCondition(M, col_num, i);
+        M = SetFeatureThisCondition(M, col_num(i), i);
 
         M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, col_num, i, i);
 

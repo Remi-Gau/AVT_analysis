@@ -15,7 +15,7 @@ function test_SetFeatureIpsiContraScaledBasic
     RowToAdd = 2;
     col_num = [1 4];
 
-    Models = SetFeatureThisCondition(Models, col_num, RowToAdd);
+    Models = SetFeatureThisCondition(Models, col_num(2), RowToAdd);
 
     Expected{1}.Ac(:, 1) = [1; zeros(5, 1)];
     Expected{1}.Ac(2, 4, 2) = 1;

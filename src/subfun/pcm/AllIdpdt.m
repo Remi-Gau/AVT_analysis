@@ -18,7 +18,7 @@ function M = AllIdpdt(M, IpsiContraScaled)
 
     for i = 1:NbConditions
 
-        M = SetFeatureThisCondition(M, col_num, i);
+        M = SetFeatureThisCondition(M, col_num(i), i);
 
         M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, col_num, i, i);
 

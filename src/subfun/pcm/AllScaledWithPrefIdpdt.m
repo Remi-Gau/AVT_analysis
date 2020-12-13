@@ -14,7 +14,7 @@ function M = AllScaledWithPrefIdpdt(M, IpsiContraScaled, AuditoryOrVisual)
 
     for i = 1:NbConditions
 
-        M = SetFeatureThisCondition(M, col_num, i);
+        M = SetFeatureThisCondition(M, col_num(i), i);
 
         M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, col_num, i, i);
 
