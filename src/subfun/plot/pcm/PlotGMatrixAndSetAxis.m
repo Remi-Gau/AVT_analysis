@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 function PlotGMatrixAndSetAxis(Matrix, CondNames, Title, FONTSIZE, SymmetricalClim)
 
     if nargin < 5 || isempty(SymmetricalClim)

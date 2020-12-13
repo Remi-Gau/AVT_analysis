@@ -1,4 +1,5 @@
 % (C) Copyright 2020 Remi Gau
+
 function [Y0, Y1] = GeneratePcmData(Z, G, s, sig, NbFeatures, X, B)
     %
     % USAGE::

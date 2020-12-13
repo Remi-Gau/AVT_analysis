@@ -1,4 +1,5 @@
 % (C) Copyright 2020 Remi Gau
+
 function  fig_handles = PlotPcmInd(M, G, G_hat, T_ind, D, theta_ind, G_pred_ind, G_pred_ind_CV, RDMs_CV, opt)
 
     COLOR_SUBJECTS = SubjectColours();
