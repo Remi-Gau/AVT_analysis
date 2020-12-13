@@ -1,6 +1,6 @@
 % (C) Copyright 2020 Remi Gau
 
-function varargout = RunPcm(Y, M, partVec, condVec)
+function varargout = RunGroupPcm(Y, M, partVec, condVec)
     %
     % Runs PCM and cross validated PCM at the group level
     %
@@ -13,7 +13,7 @@ function varargout = RunPcm(Y, M, partVec, condVec)
     runEffect  = 'fixed';
 
     % Fit the models on the group level
-    fprintf('\n\n  Running PCM\n\n');
+    fprintf('\n\n   Running PCM\n\n');
 
     [T_grp, theta_grp, G_pred_grp] = pcm_fitModelGroup(Y, M, partVec, condVec, ...
                                                        'runEffect', runEffect, ...

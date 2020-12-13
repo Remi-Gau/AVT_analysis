@@ -1,12 +1,13 @@
 % (C) Copyright 2020 Remi Gau
-function [Y0, Y1] = Generate_PCM_data(Z, G, s, sig, NbFeatures, X, B)
+
+function [Y0, Y1] = GeneratePcmData(Z, G, s, sig, NbFeatures, X, B)
     %
     % USAGE::
     %
-    %  [Y0, Y1] = Generate_PCM_data(Z, G, s, sig, NbFeatures, X, B)
+    %  [Y0, Y1] = GeneratePcmData(Z, G, s, sig, NbFeatures, X, B)
     %
 
-    if nargin < 6 || nargin < 7 || isempty(X) || isempty(B)
+    if nargin < 6 || isempty(X) || isempty(B)
         Do_fixed_effect = 0;
     else
         Do_fixed_effect = 1;

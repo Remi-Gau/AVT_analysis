@@ -62,8 +62,6 @@ Visible = 'on';
 
 IsTarget = false;
 
-DoFeaturePooling = true;
-
 Space = 'surf';
 
 %% Will not change
@@ -198,13 +196,11 @@ for iFam = 1:2
                     '_analysis-', Analysis(iAnalysis).name, ...
                     '_NbFamilies-', NbFam];
 
-        %     print_PCM_table(Struct2Save, Struct2Save, ROI, NbROI, FigureDir, opt);
-
         figure( ...
                'name', strrep(filename, '_', ' '), ...
-               'Position', FigDim, ...
-               'Color', [1 1 1], ...
-               'visible', Visible);
+               'Position', FigDim);
+
+        SetFigureDefaults(Opt);
 
         colormap('gray');
 

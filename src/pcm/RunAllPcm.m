@@ -2,20 +2,6 @@
 %
 % Runs the PCM
 
-% 3X3 models
-% on the 3 sensory modalities (A, V and T) but separately for
-% ipsi and contra
-%
-% It has 12 models that represent all the different ways that those 3
-% conditions can be either:
-%
-% - scaled
-% - scaled and independent
-% - independent
-%
-% See also `Set3X3models()`
-%
-
 % TODO
 % - Make it run on the b parameters
 % - Make it run on volume
@@ -27,7 +13,7 @@ close all;
 
 %% Main parameters
 
-ModelType = '6X6';
+ModelType = '3X3';
 
 % Choose on what type of data the analysis will be run
 %
@@ -63,13 +49,15 @@ Space = 'surf';
 
 MVNN = true;
 
+IndividualPcmDo = false;
+
 %%
 
 NbLayers = 6;
 
 ConditionType = 'stim';
 if IsTarget
-    ConditionType = 'target';
+    ConditionType = 'target'; %#ok<*UNRCH>
 end
 
 Dirs = SetDir(Space, MVNN);
@@ -83,16 +71,14 @@ end
 
 [SubLs, NbSub] = GetSubjectList(InputDir);
 
-FigureDir = fullfile(Dirs.PCM, ModelType, 'figures');
-mkdir(FigureDir);
+OutputDir = fullfile(Dirs.PCM, ModelType);
+mkdir(OutputDir);
 
 %% Build the models
 fprintf('Building models\n');
 
 switch lower(ModelType)
     case '3x3'
-
-        Models = Set3X3models();
 
         %% Analysis name condition to use for it
 
@@ -106,7 +92,6 @@ switch lower(ModelType)
         Analysis(3).CdtToSelect = 1:6;
 
     case '6x6'
-        Models = Set6X6models();
 
         Analysis(1).name = 'AllConditions';
         Analysis(1).CdtToSelect = 1:6;
@@ -205,7 +190,14 @@ for iROI =  1:numel(ROIs)
 
     for iAnalysis = 1:numel(Analysis)
 
-        fprintf('\n\n  Running analysis: %s\n\n', Analysis(iAnalysis).name);
+        fprintf('\n\n  Running analysis: %s\n', Analysis(iAnalysis).name);
+
+        Filename = ['pcm_results', ...
+                    '_roi-', ROIs{iROI}, ...
+                    '_cdt-', ConditionType, ...
+                    '_param-', lower(InputType), ...
+                    '_analysis-', Analysis(iAnalysis).name, ...
+                    '.mat'];
 
         [GrpData, GrpRunVec, GrpConditionVec] = PreparePcmInput( ...
                                                                 GrpDataSource, ...
@@ -215,22 +207,26 @@ for iROI =  1:numel(ROIs)
 
         G_hat = ComputeGmatrix(GrpData, GrpRunVec, GrpConditionVec);
 
-        [T_grp, theta_grp, G_pred_grp, T_cr, theta_cr, G_pred_cr] = RunPcm( ...
-                                                                           GrpData, ...
-                                                                           Models, ...
-                                                                           GrpRunVec, ...
-                                                                           GrpConditionVec);
+        if IndividualPcmDo
+            [T_ind, theta_ind, G_pred_ind, D, T_ind_cross, theta_ind_cross] = RunIndividualPcm( ...
+                                                                                               GrpData, ...
+                                                                                               Models, ...
+                                                                                               GrpRunVec, ...
+                                                                                               GrpConditionVec);
 
-        % Save
-        filename = ['pcm_results', ...
-                    '_roi-', ROIs{iROI}, ...
-                    '_cdt-', ConditionType, ...
-                    '_param-', lower(InputType), ...
-                    '_analysis-', Analysis(iAnalysis).name, ...
-                    '.mat'];
-        filename = fullfile(Dirs.PCM, ModelType, filename);
+            save(fullfile(OutputDir,  ['individual_' Filename]), ...
+                 'Models', ...
+                 'T_ind', 'theta_ind', 'G_pred_ind', ...
+                 'D', 'T_ind_cross', 'theta_ind_cross');
+        end
 
-        save(filename, ...
+        [T_grp, theta_grp, G_pred_grp, T_cr, theta_cr, G_pred_cr] = RunGroupPcm( ...
+                                                                                GrpData, ...
+                                                                                Models, ...
+                                                                                GrpRunVec, ...
+                                                                                GrpConditionVec);
+
+        save(fullfile(OutputDir, ['group_' Filename]), ...
              'Analysis', ...
              'Models', ...
              'GrpRunVec', 'GrpConditionVec', ...
@@ -242,24 +238,27 @@ for iROI =  1:numel(ROIs)
 
 end
 
-function varargout = PreparePcmInput(Data, RunVec, ConditionVec, Analysis)
+function [T_ind, theta_ind, G_pred_ind, D, T_ind_cross, theta_ind_cross] = RunIndividualPcm(Data, Models, RunVec, ConditionVec)
 
-    for iSub = 1:size(Data, 1)
+    MaxIteration = 50000;
+    runEffect  = 'fixed';
 
-        % Only keep the conditions for that analysis
+    fprintf('   Doing individual analysis\n');
 
-        ConditionVec{iSub}(~ismember(ConditionVec{iSub}, Analysis.CdtToSelect)) = 0;
+    [T_ind, theta_ind, G_pred_ind] = pcm_fitModelIndivid( ...
+                                                         Data, ...
+                                                         Models, ...
+                                                         RunVec, ...
+                                                         ConditionVec, ...
+                                                         'runEffect', runEffect, ...
+                                                         'MaxIteration', MaxIteration); %#ok<*ASGLU>
 
-        if strcmpi(Analysis.name, 'contraipsi')
-            [Data{iSub}, ConditionVec{iSub}, RunVec{iSub}] = CombineIpsiAndContra( ...
-                                                                                  Data{iSub}, ...
-                                                                                  ConditionVec{iSub}, ...
-                                                                                  RunVec{iSub}, ...
-                                                                                  'pool');
-        end
-
-    end
-
-    varargout = {Data, RunVec, ConditionVec};
+    [D, T_ind_cross, theta_ind_cross] = pcm_fitModelIndividCrossval( ...
+                                                                    Data, ...
+                                                                    Models, ...
+                                                                    RunVec, ...
+                                                                    ConditionVec, ...
+                                                                    'runEffect', runEffect, ...
+                                                                    'MaxIteration', MaxIteration);
 
 end
