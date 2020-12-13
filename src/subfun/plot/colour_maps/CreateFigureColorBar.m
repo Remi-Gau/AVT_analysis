@@ -1,33 +1,33 @@
 function CreateFigureColorBar(Name, MIN, MAX, ColorMap)
-    
+
     if nargin < 1
         Name = 'test';
     end
-    
+
     if nargin < 3
         MAX = 100;
         MIN = -50;
     end
-    
+
     if nargin < 4
         ColorMap = BrainColourMaps('hot_increasing');
     end
-    
+
     NbYtick = 10;
     NbLevels = 1000;
-    
+
     % Create a scale with the original values
-    figure(...
-        'name', Name, ...
-        'Position', [50, 50, 200, 500], ...
-        'Color', [1 1 1]);
-    
+    figure( ...
+           'name', Name, ...
+           'Position', [50, 50, 200, 500], ...
+           'Color', [1 1 1]);
+
     SetFigureDefaults();
-    
+
     colormap(ColorMap);
-    
+
     imagesc(repmat(linspace(MAX, MIN, NbLevels)', 1, 100));
-    
+
     set(gca, ...
         'tickdir', 'out', ...
         'xtick', [], ...
@@ -36,7 +36,7 @@ function CreateFigureColorBar(Name, MIN, MAX, ColorMap)
         'yticklabel', floor(linspace(MAX, MIN, NbYtick) * NbLevels) / NbLevels, ...
         'ticklength', [0.01 0.01], ...
         'fontsize', 10);
-    
+
     % For a second axis
     %         ax = gca;
     %         axPos = ax.Position;
@@ -60,5 +60,5 @@ function CreateFigureColorBar(Name, MIN, MAX, ColorMap)
     %             'yticklabel', YTickLabel, ...
     %             'YAxisLocation', 'right', ...
     %             'ticklength', [0.01 0.01], 'fontsize', 14);
-    
+
 end

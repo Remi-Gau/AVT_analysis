@@ -1,5 +1,3 @@
-
-
 % compute RSA distances (A --> B) in a cross validated fashion
 A =  rsa.distanceLDC(Y{iSub}(:, Vert2Take), partVec{iSub}, condVec{iSub});
 
@@ -19,8 +17,6 @@ RDMs_CV(:, :, iSub, iSplit) = squareform(mean([A; B]));
 
 %% Compute CVed G-matrix, do multidimensional scaling
 G_hat(:, :, iSub, iSplit) = pcm_estGCrossval(Y{iSub}(:, Vert2Take), partVec{iSub}, condVec{iSub});
-
-
 
 %%
 % Eucledian normalization

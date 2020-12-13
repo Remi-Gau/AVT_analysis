@@ -131,8 +131,8 @@ for iROI = 1:numel(ROIs)
     figure( ...
            'name', strrep(filename, '_', ' '), ...
            'Position', FigDim);
-       
-    SetFigureDefaults(Opt)
+
+    SetFigureDefaults(Opt);
 
     Subplot = 1;
 

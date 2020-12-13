@@ -1,6 +1,6 @@
 % (C) Copyright 2020 Remi Gau
 function SetFigureDefaults(Opt)
-    
+
     if nargin < 1 || isempty(Opt)
         Opt.Visible = 'on';
     end

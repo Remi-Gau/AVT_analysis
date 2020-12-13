@@ -199,8 +199,8 @@ for iFam = 1:2
         figure( ...
                'name', strrep(filename, '_', ' '), ...
                'Position', FigDim);
-           
-        SetFigureDefaults(Opt)
+
+        SetFigureDefaults(Opt);
 
         colormap('gray');
 

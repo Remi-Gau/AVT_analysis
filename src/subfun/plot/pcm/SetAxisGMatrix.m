@@ -6,9 +6,9 @@ function SetAxisGMatrix(ConditionNames, FONTSIZE)
         'ytick', 1:numel(ConditionNames), ...
         'yticklabel', ConditionNames, ...
         'ticklength', [0.01 0], ...
-        'fontsize', FONTSIZE-2);
+        'fontsize', FONTSIZE - 2);
     box off;
     axis square;
-    
+
     colorbar;
 end
