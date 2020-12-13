@@ -36,8 +36,6 @@ ROIs = { ...
     'PT'
     };
 
-PlotSubject = false;
-
 % This needs to be adapted or even saved with the PCM results
 [~, CondNames] = GetConditionList();
 switch lower(ModelType)
@@ -55,9 +53,6 @@ switch lower(ModelType)
         
         Analysis(3).name = 'ContraIpsi';
         Analysis(3).CondNames = {'A', 'V', 'T'};
-        
-        m = 3;
-        n = 5;
         
     case '6x6'
         
@@ -90,9 +85,7 @@ if IsTarget
 end
 
 Dirs = SetDir(Space, MVNN);
-
 InputDir = fullfile(Dirs.PCM, ModelType);
-
 FigureDir = fullfile(InputDir, 'figures');
 mkdir(FigureDir);
 
@@ -146,13 +139,14 @@ for iROI = 1:numel(ROIs)
         
         % plot pred G mat from each model
         for iModel = 2:(numel(Models)-1)
+            
             subplot(m, n, Subplot);
             
             Title = [num2str(iModel - 1) ' - ' strrep(Models{iModel}.name, '_', ' ')];
-            
             PlotGMatrixAndSetAxis(mean(G_pred_cr{iModel}, 3), Analysis(iAnalysis).CondNames, Title, FONTSIZE);
             
             Subplot = Subplot + 1;
+            
         end
         
         mtit(get(gcf, 'name'), ...

@@ -53,9 +53,6 @@ switch lower(ModelType)
         Analysis(3).name = 'ContraIpsi';
         Analysis(3).CondNames = {'A', 'V', 'T'};
         
-        m = 3;
-        n = 5;
-        
     case '6x6'
         
         Analysis(1).name = 'AllConditions';
@@ -63,9 +60,9 @@ switch lower(ModelType)
         Analysis(1).CondNames = CondNames(1:6);
         
 end
-        
+
 FigDim = [50, 50, 750, 750];
-FONTSIZE = 8;
+FONTSIZE = 12;
 
 
 ColorMap = SeismicColourMap(1000);
@@ -121,88 +118,62 @@ for iROI = 1:numel(ROIs)
             'Position', FigDim);
         
         SetFigureDefaults();
-
+        
         Title = strrep(FigureFilename, '_', ' ');
         
-        PlotGMatrixAndSetAxis(mean(G_hat, 3), Analysis.CondNames, Title, FONTSIZE, false);
+        PlotGMatrixAndSetAxis(mean(G_hat, 3), Analysis(iAnalysis).CondNames, Title, FONTSIZE, false);
         
         NewColorMap = NonCenteredDivergingColourmap(mean(G_hat, 3), ColorMap);
         colormap(NewColorMap);
-
+        
         axis square;
-        axis ([.5 6.5 .5 6.5]);
+        axis (repmat([0.5, size(G_hat,1) + 0.5], 1, 2));
+        
+        hold on
+        
+        AddWhiteLines(size(G_hat, 1));
+        
+        AddBlackBorder(size(G_hat, 1));
         
         FigureFilename = fullfile(FigureDir, [FigureFilename '.tif']);
         disp(FigureFilename);
-%         print(gcf, FigureFilename, '-dtiff');
+        print(gcf, FigureFilename, '-dtiff');
         
+        Clim = ComputeClimMatrix(mean(G_hat, 3), false);
+        CreateFigureColorBar('Scale-G-matrix-', Clim(1), Clim(2), NewColorMap)
+
     end
     
 end
 
+function AddBlackBorder(Width)
+    
+    Width = Width + 0.5;
+    
+    LINE_WIDTH = 3;
+    
+    plot([0.5 0.5],         [0.51 Width+0.01], 'k', 'linewidth', LINE_WIDTH);
+    plot([Width Width],     [0.51 Width+0.01], 'k', 'linewidth', LINE_WIDTH);
+    plot([0.51 Width+0.01], [0.5 0.5],         'k', 'linewidth', LINE_WIDTH);
+    plot([0.51 Width+0.01], [Width Width],     'k', 'linewidth', LINE_WIDTH);
+    
+end
 
-% 
-% 
-%         % Add white lines
-%         if all(ConditionOrder == [2 4 6 1 3 5])
-%             plot([3.5 3.5], [0.52 6.52], 'color', [.8 .8 .8], 'linewidth', 3);
-%             plot([0.52 6.52], [3.5 3.5], 'color', [.8 .8 .8], 'linewidth', 3);
-%         else
-%             Pos = 2.5;
-%             for  i = 1:2
-%                 plot([Pos Pos], [0.52 6.52], 'w', 'linewidth', 3);
-%                 plot([0.52 6.52], [Pos Pos], 'w', 'linewidth', 3);
-%                 Pos = Pos + 2;
-%             end
-%         end
-%         
-%         % add black line contours
-%         plot([0.5 0.5], [0.51 6.51], 'k', 'linewidth', 3);
-%         plot([6.5 6.5], [0.51 6.51], 'k', 'linewidth', 3);
-%         plot([0.51 6.51], [0.5 0.5], 'k', 'linewidth', 3);
-%         plot([0.51 6.51], [6.5 6.5], 'k', 'linewidth', 3);
-%         
-%         
-%         
-%                 %% Print log and non-log scale together
-%         if iScale == 2
-%             % Create a scale with the original values
-%             fig = figure('name', ['Scale-G-matrix-' Scaling opt.FigName], ...
-%                 'Position', [50, 50, 700, 600], 'Color', [1 1 1]);
-%             
-%             colormap(NewColorMap);
-%             
-%             imagesc(repmat(linspace(MAX, MIN, 1000)', 1, 100));
-%             
-%             NbYtick = 10;
-%             set(gca, 'tickdir', 'out', 'xtick', [], 'xticklabel', [], ...
-%                 'ytick', linspace(1, 1000, NbYtick), ...
-%                 'yticklabel', floor(linspace(MAX, MIN, NbYtick) * 10^3) / 10^3, ...
-%                 'ticklength', [0.01 0.01], 'fontsize', 12);
-%             
-%             ax = gca;
-%             axPos = ax.Position;
-%             axes('Position', axPos);
-%             
-%             imagesc(repmat(linspace(MAX, MIN, 1000)', 1, 100));
-%             
-%             % get the Y scale unnormalized
-%             %                     linspace(MAX,MIN,NbYtick)
-%             %                     abs(linspace(MAX,MIN,NbYtick))
-%             %                     10.^abs(linspace(MAX,MIN,NbYtick))
-%             %                     10.^abs(linspace(MAX,MIN,NbYtick))*Min2Keep
-%             %                     10.^abs(linspace(MAX,MIN,NbYtick))*Min2Keep.*sign(linspace(MAX,MIN,NbYtick))
-%             YTickLabel = linspace(MAX, MIN, NbYtick);
-%             YTickLabel = 10.^(abs(linspace(MAX, MIN, NbYtick))) * Min2Keep .* sign(YTickLabel);
-%             YTickLabel = floor(YTickLabel * 10^4) / 10^4;
-%             
-%             set(gca, 'tickdir', 'out', 'xtick', [], 'xticklabel', [], ...
-%                 'ytick', linspace(1, 1000, NbYtick), ...
-%                 'yticklabel', YTickLabel, ...
-%                 'YAxisLocation', 'right', ...
-%                 'ticklength', [0.01 0.01], 'fontsize', 14);
-%             
-%             %                                         print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.tif']  ), '-dtiff')
-%             %                     print(gcf, fullfile(PCM_dir, 'Cdt', [fig.Name, '.svg']  ), '-dsvg')
-%             
-%         end
+function AddWhiteLines(Width)
+    
+    LINE_WIDTH = 3;
+    COLOR = [.8 .8 .8];
+    
+    if Width == 3
+        Pos = [1 2];
+    elseif Width == 6
+        Pos = [2 4];
+    end
+    
+    for  i = 1:numel(Pos)
+        ThisPos = Pos(i);
+        plot([ThisPos, ThisPos] + 0.51, [0.51 Width + 0.51], 'color', COLOR, 'linewidth', LINE_WIDTH);
+        plot([0.51 Width + 0.51], [ThisPos ThisPos] + 0.51,  'color', COLOR, 'linewidth', LINE_WIDTH);
+    end
+    
+end

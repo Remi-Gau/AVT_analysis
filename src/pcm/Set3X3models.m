@@ -1,49 +1,7 @@
 % (C) Copyright 2020 Remi Gau
 
 function M = Set3X3models()
-    %
-    % Generates the 12 models that represent all the different ways that those 3
-    % conditions can be either:
-    %
-    % - scaled
-    %
-    % - scaled and independent
-    %
-    % - independent
-    %
-    % Used to run on the 3 sensory modalities (A, V and T) but separately for
-    % ipsi and contra
-    %
-    % You don't have 3*3 models because of
-    %
-    % - transitivity issues where if T is a scaled version of V and V is a
-    %   scaled version of A, then how can T be independent from A?
-    %
-    % - similarly some models can have 2 possible interpretations: e.g the 2 following can be
-    %   described by the same model
-    %
-    %   - V is scaled to A
-    %   - T is scaled and independent from A
-    %   - T is scaled to V
-    %
-    %   - V is scaled to A
-    %   - T is scaled to A
-    %   - T is scaled and independent from V
-    %
 
-    % 3X3 models
-    % the 3 sensory modalities (A, V and T) but separately for
-    % ipsi and contra
-    %
-    % It has 12 models that represent all the different ways that those 3
-    % conditions can be either:
-    %
-    % - scaled
-    % - scaled and independent
-    % - independent
-    %
-    % See also `Set3X3models()`
-    %
 
     CondNames = { ...
                  'A ipsi', 'A contra', ...
