@@ -1,6 +1,6 @@
 % (C) Copyright 2020 Remi Gau
 
-function M = NonPrefIdpdt(M, NbConditions, IpsiContraScaled)
+function M = NonPrefIdpdt(M, IpsiContraScaled)
 
     Cdt = 5:6;
 
@@ -17,11 +17,11 @@ function M = NonPrefIdpdt(M, NbConditions, IpsiContraScaled)
     end
 
     for i = 1:2
-        
-        M = SetFeatureThisCondition(M, NbConditions, col_num, Cdt(i));
-        
-        M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, NbConditions, col_num, i, Cdt(i));
-        
+
+        M = SetFeatureThisCondition(M, col_num, Cdt(i));
+
+        M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, col_num, i, Cdt(i));
+
     end
 
 end

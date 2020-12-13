@@ -1,8 +1,10 @@
 % (C) Copyright 2020 Remi Gau
 
-function M = AllScaledWithPrefIdpdt(M, NbConditions, IpsiContraScaled, AuditoryOrVisual)
+function M = AllScaledWithPrefIdpdt(M, IpsiContraScaled, AuditoryOrVisual)
 
-    M = PrefIdpdt(M, NbConditions, IpsiContraScaled, AuditoryOrVisual);
+    NbConditions = 6;
+
+    M = PrefIdpdt(M, IpsiContraScaled, AuditoryOrVisual);
 
     if IpsiContraScaled == 1
         col_num = [1 1 1 1 1 1] + size(M{end}.Ac, 2);
@@ -12,9 +14,9 @@ function M = AllScaledWithPrefIdpdt(M, NbConditions, IpsiContraScaled, AuditoryO
 
     for i = 1:NbConditions
 
-        M = SetFeatureThisCondition(M, NbConditions, col_num, i);
+        M = SetFeatureThisCondition(M, col_num, i);
 
-        M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, NbConditions, col_num, i, i);
+        M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, col_num, i, i);
 
     end
 

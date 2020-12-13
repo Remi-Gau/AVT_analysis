@@ -1,6 +1,8 @@
 % (C) Copyright 2020 Remi Gau
 
-function M = AllScaled(M, NbConditions, IpsiContraScaled)
+function M = AllScaled(M, IpsiContraScaled)
+
+    NbConditions = 6;
 
     if IpsiContraScaled == 1
         col_num = [1 1 1 1 1 1];
@@ -10,9 +12,9 @@ function M = AllScaled(M, NbConditions, IpsiContraScaled)
 
     for i = 1:numel(NbConditions)
 
-        M = SetFeatureThisCondition(M, NbConditions, col_num, i);
+        M = SetFeatureThisCondition(M, col_num, i);
 
-        M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, NbConditions, col_num, i, i);
+        M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, col_num, i, i);
 
     end
 

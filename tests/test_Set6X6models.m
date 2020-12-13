@@ -9,7 +9,7 @@ function test_suite = test_Set6X6models %#ok<*STOUT>
 end
 
 function test_Set6X6modelsBasic
-    
+
     sets = {1:3, 1:6, 0:1};
     [x, y, z] = ndgrid(sets{:});
     FeaturesToAdd = [x(:) y(:) z(:)];

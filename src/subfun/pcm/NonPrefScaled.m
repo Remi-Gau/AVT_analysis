@@ -1,6 +1,6 @@
 % (C) Copyright 2020 Remi Gau
 
-function M = NonPrefScaled(M, NbConditions, IpsiContraScaled, AuditoryOrVisual)
+function M = NonPrefScaled(M, IpsiContraScaled, AuditoryOrVisual)
 
     if strcmpi(AuditoryOrVisual, 'auditory')
         Cdt = 3:6;
@@ -22,9 +22,9 @@ function M = NonPrefScaled(M, NbConditions, IpsiContraScaled, AuditoryOrVisual)
 
     for i = 1:numel(Cdt)
 
-        M = SetFeatureThisCondition(M, NbConditions, col_num, Cdt(i));
+        M = SetFeatureThisCondition(M, col_num, Cdt(i));
 
-        M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, NbConditions, col_num, i, Cdt(i));
+        M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, col_num, i, Cdt(i));
 
     end
 

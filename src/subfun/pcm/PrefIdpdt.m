@@ -1,6 +1,6 @@
 % (C) Copyright 2020 Remi Gau
 
-function M = PrefIdpdt(M, NbConditions, IpsiContraScaled, AuditoryOrVisual)
+function M = PrefIdpdt(M, IpsiContraScaled, AuditoryOrVisual)
 
     if strcmpi(AuditoryOrVisual, 'auditory')
         Cdt = 1:2;
@@ -15,10 +15,10 @@ function M = PrefIdpdt(M, NbConditions, IpsiContraScaled, AuditoryOrVisual)
     end
 
     for i = 1:numel(Cdt)
-        
-        M = SetFeatureThisCondition(M, NbConditions, col_num, Cdt(i));
-        
-        M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, NbConditions, col_num, i, Cdt(i));
+
+        M = SetFeatureThisCondition(M, col_num, Cdt(i));
+
+        M = SetFeatureIpsiContraScaled(M, IpsiContraScaled, col_num, i, Cdt(i));
 
     end
 

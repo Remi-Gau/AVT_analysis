@@ -124,8 +124,8 @@ function M = Set3X3models()
     M{end}.Ac(:, 2, end + 1) = [0 1 0]';
     M{end}.Ac(:, 2, end + 1) = [0 0 1]';
     M{end}.Ac(:, 3, end + 1) = [0 0 1]';
-    
-    for iM = 2:( numel(M)- 1 )
+
+    for iM = 2:(numel(M) - 1)
         M{iM}.fitAlgorithm = Alg;
         M{iM}.numGparams = size(M{iM}.Ac, 3);
     end

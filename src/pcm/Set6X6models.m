@@ -75,34 +75,34 @@ function M = Set6X6models(AuditoryOrVisual, FeaturesToAdd)
         switch FeaturesToAdd(iModel, 2)
 
             case 1
-                M = AllScaled(M, NbConditions, IpsiContraScaled);
-%                 M = AllIdpdt(M, NbConditions, IpsiContraScaled);
+                M = AllScaled(M, IpsiContraScaled);
+                %                 M = AllIdpdt(M, NbConditions, IpsiContraScaled);
 
             case 2
-                M = AllScaled(M, NbConditions, IpsiContraScaled);
-                M = NonPrefScaled(M, NbConditions, IpsiContraScaled, AuditoryOrVisual);
+                M = AllScaled(M, IpsiContraScaled);
+                M = NonPrefScaled(M, IpsiContraScaled, AuditoryOrVisual);
 
             case 3
-                M = AllScaledWithPrefIdpdt(M, NbConditions, IpsiContraScaled, AuditoryOrVisual);
-                M = NonPrefScaled(M, NbConditions, IpsiContraScaled, AuditoryOrVisual);
-                M = NonPrefIdpdt(M, NbConditions, IpsiContraScaled);
+                M = AllScaledWithPrefIdpdt(M, IpsiContraScaled, AuditoryOrVisual);
+                M = NonPrefScaled(M, IpsiContraScaled, AuditoryOrVisual);
+                M = NonPrefIdpdt(M, IpsiContraScaled);
 
             case 4
-                M = PrefIdpdt(M, NbConditions, IpsiContraScaled, AuditoryOrVisual);
-                M = NonPrefScaled(M, NbConditions, IpsiContraScaled, AuditoryOrVisual);
+                M = PrefIdpdt(M, IpsiContraScaled, AuditoryOrVisual);
+                M = NonPrefScaled(M, IpsiContraScaled, AuditoryOrVisual);
 
             case 5
-                M = PrefIdpdt(M, NbConditions, IpsiContraScaled, AuditoryOrVisual);
-                M = NonPrefScaled(M, NbConditions, IpsiContraScaled, AuditoryOrVisual);
-                M = NonPrefIdpdt(M, NbConditions, IpsiContraScaled);
+                M = PrefIdpdt(M, IpsiContraScaled, AuditoryOrVisual);
+                M = NonPrefScaled(M, IpsiContraScaled, AuditoryOrVisual);
+                M = NonPrefIdpdt(M, IpsiContraScaled);
 
             case 6
-                M = AllIdpdt(M, NbConditions, IpsiContraScaled);
+                M = AllIdpdt(M, IpsiContraScaled);
 
         end
 
         M = SetFeatureGeneralIpsiContra(M, FeaturesToAdd(iModel, 3));
-        
+
         % remove dummy feature
         M{end}.Ac(:, :, 1) = [];
         % remove columns of 0s
@@ -129,18 +129,3 @@ function M = Set6X6models(AuditoryOrVisual, FeaturesToAdd)
     M{end}.fitAlgorithm = 'minimize';
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
