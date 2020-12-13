@@ -40,8 +40,6 @@ PlotSubject = false;
 switch lower(ModelType)
     case '3x3'
 
-        Models = Set3X3models();
-
         %% Analysis name condition to use for it
 
         Analysis(1).name = 'Ipsi';
@@ -54,21 +52,19 @@ switch lower(ModelType)
         Analysis(3).CdtToSelect = 1:6;
 
     case '6x6'
-        Models = Set6X6models();
 
         Analysis(1).name = 'AllConditions';
         Analysis(1).CdtToSelect = 1:6;
 end
 
 FigDim = [50, 50, 1400, 750];
-Visible = 'on';
+
+FONTSIZE = 12;
 
 %% Other parameters
 % Unlikely to change
 
 IsTarget = false;
-
-DoFeaturePooling = true;
 
 Space = 'surf';
 
@@ -134,9 +130,9 @@ for iROI = 1:numel(ROIs)
 
     figure( ...
            'name', strrep(filename, '_', ' '), ...
-           'Position', FigDim, ...
-           'Color', [1 1 1], ...
-           'visible', Visible);
+           'Position', FigDim);
+       
+    SetFigureDefaults(Opt)
 
     Subplot = 1;
 
@@ -199,7 +195,7 @@ for iROI = 1:numel(ROIs)
 
             ylabel('');
 
-            set(gca, 'fontsize', 8, ...
+            set(gca, 'fontsize', FONTSIZE, ...
                 'xtick', 1:(NbModels - 2), ...
                 'xticklabel', 2:(NbModels - 1));
 
@@ -232,13 +228,13 @@ for iROI = 1:numel(ROIs)
                 end
 
                 t = title(temp);
-                set(t, 'fontsize', 12);
+                set(t, 'fontsize', FONTSIZE);
 
             end
 
             if Normalize == 0
                 t = ylabel(Analysis(iAnalysis).name);
-                set(t, 'fontsize', 14);
+                set(t, 'fontsize', FONTSIZE + 2);
             end
 
             axis([0.5 (NbModels - 2) + 0.5 0 MAX]);
@@ -250,10 +246,9 @@ for iROI = 1:numel(ROIs)
     end
 
     mtit(strrep(filename, '_', ' '), ...
-         'fontsize', 12, ...
+         'fontsize', FONTSIZE, ...
          'xoff', 0, ...
          'yoff', .035);
-    set(gcf, 'visible', Visible');
 
     filename = fullfile(FigureDir, [filename '.tif']);
     disp(filename);

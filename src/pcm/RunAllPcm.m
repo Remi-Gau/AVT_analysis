@@ -38,8 +38,6 @@ ROIs = { ...
     'PT'
     };
 
-ROIs = {'A1'};
-
 %% Other parameters
 % Unlikely to change
 
@@ -59,7 +57,7 @@ NbLayers = 6;
 
 ConditionType = 'stim';
 if IsTarget
-    ConditionType = 'target';
+    ConditionType = 'target'; %#ok<*UNRCH>
 end
 
 Dirs = SetDir(Space, MVNN);
@@ -82,8 +80,6 @@ fprintf('Building models\n');
 switch lower(ModelType)
     case '3x3'
         
-        Models = Set3X3models();
-        
         %% Analysis name condition to use for it
         
         Analysis(1).name = 'Ipsi';
@@ -96,7 +92,6 @@ switch lower(ModelType)
         Analysis(3).CdtToSelect = 1:6;
         
     case '6x6'
-        Models = Set6X6models();
         
         Analysis(1).name = 'AllConditions';
         Analysis(1).CdtToSelect = 1:6;

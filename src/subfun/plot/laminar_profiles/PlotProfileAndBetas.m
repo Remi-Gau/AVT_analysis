@@ -15,9 +15,7 @@ function PlotProfileAndBetas(Data, SubjectVec, Opt)
     Opt = CheckPlottingOptions(Opt, Data);
 
     figure('Name', 'test', ...
-           'Position', Opt.FigDim, ...
-           'Color', [1 1 1], ...
-           'Visible', Opt.Visible);
+           'Position', Opt.FigDim);
 
     SetFigureDefaults(Opt);
 
