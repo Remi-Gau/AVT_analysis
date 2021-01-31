@@ -2,11 +2,13 @@
 
 function M = Set3X3models()
 
+    NbConditions = 3;
+    
     Alg = 'NR'; % 'minimize'; 'NR'
 
     M = {};
 
-    M = SetNullModelPcm(M, 3);
+    M = SetNullModelPcm(M, NbConditions);
 
     % A, T, V scaled
     M{end + 1}.type = 'feature';

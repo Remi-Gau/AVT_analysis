@@ -10,16 +10,16 @@ function M = SetModelSixConditions(M, ConditionScaled, IpsiContraScaled)
     %   M = templateFunction(M, ConditionScaled, IpsiContraScaled)
     %
     % :param M: Models: the function will create `M{end}.Ac`
-    % :type argin1: cell
+    % :type M: cell
     % :param ConditionScaled: ``{[conditions scaled to each other], [indendent conditions]}``
     %                         For example: ``{[VT], [A]}``
-    % :type argin2: cell
+    % :type ConditionScaled: cell
     % :param IpsiContraScaled: Vector to denote whether ipsi and contra of a
     %                          certain condition are scaled to each other. In
     %                          the order AVT. For example: ``[true(), false(), false()]``
-    % :type argin3: logical vector
+    % :type IpsiContraScaled: logical vector
     
-    M{end}.Ac = [];
+    M{end+1}.Ac = [];
     
     %%
     % all scaled

@@ -1,8 +1,8 @@
 % (C) Copyright 2020 Remi Gau
 
-function M = PrefIdpdt(M, IpsiContraScaled, AuditoryOrVisual)
+function M = PrefIdpdt(M, IpsiContraScaled, IsAuditoryRoi)
 
-    if strcmpi(AuditoryOrVisual, 'auditory')
+    if IsAuditoryRoi
         Cdt = 1:2;
     else
         Cdt = 3:4;

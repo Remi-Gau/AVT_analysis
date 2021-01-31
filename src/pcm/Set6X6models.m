@@ -1,6 +1,6 @@
 % (C) Copyright 2020 Remi Gau
 
-function M = Set6X6models(AuditoryOrVisual, FeaturesToAdd)
+function M = Set6X6models(IsAuditoryRoi, FeaturesToAdd)
 
     % AuditoryOrVisual: determines if this is for an auditory or visual ROI
 
@@ -44,8 +44,8 @@ function M = Set6X6models(AuditoryOrVisual, FeaturesToAdd)
     %   0 --> no
     %   1 --> yes
 
-    if nargin < 1 || isempty(AuditoryOrVisual)
-        AuditoryOrVisual = 'auditory';
+    if nargin < 1 || isempty(IsAuditoryRoi)
+        IsAuditoryRoi = true;
     end
 
     NbConditions = 6;
@@ -71,20 +71,20 @@ function M = Set6X6models(AuditoryOrVisual, FeaturesToAdd)
 
             case 2
                 M = AllScaled(M, IpsiContraScaled);
-                M = NonPrefScaled(M, IpsiContraScaled, AuditoryOrVisual);
+                M = NonPrefScaled(M, IpsiContraScaled, IsAuditoryRoi);
 
             case 3
-                M = AllScaledWithPrefIdpdt(M, IpsiContraScaled, AuditoryOrVisual);
-                M = NonPrefScaled(M, IpsiContraScaled, AuditoryOrVisual);
+                M = AllScaledWithPrefIdpdt(M, IpsiContraScaled, IsAuditoryRoi);
+                M = NonPrefScaled(M, IpsiContraScaled, IsAuditoryRoi);
                 M = NonPrefIdpdt(M, IpsiContraScaled);
 
             case 4
-                M = PrefIdpdt(M, IpsiContraScaled, AuditoryOrVisual);
-                M = NonPrefScaled(M, IpsiContraScaled, AuditoryOrVisual);
+                M = PrefIdpdt(M, IpsiContraScaled, IsAuditoryRoi);
+                M = NonPrefScaled(M, IpsiContraScaled, IsAuditoryRoi);
 
             case 5
-                M = PrefIdpdt(M, IpsiContraScaled, AuditoryOrVisual);
-                M = NonPrefScaled(M, IpsiContraScaled, AuditoryOrVisual);
+                M = PrefIdpdt(M, IpsiContraScaled, IsAuditoryRoi);
+                M = NonPrefScaled(M, IpsiContraScaled, IsAuditoryRoi);
                 M = NonPrefIdpdt(M, IpsiContraScaled);
 
             case 6

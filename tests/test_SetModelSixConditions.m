@@ -23,7 +23,7 @@ function test_SetModelSixConditionsAllScaled
     Expected{1}.Ac(5, 1, 5) = 1;
     Expected{1}.Ac(6, 1, 6) = 1;  
 
-    assertEqual(Models, Expected);
+    assertEqual(Models{end}, Expected{1});
     
     clear Expected
     
@@ -43,7 +43,7 @@ function test_SetModelSixConditionsAllScaled
     Expected{1}.Ac(5, 1, 5) = 1;
     Expected{1}.Ac(6, 2, 6) = 1;    
 
-    assertEqual(Models, Expected);
+    assertEqual(Models{end}, Expected{1});
     
 end
 
@@ -65,7 +65,7 @@ function test_SetModelSixConditionsAllIdpdt
     Expected{1}.Ac(5, 3, 5) = 1;
     Expected{1}.Ac(6, 3, 6) = 1;  
 
-    assertEqual(Models, Expected);
+    assertEqual(Models{end}, Expected{1});
     
     clear Expected
     
@@ -84,7 +84,7 @@ function test_SetModelSixConditionsAllIdpdt
     Expected{1}.Ac(5, 5, 5) = 1;
     Expected{1}.Ac(6, 6, 6) = 1;  
 
-    assertEqual(Models, Expected);
+    assertEqual(Models{end}, Expected{1});
     
     clear Expected
 
@@ -107,7 +107,7 @@ function test_SetModelSixConditionsAudioIdpdt
     Expected{1}.Ac(5, 2, 5) = 1;
     Expected{1}.Ac(6, 3, 6) = 1;  
 
-    assertEqual(Models, Expected);
+    assertEqual(Models{end}, Expected{1});
     
     clear Expected
 

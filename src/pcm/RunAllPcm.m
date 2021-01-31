@@ -13,7 +13,7 @@ close all;
 
 %% Main parameters
 
-ModelType = '3X3';
+ModelType = 'subset6X6'; % '3X3', '6X6', 'subset6X6'
 
 % Choose on what type of data the analysis will be run
 %
@@ -78,10 +78,8 @@ mkdir(OutputDir);
 fprintf('Building models\n');
 
 switch lower(ModelType)
+    
     case '3x3'
-
-        %% Analysis name condition to use for it
-
         Analysis(1).name = 'Ipsi';
         Analysis(1).CdtToSelect = 1:2:5;
 
@@ -91,10 +89,10 @@ switch lower(ModelType)
         Analysis(3).name = 'ContraIpsi';
         Analysis(3).CdtToSelect = 1:6;
 
-    case '6x6'
-
+    case {'6x6', 'subset6x6'}
         Analysis(1).name = 'AllConditions';
         Analysis(1).CdtToSelect = 1:6;
+        
 end
 
 %% Start
@@ -171,15 +169,18 @@ for iROI =  1:numel(ROIs)
 
     GrpData = tmp;
 
+    IsAuditoryRoi = true;
+    if any(strcmp(ROIs{iROI}, {'V1', 'V2', 'V3', 'V4', 'V5'}))
+        IsAuditoryRoi = false;
+    end
+    
     switch lower(ModelType)
         case '3x3'
             Models = Set3X3models();
         case '6x6'
-            AuditoryOrVisual = 'auditory';
-            if any(strcmp(ROIs{iROI}, {'V1', 'V2', 'V3', 'V4', 'V5'}))
-                AuditoryOrVisual = 'visual';
-            end
-            Models = Set6X6models(AuditoryOrVisual);
+            Models = Set6X6models(IsAuditoryRoi);
+        case 'subset6x6'
+            Models = SetSubset6X6Models(IsAuditoryRoi);      
     end
 
     %% Run the PCM
