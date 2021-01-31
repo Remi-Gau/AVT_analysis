@@ -12,7 +12,7 @@ function M = Set6X6models(AuditoryOrVisual, FeaturesToAdd)
     % That's why ``NbConditions = 6``
 
     % Relies on ``FeaturesToAdd`` to decide on the features that will make up
-    % the mode
+    % the model
     %
     % 1rst column: Ipsi-contra
     %   1 --> scaled
@@ -44,9 +44,6 @@ function M = Set6X6models(AuditoryOrVisual, FeaturesToAdd)
     %   0 --> no
     %   1 --> yes
 
-    % TODO
-    % compare to in the docs/pcm/6X6/Set_PCM_models_feature.m
-
     if nargin < 1 || isempty(AuditoryOrVisual)
         AuditoryOrVisual = 'auditory';
     end
@@ -57,13 +54,7 @@ function M = Set6X6models(AuditoryOrVisual, FeaturesToAdd)
 
     M = {};
 
-    % null model
-    M{1}.type       = 'feature';
-    M{1}.Ac = [];
-    M{1}.Ac = zeros(NbConditions, 1);
-    M{1}.numGparams = size(M{1}.Ac, 3);
-    M{1}.name       = 'null';
-    M{1}.fitAlgorithm = 'minimize';
+    M = SetNullModelPcm(M, NbConditions);
 
     for iModel = 1:size(FeaturesToAdd, 1)
         M{end + 1}.type       = 'feature'; %#ok<*AGROW>
@@ -121,11 +112,6 @@ function M = Set6X6models(AuditoryOrVisual, FeaturesToAdd)
 
     end
 
-    % Free model as Noise ceiling
-    M{end + 1}.type       = 'freechol';
-    M{end}.numCond    = NbConditions;
-    M{end}.name       = 'noiseceiling';
-    M{end}           = pcm_prepFreeModel(M{end});
-    M{end}.fitAlgorithm = 'minimize';
+    M = SetFreeModelPcm(M, NbConditions);
 
 end
