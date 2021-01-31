@@ -1,12 +1,37 @@
 % (C) Copyright 2020 Remi Gau
 
-function [Min, Max] = ComputeMinMax(Type, Data, Opt, ColumnToReport)
+function [Min, Max] = ComputeMinMax(Type, Data, Opt, ColumnToReport, Parameter)
+    % gets minimum and maximum of
+    % - an array
+    % OR
+    % - a horizontal cell of arrays
+    % OR
+    % on a horizontal structure of the shape:
+    % - Struct(1,n).Data
+    % OR
+    % on a horizontal structure of the shape:
+    % - Struct(1,n).Mean
+    % - Struct(1,n).UpperError
+    % - Struct(1,n).LowerError
+    %
+    % Type:
+    % 'all' returns min and max of all values across arrays, cells, structures
+    % 'groupallcolumns' returns min and max of all values across arrays, cells, structures for
+    % the range [Struct(1,n).Mean-Struct(1,n).LowerError  Struct(1,n).Mean+Struct(1,n).UpperError]
+    % 'group' returns min and max of the ColumnToReport cells, structures for
+    % the range
+    % [Struct(1,ColumnToReport).Mean-Struct(1,ColumnToReport).LowerError  ...
+    %  Struct(1,ColumnToReport).Mean+Struct(1,ColumnToReport).UpperError]
+
+    if nargin < 5
+        Parameter = [];
+    end
 
     Min = 0;
     Max = 0;
 
     if isstruct(Data)
-        [Data, Data2] = PrepareData(Type, Data, Opt);
+        [Data, Data2] = PrepareData(Type, Data, Opt, Parameter);
 
     elseif ~iscell(Data)
         Data = {Data};
@@ -51,7 +76,7 @@ function [Min, Max] = ComputeMinMax(Type, Data, Opt, ColumnToReport)
 
 end
 
-function [Data1, Data2] = PrepareData(Type, Data, Opt)
+function [Data1, Data2] = PrepareData(Type, Data, Opt, Parameter)
 
     Data1 = {};
     Data2 = {};
@@ -59,14 +84,22 @@ function [Data1, Data2] = PrepareData(Type, Data, Opt)
     for i = 1:Opt.m
 
         if strcmpi(Type, 'all')
-            Data1{1, i} = Data(1, i).Data; %#ok<*AGROW>
+            Data1{1, i} = FilterOnParameter(Data(1, i).Data, Parameter); %#ok<*AGROW>
 
         else
-            Data1{1, i} = Data(1, i).Mean + Data(1, i).UpperError;
-            Data2{1, i} = Data(1, i).Mean - Data(1, i).LowerError;
+            tmp = Data(1, i).Mean + Data(1, i).UpperError;
+            Data1{1, i} = FilterOnParameter(tmp, Parameter);
+            tmp = Data(1, i).Mean - Data(1, i).LowerError;
+            Data2{1, i} = FilterOnParameter(tmp, Parameter);
 
         end
 
     end
 
+end
+
+function Data = FilterOnParameter(Data, Parameter)
+    if ~isempty(Parameter)
+        Data = Data(:, Parameter);
+    end
 end

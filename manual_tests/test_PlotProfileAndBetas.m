@@ -10,17 +10,17 @@ end
 
 function Opt = SetOptions(Opt, J)
 
-    Opt.PlotQuadratic = false;
-    Opt.ErrorBarType = 'STD';
+    Opt.PlotQuadratic = true;
+    Opt.ErrorBarType = 'SEM';
     Opt.Alpha = 0.05;
     Opt.PlotPValue = true;
     Opt.PermutationTest.Do = false;
     Opt.PermutationTest.Plot = false;
-    Opt.PlotSubjects = false;
+    Opt.PlotSubjects = true;
     Opt.ShadedErrorBar = true;
     Opt.NbLayers = 6;
 
-    Opt.Specific{1, J}.PlotMinMaxType = 'all'; % all group groupallcolumns
+    Opt.Specific{1, J}.PlotMinMaxType = 'group'; % all group groupallcolumns
     Opt.Specific{1, J}.IsMvpa = false;
     Opt.Specific{1, J}.Ttest.SideOfTtest = 'both';
 
@@ -52,8 +52,8 @@ function [Data, SubjectVec] = GenerateDataROI(OptGenData, ROI, Cdt)
         Quad = 0.1;
     end
 
-    OptGenData.StdDevBetweenSubject = 1;
-    OptGenData.StdDevWithinSubject = 1;
+    OptGenData.StdDevBetweenSubject = 2;
+    OptGenData.StdDevWithinSubject = 2;
 
     OptGenData.Betas = [Cst; Lin; Quad];
 

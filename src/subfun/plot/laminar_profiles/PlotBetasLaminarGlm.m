@@ -1,8 +1,8 @@
 % (C) Copyright 2020 Remi Gau
 
-function PlotBetasLaminarGlm(Opt, MinMax, iParameter, iColumn)
+function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
 
-    if nargin < 4 || isempty(iColumn)
+    if nargin < 3 || isempty(iColumn)
         iColumn = 1;
     end
 
@@ -33,7 +33,7 @@ function PlotBetasLaminarGlm(Opt, MinMax, iParameter, iColumn)
                         ConditionVec, CdtList(iCdt)};
             RowsToSelect = ReturnRowsToSelect(Criteria);
 
-            DataToPlot = Opt.Specific{1, iColumn}.Group.Beta(RowsToSelect, iParameter);
+            DataToPlot = Opt.Specific{1, iColumn}.Group.Beta.Data(RowsToSelect, iParameter);
 
             % Store to compute p values and max min
             AllGroupBetas(:, iLine) = DataToPlot; %#ok<*AGROW>
@@ -59,7 +59,9 @@ function PlotBetasLaminarGlm(Opt, MinMax, iParameter, iColumn)
     plot([0, max(Xpos) + 0.5], Baseline, '-k', 'LineWidth', 1);
 
     %% Tight fight with some vertical margin
-    [Min, Max, Margin] = ComputeMargin(MinMax(1), MinMax(2), 3);
+    [Min, Max, Margin] = ComputeMargin(Opt.Specific{1, iColumn}.Group.Beta.Min, ...
+                                       Opt.Specific{1, iColumn}.Group.Beta.Max, ...
+                                       6);
 
     axis([0, Xpos(numel(Opt.Specific{1, iColumn}.RoiNames)) + .5, Min, Max]);
 

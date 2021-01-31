@@ -20,11 +20,16 @@ function PlotProfileAndBetas(Opt)
         RoiList = unique(RoiVec);
         CdtList = unique(ConditionVec);
 
-        GroupData = [];
-        GroupMean = [];
-        GroupUpperError = [];
-        GroupLowerError = [];
-        GroupBeta = [];
+        Group.Data = [];
+        Group.Mean = [];
+        Group.UpperError = [];
+        Group.LowerError = [];
+
+        GroupBeta.Data = [];
+        GroupBeta.Mean = [];
+        GroupBeta.UpperError = [];
+        GroupBeta.LowerError = [];
+
         GroupRoiVec = [];
         GroupConditionVec = [];
         GroupSubjectVec = [];
@@ -44,18 +49,13 @@ function PlotProfileAndBetas(Opt)
                 % compute S parameter betas
                 BetaHat = RunLaminarGlm(Data, DesignMatrix);
                 DataTmp = ComputeSubjectAverage(BetaHat, SubjectVec);
-                GroupBeta = [GroupBeta; DataTmp];
+                GroupBeta = AppendMeanAndError(DataTmp, GroupBeta, Opt);
 
                 % compute profile for each subject
                 [DataTmp, SubjTmp] = ComputeSubjectAverage(Data, SubjectVec);
-                GroupData = [GroupData; DataTmp]; %#ok<*AGROW>
-                GroupSubjectVec = [GroupSubjectVec; SubjTmp];
+                Group = AppendMeanAndError(DataTmp, Group, Opt);
 
-                GroupMean(end + 1, :) = mean(DataTmp);
-                [LowerError, UpperError] = ComputeDispersionIndex(DataTmp, Opt);
-                GroupUpperError = [GroupUpperError; UpperError];
-                GroupLowerError = [GroupLowerError; LowerError];
-
+                GroupSubjectVec = [GroupSubjectVec; SubjTmp]; %#ok<*AGROW>
                 GroupRoiVec = [GroupRoiVec; ones(size(SubjTmp)) * iRoi];
                 GroupConditionVec = [GroupConditionVec; ones(size(SubjTmp)) * iCdt];
 
@@ -63,16 +63,14 @@ function PlotProfileAndBetas(Opt)
 
         end
 
-        Opt.Specific{1, iColumn}.Group.Data = GroupData;
-        Opt.Specific{1, iColumn}.Group.Mean = GroupMean;
-        Opt.Specific{1, iColumn}.Group.UpperError = GroupUpperError;
-        Opt.Specific{1, iColumn}.Group.LowerError = GroupLowerError;
+        Opt.Specific{1, iColumn}.Group = Group;
         Opt.Specific{1, iColumn}.Group.Beta = GroupBeta;
         Opt.Specific{1, iColumn}.Group.SubjectVec = GroupSubjectVec;
         Opt.Specific{1, iColumn}.Group.RoiVec = GroupRoiVec;
         Opt.Specific{1, iColumn}.Group.ConditionVec = GroupConditionVec;
 
         AllData(1, iColumn) = Opt.Specific{1, iColumn}.Group;
+        BetaData(1, iColumn) = Opt.Specific{1, iColumn}.Group.Beta;
 
     end
 
@@ -87,25 +85,23 @@ function PlotProfileAndBetas(Opt)
 
         PlotGroupProfile(Opt, iColumn);
 
-        %% Get min and max over subjects for this s parameter
-        % TODO : - try to refactor and reuse the same approach as for P
-        %        values.
-        %        - make it possible to set min and max across conditions (columns of a figure)
-        %         [ThisMin, ThisMax] = ComputeMinMax(Opt.PlotMinMaxType, ...
-        %             BetaHat{:, iCondtion, iLine}(:, iParameter), ...
-        %             SubjectVec, ...
-        %             Opt);
-        %         Max = max([Max, ThisMax]);
-        %         Min = min([Min, ThisMin]);
-
-        MinMax = [-5 5];
-
-        PlotBetasLaminarGlm(Opt, MinMax, 1, iColumn);
-
-        PlotBetasLaminarGlm(Opt, MinMax, 2, iColumn);
-
+        SparamToPlot = 2;
         if Opt.PlotQuadratic
-            PlotBetasLaminarGlm(Opt, MinMax, 3, iColumn);
+            SparamToPlot = 3;
+        end
+
+        for iSparam = 1:SparamToPlot
+
+            [Min, Max] = ComputeMinMax(Opt.Specific{1, iColumn}.PlotMinMaxType, ...
+                                       BetaData, ...
+                                       Opt, ...
+                                       iColumn, ...
+                                       iSparam);
+            Opt.Specific{1, iColumn}.Group.Beta.Min = Min;
+            Opt.Specific{1, iColumn}.Group.Beta.Max = Max;
+
+            PlotBetasLaminarGlm(Opt, iSparam, iColumn);
+
         end
 
     end
@@ -171,5 +167,15 @@ function Opt = CheckPlottingOptions(Opt)
         end
 
     end
+
+end
+
+function Structure = AppendMeanAndError(Data, Structure, Opt)
+
+    Structure.Data = [Structure.Data; Data];
+    Structure.Mean(end + 1, :) = mean(Data);
+    [Lower, Upper] = ComputeDispersionIndex(Data, Opt);
+    Structure.UpperError(end + 1, :) = Upper;
+    Structure.LowerError(end + 1, :) = Lower;
 
 end

@@ -113,12 +113,11 @@ end
 function test_ComputeMinMax2ROIs2ConditionsGroupColumn()
 
     Opt.m = 2;
-    ColumnToReport = 2;
 
     Data(1, 1).Mean = [
-                       0 0
-                       0 0
-                       0 0
+                       -5 0
+                       -5 0
+                       -3 0
                       ];
     Data(1, 1).UpperError = [
                              1 1
@@ -144,7 +143,56 @@ function test_ComputeMinMax2ROIs2ConditionsGroupColumn()
                              3 3 2
                             ];
 
+    ColumnToReport = 1;
     [Min, Max] = ComputeMinMax('group', Data, Opt, ColumnToReport);
+
+    assertEqual(Min, -8);
+    assertEqual(Max, 3);
+
+    ColumnToReport = 2;
+    [Min, Max] = ComputeMinMax('group', Data, Opt, ColumnToReport);
+
+    assertEqual(Min, -6);
+    assertEqual(Max, 6);
+
+end
+
+function test_ComputeMinMax2ROIs2ConditionsGroupColumnParameter()
+
+    Opt.m = 2;
+    ColumnToReport = 2;
+    Parameter = 2;
+
+    Data(1, 1).Mean = [
+                       0 0
+                       0 0
+                       0 0
+                      ];
+    Data(1, 1).UpperError = [
+                             1 1
+                             3 3
+                             2 2
+                            ];
+    Data(1, 1).LowerError = [
+                             1 1
+                             3 3
+                             2 2
+                            ];
+
+    Data(1, 2).Mean = [
+                       0 -3
+                       0 3
+                      ];
+    Data(1, 2).UpperError = [
+                             1 1
+                             3 3
+                            ];
+    Data(1, 2).LowerError = [
+                             1 3
+                             3 3
+                            ];
+
+    [Min, Max] = ComputeMinMax('group', Data, Opt, ColumnToReport, Parameter);
 
     assertEqual(Min, -6);
     assertEqual(Max, 6);
