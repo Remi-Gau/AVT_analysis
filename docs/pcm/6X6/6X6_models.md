@@ -1,41 +1,5 @@
 # 6 X 6 PCM models
 
-Let's go through example of visual areas
-
--   V = preferred
--   A, T = non-preferred
-
-Now there are 3 options:
-
-1. only scaled versions (`S`)
-2. completely independent (`I`)
-3. scaled + independent (`S+I`)
-
-`S(A, V)` means A and V are scaled version of each other.
-
-Now we do it factorially:
-
--   Factor 1: Do stimuli from ipsi vs. contra elicit common, independent or
-    partly shared representations?
-
-    -   `S(Ipsi, Contra)`
-    -   `S+I(Ipsi, Contra)`
-    -   `I(Ipsi, Contra)`
-
--   Factor 2: Do stimuli from different sensory modalities elicit common,
-    independent or partly shared representations?
-
-    -   `S(A, V T)`
-    -   `S+I(A, V, T)`
-    -   `S+I(V vs. (A,T)) & S(A, T)`
-    -   `I(V vs. (A,T)) & S(A, T)`
-    -   `I(V vs. (A,T)) & S+I(A, T)`
-    -   `I(A, V, T)`
-
--   Factor 3: Do we have additional ipsi vs. contra expression?
-    -   yes
-    -   no
-
 ## Model specification
 
 model 1: null model

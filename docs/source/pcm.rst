@@ -100,8 +100,6 @@ Now there are 3 options:
 
 `S(A, V)` means A and V are scaled version of each other.
 
-
-
 -   Factor 1: Do stimuli from ipsi vs. contra elicit common, independent or
     partly shared representations?
 
@@ -135,6 +133,12 @@ or the models that are "redundant".
 To make things simpler we only have things that can be independent OR scaled. Not both.
 
 We also remove the 3rd factor.
+
+And we do not create any model where Tactile is independent and Auditory and Visual conditions are scaled.
+
+So we end up with a subset of models for 6X6.
+
+See the tree of models (tree.html)
 
 
 
