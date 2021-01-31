@@ -14,7 +14,7 @@ function test_Set6X6modelsBasic
     [x, y, z] = ndgrid(sets{:});
     FeaturesToAdd = [x(:) y(:) z(:)];
 
-    M = Set6X6models('auditory', FeaturesToAdd);
-    M = Set6X6models('visual', FeaturesToAdd);
+    M = Set6X6models(true, FeaturesToAdd);
+    M = Set6X6models(false, FeaturesToAdd);
 
 end

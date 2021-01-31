@@ -121,34 +121,5 @@ var treeData = [{
         }]
       }]
     }]
-  }, {
-    "name": "I(T vs (A, V)) & S(A, V)",
-    "_children": [{
-      "name": "S(T Ipsi, T Contra)",
-      "_children": [{
-        "name": "S(A Ipsi, A Contra)",
-        "_children": [{
-          "name": "S(V Ipsi, V Contra)"
-        }]
-      }, {
-        "name": "I(A Ipsi, A Contra)",
-        "_children": [{
-          "name": "I(V Ipsi, V Contra)"
-        }]
-      }]
-    }, {
-      "name": "I(T Ipsi, T Contra)",
-      "_children": [{
-        "name": "S(A Ipsi, A Contra)",
-        "_children": [{
-          "name": "S(V Ipsi, V Contra)"
-        }]
-      }, {
-        "name": "I(A Ipsi, A Contra)",
-        "_children": [{
-          "name": "I(V Ipsi, V Contra)"
-        }]
-      }]
-    }]
   }]
 }];

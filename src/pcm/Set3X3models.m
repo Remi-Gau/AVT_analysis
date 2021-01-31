@@ -2,23 +2,13 @@
 
 function M = Set3X3models()
 
-    CondNames = { ...
-                 'A ipsi', 'A contra', ...
-                 'V ipsi', 'V contra', ...
-                 'T ipsi', 'T contra' ...
-                };
+    NbConditions = 3;
 
     Alg = 'NR'; % 'minimize'; 'NR'
 
     M = {};
 
-    % null model
-    M{1}.type       = 'feature';
-    M{1}.Ac = [];
-    M{1}.Ac = zeros(3, 1);
-    M{1}.numGparams = size(M{1}.Ac, 3);
-    M{1}.name       = 'null';
-    M{1}.fitAlgorithm = 'minimize';
+    M = SetNullModelPcm(M, NbConditions);
 
     % A, T, V scaled
     M{end + 1}.type = 'feature';
@@ -130,11 +120,6 @@ function M = Set3X3models()
         M{iM}.numGparams = size(M{iM}.Ac, 3);
     end
 
-    % Free model as Noise ceiling
-    M{end + 1}.type       = 'freechol';
-    M{end}.numCond    = numel(CondNames) / 2;
-    M{end}.name       = 'noiseceiling';
-    M{end}           = pcm_prepFreeModel(M{end});
-    M{end}.fitAlgorithm = 'minimize';
+    M = SetFreeModelPcm(M, NbConditions);
 
 end

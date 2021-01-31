@@ -8,7 +8,7 @@ function test_suite = test_Set3X3models %#ok<*STOUT>
     initTestSuite;
 end
 
-function test_Set6X6modelsBasic
+function test_Set3X3modelsBasic
 
     M = Set3X3models();
 

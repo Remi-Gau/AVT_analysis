@@ -1,10 +1,10 @@
 % (C) Copyright 2020 Remi Gau
 
-function M = NonPrefScaled(M, IpsiContraScaled, AuditoryOrVisual)
+function M = NonPrefScaled(M, IpsiContraScaled, IsAuditoryRoi)
 
-    if strcmpi(AuditoryOrVisual, 'auditory')
+    if IsAuditoryRoi
         Cdt = 3:6;
-    elseif strcmpi(AuditoryOrVisual, 'visual')
+    else
         Cdt = [1 2 5 6];
     end
 
