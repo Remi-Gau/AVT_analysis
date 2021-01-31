@@ -78,7 +78,7 @@ mkdir(OutputDir);
 fprintf('Building models\n');
 
 switch lower(ModelType)
-    
+
     case '3x3'
         Analysis(1).name = 'Ipsi';
         Analysis(1).CdtToSelect = 1:2:5;
@@ -92,7 +92,7 @@ switch lower(ModelType)
     case {'6x6', 'subset6x6'}
         Analysis(1).name = 'AllConditions';
         Analysis(1).CdtToSelect = 1:6;
-        
+
 end
 
 %% Start
@@ -173,14 +173,14 @@ for iROI =  1:numel(ROIs)
     if any(strcmp(ROIs{iROI}, {'V1', 'V2', 'V3', 'V4', 'V5'}))
         IsAuditoryRoi = false;
     end
-    
+
     switch lower(ModelType)
         case '3x3'
             Models = Set3X3models();
         case '6x6'
             Models = Set6X6models(IsAuditoryRoi);
         case 'subset6x6'
-            Models = SetSubset6X6Models(IsAuditoryRoi);      
+            Models = SetSubset6X6Models(IsAuditoryRoi);
     end
 
     %% Run the PCM

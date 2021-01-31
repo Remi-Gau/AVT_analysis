@@ -3,7 +3,7 @@
 function M = Set3X3models()
 
     NbConditions = 3;
-    
+
     Alg = 'NR'; % 'minimize'; 'NR'
 
     M = {};

@@ -55,7 +55,7 @@ function test_SetModalityIpsiContraScaledVisualScaled
 end
 
 function test_SetModalityIpsiContraScaledAudioIdpdt
-    
+
     Models{1}.Ac = zeros(6, 1);
 
     Modality = 'A';
@@ -72,7 +72,7 @@ function test_SetModalityIpsiContraScaledAudioIdpdt
 end
 
 function test_SetModalityIpsiContraScaledVisualIdpdt
-    
+
     Models{1}.Ac = zeros(6, 1);
 
     Modality = 'V';
@@ -89,7 +89,7 @@ function test_SetModalityIpsiContraScaledVisualIdpdt
 end
 
 function test_SetModalityIpsiContraScaledTactileIdpdt
-    
+
     Models{1}.Ac = zeros(6, 1);
 
     Modality = 'T';
@@ -104,4 +104,3 @@ function test_SetModalityIpsiContraScaledTactileIdpdt
     assertEqual(Models, Expected);
 
 end
-

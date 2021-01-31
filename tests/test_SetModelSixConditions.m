@@ -11,7 +11,7 @@ function test_SetModelSixConditionsAllScaled
     Models{1}.Ac = [];
 
     ConditionScaled = {['A', 'V', 'T'], []};
-    IpsiContraScaled = true(1,3);
+    IpsiContraScaled = true(1, 3);
 
     Models = SetModelSixConditions(Models, ConditionScaled, IpsiContraScaled);
 
@@ -21,17 +21,17 @@ function test_SetModelSixConditionsAllScaled
     Expected{1}.Ac(3, 1, 3) = 1;
     Expected{1}.Ac(4, 1, 4) = 1;
     Expected{1}.Ac(5, 1, 5) = 1;
-    Expected{1}.Ac(6, 1, 6) = 1;  
+    Expected{1}.Ac(6, 1, 6) = 1;
 
     assertEqual(Models{end}, Expected{1});
-    
-    clear Expected
-    
+
+    clear Expected;
+
     %%
     Models{1}.Ac = [];
-    
+
     ConditionScaled = {['A', 'V', 'T'], []};
-    IpsiContraScaled = false(1,3);
+    IpsiContraScaled = false(1, 3);
 
     Models = SetModelSixConditions(Models, ConditionScaled, IpsiContraScaled);
 
@@ -41,19 +41,18 @@ function test_SetModelSixConditionsAllScaled
     Expected{1}.Ac(3, 1, 3) = 1;
     Expected{1}.Ac(4, 2, 4) = 1;
     Expected{1}.Ac(5, 1, 5) = 1;
-    Expected{1}.Ac(6, 2, 6) = 1;    
+    Expected{1}.Ac(6, 2, 6) = 1;
 
     assertEqual(Models{end}, Expected{1});
-    
-end
 
+end
 
 function test_SetModelSixConditionsAllIdpdt
 
     Models{1}.Ac = [];
 
     ConditionScaled = {[], ['A', 'V', 'T']};
-    IpsiContraScaled = true(1,3);
+    IpsiContraScaled = true(1, 3);
 
     Models = SetModelSixConditions(Models, ConditionScaled, IpsiContraScaled);
 
@@ -63,16 +62,16 @@ function test_SetModelSixConditionsAllIdpdt
     Expected{1}.Ac(3, 2, 3) = 1;
     Expected{1}.Ac(4, 2, 4) = 1;
     Expected{1}.Ac(5, 3, 5) = 1;
-    Expected{1}.Ac(6, 3, 6) = 1;  
+    Expected{1}.Ac(6, 3, 6) = 1;
 
     assertEqual(Models{end}, Expected{1});
-    
-    clear Expected
-    
+
+    clear Expected;
+
     Models{1}.Ac = [];
 
     ConditionScaled = {[], ['A', 'V', 'T']};
-    IpsiContraScaled = false(1,3);
+    IpsiContraScaled = false(1, 3);
 
     Models = SetModelSixConditions(Models, ConditionScaled, IpsiContraScaled);
 
@@ -82,11 +81,11 @@ function test_SetModelSixConditionsAllIdpdt
     Expected{1}.Ac(3, 3, 3) = 1;
     Expected{1}.Ac(4, 4, 4) = 1;
     Expected{1}.Ac(5, 5, 5) = 1;
-    Expected{1}.Ac(6, 6, 6) = 1;  
+    Expected{1}.Ac(6, 6, 6) = 1;
 
     assertEqual(Models{end}, Expected{1});
-    
-    clear Expected
+
+    clear Expected;
 
 end
 
@@ -105,10 +104,10 @@ function test_SetModelSixConditionsAudioIdpdt
     Expected{1}.Ac(3, 2, 3) = 1;
     Expected{1}.Ac(4, 3, 4) = 1;
     Expected{1}.Ac(5, 2, 5) = 1;
-    Expected{1}.Ac(6, 3, 6) = 1;  
+    Expected{1}.Ac(6, 3, 6) = 1;
 
     assertEqual(Models{end}, Expected{1});
-    
-    clear Expected
+
+    clear Expected;
 
 end
