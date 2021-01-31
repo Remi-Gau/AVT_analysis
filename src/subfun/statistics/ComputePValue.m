@@ -36,7 +36,7 @@ function [P, STATS] = ComputePValue(Data, Opt)
     end
 
     % sing permutation test
-    if Opt.Ttest.PermutationTest.Do
+    if Opt.PermutationTest.Do
 
         STATS = [];
 

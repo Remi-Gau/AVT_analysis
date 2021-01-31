@@ -2,7 +2,7 @@
 
 function [GroupData, SubjectVec] = ComputeSubjectAverage(Data, SubjectVec)
     %
-    % Given tidy data and a vector specifying which rows beloings to which
+    % Given tidy data and a vector specifying which rows belongs to which
     % subject, it returns an array with one row per subject.
     %
     % USAGE::
@@ -23,9 +23,7 @@ function [GroupData, SubjectVec] = ComputeSubjectAverage(Data, SubjectVec)
     end
 
     % make sure SubjectVec is a vertical vector
-    if size(SubjectVec, 2) > 1
-        SubjectVec = SubjectVec';
-    end
+    SubjectVec = ReturnVerticalVector(SubjectVec);
 
     ListSubjects = unique(SubjectVec);
 
@@ -34,7 +32,8 @@ function [GroupData, SubjectVec] = ComputeSubjectAverage(Data, SubjectVec)
     for idx = 1:numel(ListSubjects)
 
         iSubject = ListSubjects(idx);
-        GroupData(iSubject, :) = mean(Data(SubjectVec == iSubject, :));
+        RowsToSelect = ReturnRowsToSelect({SubjectVec, iSubject});
+        GroupData(iSubject, :) = mean(Data(RowsToSelect, :));
 
     end
 

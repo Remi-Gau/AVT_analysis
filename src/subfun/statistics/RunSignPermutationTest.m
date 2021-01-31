@@ -59,7 +59,7 @@ function P = RunSignPermutationTest(Data, Opt)
         Opt.Ttest.SideOfTtest = 'both';
     end
 
-    Permutations = Opt.Ttest.PermutationTest.Permutations;
+    Permutations = Opt.PermutationTest.Permutations;
     ValueToTest = Opt.Ttest.ValueToTest;
     SideOfTtest = Opt.Ttest.SideOfTtest;
 

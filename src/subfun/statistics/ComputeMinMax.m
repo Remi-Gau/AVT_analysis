@@ -1,38 +1,22 @@
 % (C) Copyright 2020 Remi Gau
 
-function [Min, Max] = ComputeMinMax(Type, Data, SubjectVec, Opt, iColumn)
-
-    if nargin < 5 || isempty(iColumn)
-        iColumn = 1;
-    end
-
-    if ~iscell(Data)
-        Data = {Data};
-    end
-
-    if ~iscell(SubjectVec)
-        SubjectVec = {SubjectVec};
-    end
+function [Min, Max] = ComputeMinMax(Type, Data, Opt, ColumnToReport)
 
     Min = 0;
     Max = 0;
 
-    GroupData = cell(size(Data));
-    %% get subject average for each parts of the cell
-    for iCondtion = 1:size(Data, 2)
-        for iLine = 1:size(Data, 3)
+    if isstruct(Data)
+        [Data, Data2] = PrepareData(Type, Data, Opt);
 
-            GroupData{:, iCondtion, iLine} = ComputeSubjectAverage( ...
-                                                                   Data{:, iCondtion, iLine}, ...
-                                                                   SubjectVec{:, iCondtion, iLine}); %#ok<*AGROW>
+    elseif ~iscell(Data)
+        Data = {Data};
 
-        end
     end
 
     if strcmpi(Type, 'all')
 
-        AllMax = cellfun(@(x) max(x), GroupData, 'UniformOutput', false);
-        AllMin = cellfun(@(x) min(x), GroupData, 'UniformOutput', false);
+        AllMax = cellfun(@(x) max(x), Data, 'UniformOutput', false);
+        AllMin = cellfun(@(x) min(x), Data, 'UniformOutput', false);
 
         ThisMax = max(squeeze(cellfun(@(x) max(x), AllMax)));
         ThisMin = min(squeeze(cellfun(@(x) min(x), AllMin)));
@@ -44,32 +28,18 @@ function [Min, Max] = ComputeMinMax(Type, Data, SubjectVec, Opt, iColumn)
 
     end
 
-    %% get subject average for each parts of the cell
-    for iCondtion = 1:size(Data, 2)
-        for iLine = 1:size(Data, 3)
-
-            % this will only be necessary for group level stuff
-            GroupMean =  mean(GroupData{:, iCondtion, iLine});
-            [LowerError, UpperError] = ComputeDispersionIndex(GroupData{:, iCondtion, iLine}, Opt);
-
-            GroupMax(:, iCondtion, iLine) = max(GroupMean(:) + UpperError(:));
-            GroupMin(:, iCondtion, iLine) = min(GroupMean(:) - LowerError(:));
-
-        end
-    end
-
     switch lower(Type)
 
         % get the min and max at the group level across conditions and ROIs
         case 'groupallcolumns'
 
-            ThisMax = max(GroupMax(:));
-            ThisMin = min(GroupMin(:));
+            [~, ThisMax] = ComputeMinMax('all', Data, Opt);
+            ThisMin = ComputeMinMax('all', Data2, Opt);
 
         case 'group'
 
-            ThisMax = max(GroupMax(:, iColumn, :));
-            ThisMin = min(GroupMin(:, iColumn, :));
+            [~, ThisMax] = ComputeMinMax('all', Data{ColumnToReport}, Opt);
+            ThisMin = ComputeMinMax('all', Data2{ColumnToReport}, Opt);
 
         otherwise
             error('Not sure what to do. Allowed Types are: all, group, groupallcolumns');
@@ -78,5 +48,25 @@ function [Min, Max] = ComputeMinMax(Type, Data, SubjectVec, Opt, iColumn)
 
     Max = max([Max, ThisMax]);
     Min = min([Min, ThisMin]);
+
+end
+
+function [Data1, Data2] = PrepareData(Type, Data, Opt)
+
+    Data1 = {};
+    Data2 = {};
+
+    for i = 1:Opt.m
+
+        if strcmpi(Type, 'all')
+            Data1{1, i} = Data(1, i).Data; %#ok<*AGROW>
+
+        else
+            Data1{1, i} = Data(1, i).Mean + Data(1, i).UpperError;
+            Data2{1, i} = Data(1, i).Mean - Data(1, i).LowerError;
+
+        end
+
+    end
 
 end

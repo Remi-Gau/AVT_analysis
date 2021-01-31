@@ -76,7 +76,7 @@ end
 
 function  ThisSubplot = GetSubplotIndex(iCondtion, iParameter, Opt)
     %
-    % returns subplot on which to draw the lainar profile depending on the
+    % returns subplot on which to draw the laminar profile depending on the
     % number of columns in the figure
     %
     %

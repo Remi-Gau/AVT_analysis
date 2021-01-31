@@ -17,8 +17,8 @@ function test_RunSignPermutationTestBasic
 
     Data = randn(10, NbVariables);
 
-    Opt.Ttest.PermutationTest.Do = true;
-    Opt = CreatePermutationList(Opt);
+    Opt.PermutationTest.Do = true;
+    Opt.PermutationTest = CreatePermutationList(Opt.PermutationTest);
 
     Opt.Ttest.PermutationTest.Plot = true();
 
