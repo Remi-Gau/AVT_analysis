@@ -20,7 +20,7 @@ function  PlotGroupProfile(Opt, iColumn)
     ConditionVec = Opt.Specific{1, iColumn}.Group.ConditionVec;
 
     RoiList = unique(RoiVec);
-    CdtList = unique(RoiVec);
+    CdtList = unique(ConditionVec);
 
     iLine = 1;
 

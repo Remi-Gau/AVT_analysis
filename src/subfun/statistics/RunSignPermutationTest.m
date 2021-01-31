@@ -1,6 +1,6 @@
 % (C) Copyright 2020 Remi Gau
 
-function P = RunSignPermutationTest(Data, Opt)
+function P = RunSignPermutationTest(Data, Opt, Ttest)
     %
     % Computes p value of a one sample t-test using an exact sign permutation test.
     %
@@ -48,20 +48,20 @@ function P = RunSignPermutationTest(Data, Opt)
     %     P = RunSignPermutationTest(Data, Opt);
     %
 
-    if ~isfield(Opt.Ttest, 'ValueToTest') || isempty(Opt.Ttest.ValueToTest)
-        Opt.Ttest.ValueToTest = 0;
-    elseif Opt.Ttest.ValueToTest == 0
+    if ~isfield(Ttest, 'ValueToTest') || isempty(Ttest.ValueToTest)
+        Ttest.ValueToTest = 0;
+    elseif Ttest.ValueToTest == 0
     else
         error('test against other values than 0 not yet implemented.');
     end
 
-    if ~isfield(Opt.Ttest, 'SideOfTtest') && isempty(Opt.Ttest.SideOfTtest)
-        Opt.Ttest.SideOfTtest = 'both';
+    if ~isfield(Ttest, 'SideOfTtest') && isempty(Ttest.SideOfTtest)
+        Ttest.SideOfTtest = 'both';
     end
 
     Permutations = Opt.PermutationTest.Permutations;
-    ValueToTest = Opt.Ttest.ValueToTest;
-    SideOfTtest = Opt.Ttest.SideOfTtest;
+    ValueToTest = Ttest.ValueToTest;
+    SideOfTtest = Ttest.SideOfTtest;
 
     if ~(size(Data, 1) == size(Permutations, 2))
         error('number of data points must match that in the sign permutation matrix.');
@@ -97,7 +97,7 @@ function P = RunSignPermutationTest(Data, Opt)
             error('unknown test side: must be left, right or both');
     end
 
-    if size(Data, 2) == 1 && Opt.Ttest.PermutationTest.Plot
+    if size(Data, 2) == 1 && Opt.PermutationTest.Plot
         figure();
         hold on;
         hist(NullDistribution, 20);

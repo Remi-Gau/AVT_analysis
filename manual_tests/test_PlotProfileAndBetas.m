@@ -14,12 +14,13 @@ function Opt = SetOptions(Opt, J)
     Opt.ErrorBarType = 'STD';
     Opt.Alpha = 0.05;
     Opt.PlotPValue = true;
-    Opt.PermutationTest.Do = true;
-    Opt.PlotSubjects = true;
+    Opt.PermutationTest.Do = false;
+    Opt.PermutationTest.Plot = false;
+    Opt.PlotSubjects = false;
     Opt.ShadedErrorBar = true;
     Opt.NbLayers = 6;
 
-    Opt.Specific{1, J}.PlotMinMaxType = 'groupallcolumns'; % all group groupallcolumns
+    Opt.Specific{1, J}.PlotMinMaxType = 'all'; % all group groupallcolumns
     Opt.Specific{1, J}.IsMvpa = false;
     Opt.Specific{1, J}.Ttest.SideOfTtest = 'both';
 
@@ -77,7 +78,7 @@ function test_OneRoi
     Opt.Specific{1}.RoiVec = ones(size(Data, 1), 1);
 
     Opt.Specific{1}.Titles = 'ROI 1 - Condition Name';
-    Opt.Specific{1}.RoiNames = 'ROI 1';
+    Opt.Specific{1}.RoiNames = {'ROI 1'};
 
     Opt = SetOptions(Opt, 1);
 

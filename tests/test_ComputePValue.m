@@ -24,16 +24,16 @@ function test_ComputePValuePermutation
     Opt.PermutationTest = CreatePermutationList(Opt.PermutationTest);
 
     % run tests and make sure that we have tolerable false positive rate
-    Opt.Ttest.SideOfTtest =  'both';
-    P = ComputePValue(Data, Opt);
+    Ttest.SideOfTtest =  'both';
+    P = ComputePValue(Data, Opt, Ttest);
     CheckFalsePositiveRate(P, TestTolerance);
 
-    Opt.Ttest.SideOfTtest =  'right';
-    P = ComputePValue(Data, Opt);
+    Ttest.SideOfTtest =  'right';
+    P = ComputePValue(Data, Opt, Ttest);
     CheckFalsePositiveRate(P, TestTolerance);
 
-    Opt.Ttest.SideOfTtest =  'left';
-    P = ComputePValue(Data, Opt);
+    Ttest.SideOfTtest =  'left';
+    P = ComputePValue(Data, Opt, Ttest);
     CheckFalsePositiveRate(P, TestTolerance);
 
 end

@@ -98,17 +98,15 @@ function PlotProfileAndBetas(Opt)
         %         Max = max([Max, ThisMax]);
         %         Min = min([Min, ThisMin]);
 
-        %         MinMax = [-5 5];
-        %
-        %         DataToPlot = GroupData(:, iColumn, :);
-        %
-        %         PlotBetasLaminarGlm(DataToPlot, Opt, MinMax, 1, iColumn);
-        %
-        %         PlotBetasLaminarGlm(DataToPlot, Opt, MinMax, 2, iColumn);
-        %
-        %         if Opt.PlotQuadratic
-        %             PlotBetasLaminarGlm(DataToPlot, Opt, MinMax, 3, iColumn);
-        %         end
+        MinMax = [-5 5];
+
+        PlotBetasLaminarGlm(Opt, MinMax, 1, iColumn);
+
+        PlotBetasLaminarGlm(Opt, MinMax, 2, iColumn);
+
+        if Opt.PlotQuadratic
+            PlotBetasLaminarGlm(Opt, MinMax, 3, iColumn);
+        end
 
     end
 
@@ -151,6 +149,10 @@ function Opt = CheckPlottingOptions(Opt)
 
     if ~isfield(Opt, 'LineColors')
         Opt.LineColors = RoiColours();
+    end
+
+    if Opt.PermutationTest.Do
+        Opt.PermutationTest = CreatePermutationList(Opt.PermutationTest);
     end
 
     if contains(Opt.ErrorBarType, 'CI')

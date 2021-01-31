@@ -1,41 +1,58 @@
 % (C) Copyright 2020 Remi Gau
 
-function PlotBetasLaminarGlm(Data, Opt, MinMax, iParameter, iCondtion)
+function PlotBetasLaminarGlm(Opt, MinMax, iParameter, iColumn)
 
-    if nargin < 5 || isempty(iCondtion)
-        iCondtion = 1;
+    if nargin < 4 || isempty(iColumn)
+        iColumn = 1;
     end
 
     ParameterNames = {'Constant', 'Linear', 'Quadratic'};
 
-    ThisSubplot = GetSubplotIndex(iCondtion, iParameter, Opt);
+    ThisSubplot = GetSubplotIndex(iColumn, iParameter, Opt);
 
     subplot(Opt.n, Opt.m, ThisSubplot);
 
     hold on;
     grid on;
 
+    RoiVec = Opt.Specific{1, iColumn}.Group.RoiVec;
+    ConditionVec = Opt.Specific{1, iColumn}.Group.ConditionVec;
+
+    RoiList = unique(RoiVec);
+    CdtList = unique(ConditionVec);
+
     AllGroupBetas = [];
+    iLine = 1;
 
-    % for each ROI or Condition depending on how the input data is formated
-    for iLine = 1:size(Data, 3)
+    for iRoi = 1:numel(RoiList)
 
-        DataToPlot = Data{:, :, iLine}(:, iParameter);
+        for iCdt = 1:numel(CdtList)
 
-        % Store to compute p values and max min
-        AllGroupBetas(:, iLine) = DataToPlot; %#ok<*AGROW>
+            Criteria = {
+                        RoiVec, RoiList(iRoi); ...
+                        ConditionVec, CdtList(iCdt)};
+            RowsToSelect = ReturnRowsToSelect(Criteria);
 
-        %% Main plot
-        ViolinPlot(DataToPlot, Opt, iLine);
+            DataToPlot = Opt.Specific{1, iColumn}.Group.Beta(RowsToSelect, iParameter);
 
-        %% Plot mean + dispersion
-        PlotMeanAndDispersion(DataToPlot, Opt, iLine);
+            % Store to compute p values and max min
+            AllGroupBetas(:, iLine) = DataToPlot; %#ok<*AGROW>
 
+            %% Main plot
+            ViolinPlot(DataToPlot, Opt, iLine);
+
+            %% Plot mean + dispersion
+            PlotMeanAndDispersion(DataToPlot, Opt, iLine);
+
+            iLine = iLine + 1;
+
+        end
     end
 
     %% plot zero line
     Baseline = [0, 0];
-    if Opt.IsMvpa
+    IsMvpa = Opt.Specific{1, iColumn}.IsMvpa;
+    if IsMvpa
         Baseline = [0.5, 0.5];
     end
     Xpos = ReturnXpositionViolinPlot();
@@ -44,13 +61,13 @@ function PlotBetasLaminarGlm(Data, Opt, MinMax, iParameter, iCondtion)
     %% Tight fight with some vertical margin
     [Min, Max, Margin] = ComputeMargin(MinMax(1), MinMax(2), 3);
 
-    axis([0, Xpos(numel(Opt.RoiNames)) + .5, Min, Max]);
+    axis([0, Xpos(numel(Opt.Specific{1, iColumn}.RoiNames)) + .5, Min, Max]);
 
     %% Labels
     set(gca, ...
         'tickdir', 'out', ...
         'xtick', Xpos - 0.25, ...
-        'xticklabel', Opt.RoiNames, ...
+        'xticklabel', Opt.Specific{1, iColumn}.RoiNames, ...
         'xgrid', 'off', ...
         'ticklength', [0.01 0.01], ...
         'fontsize', Opt.Fontsize);
@@ -64,11 +81,11 @@ function PlotBetasLaminarGlm(Data, Opt, MinMax, iParameter, iCondtion)
 
     %% Compute p values and print them
     % offset values for oncoming stats: accuracy tested against null = 0.5
-    if Opt.IsMvpa
+    if IsMvpa
         % Data = Data - .5;
     end
 
-    [P, ~] = ComputePValue(AllGroupBetas, Opt);
+    [P, ~] = ComputePValue(AllGroupBetas, Opt, Opt.Specific{1, iColumn}.Ttest);
 
     PrintPValue(P, Xpos - 0.25, Max - Margin / 2, Opt);
 
