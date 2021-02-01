@@ -14,7 +14,7 @@ function  PlotGroupProfile(Opt, iColumn)
     subplot(Opt.n, Opt.m, ThisSubplot);
 
     hold on;
-    grid on;
+    grid off;
 
     RoiVec = Opt.Specific{1, iColumn}.Group.RoiVec;
     ConditionVec = Opt.Specific{1, iColumn}.Group.ConditionVec;
@@ -69,13 +69,14 @@ function  PlotGroupProfile(Opt, iColumn)
         'xticklabel', ' ', ...
         'ticklength', [0.01 0.1], ...
         'xgrid', 'off', ...
+        'ygrid', 'off', ...
         'fontsize', Opt.Fontsize);
 
-    XLabel = 'Cortical depth';
-    t = xlabel(XLabel);
-    set(t, ...
-        'fontweight', 'bold', ...
-        'fontsize', Opt.Fontsize);
+    %     XLabel = 'Cortical depth';
+    %     t = xlabel(XLabel);
+    %     set(t, ...
+    %         'fontweight', 'bold', ...
+    %         'fontsize', Opt.Fontsize);
 
     YLabel = 'B Param. est. [a u]';
     if IsMvpa
@@ -102,11 +103,12 @@ function PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iLine)
     else
         LINE_COLOR = Opt.LineColors(iLine, :);
     end
+    LINE_WIDTH = 2.5;
 
-    LINE_WIDTH = 2;
     MARKER = 'o';
-    MARKER_SIZE = 4;
+    MARKER_SIZE = 2;
 
+    ERROR_LINE_WIDTH = 1;
     LINE_STYLE = '-';
     MARKER_FACE_COLOR = LINE_COLOR;
 
@@ -140,7 +142,8 @@ function PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iLine)
 
         set(l, ...
             'LineStyle', LINE_STYLE, ...
-            'Color', LINE_COLOR);
+            'Color', LINE_COLOR, ...
+            'LineWidth', ERROR_LINE_WIDTH);
 
         l = plot( ...
                  xPosition, ...

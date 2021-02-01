@@ -4,7 +4,7 @@ function PlotProfileAndBetas(Opt)
 
     Opt = CheckPlottingOptions(Opt);
 
-    figure('Name', 'test', ...
+    figure('Name', Opt.Specific{1}.Titles, ...
            'Position', Opt.FigDim);
 
     SetFigureDefaults(Opt);
@@ -76,6 +76,7 @@ function PlotProfileAndBetas(Opt)
 
     for iColumn = 1:Opt.m
 
+        %% Plot profiles
         [Min, Max] = ComputeMinMax(Opt.Specific{1, iColumn}.PlotMinMaxType, ...
                                    AllData, ...
                                    Opt, ...
@@ -85,6 +86,7 @@ function PlotProfileAndBetas(Opt)
 
         PlotGroupProfile(Opt, iColumn);
 
+        %% Plot s parameters
         SparamToPlot = 2;
         if Opt.PlotQuadratic
             SparamToPlot = 3;

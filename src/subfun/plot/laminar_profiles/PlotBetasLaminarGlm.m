@@ -15,6 +15,15 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
     hold on;
     grid on;
 
+    %% plot zero line
+    Baseline = [0, 0];
+    IsMvpa = Opt.Specific{1, iColumn}.IsMvpa;
+    if IsMvpa
+        Baseline = [0.5, 0.5];
+    end
+    Xpos = ReturnXpositionViolinPlot();
+    plot([0, max(Xpos) + 0.5], Baseline, '-k', 'LineWidth', 1);
+
     RoiVec = Opt.Specific{1, iColumn}.Group.RoiVec;
     ConditionVec = Opt.Specific{1, iColumn}.Group.ConditionVec;
 
@@ -49,19 +58,10 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
         end
     end
 
-    %% plot zero line
-    Baseline = [0, 0];
-    IsMvpa = Opt.Specific{1, iColumn}.IsMvpa;
-    if IsMvpa
-        Baseline = [0.5, 0.5];
-    end
-    Xpos = ReturnXpositionViolinPlot();
-    plot([0, max(Xpos) + 0.5], Baseline, '-k', 'LineWidth', 1);
-
     %% Tight fight with some vertical margin
     [Min, Max, Margin] = ComputeMargin(Opt.Specific{1, iColumn}.Group.Beta.Min, ...
                                        Opt.Specific{1, iColumn}.Group.Beta.Max, ...
-                                       6);
+                                       4);
 
     axis([0, Xpos(numel(Opt.Specific{1, iColumn}.RoiNames)) + .5, Min, Max]);
 
@@ -71,6 +71,7 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
         'xtick', Xpos - 0.25, ...
         'xticklabel', Opt.Specific{1, iColumn}.RoiNames, ...
         'xgrid', 'off', ...
+        'ygrid', 'off', ...
         'ticklength', [0.01 0.01], ...
         'fontsize', Opt.Fontsize);
 
@@ -89,7 +90,7 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
 
     [P, ~] = ComputePValue(AllGroupBetas, Opt, Opt.Specific{1, iColumn}.Ttest);
 
-    PrintPValue(P, Xpos - 0.25, Max - Margin / 2, Opt);
+    PrintPValue(P, Xpos - 0.25, Max - Margin / 4, Opt);
 
 end
 
@@ -132,13 +133,13 @@ function ViolinPlot(GroupData, Opt, iLine)
     GLOBAL_NORM = 2;
 
     MARKER = 'o';
-    MARKER_SIZE = 5;
+    MARKER_SIZE = 2;
     MARKER_EDGE_COLOR = 'k';
-    MARKER_FACE_COLOR = 'w';
+    MARKER_FACE_COLOR = 'k';
 
     LINE_WIDTH = 1;
     BIN_WIDTH = 0.5;
-    SPREAD_WIDTH = 0.5;
+    SPREAD_WIDTH = 0.8;
 
     Color = Opt.LineColors(iLine, :);
     Xpos = ReturnXpositionViolinPlot();
