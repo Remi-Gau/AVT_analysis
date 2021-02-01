@@ -1,6 +1,6 @@
 % (C) Copyright 2020 Remi Gau
 
-function  Opt = CreatePermutationList(Opt)
+function  PermutationTest = CreatePermutationList(PermutationTest)
     %
     % Creates a "list" of sign changes to implement to run an exact sign-permutation
     % test. Currently only works for a maximum of 10 data points (otherwise the
@@ -21,7 +21,7 @@ function  Opt = CreatePermutationList(Opt)
     %
 
     Permutations = [];
-    if Opt.Ttest.PermutationTest.Do
+    if PermutationTest.Do
 
         sets = {};
         for iSub = 1:10
@@ -39,6 +39,6 @@ function  Opt = CreatePermutationList(Opt)
 
     end
 
-    Opt.Ttest.PermutationTest.Permutations = Permutations;
+    PermutationTest.Permutations = Permutations;
 
 end

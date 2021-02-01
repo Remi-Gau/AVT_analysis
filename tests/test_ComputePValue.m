@@ -16,24 +16,24 @@ function test_ComputePValuePermutation
     % will only work with 10 subjects for now
     NbSubjects = 10;
 
-    Opt.Ttest.PermutationTest.Do = true();
+    Opt.PermutationTest.Do = true();
 
     % create dummy data
     Data = randn(10, NbVariables);
 
-    Opt = CreatePermutationList(Opt);
+    Opt.PermutationTest = CreatePermutationList(Opt.PermutationTest);
 
     % run tests and make sure that we have tolerable false positive rate
-    Opt.Ttest.SideOfTtest =  'both';
-    P = ComputePValue(Data, Opt);
+    Ttest.SideOfTtest =  'both';
+    P = ComputePValue(Data, Opt, Ttest);
     CheckFalsePositiveRate(P, TestTolerance);
 
-    Opt.Ttest.SideOfTtest =  'right';
-    P = ComputePValue(Data, Opt);
+    Ttest.SideOfTtest =  'right';
+    P = ComputePValue(Data, Opt, Ttest);
     CheckFalsePositiveRate(P, TestTolerance);
 
-    Opt.Ttest.SideOfTtest =  'left';
-    P = ComputePValue(Data, Opt);
+    Ttest.SideOfTtest =  'left';
+    P = ComputePValue(Data, Opt, Ttest);
     CheckFalsePositiveRate(P, TestTolerance);
 
 end

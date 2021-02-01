@@ -17,22 +17,22 @@ function test_RunSignPermutationTestBasic
 
     Data = randn(10, NbVariables);
 
-    Opt.Ttest.PermutationTest.Do = true;
-    Opt = CreatePermutationList(Opt);
+    Opt.PermutationTest.Do = true;
+    Opt.PermutationTest = CreatePermutationList(Opt.PermutationTest);
 
-    Opt.Ttest.PermutationTest.Plot = true();
+    Ttest.PermutationTest.Plot = true();
 
     % run tests and make sure that we have tolerable false positive rate
-    Opt.Ttest.SideOfTtest =  'both';
-    P = RunSignPermutationTest(Data, Opt);
+    Ttest.SideOfTtest =  'both';
+    P = RunSignPermutationTest(Data, Opt, Ttest);
     CheckFalsePositiveRate(P, TestTolerance);
 
-    Opt.Ttest.SideOfTtest =  'right';
-    P = RunSignPermutationTest(Data, Opt);
+    Ttest.SideOfTtest =  'right';
+    P = RunSignPermutationTest(Data, Opt, Ttest);
     CheckFalsePositiveRate(P, TestTolerance);
 
-    Opt.Ttest.SideOfTtest =  'left';
-    P = RunSignPermutationTest(Data, Opt);
+    Ttest.SideOfTtest =  'left';
+    P = RunSignPermutationTest(Data, Opt, Ttest);
     CheckFalsePositiveRate(P, TestTolerance);
 
 end

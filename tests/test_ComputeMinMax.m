@@ -10,116 +10,191 @@ end
 
 function test_ComputeMinMaxBasic()
 
-    Opt.ErrorBarType = 'SEM';
-    Opt.PlotSubjects = true();
-
-    SubjectVec = [1 1 2 2 3 3];
+    Opt.tmp = '';
 
     Data = [
-            1 1  % subject 1
-            1 1  % subject 1
-            2 2  % subject 2
-            1 1  % subject 2
-            3 3  % subject 3
-            2 2  % subject 3
+            1 1
+            1 1
+            2 2
+            1 1
+            3 3
+            2 2
            ];
 
-    [Min, Max] = ComputeMinMax('all', Data, SubjectVec, Opt);
+    [Min, Max] = ComputeMinMax('all', Data, Opt);
 
     assertEqual(Min, 0);
-    assertEqual(Max, 2.5);
+    assertEqual(Max, 3);
 
 end
 
-function test_ComputeMinMax2ROIs()
+function test_ComputeMinMaxBasic2()
 
-    Opt.ErrorBarType = 'SEM';
-    Opt.PlotSubjects = true();
+    Opt.tmp = '';
 
-    SubjectVec{1, 1, 1} = [1 1 2 2 3 3];
+    Data{1, 1} = [
+                  1 1
+                  3 3
+                  2 2
+                 ];
+    Data{1, 2} = [
+                  1 1 0
+                  -3 3 2
+                 ];
 
-    Data{1, 1, 1} = [
-                     1 1  % subject 1
-                     1 1  % subject 1
-                     2 2  % subject 2
-                     1 1  % subject 2
-                     3 3  % subject 3
-                     2 2  % subject 3
-                    ];
+    [Min, Max] = ComputeMinMax('all', Data, Opt);
 
-    SubjectVec{1, 1, 2} = [1 1 2 2 3 3];
-
-    Data{1, 1, 2} = [
-                     -1 -1  % subject 1
-                     -1 -1  % subject 1
-                     2 2  % subject 2
-                     1 1  % subject 2
-                     3 3  % subject 3
-                     2 2  % subject 3
-                    ];
-
-    [Min, Max] = ComputeMinMax('all', Data, SubjectVec, Opt);
-
-    assertEqual(Min, -1);
-    assertEqual(Max, 2.5);
+    assertEqual(Min, -3);
+    assertEqual(Max, 3);
 
 end
 
-function test_ComputeMinMax2ROIs2ConditionsGroup()
+function test_ComputeMinMaxBasic3()
 
-    Opt.ErrorBarType = 'SEM';
-    Opt.PlotSubjects = true();
+    Opt.m = 2;
 
-    for iLine = 1:2
-        for iColumn = 1:2
+    Data(1, 1).Data = [
+                       1 1
+                       3 3
+                       2 2
+                      ];
+    Data(1, 2).Data = [
+                       1 1 0
+                       -3 3 2
+                      ];
 
-            SubjectVec{1, iColumn, iLine} = [1 1 2 2 3 3];
+    [Min, Max] = ComputeMinMax('all', Data, Opt);
 
-            Data{1, iColumn, iLine} = [
-                                       -2 -2  % subject 1
-                                       -2 -2  % subject 1
-                                       iColumn iColumn  % subject 2
-                                       iColumn iColumn  % subject 2
-                                       iLine iLine  % subject 3
-                                       iLine iLine  % subject 3
-                                      ];
+    assertEqual(Min, -3);
+    assertEqual(Max, 3);
 
-        end
-    end
+end
 
-    [Min, Max] = ComputeMinMax('groupallcolumns', Data, SubjectVec, Opt);
+function test_ComputeMinMaxGrouLevelAllGroups()
 
-    assertEqual(Min, -1);
-    assertEqual(Max, 2);
+    Opt.m = 2;
+
+    Data(1, 1).Mean = [
+                       1 1
+                       3 3
+                       2 2
+                      ];
+    Data(1, 1).UpperError = [
+                             1 1
+                             3 3
+                             2 2
+                            ];
+    Data(1, 1).LowerError = [
+                             1 1
+                             3 3
+                             2 2
+                            ];
+
+    Data(1, 2).Mean = [
+                       1 1 0
+                       -3 3 2
+                      ];
+    Data(1, 2).UpperError = [
+                             1 1 1
+                             3 3 2
+                            ];
+    Data(1, 2).LowerError = [
+                             1 1 0
+                             3 3 2
+                            ];
+
+    [Min, Max] = ComputeMinMax('groupallcolumns', Data, Opt);
+
+    assertEqual(Min, -6);
+    assertEqual(Max, 6);
 
 end
 
 function test_ComputeMinMax2ROIs2ConditionsGroupColumn()
 
-    Opt.ErrorBarType = 'SEM';
-    Opt.PlotSubjects = true();
+    Opt.m = 2;
+
+    Data(1, 1).Mean = [
+                       -5 0
+                       -5 0
+                       -3 0
+                      ];
+    Data(1, 1).UpperError = [
+                             1 1
+                             3 3
+                             2 2
+                            ];
+    Data(1, 1).LowerError = [
+                             1 1
+                             3 3
+                             2 2
+                            ];
+
+    Data(1, 2).Mean = [
+                       1 1 0
+                       -3 3 2
+                      ];
+    Data(1, 2).UpperError = [
+                             1 1 1
+                             3 3 2
+                            ];
+    Data(1, 2).LowerError = [
+                             1 1 0
+                             3 3 2
+                            ];
+
+    ColumnToReport = 1;
+    [Min, Max] = ComputeMinMax('group', Data, Opt, ColumnToReport);
+
+    assertEqual(Min, -8);
+    assertEqual(Max, 3);
+
     ColumnToReport = 2;
+    [Min, Max] = ComputeMinMax('group', Data, Opt, ColumnToReport);
 
-    for iLine = 1:2
-        for iColumn = 1:2
+    assertEqual(Min, -6);
+    assertEqual(Max, 6);
 
-            SubjectVec{1, iColumn, iLine} = [1 1 2 2 3 3];
+end
 
-            Data{1, iColumn, iLine} = [
-                                       -2 -2  % subject 1
-                                       -2 -2  % subject 1
-                                       iColumn iColumn  % subject 2
-                                       iColumn iColumn  % subject 2
-                                       iLine iLine  % subject 3
-                                       iLine iLine  % subject 3
-                                      ];
+function test_ComputeMinMax2ROIs2ConditionsGroupColumnParameter()
 
-        end
-    end
+    Opt.m = 2;
+    ColumnToReport = 2;
+    Parameter = 2;
 
-    [Min, Max] = ComputeMinMax('group', Data, SubjectVec, Opt, ColumnToReport);
+    Data(1, 1).Mean = [
+                       0 0
+                       0 0
+                       0 0
+                      ];
+    Data(1, 1).UpperError = [
+                             1 1
+                             3 3
+                             2 2
+                            ];
+    Data(1, 1).LowerError = [
+                             1 1
+                             3 3
+                             2 2
+                            ];
 
-    assertElementsAlmostEqual(Min, -0.86852, 'absolute', 5 * 1e-3);
-    assertEqual(Max, 2);
+    Data(1, 2).Mean = [
+                       0 -3
+                       0 3
+                      ];
+    Data(1, 2).UpperError = [
+                             1 1
+                             3 3
+                            ];
+    Data(1, 2).LowerError = [
+                             1 3
+                             3 3
+                            ];
+
+    [Min, Max] = ComputeMinMax('group', Data, Opt, ColumnToReport, Parameter);
+
+    assertEqual(Min, -6);
+    assertEqual(Max, 6);
 
 end

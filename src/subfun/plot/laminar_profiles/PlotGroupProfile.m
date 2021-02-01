@@ -1,12 +1,12 @@
 % (C) Copyright 2020 Remi Gau
 
-function  PlotGroupProfile(Data, SubjectVec, Opt, iCondtion)
+function  PlotGroupProfile(Opt, iColumn)
 
-    if nargin < 4 || isempty(iCondtion)
-        iCondtion = 1;
+    if nargin < 2 || isempty(iColumn)
+        iColumn = 1;
     end
 
-    ThisSubplot = GetSubplotIndices(iCondtion, Opt);
+    ThisSubplot = GetSubplotIndices(iColumn, Opt);
 
     subplot(Opt.n, Opt.m, ThisSubplot);
     PlotRectangle(Opt, true);
@@ -16,32 +16,49 @@ function  PlotGroupProfile(Data, SubjectVec, Opt, iCondtion)
     hold on;
     grid on;
 
-    for iLine = 1:size(Data, 3)
+    RoiVec = Opt.Specific{1, iColumn}.Group.RoiVec;
+    ConditionVec = Opt.Specific{1, iColumn}.Group.ConditionVec;
 
-        GroupData = ComputeSubjectAverage( ...
-                                          Data{:, iCondtion, iLine}, ...
-                                          SubjectVec{:, iCondtion, iLine});
+    RoiList = unique(RoiVec);
+    CdtList = unique(ConditionVec);
 
-        GroupMean =  mean(GroupData);
-        [LowerError, UpperError] = ComputeDispersionIndex(GroupData, Opt);
+    iLine = 1;
 
-        PlotProfileSubjects(GroupData, Opt);
+    for iRoi = 1:numel(RoiList)
 
-        xOffset = (iLine - 1) * 0.1;
-        PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iLine);
+        for iCdt = 1:numel(CdtList)
 
+            Criteria = {
+                        RoiVec, RoiList(iRoi); ...
+                        ConditionVec, CdtList(iCdt)};
+            RowsToSelect = ReturnRowsToSelect(Criteria);
+
+            Data = Opt.Specific{1, iColumn}.Group.Data(RowsToSelect, :);
+
+            GroupMean = mean(Data);
+            [LowerError, UpperError] = ComputeDispersionIndex(Data, Opt);
+
+            PlotProfileSubjects(Data, Opt);
+
+            xOffset = (iLine - 1) * 0.1;
+            PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iLine);
+
+            iLine = iLine + 1;
+
+        end
     end
 
     %% Baseline
+    IsMvpa = Opt.Specific{1, iColumn}.IsMvpa;
     Baseline = [0, 0];
-    if Opt.IsMvpa
+    if IsMvpa
         Baseline = [0.5, 0.5];
     end
     plot([0, Opt.NbLayers + 0.5], Baseline, '-k', 'LineWidth', 1);
 
     %% Set tighet axes with margin
-    [Min, Max] = ComputeMinMax(Opt.PlotMinMaxType, Data, SubjectVec, Opt, iCondtion);
-    [Min, Max] = ComputeMargin(Min, Max);
+    [Min, Max] = ComputeMargin(Opt.Specific{1, iColumn}.Group.Min, ...
+                               Opt.Specific{1, iColumn}.Group.Max);
 
     axis([0.5, Opt.NbLayers + .5, Min, Max]);
 
@@ -61,7 +78,7 @@ function  PlotGroupProfile(Data, SubjectVec, Opt, iCondtion)
         'fontsize', Opt.Fontsize);
 
     YLabel = 'B Param. est. [a u]';
-    if Opt.IsMvpa
+    if IsMvpa
         YLabel = 'Decoding accuracy';
     end
     t = ylabel(YLabel);
@@ -69,7 +86,7 @@ function  PlotGroupProfile(Data, SubjectVec, Opt, iCondtion)
         'fontweight', 'bold', ...
         'fontsize', Opt.Fontsize);
 
-    Title = Opt.Titles{1, iCondtion};
+    Title = Opt.Specific{1, iColumn}.Titles;
     t = title(Title);
     set(t, 'fontsize', Opt.Fontsize + 2);
 

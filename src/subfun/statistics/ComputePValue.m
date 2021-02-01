@@ -1,6 +1,6 @@
 % (C) Copyright 2020 Remi Gau
 
-function [P, STATS] = ComputePValue(Data, Opt)
+function [P, STATS] = ComputePValue(Data, Opt, Ttest)
     %
     % Computes p value of a one sample t-test using either a regular parametric t-test
     % or an exact sign permutation test.
@@ -27,29 +27,29 @@ function [P, STATS] = ComputePValue(Data, Opt)
     %           :TestSide: (string)
     %
 
-    if ~isfield(Opt.Ttest, 'ValueToTest') || isempty(Opt.Ttest.ValueToTest)
-        Opt.Ttest.ValueToTest = 0;
+    if ~isfield(Ttest, 'ValueToTest') || isempty(Ttest.ValueToTest)
+        Ttest.ValueToTest = 0;
     end
 
-    if ~isfield(Opt.Ttest, 'SideOfTtest') && isempty(Opt.Ttest.SideOfTtest)
-        Opt.Ttest.SideOfTtest = 'both';
+    if ~isfield(Ttest, 'SideOfTtest') && isempty(Ttest.SideOfTtest)
+        Ttest.SideOfTtest = 'both';
     end
 
     % sing permutation test
-    if Opt.Ttest.PermutationTest.Do
+    if Opt.PermutationTest.Do
 
         STATS = [];
 
-        P = RunSignPermutationTest(Data, Opt);
+        P = RunSignPermutationTest(Data, Opt, Ttest);
 
     else
 
         % or ttest
         [~, P, ~, STATS] = ttest( ...
                                  Data, ...
-                                 Opt.Ttest.ValueToTest, ...
+                                 Ttest.ValueToTest, ...
                                  'alpha', Opt.Alpha, ...
-                                 'tail', Opt.Ttest.SideOfTtest);
+                                 'tail', Ttest.SideOfTtest);
 
     end
 end

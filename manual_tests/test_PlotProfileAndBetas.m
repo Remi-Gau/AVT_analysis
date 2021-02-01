@@ -1,101 +1,159 @@
 %% (C) Copyright 2020 Remi Gau
 
-clear;
-close all;
+function test_suite = test_PlotProfileAndBetas %#ok<*STOUT>
+    try % assignment of 'localfunctions' is necessary in Matlab >= 2016
+        test_functions = localfunctions(); %#ok<*NASGU>
+    catch % no problem; early Matlab versions can use initTestSuite fine
+    end
+    initTestSuite;
+end
 
-Opt.NbSubject = 10;
-Opt.NbRuns = 20;
-Opt.NbLayers = 6;
+function Opt = SetOptions(Opt, J)
 
-Opt.IsMvpa = false;
+    Opt.PlotQuadratic = true;
+    Opt.ErrorBarType = 'SEM';
+    Opt.Alpha = 0.05;
+    Opt.PlotPValue = true;
+    Opt.PermutationTest.Do = false;
+    Opt.PermutationTest.Plot = false;
+    Opt.PlotSubjects = true;
+    Opt.ShadedErrorBar = true;
+    Opt.NbLayers = 6;
 
-Opt.ErrorBarType = 'STD';
-Opt.Alpha = 0.05;
-Opt.PlotPValue = true;
-Opt.Ttest.SideOfTtest = 'both';
-Opt.Ttest.PermutationTest.Do = true;
+    Opt.Specific{1, J}.PlotMinMaxType = 'group'; % all group groupallcolumns
+    Opt.Specific{1, J}.IsMvpa = false;
+    Opt.Specific{1, J}.Ttest.SideOfTtest = 'both';
 
-Opt.PlotSubjects = true;
-Opt.ShadedErrorBar = true;
-Opt.PlotQuadratic = false;
+end
 
-%% Plot one ROI / Condition
-Cst = 1;
-Lin = 0.5;
-Quad = 0.1;
+function [Data, SubjectVec] = GenerateDataROI(OptGenData, ROI, Cdt)
 
-Opt.PlotMinMaxType = 'all';
+    if ROI == 1 && Cdt == 1
+        Cst = -2;
+        Lin = 0.8;
+        Quad = 0.1;
+    end
 
-Opt.Betas = [Cst; Lin; Quad];
-Opt.StdDevBetweenSubject = 0.5;
-Opt.StdDevWithinSubject = 0.1;
+    if ROI == 2 && Cdt == 1
+        Cst = -2;
+        Lin = 0.8;
+        Quad = 0.1;
+    end
 
-Opt.Titles{1} = 'ROI 1 - Condition Name';
+    if ROI == 1 && Cdt == 2
+        Cst = -2;
+        Lin = -0.8;
+        Quad = 0.1;
+    end
 
-Opt.RoiNames = {'ROI 1'};
+    if ROI == 2 && Cdt == 2
+        Cst = 2;
+        Lin = -0.4;
+        Quad = 0.1;
+    end
 
-[Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt);
+    OptGenData.StdDevBetweenSubject = 2;
+    OptGenData.StdDevWithinSubject = 2;
 
-PlotProfileAndBetas(Data, SubjectVec, Opt);
+    OptGenData.Betas = [Cst; Lin; Quad];
 
-%% Plot several ROIs
+    [Data, SubjectVec] = GenerateGroupDataLaminarProfiles(OptGenData);
 
-Opt.PlotMinMaxType = 'group';
+end
 
-Opt.Titles{1, 1} = 'Condition 1';
+function test_OneRoi
 
-Opt.RoiNames = {'ROI 1', 'ROI 2'};
+    close all;
 
-DataAllRois{1, 1, 1} = Data;
-SubjectVecAllRois{1, 1, 1} = SubjectVec;
+    %% Plot one ROI / Condition
 
-Cst = -2;
-Lin = 0.8;
-Quad = 0.1;
+    OptGenData.NbSubject = 10;
+    OptGenData.NbRuns = 20;
+    OptGenData.NbLayers = 6;
 
-Opt.Betas = [Cst; Lin; Quad];
-Opt.StdDevBetweenSubject = 0.8;
-Opt.StdDevWithinSubject = 1;
+    [Data, SubjectVec] = GenerateDataROI(OptGenData, 1, 1);
+    Opt.Specific{1}.Data = Data;
+    Opt.Specific{1}.SubjectVec = SubjectVec;
+    Opt.Specific{1}.ConditionVec = ones(size(Data, 1), 1);
+    Opt.Specific{1}.RoiVec = ones(size(Data, 1), 1);
 
-[Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt);
+    Opt.Specific{1}.Titles = 'ROI 1 - Condition Name';
+    Opt.Specific{1}.RoiNames = {'ROI 1'};
 
-DataAllRois{1, 1, 2} = Data;
-SubjectVecAllRois{1, 1, 2} = SubjectVec;
+    Opt = SetOptions(Opt, 1);
 
-PlotProfileAndBetas(DataAllRois, SubjectVecAllRois, Opt);
+    PlotProfileAndBetas(Opt);
 
-%% Plot several ROIs and several conditions
+end
 
-Opt.PlotMinMaxType = 'group';
+function test_TwoRois
 
-Opt.Titles{1, 2} = 'Condition 2';
+    OptGenData.NbSubject = 10;
+    OptGenData.NbRuns = 20;
+    OptGenData.NbLayers = 6;
 
-Opt.RoiNames = {'ROI 1', 'ROI 2'};
+    [Data1, SubjectVec1] =  GenerateDataROI(OptGenData, 1, 1);
+    [Data2, SubjectVec2] =  GenerateDataROI(OptGenData, 1, 2);
 
-Cst = -2;
-Lin = -0.8;
-Quad = 0.1;
+    Data = cat(1, Data1, Data2);
+    SubjectVec = cat(1, SubjectVec1, SubjectVec2);
 
-Opt.Betas = [Cst; Lin; Quad];
-Opt.StdDevBetweenSubject = 1.5;
-Opt.StdDevWithinSubject = 1;
+    Opt.Specific{1}.Data = Data;
+    Opt.Specific{1}.SubjectVec = SubjectVec;
+    Opt.Specific{1}.ConditionVec = [ones(size(Data1, 1), 1); ones(size(Data2, 1), 1)];
+    Opt.Specific{1}.RoiVec = [ones(size(Data1, 1), 1); 2 * ones(size(Data2, 1), 1)];
 
-[Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt);
+    Opt.Specific{1}.Titles = 'Condition 1';
+    Opt.Specific{1}.RoiNames = {'ROI 1', 'ROI 2'};
 
-DataAllRois{:, 2, 1} = Data;
-SubjectVecAllRois{:, 2, 1} = SubjectVec;
+    Opt = SetOptions(Opt, 1);
 
-Cst = 2;
-Lin = -0.4;
-Quad = 0.1;
+    PlotProfileAndBetas(Opt);
 
-Opt.Betas = [Cst; Lin; Quad];
-Opt.StdDevBetweenSubject = 0.8;
-Opt.StdDevWithinSubject = 1;
+end
 
-[Data, SubjectVec] = GenerateGroupDataLaminarProfiles(Opt);
+function test_TwoRoisSeveralConditions
 
-DataAllRois{:, 2, 2} = Data;
-SubjectVecAllRois{:, 2, 2} = SubjectVec;
+    OptGenData.NbSubject = 10;
+    OptGenData.NbRuns = 20;
+    OptGenData.NbLayers = 6;
 
-PlotProfileAndBetas(DataAllRois, SubjectVecAllRois, Opt);
+    iColumn = 1;
+
+    Opt.Specific{1, iColumn}.Titles = 'Condition 1';
+    Opt.Specific{1, iColumn}.RoiNames = {'ROI 1', 'ROI 2'};
+
+    [Data1, SubjectVec1] =  GenerateDataROI(OptGenData, 1, 1);
+    [Data2, SubjectVec2] =  GenerateDataROI(OptGenData, 1, 2);
+
+    Data = cat(1, Data1, Data2);
+    SubjectVec = cat(1, SubjectVec1, SubjectVec2);
+
+    Opt.Specific{1, iColumn}.Data = Data;
+    Opt.Specific{1, iColumn}.SubjectVec = SubjectVec;
+    Opt.Specific{1, iColumn}.ConditionVec = [ones(size(Data1, 1), 1); ones(size(Data2, 1), 1)];
+    Opt.Specific{1, iColumn}.RoiVec = [ones(size(Data1, 1), 1); 2 * ones(size(Data2, 1), 1)];
+
+    %%
+    iColumn = 2;
+
+    Opt.Specific{1, iColumn}.Titles = 'Condition 2';
+    Opt.Specific{1, iColumn}.RoiNames = {'ROI 1', 'ROI 2'};
+
+    [Data1, SubjectVec1] =  GenerateDataROI(OptGenData, 2, 1);
+    [Data2, SubjectVec2] =  GenerateDataROI(OptGenData, 2, 2);
+
+    Data = cat(1, Data1, Data2);
+    SubjectVec = cat(1, SubjectVec1, SubjectVec2);
+
+    Opt.Specific{1, iColumn}.Data = Data;
+    Opt.Specific{1, iColumn}.SubjectVec = SubjectVec;
+    Opt.Specific{1, iColumn}.ConditionVec = [2 * ones(size(Data1, 1), 1); 2 * ones(size(Data2, 1), 1)];
+    Opt.Specific{1, iColumn}.RoiVec = [ones(size(Data1, 1), 1); 2 * ones(size(Data2, 1), 1)];
+
+    Opt = SetOptions(Opt, 1);
+    Opt = SetOptions(Opt, 2);
+
+    PlotProfileAndBetas(Opt);
+
+end
