@@ -161,13 +161,7 @@ for iROI =  1:numel(ROIs)
 
     end
 
-    %% Pool data between hemispheres
-    tmp = {};
-    for iSub = 1:NbSub
-        tmp{iSub, 1} = [GrpData{iSub, 1} GrpData{iSub, 2}];
-    end
-
-    GrpData = tmp;
+    GrpData = CombineDataBothHemisphere(GrpData);
 
     IsAuditoryRoi = true;
     if any(strcmp(ROIs{iROI}, {'V1', 'V2', 'V3', 'V4', 'V5'}))

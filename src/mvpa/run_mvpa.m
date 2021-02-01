@@ -146,7 +146,7 @@ for iSub = 1:NbSub
             CvMatOrig = [ConditionVec RunVec LayerVec];
 
             % Pool data between hemispheres
-            Data = [DataHs{1, 1} DataHs{1, 2}];
+            Data = CombineDataBothHemisphere(DataHs);
             clear DataHs;
 
             % TODO
