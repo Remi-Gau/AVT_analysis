@@ -40,7 +40,7 @@ function AllocateProfileDataAndPlot(Data, ROIs, Titles, Cdt)
 
     Opt.Specific{1} = ToPlot;
     Opt.Specific{1}.Titles = Titles;
-    Opt.Specific{1}.RoiNames = ROIs;
+    Opt.Specific{1}.XLabel = ROIs;
 
     Opt = SetProfilePlottingOptions(Opt);
 

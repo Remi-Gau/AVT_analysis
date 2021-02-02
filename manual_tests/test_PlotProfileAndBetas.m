@@ -8,24 +8,6 @@ function test_suite = test_PlotProfileAndBetas %#ok<*STOUT>
     initTestSuite;
 end
 
-function Opt = SetOptions(Opt, J)
-
-    Opt.PlotQuadratic = true;
-    Opt.ErrorBarType = 'SEM';
-    Opt.Alpha = 0.05;
-    Opt.PlotPValue = true;
-    Opt.PermutationTest.Do = false;
-    Opt.PermutationTest.Plot = false;
-    Opt.PlotSubjects = true;
-    Opt.ShadedErrorBar = true;
-    Opt.NbLayers = 6;
-
-    Opt.Specific{1, J}.PlotMinMaxType = 'group'; % all group groupallcolumns
-    Opt.Specific{1, J}.IsMvpa = false;
-    Opt.Specific{1, J}.Ttest.SideOfTtest = 'both';
-
-end
-
 function [Data, SubjectVec] = GenerateDataROI(OptGenData, ROI, Cdt)
 
     if ROI == 1 && Cdt == 1
@@ -71,6 +53,7 @@ function test_OneRoi
     OptGenData.NbRuns = 20;
     OptGenData.NbLayers = 6;
 
+    %%
     [Data, SubjectVec] = GenerateDataROI(OptGenData, 1, 1);
     Opt.Specific{1}.Data = Data;
     Opt.Specific{1}.SubjectVec = SubjectVec;
@@ -78,10 +61,12 @@ function test_OneRoi
     Opt.Specific{1}.RoiVec = ones(size(Data, 1), 1);
 
     Opt.Specific{1}.Titles = 'ROI 1 - Condition Name';
-    Opt.Specific{1}.RoiNames = {'ROI 1'};
+    Opt.Specific{1}.XLabel = {'ROI 1'};
 
-    Opt = SetOptions(Opt, 1);
+    %%
+    Opt.Title = 'Figure title';
 
+    Opt = SetProfilePlottingOptions(Opt);
     PlotProfileAndBetas(Opt);
 
 end
@@ -92,6 +77,7 @@ function test_TwoRois
     OptGenData.NbRuns = 20;
     OptGenData.NbLayers = 6;
 
+    %%
     [Data1, SubjectVec1] =  GenerateDataROI(OptGenData, 1, 1);
     [Data2, SubjectVec2] =  GenerateDataROI(OptGenData, 1, 2);
 
@@ -104,10 +90,12 @@ function test_TwoRois
     Opt.Specific{1}.RoiVec = [ones(size(Data1, 1), 1); 2 * ones(size(Data2, 1), 1)];
 
     Opt.Specific{1}.Titles = 'Condition 1';
-    Opt.Specific{1}.RoiNames = {'ROI 1', 'ROI 2'};
+    Opt.Specific{1}.XLabel = {'ROI 1', 'ROI 2'};
 
-    Opt = SetOptions(Opt, 1);
+    %%
+    Opt.Title = 'Condition 1 in ROi 1 and 2';
 
+    Opt = SetProfilePlottingOptions(Opt);
     PlotProfileAndBetas(Opt);
 
 end
@@ -118,10 +106,11 @@ function test_TwoRoisSeveralConditions
     OptGenData.NbRuns = 20;
     OptGenData.NbLayers = 6;
 
+    %%
     iColumn = 1;
 
     Opt.Specific{1, iColumn}.Titles = 'Condition 1';
-    Opt.Specific{1, iColumn}.RoiNames = {'ROI 1', 'ROI 2'};
+    Opt.Specific{1, iColumn}.XLabel = {'ROI 1', 'ROI 2'};
 
     [Data1, SubjectVec1] =  GenerateDataROI(OptGenData, 1, 1);
     [Data2, SubjectVec2] =  GenerateDataROI(OptGenData, 1, 2);
@@ -138,7 +127,7 @@ function test_TwoRoisSeveralConditions
     iColumn = 2;
 
     Opt.Specific{1, iColumn}.Titles = 'Condition 2';
-    Opt.Specific{1, iColumn}.RoiNames = {'ROI 1', 'ROI 2'};
+    Opt.Specific{1, iColumn}.XLabel = {'ROI 1', 'ROI 2'};
 
     [Data1, SubjectVec1] =  GenerateDataROI(OptGenData, 2, 1);
     [Data2, SubjectVec2] =  GenerateDataROI(OptGenData, 2, 2);
@@ -151,9 +140,62 @@ function test_TwoRoisSeveralConditions
     Opt.Specific{1, iColumn}.ConditionVec = [2 * ones(size(Data1, 1), 1); 2 * ones(size(Data2, 1), 1)];
     Opt.Specific{1, iColumn}.RoiVec = [ones(size(Data1, 1), 1); 2 * ones(size(Data2, 1), 1)];
 
-    Opt = SetOptions(Opt, 1);
-    Opt = SetOptions(Opt, 2);
+    %%
+    Opt = SetProfilePlottingOptions(Opt);
 
+    Opt.Title = 'Condition 1 and 2 in ROi 1 and 2';
+    PlotProfileAndBetas(Opt);
+
+end
+
+function test_OneRoiTwoConditions
+
+    OptGenData.NbSubject = 10;
+    OptGenData.NbRuns = 20;
+    OptGenData.NbLayers = 6;
+
+    Opt.m = 2;
+    Opt.n = 5;
+
+    %%
+    iColumn = 1;
+
+    Opt.Specific{1, iColumn}.Titles = 'Condition 1 & 2';
+    Opt.Specific{1, iColumn}.XLabel = {'Cdt 1', 'Cdt 2'};
+
+    [Data1, SubjectVec1] =  GenerateDataROI(OptGenData, 1, 1);
+    [Data2, SubjectVec2] =  GenerateDataROI(OptGenData, 1, 2);
+
+    Data = cat(1, Data1, Data2);
+    SubjectVec = cat(1, SubjectVec1, SubjectVec2);
+
+    Opt.Specific{1, iColumn}.Data = Data;
+    Opt.Specific{1, iColumn}.SubjectVec = SubjectVec;
+    Opt.Specific{1, iColumn}.ConditionVec = [ones(size(Data1, 1), 1); 2 * ones(size(Data2, 1), 1)];
+    Opt.Specific{1, iColumn}.RoiVec = [ones(size(Data1, 1), 1); ones(size(Data2, 1), 1)];
+
+    Opt.Specific{1, iColumn}.ProfileSubplot = 1:4;
+    Opt.Specific{1, iColumn}.BetaSubplot = {9; 11; 13};
+
+    %%
+    iColumn = 2;
+
+    Opt.Specific{1, iColumn}.Titles = 'Difference';
+    Opt.Specific{1, iColumn}.XLabel = {'Difference'};
+
+    [Data, SubjectVec] = GenerateDataROI(OptGenData, 1, 1);
+    Opt.Specific{1, iColumn}.Data = Data;
+    Opt.Specific{1, iColumn}.SubjectVec = SubjectVec;
+    Opt.Specific{1, iColumn}.ConditionVec = ones(size(Data, 1), 1);
+    Opt.Specific{1, iColumn}.RoiVec = ones(size(Data, 1), 1);
+
+    Opt.Specific{1, iColumn}.ProfileSubplot = 5:8;
+    Opt.Specific{1, iColumn}.BetaSubplot = {10; 12; 14};
+
+    %%
+    Opt.Title = 'Condition 1 and 2 in ROi 1';
+
+    Opt = SetProfilePlottingOptions(Opt);
     PlotProfileAndBetas(Opt);
 
 end

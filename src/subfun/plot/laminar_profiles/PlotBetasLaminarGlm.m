@@ -8,7 +8,7 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
 
     ParameterNames = {'Constant', 'Linear', 'Quadratic'};
 
-    ThisSubplot = GetSubplotIndex(iColumn, iParameter, Opt);
+    ThisSubplot = GetSubplotIndex(Opt, iColumn, iParameter);
 
     subplot(Opt.n, Opt.m, ThisSubplot);
 
@@ -63,13 +63,13 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
                                        Opt.Specific{1, iColumn}.Group.Beta.Max, ...
                                        4);
 
-    axis([0, Xpos(numel(Opt.Specific{1, iColumn}.RoiNames)) + .5, Min, Max]);
+    axis([0, Xpos(numel(Opt.Specific{1, iColumn}.XLabel)) + .5, Min, Max]);
 
     %% Labels
     set(gca, ...
         'tickdir', 'out', ...
         'xtick', Xpos - 0.25, ...
-        'xticklabel', Opt.Specific{1, iColumn}.RoiNames, ...
+        'xticklabel', Opt.Specific{1, iColumn}.XLabel, ...
         'xgrid', 'off', ...
         'ygrid', 'off', ...
         'ticklength', [0.01 0.01], ...
@@ -94,7 +94,7 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
 
 end
 
-function  ThisSubplot = GetSubplotIndex(iCondtion, iParameter, Opt)
+function  ThisSubplot = GetSubplotIndex(Opt, iColumn, iParameter)
     %
     % returns subplot on which to draw the laminar profile depending on the
     % number of columns in the figure
@@ -109,6 +109,11 @@ function  ThisSubplot = GetSubplotIndex(iCondtion, iParameter, Opt)
     % the second column fo subplots, we take the element SubplotTable(1, 3 , 2)
     %
 
+    if isfield(Opt.Specific{1, iColumn}, 'BetaSubplot')
+        ThisSubplot = Opt.Specific{1, iColumn}.BetaSubplot{iParameter};
+        return
+    end
+
     SubplotTable(:, :, 1) = [ ...
                              3, 5, 7
                              4, 7, 10
@@ -122,7 +127,7 @@ function  ThisSubplot = GetSubplotIndex(iCondtion, iParameter, Opt)
     SubplotTable(:, :, 3) = SubplotTable(:, :, 2) + 1;
     SubplotTable(:, 2, 3) = nan(3, 1);
 
-    ThisSubplot = SubplotTable(iParameter, Opt.m, iCondtion);
+    ThisSubplot = SubplotTable(iParameter, Opt.m, iColumn);
 
 end
 

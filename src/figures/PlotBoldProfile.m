@@ -3,6 +3,19 @@
 clear;
 close all;
 
+space = 'surf';
+MVNN =  false;
+
+[Dirs] = SetDir(space, MVNN);
+InputDir = fullfile(Dirs.ExtractedBetas, 'group');
+OutputDir = fullfile(Dirs.Figures, 'BoldProfiles');
+[~, ~, ~] = mkdir(OutputDir);
+
+%     ConditionType = 'stim';
+%     if IsTarget
+%         ConditionType = 'target'; %#ok<*UNRCH>
+%     end
+
 ROIs = { ...
         'A1'
         'PT'
@@ -10,21 +23,15 @@ ROIs = { ...
         'V2'
        };
 
-space = 'surf';
+Data = LoadProfileData(ROIs, InputDir);
 
 %%
-MVNN =  false;
-[Dirs] = SetDir(space, MVNN);
-InputDir = fullfile(Dirs.ExtractedBetas, 'group');
-OutputDir = fullfile(Dirs.Figures, 'BoldProfiles');
-mkdir(OutputDir);
-
-%     ConditionType = 'stim';
-%     if IsTarget
-%         ConditionType = 'target'; %#ok<*UNRCH>
-%     end
-
-Data = LoadProfileData(ROIs, InputDir);
+ROIs = { ...
+        'A1'
+        'PT'
+        'V1'
+        'V2'
+       };
 
 [~, CondNamesIpsiContra] = GetConditionList();
 
@@ -40,15 +47,15 @@ PrintFigure(OutputDir);
 AllocateProfileDataAndPlot(Data, ROIs, '[Contra-Ipsi]_T', {6, -5});
 PrintFigure(OutputDir);
 
-% Does not work because of subject 6
-%     AllocateDataAndPlot(Data, ROIs, '[A-T]_ipsi', {1, -5});
-%     AllocateDataAndPlot(Data, ROIs, '[A-T]_contra', {2, -6});
+AllocateProfileDataAndPlot(Data, ROIs, '[A-T]_{ipsi}', {1, -5});
+AllocateProfileDataAndPlot(Data, ROIs, '[A-T]_{contra}', {2, -6});
 
 AllocateProfileDataAndPlot(Data, ROIs, '[V-T]_{ipsi}', {3, -5});
 PrintFigure(OutputDir);
 AllocateProfileDataAndPlot(Data, ROIs, '[V-T]_{contra}', {4, -6});
 PrintFigure(OutputDir);
 
+%%
 ROIs = {'PT'};
 AllocateProfileDataAndPlot(Data, ROIs, 'PT - [Contra-Ipsi]_T', {6, -5});
 PrintFigure(OutputDir);
@@ -91,7 +98,7 @@ for iROI = 1:size(ROIs, 1)
 
     Opt.Specific{1} = ToPlot;
     Opt.Specific{1}.Titles = Title;
-    Opt.Specific{1}.RoiNames = XLabel;
+    Opt.Specific{1}.XLabel = XLabel;
 
     Opt = SetProfilePlottingOptions(Opt);
 

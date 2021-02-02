@@ -6,7 +6,7 @@ function Data = CombineDataBothHemisphere(Data)
 
     tmp = {};
     for iSub = 1:NbSub
-        tmp{iSub, 1} = [Data{iSub, 1} Data{iSub, 2}];
+        tmp{iSub, 1} = [Data{iSub, 1} Data{iSub, 2}]; %#ok<*AGROW>
     end
     Data = tmp;
 

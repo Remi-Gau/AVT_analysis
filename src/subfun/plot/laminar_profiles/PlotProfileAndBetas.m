@@ -4,12 +4,12 @@ function PlotProfileAndBetas(Opt)
 
     Opt = CheckProfilePlottingOptions(Opt);
 
-    figure('Name', Opt.Specific{1}.Titles, ...
+    figure('Name', Opt.Title, ...
            'Position', Opt.FigDim);
 
     SetFigureDefaults(Opt);
 
-    for iColumn = 1:Opt.m
+    for iColumn = 1:size(Opt.Specific, 2)
 
         Opt = ComputeSubjectProfileAndBetaAverage(Opt, iColumn);
 
@@ -18,7 +18,7 @@ function PlotProfileAndBetas(Opt)
 
     end
 
-    for iColumn = 1:Opt.m
+    for iColumn = 1:size(Opt.Specific, 2)
 
         %% Plot profiles
         [Min, Max] = ComputeMinMax(Opt.Specific{1, iColumn}.PlotMinMaxType, ...
@@ -51,6 +51,11 @@ function PlotProfileAndBetas(Opt)
         end
 
     end
+
+    mtit(upper(Opt.Title), ...
+         'fontsize', Opt.Fontsize + 4, ...
+         'xoff', 0, ...
+         'yoff', .05);
 
 end
 
