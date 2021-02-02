@@ -4,11 +4,11 @@ clear;
 close all;
 
 ROIs = { ...
-    'A1'
-    'PT'
-    'V1'
-    'V2'
-    };
+        'A1'
+        'PT'
+        'V1'
+        'V2'
+       };
 
 space = 'surf';
 
@@ -58,45 +58,45 @@ PrintFigure(OutputDir);
 
 %%
 ROIs = { ...
-    'PT'
-    'V2'
-    };
+        'PT'
+        'V2'
+       };
 
 for iROI = 1:size(ROIs, 1)
-    
+
     Title = [ROIs{iROI} ' - [Contra & Ipsi]_T'];
     XLabel = {'T contra', 'T ipsi'};
-    
+
     Cdt1 = 6;
     Cdt2 = 5;
-    
+
     idx = ReturnRoiIndex(Data, ROIs{iROI});
-    
+
     ToPlot = struct('Data', [], 'SubjectVec', [], 'ConditionVec', [], 'RoiVec', []);
-    
+
     RowsToSelect = ReturnRowsToSelect({Data(idx, 1).ConditionVec, Cdt1});
     RowsToSelect2 = ReturnRowsToSelect({Data(idx, 1).ConditionVec, Cdt2});
-    
+
     ToPlot.Data = [ToPlot.Data; ...
-        Data(idx, 1).Data(RowsToSelect, :); ...
-        Data(idx, 1).Data(RowsToSelect2, :)];
+                   Data(idx, 1).Data(RowsToSelect, :); ...
+                   Data(idx, 1).Data(RowsToSelect2, :)];
     ToPlot.SubjectVec = [ToPlot.SubjectVec; ...
-        Data(idx, 1).SubjVec(RowsToSelect, :); ...
-        Data(idx, 1).SubjVec(RowsToSelect2, :)];
+                         Data(idx, 1).SubjVec(RowsToSelect, :); ...
+                         Data(idx, 1).SubjVec(RowsToSelect2, :)];
     ToPlot.ConditionVec = [ToPlot.ConditionVec; ...
-        Data(idx, 1).ConditionVec(RowsToSelect, :); ...
-        Data(idx, 1).ConditionVec(RowsToSelect2, :)];
-    
+                           Data(idx, 1).ConditionVec(RowsToSelect, :); ...
+                           Data(idx, 1).ConditionVec(RowsToSelect2, :)];
+
     ToPlot.RoiVec = [ToPlot.RoiVec; ones(sum([RowsToSelect; RowsToSelect2]), 1) * iROI];
-    
+
     Opt.Specific{1} = ToPlot;
     Opt.Specific{1}.Titles = Title;
     Opt.Specific{1}.RoiNames = XLabel;
-    
+
     Opt = SetProfilePlottingOptions(Opt);
-    
+
     PlotProfileAndBetas(Opt);
-    
+
     PrintFigure(OutputDir);
-    
+
 end
