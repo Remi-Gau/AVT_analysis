@@ -48,20 +48,21 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
             AllGroupBetas(:, iLine) = DataToPlot; %#ok<*AGROW>
 
             %% Main plot
-            ViolinPlot(DataToPlot, Opt, iLine);
+            ViolinPlot(DataToPlot, Opt, iColumn, iLine);
 
             %% Plot mean + dispersion
-            PlotMeanAndDispersion(DataToPlot, Opt, iLine);
+            PlotMeanAndDispersion(DataToPlot, Opt, iColumn, iLine);
 
             iLine = iLine + 1;
 
         end
     end
 
-    %% Tight fight with some vertical margin
+    %% Tight fit with some vertical margin
+    ViolinPlotParameters = GetViolinPlotParameters();
     [Min, Max, Margin] = ComputeMargin(Opt.Specific{1, iColumn}.Group.Beta.Min, ...
                                        Opt.Specific{1, iColumn}.Group.Beta.Max, ...
-                                       4);
+                                       ViolinPlotParameters.Margin);
 
     axis([0, Xpos(numel(Opt.Specific{1, iColumn}.XLabel)) + .5, Min, Max]);
 
@@ -131,43 +132,31 @@ function  ThisSubplot = GetSubplotIndex(Opt, iColumn, iParameter)
 
 end
 
-function ViolinPlot(GroupData, Opt, iLine)
+function ViolinPlot(GroupData, Opt, iColumn, iLine)
+    
+    ViolinPlotParameters = GetViolinPlotParameters();
 
-    DIST_WIDTH = 0.5;
-    SHOW_MEAN_MEDIAN = 0;
-    GLOBAL_NORM = 2;
-
-    MARKER = 'o';
-    MARKER_SIZE = 2;
-    MARKER_EDGE_COLOR = 'k';
-    MARKER_FACE_COLOR = 'k';
-
-    LINE_WIDTH = 1;
-    BIN_WIDTH = 0.5;
-    SPREAD_WIDTH = 0.8;
-
-    Color = Opt.LineColors(iLine, :);
     Xpos = ReturnXpositionViolinPlot();
 
     distributionPlot( ...
                      GroupData, ...
                      'xValues', Xpos(iLine), ...
-                     'color', Color, ...
-                     'distWidth', DIST_WIDTH, ...
-                     'showMM', SHOW_MEAN_MEDIAN, ...
-                     'globalNorm', GLOBAL_NORM);
+                     'color', Opt.Specific{1, iColumn}.LineColors(iLine, :), ...
+                     'distWidth', ViolinPlotParameters.DistWidth, ...
+                     'showMM', ViolinPlotParameters.ShowMeanMedian, ...
+                     'globalNorm', ViolinPlotParameters.GlobalNorm);
 
     h = plotSpread( ...
                    GroupData, ...
                    'xValues', Xpos(iLine), ...
-                   'distributionMarkers', {MARKER}, ...
-                   'binWidth', BIN_WIDTH, ...
-                   'spreadWidth', SPREAD_WIDTH);
+                   'distributionMarkers', {ViolinPlotParameters.Marker}, ...
+                   'binWidth', ViolinPlotParameters.BinWidth, ...
+                   'spreadWidth', ViolinPlotParameters.SpreadWidth);
     set(h{1}, ...
-        'MarkerSize', MARKER_SIZE, ...
-        'MarkerEdgeColor', MARKER_EDGE_COLOR, ...
-        'MarkerFaceColor', MARKER_FACE_COLOR, ...
-        'LineWidth', LINE_WIDTH);
+        'MarkerSize', ViolinPlotParameters.MarkerSize, ...
+        'MarkerEdgeColor', ViolinPlotParameters.MarkerEdgeColor, ...
+        'MarkerFaceColor', ViolinPlotParameters.MarkerFaceColor, ...
+        'LineWidth', ViolinPlotParameters.LineWidth);
 
     %  TODO
     %  Plot each subject with its color
@@ -186,16 +175,14 @@ function ViolinPlot(GroupData, Opt, iLine)
 
 end
 
-function PlotMeanAndDispersion(GroupData, Opt, iLine)
+function PlotMeanAndDispersion(GroupData, Opt, iColumn, iLine)
     %
     % Plots a thin error bar and a thick line across data points
     %
 
-    LINE_WIDTH = 1;
-    MARKER = 'o';
-    MARKER_SIZE = 5;
+    [~, MeanDispersion] = GetViolinPlotParameters();
 
-    Color = Opt.LineColors(iLine, :);
+    Color = Opt.Specific{1, iColumn}.LineColors(iLine, :);
     Xpos = ReturnXpositionViolinPlot();
 
     GroupMean =  mean(GroupData);
@@ -208,7 +195,7 @@ function PlotMeanAndDispersion(GroupData, Opt, iLine)
                  UpperError);
 
     set(l, ...
-        'LineWidth', LINE_WIDTH, ...
+        'LineWidth', MeanDispersion.LineWidth, ...
         'Color', Color);
 
     l = plot( ...
@@ -216,8 +203,8 @@ function PlotMeanAndDispersion(GroupData, Opt, iLine)
              GroupMean);
 
     set(l, ...
-        'Marker', MARKER, ...
-        'MarkerSize', MARKER_SIZE, ...
+        'Marker', MeanDispersion.Marker, ...
+        'MarkerSize', MeanDispersion.MarkerSize, ...
         'MarkerFaceColor', Color, ...
         'Color', Color);
 

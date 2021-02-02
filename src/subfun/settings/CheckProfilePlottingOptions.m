@@ -43,10 +43,6 @@ function Opt = CheckProfilePlottingOptions(Opt)
         Opt.PlotPValue = true;
     end
 
-    if ~isfield(Opt, 'LineColors')
-        Opt.LineColors = RoiColours();
-    end
-
     if Opt.PermutationTest.Do
         Opt.PermutationTest = CreatePermutationList(Opt.PermutationTest);
     end
@@ -65,6 +61,10 @@ function Opt = CheckProfilePlottingOptions(Opt)
             Opt.ShadedErrorBar = false;
             Opt.PlotSubjects = false;
         end
+        
+       if ~isfield(Opt.Specific{i}, 'LineColors')
+            Opt.Specific{i}.LineColors = RoiColours();
+       end
 
     end
 

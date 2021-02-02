@@ -41,7 +41,7 @@ function  PlotGroupProfile(Opt, iColumn)
             PlotProfileSubjects(Data, Opt);
 
             xOffset = (iLine - 1) * 0.1;
-            PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iLine);
+            PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iColumn, iLine);
 
             iLine = iLine + 1;
 
@@ -93,7 +93,7 @@ function  PlotGroupProfile(Opt, iColumn)
 
 end
 
-function PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iLine)
+function PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iColumn, iLine)
     %
     % Plots the laminar profile for BOLD or MVPA
     %
@@ -101,7 +101,7 @@ function PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iLine)
     ProfileLine = GetProfileLinePlotParameters();
 
     if exist('iLine', 'var') && ~isempty(iLine)
-        ProfileLine.LineColor = Opt.LineColors(iLine, :);
+        ProfileLine.LineColor = Opt.Specific{1, iColumn}.LineColors(iLine, :);
     end
 
     xPosition = (1:Opt.NbLayers) + xOffset;
