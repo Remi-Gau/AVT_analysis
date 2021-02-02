@@ -1,3 +1,8 @@
+Plotting figures
+****************
+  
+Scripts and functions for plotting laminar profiles
+
 .. for stim and target independently
 
     .. % Ipsilateral
@@ -16,3 +21,24 @@
 .. ipsi side
 
 .. contra side
+
+Functions
+=========
+
+.. automodule:: src.figures
+
+.. autoscript:: PlotBoldProfile
+
+.. automodule:: manual_tests
+
+.. autoscript:: test_PlotProfileAndBetas
+
+
+Sub-functions
+=============
+
+.. automodule:: src.subfun.settings
+
+.. automodule:: src.subfun.plot
+
+
