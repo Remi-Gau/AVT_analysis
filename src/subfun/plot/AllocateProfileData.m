@@ -9,29 +9,55 @@ function ToPlot = AllocateProfileData(Data, ROIs, Cdt)
         idx = ReturnRoiIndex(Data, ROIs{iROI});
 
         RowsToSelect = ReturnRowsToSelect({Data(idx, 1).ConditionVec, Cdt{1}});
-        
+
+        SubjectVec = Data(idx, 1).SubjVec(RowsToSelect, :);
+
+        ConditionVec = Data(idx, 1).ConditionVec(RowsToSelect, :);
+
+        RoiVec = ones(sum(RowsToSelect), 1) * iROI;
+
         switch numel(Cdt)
 
+            % plot one condition
             case 1
 
-                ToPlot.Data = [ToPlot.Data; Data(idx, 1).Data(RowsToSelect, :)];
-
+                tmp = Data(idx, 1).Data(RowsToSelect, :);
 
             case 2
 
                 RowsToSelect2 = ReturnRowsToSelect({Data(idx, 1).ConditionVec, abs(Cdt{2})});
 
-                tmp = Data(idx, 1).Data(RowsToSelect, :) + ...
-                    sign(Cdt{2}) * Data(idx, 1).Data(RowsToSelect2, :);
+                % difference between conditions
+                if size(Cdt, 2) == 2
 
-                ToPlot.Data = [ToPlot.Data; tmp];
+                    tmp = Data(idx, 1).Data(RowsToSelect, :) + ...
+                        sign(Cdt{2}) * Data(idx, 1).Data(RowsToSelect2, :);
+
+                    % plot both conditions
+                else
+
+                    tmp = cat(1, ...
+                              Data(idx, 1).Data(RowsToSelect, :), ...
+                              Data(idx, 1).Data(RowsToSelect2, :));
+
+                    ConditionVec = cat(1, ...
+                                       Data(idx, 1).ConditionVec(RowsToSelect, :), ...
+                                       Data(idx, 1).ConditionVec(RowsToSelect2, :));
+
+                    SubjectVec = repmat(SubjectVec, 2, 1);
+                    RoiVec = repmat(RoiVec, 2, 1);
+
+                end
 
         end
-        
-        ToPlot.SubjectVec = [ToPlot.SubjectVec; Data(idx, 1).SubjVec(RowsToSelect, :)];
-        ToPlot.ConditionVec = [ToPlot.ConditionVec; Data(idx, 1).ConditionVec(RowsToSelect, :)];
-        
-        ToPlot.RoiVec = [ToPlot.RoiVec; ones(sum(RowsToSelect), 1) * iROI];
+
+        ToPlot.Data = [ToPlot.Data; tmp];
+
+        ToPlot.SubjectVec = [ToPlot.SubjectVec; SubjectVec];
+
+        ToPlot.ConditionVec = [ToPlot.ConditionVec; ConditionVec];
+
+        ToPlot.RoiVec = [ToPlot.RoiVec; RoiVec];
 
     end
 

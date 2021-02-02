@@ -61,10 +61,10 @@ function Opt = CheckProfilePlottingOptions(Opt)
             Opt.ShadedErrorBar = false;
             Opt.PlotSubjects = false;
         end
-        
-       if ~isfield(Opt.Specific{i}, 'LineColors')
+
+        if ~isfield(Opt.Specific{i}, 'LineColors')
             Opt.Specific{i}.LineColors = RoiColours();
-       end
+        end
 
     end
 

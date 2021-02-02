@@ -133,7 +133,7 @@ function  ThisSubplot = GetSubplotIndex(Opt, iColumn, iParameter)
 end
 
 function ViolinPlot(GroupData, Opt, iColumn, iLine)
-    
+
     ViolinPlotParameters = GetViolinPlotParameters();
 
     Xpos = ReturnXpositionViolinPlot();

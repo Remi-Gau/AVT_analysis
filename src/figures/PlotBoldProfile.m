@@ -17,110 +17,210 @@ OutputDir = fullfile(Dirs.Figures, 'BoldProfiles');
 %     end
 
 ROIs = { ...
-    'A1'
-    'PT'
-    'V1'
-    'V2'
-    };
+        'A1'
+        'PT'
+        'V1'
+        'V2'
+       };
 
 Data = LoadProfileData(ROIs, InputDir);
 
-%%
+%% Against baseline
 ROIs = { ...
-    'A1'
-    'PT'
-    'V1'
-    'V2'
-    };
+        'A1'
+        'PT'
+        'V1'
+        'V2'
+       };
 
 [~, CondNamesIpsiContra] = GetConditionList();
 
-iColumn = 1;
+for iROI = 2:2:6
 
-for Cdt = 2:2:6
-    
-    iColumn = 1;
-    
-    ToPlot = AllocateProfileData(Data, ROIs, {Cdt});
+    clear Opt;
 
-    Opt.Specific{iColumn} = ToPlot;
-    Opt.Specific{iColumn}.Titles = CondNamesIpsiContra{Cdt}(6:end);
-    Opt.Specific{iColumn}.XLabel = ROIs;
+    for iColumn = 1:2
 
-    iColumn = 2;
-    
-    Opt.Specific{iColumn} = ToPlot;
-    Opt.Specific{iColumn}.Titles = CondNamesIpsiContra{Cdt-1}(6:end);
-    Opt.Specific{iColumn}.XLabel = ROIs;
-    
-    Opt.Title = strrep(CondNamesIpsiContra{Cdt}(1:5), 'S', ' S');
-    
+        if iColumn == 2
+            iROI = iROI - 1;
+        end
+
+        ToPlot = AllocateProfileData(Data, ROIs, {iROI});
+
+        Opt.Specific{1, iColumn} = ToPlot;
+        Opt.Specific{1, iColumn}.Titles = CondNamesIpsiContra{iROI}(6:end);
+        Opt.Specific{1, iColumn}.XLabel = ROIs;
+
+    end
+
+    Opt.Title = strrep(CondNamesIpsiContra{iROI}(1:5), 'S', ' S');
+
     Opt = SetProfilePlottingOptions(Opt);
-    
-    PlotProfileAndBetas(Opt);
-    
-    PrintFigure(fullfile(OutputDir, 'baseline'));
-    
+
+    %     PlotProfileAndBetas(Opt);
+    %     PrintFigure(fullfile(OutputDir, 'baseline'));
+
 end
 
-% AllocateProfileDataPlotPrint(Data, ROIs, '[Contra-Ipsi]_A', {2, -1}, iColumn, fullfile(OutputDir, 'cross-side'));
-% AllocateProfileDataPlotPrint(Data, ROIs, '[Contra-Ipsi]_V', {4, -3}, fullfile(OutputDir, 'cross-side'));
-% AllocateProfileDataPlotPrint(Data, ROIs, '[Contra-Ipsi]_T', {6, -5}, fullfile(OutputDir, 'cross-side'));
-%
-% AllocateProfileDataPlotPrint(Data, ROIs, '[A-T]_{ipsi}', {1, -5}, fullfile(OutputDir, 'cross-sensory'));
-% AllocateProfileDataPlotPrint(Data, ROIs, '[A-T]_{contra}', {2, -6}, fullfile(OutputDir, 'cross-sensory'));
-% AllocateProfileDataPlotPrint(Data, ROIs, '[V-T]_{ipsi}', {3, -5}, fullfile(OutputDir, 'cross-sensory'));
-% AllocateProfileDataPlotPrint(Data, ROIs, '[V-T]_{contra}', {4, -6}, fullfile(OutputDir, 'cross-sensory'));
+%% Cross side
 
-return
+for iROI = 2:2:6
 
-%%
-ROIs = {'PT'};
-AllocateProfileDataAndPlot(Data, ROIs, 'PT - [Contra-Ipsi]_T', {6, -5});
-ROIs = {'V2'};
-AllocateProfileDataAndPlot(Data, ROIs, 'V2 - [Contra-Ipsi]_T', {6, -5});
+    clear Opt;
 
-%%
-ROIs = { ...
-    'PT'
-    'V2'
-    };
+    ToPlot = AllocateProfileData(Data, ROIs, {iROI, -1 * (iROI - 1)});
+
+    Opt.Specific{1} = ToPlot;
+    Opt.Specific{1}.Titles = '';
+    Opt.Specific{1}.XLabel = ROIs;
+
+    Opt.Title = ['[Contra-Ipsi]_{' CondNamesIpsiContra{iROI}(1) '}'];
+
+    Opt = SetProfilePlottingOptions(Opt);
+
+    %     PlotProfileAndBetas(Opt);
+    %     PrintFigure(fullfile(OutputDir, 'crossside'));
+
+end
+
+%% Cross sensory
+
+Comparisons = {
+               [2, -6], [1, -5]
+               [4, -6], [3, -5]};
+
+ComparisonsNames = {'[A-T]', '[V-T]'};
+ColumnNames = {'contra', 'ipsi'};
+
+for iROI = 1:size(Comparisons, 1)
+
+    clear Opt;
+
+    for iColumn = 1:2
+
+        tmp = {Comparisons{iROI, iColumn}(1), Comparisons{iROI, iColumn}(2)};
+
+        ToPlot = AllocateProfileData(Data, ROIs, tmp);
+
+        Opt.Specific{1, iColumn} = ToPlot;
+        Opt.Specific{1, iColumn}.Titles = ColumnNames{iColumn};
+        Opt.Specific{1, iColumn}.XLabel = ROIs;
+
+    end
+
+    Opt.Title = ComparisonsNames{iROI};
+
+    Opt = SetProfilePlottingOptions(Opt);
+
+    %     PlotProfileAndBetas(Opt);
+    %     PrintFigure(fullfile(OutputDir, 'crosssensory'));
+
+end
+
+%% Plot crossside difference with contrast against baseline
+ROIs = {
+        'PT'
+        'V2'};
 
 for iROI = 1:size(ROIs, 1)
-    
-    Title = [ROIs{iROI} ' - [Contra & Ipsi]_T'];
-    XLabel = {'T contra', 'T ipsi'};
-    
-    Cdt1 = 6;
-    Cdt2 = 5;
-    
-    idx = ReturnRoiIndex(Data, ROIs{iROI});
-    
-    ToPlot = struct('Data', [], 'SubjectVec', [], 'ConditionVec', [], 'RoiVec', []);
-    
-    RowsToSelect = ReturnRowsToSelect({Data(idx, 1).ConditionVec, Cdt1});
-    RowsToSelect2 = ReturnRowsToSelect({Data(idx, 1).ConditionVec, Cdt2});
-    
-    ToPlot.Data = [ToPlot.Data; ...
-        Data(idx, 1).Data(RowsToSelect, :); ...
-        Data(idx, 1).Data(RowsToSelect2, :)];
-    ToPlot.SubjectVec = [ToPlot.SubjectVec; ...
-        Data(idx, 1).SubjVec(RowsToSelect, :); ...
-        Data(idx, 1).SubjVec(RowsToSelect2, :)];
-    ToPlot.ConditionVec = [ToPlot.ConditionVec; ...
-        Data(idx, 1).ConditionVec(RowsToSelect, :); ...
-        Data(idx, 1).ConditionVec(RowsToSelect2, :)];
-    
-    ToPlot.RoiVec = [ToPlot.RoiVec; ones(sum([RowsToSelect; RowsToSelect2]), 1) * iROI];
-    
-    Opt.Specific{1} = ToPlot;
-    Opt.Specific{1}.Titles = Title;
-    Opt.Specific{1}.XLabel = XLabel;
-    
+
+    clear Opt;
+
+    for iColumn = 1:2
+
+        if iColumn == 1
+
+            ToPlot = AllocateProfileData(Data, ROIs(iROI), {6; 5});
+
+            Opt.Specific{1, iColumn} = ToPlot;
+            Opt.Specific{1, iColumn}.Titles = 'contra & ipsi';
+            Opt.Specific{1, iColumn}.XLabel = {'contra', 'ipsi'};
+
+            Opt.Specific{1, iColumn}.ProfileSubplot = 1:4;
+            Opt.Specific{1, iColumn}.BetaSubplot = {9; 11; 13};
+
+        elseif iColumn == 2
+
+            ToPlot = AllocateProfileData(Data, ROIs(iROI), {6, -5});
+
+            Opt.Specific{1, iColumn} = ToPlot;
+            Opt.Specific{1, iColumn}.Titles = 'difference';
+            Opt.Specific{1, iColumn}.XLabel = {'difference'};
+
+            Opt.Specific{1, iColumn}.ProfileSubplot = 5:8;
+            Opt.Specific{1, iColumn}.BetaSubplot = {10; 12; 14};
+            Opt.Specific{1, iColumn}.LineColors = [127 127 127] / 256;
+
+        end
+
+    end
+
+    Opt.m = 2;
+    Opt.n = 5;
+    Opt.Title = [ROIs{iROI} ' - [Contra-Ipsi]_T'];
+
     Opt = SetProfilePlottingOptions(Opt);
-    
-    PlotProfileAndBetas(Opt);
-    
-    PrintFigure(OutputDir);
-    
+
+    %     PlotProfileAndBetas(Opt);
+    %     PrintFigure(fullfile(OutputDir, 'crossside'));
+
+end
+
+%% Plot [A-T] difference with contrast against baseline
+ROIs = {
+        'V1'
+        'V2'};
+
+Laterality = {'ipsi', 'contra'};
+
+Conditions = {[1 5], [2 6]};
+
+for iROI = 1:size(ROIs, 1)
+
+    for iLat = 1:2
+
+        clear Opt;
+
+        for iColumn = 1:2
+
+            if iColumn == 1
+
+                ToPlot = AllocateProfileData(Data, ROIs(iROI), ...
+                                             {Conditions{1, iLat}(1); Conditions{1, iLat}(2)});
+
+                Opt.Specific{1, iColumn} = ToPlot;
+                Opt.Specific{1, iColumn}.Titles = ['[A-T]_{' Laterality{iLat} '}'];
+                Opt.Specific{1, iColumn}.XLabel = {'audio', 'tactile'};
+
+                Opt.Specific{1, iColumn}.ProfileSubplot = 1:4;
+                Opt.Specific{1, iColumn}.BetaSubplot = {9; 11; 13};
+
+            elseif iColumn == 2
+
+                ToPlot = AllocateProfileData(Data, ROIs(iROI), ...
+                                             {Conditions{1, iLat}(1), -1 * Conditions{1, iLat}(2)});
+
+                Opt.Specific{1, iColumn} = ToPlot;
+                Opt.Specific{1, iColumn}.Titles = ['difference_{' Laterality{iLat} '}'];
+                Opt.Specific{1, iColumn}.XLabel = {'difference'};
+
+                Opt.Specific{1, iColumn}.ProfileSubplot = 5:8;
+                Opt.Specific{1, iColumn}.BetaSubplot = {10; 12; 14};
+                Opt.Specific{1, iColumn}.LineColors = [127 127 127] / 256;
+
+            end
+
+        end
+
+        Opt.m = 2;
+        Opt.n = 5;
+        Opt.Title = [ROIs{iROI} ' - [A-T]_{' Laterality{iLat} '}'];
+
+        Opt = SetProfilePlottingOptions(Opt);
+
+        PlotProfileAndBetas(Opt);
+        PrintFigure(fullfile(OutputDir, 'crosssensory'));
+
+    end
+
 end

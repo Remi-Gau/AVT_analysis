@@ -191,7 +191,7 @@ function test_OneRoiTwoConditions
 
     Opt.Specific{1, iColumn}.ProfileSubplot = 5:8;
     Opt.Specific{1, iColumn}.BetaSubplot = {10; 12; 14};
-    Opt.Specific{1, iColumn}.LineColors = [127 127 127]/256;
+    Opt.Specific{1, iColumn}.LineColors = [127 127 127] / 256;
 
     %%
     Opt.Title = 'Condition 1 and 2 in ROi 1';
