@@ -14,8 +14,8 @@ function PlotRectangle(Opt, PrintDepthLabel)
 
     Ax = gca;
     AxPos = Ax.Position;
-    AxPos(2) = AxPos(2) - .02;
-    AxPos(4) = .02;
+    AxPos(2) = AxPos(2) - .015;
+    AxPos(4) = .015;
     axes('Position', AxPos);
 
     Text = round(linspace(0, 100, Opt.NbLayers + 2));
@@ -49,6 +49,6 @@ function PlotRectangle(Opt, PrintDepthLabel)
         'xticklabel',  {'WM|     ' 'GM' '     |CSF'}, ...
         'ytick', [], ...
         'yticklabel', [], ...
-        'ticklength', [0.00001 0], ...
+        'ticklength', [0.0001 0], ...
         'fontsize', Opt.Fontsize);
 end

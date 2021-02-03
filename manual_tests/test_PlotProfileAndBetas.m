@@ -11,13 +11,13 @@ end
 function [Data, SubjectVec] = GenerateDataROI(OptGenData, ROI, Cdt)
 
     if ROI == 1 && Cdt == 1
-        Cst = -2;
+        Cst = 5;
         Lin = 0.8;
         Quad = 0.1;
     end
 
     if ROI == 2 && Cdt == 1
-        Cst = -2;
+        Cst = -5;
         Lin = 0.8;
         Quad = 0.1;
     end
@@ -176,6 +176,8 @@ function test_OneRoiTwoConditions
 
     Opt.Specific{1, iColumn}.ProfileSubplot = 1:4;
     Opt.Specific{1, iColumn}.BetaSubplot = {9; 11; 13};
+    Opt.Specific{1, iColumn}.LineColors = [256 127 127
+                                           127 256 127] / 256;
 
     %%
     iColumn = 2;
