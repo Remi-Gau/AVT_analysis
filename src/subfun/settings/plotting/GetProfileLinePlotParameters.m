@@ -3,11 +3,11 @@
 function ProfileLine = GetProfileLinePlotParameters()
 
     ProfileLine.LineColor = 'k';
-    ProfileLine.LineWidth = 2.5;
-    ProfileLine.ErrorLineWidth = 1;
+    ProfileLine.LineWidth = 3;
+    ProfileLine.ErrorLineWidth = 2;
     ProfileLine.LineStyle = '-';
     ProfileLine.Marker = 'o';
-    ProfileLine.MarkerSize = 2;
+    ProfileLine.MarkerSize = 8;
     ProfileLine.MarkerFaceColor = ProfileLine.LineColor;
     ProfileLine.Transparent = true;
 

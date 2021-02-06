@@ -67,21 +67,28 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
     axis([0, Xpos(numel(Opt.Specific{1, iColumn}.XLabel)) + .5, Min, Max]);
 
     %% Labels
+    XLabel = '';
+    if iParameter > 1
+        XLabel = Opt.Specific{1, iColumn}.XLabel;
+    end
     set(gca, ...
         'tickdir', 'out', ...
         'xtick', Xpos - 0.25, ...
-        'xticklabel', Opt.Specific{1, iColumn}.XLabel, ...
+        'xticklabel', XLabel, ...
         'xgrid', 'off', ...
         'ygrid', 'off', ...
         'ticklength', [0.01 0.01], ...
         'fontsize', Opt.Fontsize + 4);
+    
 
-    YLabel = '\nS Param. est. [a u]';
-    YLabel = [ParameterNames{iParameter}, YLabel];
-    t = ylabel(sprintf(YLabel));
-    set(t, ...
-        'fontweight', 'bold', ...
-        'fontsize', Opt.Fontsize);
+    if iColumn==1
+        YLabel = '\nS Param. est. [a u]';
+        YLabel = [ParameterNames{iParameter}, YLabel];
+        t = ylabel(sprintf(YLabel));
+        set(t, ...
+            'fontweight', 'bold', ...
+            'fontsize', Opt.Fontsize);
+    end
 
     %% Compute p values and print them
     % offset values for oncoming stats: accuracy tested against null = 0.5
@@ -91,7 +98,7 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
 
     [P, ~] = ComputePValue(AllGroupBetas, Opt, Opt.Specific{1, iColumn}.Ttest);
 
-    PrintPValue(P, Xpos - 0.25, Max - Margin / 4, Opt);
+    PrintPValue(P, Xpos - 0.25, Max + Margin / 6, Opt);
 
 end
 
@@ -227,13 +234,13 @@ function PrintPValue(P, Xpos, Ypos, Opt)
                      Xpos(iP) - .2, ...
                      Ypos, ...
                      sprintf(Sig));
-            set(t, 'fontsize', Opt.Fontsize);
+            set(t, 'fontsize', Opt.Fontsize - 2);
 
             if P(iP) < Opt.Alpha
                 set(t, ...
                     'color', 'k', ...
                     'fontweight', 'bold', ...
-                    'fontsize', Opt.Fontsize + 0.5);
+                    'fontsize', Opt.Fontsize - 2);
             end
 
         end

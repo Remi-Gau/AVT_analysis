@@ -15,6 +15,14 @@ function  PlotGroupProfile(Opt, iColumn)
 
     hold on;
     grid off;
+    
+    %% Baseline
+    IsMvpa = Opt.Specific{1, iColumn}.IsMvpa;
+    Baseline = [0, 0];
+    if IsMvpa
+        Baseline = [0.5, 0.5];
+    end
+    plot([0, Opt.NbLayers + 0.5], Baseline, '-k', 'LineWidth', 1);
 
     RoiVec = Opt.Specific{1, iColumn}.Group.RoiVec;
     ConditionVec = Opt.Specific{1, iColumn}.Group.ConditionVec;
@@ -47,14 +55,6 @@ function  PlotGroupProfile(Opt, iColumn)
 
         end
     end
-
-    %% Baseline
-    IsMvpa = Opt.Specific{1, iColumn}.IsMvpa;
-    Baseline = [0, 0];
-    if IsMvpa
-        Baseline = [0.5, 0.5];
-    end
-    plot([0, Opt.NbLayers + 0.5], Baseline, '-k', 'LineWidth', 1);
 
     %% Set tighet axes with margin
     [Min, Max] = ComputeMargin(Opt.Specific{1, iColumn}.Group.Min, ...
@@ -101,6 +101,7 @@ function PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iColum
     ProfileLine = GetProfileLinePlotParameters();
 
     if exist('iLine', 'var') && ~isempty(iLine)
+        ProfileLine.MarkerFaceColor = Opt.Specific{1, iColumn}.LineColors(iLine, :);
         ProfileLine.LineColor = Opt.Specific{1, iColumn}.LineColors(iLine, :);
     end
 
@@ -130,6 +131,9 @@ function PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iColum
                      UpperError);
 
         set(l, ...
+            'Marker', ProfileLine.Marker, ...
+            'MarkerSize', ProfileLine.MarkerSize, ...
+            'MarkerFaceColor', ProfileLine.MarkerFaceColor, ...            
             'LineStyle', ProfileLine.LineStyle, ...
             'Color', ProfileLine.LineColor, ...
             'LineWidth', ProfileLine.ErrorLineWidth);

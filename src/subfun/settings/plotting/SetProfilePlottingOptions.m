@@ -19,7 +19,10 @@ function Opt = SetProfilePlottingOptions(Opt)
     Opt.NbLayers = NbLayers;
 
     for i = 1:size(Opt.Specific, 2)
-        Opt.Specific{1, i}.PlotMinMaxType = 'group'; % all group groupallcolumns
+        if ~isfield(Opt.Specific{1, i}, 'PlotMinMaxType') || ...
+                isempty(Opt.Specific{1, i}.PlotMinMaxType)
+            Opt.Specific{1, i}.PlotMinMaxType = 'group'; % all group groupallcolumns
+        end
         Opt.Specific{1, i}.IsMvpa = false;
         Opt.Specific{1, i}.Ttest.SideOfTtest = 'both';
     end

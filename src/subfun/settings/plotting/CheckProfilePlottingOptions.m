@@ -2,7 +2,7 @@
 
 function Opt = CheckProfilePlottingOptions(Opt)
 
-    Opt.Fontsize = 8;
+    Opt.Fontsize = 10;
     Opt.Visible = 'on';
 
     % define subplot grid
@@ -20,15 +20,15 @@ function Opt = CheckProfilePlottingOptions(Opt)
 
     switch Opt.m
         case 1
-            Opt.FigDim = [50, 50, 600, 800];
+            Opt.FigDim = [50, 50, 600, 1000];
         case 2
-            Opt.FigDim = [50, 50, 1200, 800];
+            Opt.FigDim = [50, 50, 1200, 1000];
         case 3
-            Opt.FigDim = [50, 50, 1800, 800];
+            Opt.FigDim = [50, 50, 1800, 1000];
     end
 
     if Opt.n >= 5
-        Opt.FigDim(4) = 1000;
+        Opt.FigDim(4) = 1600;
     end
 
     if ~isfield(Opt, 'Title')

@@ -34,8 +34,8 @@ function [Data, SubjectVec] = GenerateDataROI(OptGenData, ROI, Cdt)
         Quad = 0.1;
     end
 
-    OptGenData.StdDevBetweenSubject = 2;
-    OptGenData.StdDevWithinSubject = 2;
+    OptGenData.StdDevBetweenSubject = 5;
+    OptGenData.StdDevWithinSubject = 5;
 
     OptGenData.Betas = [Cst; Lin; Quad];
 
@@ -68,6 +68,7 @@ function test_OneRoi
 
     Opt = SetProfilePlottingOptions(Opt);
     PlotProfileAndBetas(Opt);
+    PrintFigure(pwd)
 
 end
 
@@ -97,6 +98,7 @@ function test_TwoRois
 
     Opt = SetProfilePlottingOptions(Opt);
     PlotProfileAndBetas(Opt);
+    PrintFigure(pwd)
 
 end
 
@@ -145,6 +147,7 @@ function test_TwoRoisSeveralConditions
 
     Opt.Title = 'Condition 1 and 2 in ROi 1 and 2';
     PlotProfileAndBetas(Opt);
+    PrintFigure(pwd)
 
 end
 
@@ -160,7 +163,7 @@ function test_OneRoiTwoConditions
     %%
     iColumn = 1;
 
-    Opt.Specific{1, iColumn}.Titles = 'Condition 1 & 2';
+    Opt.Specific{1, iColumn}.Titles = ' ';
     Opt.Specific{1, iColumn}.XLabel = {'Cdt 1', 'Cdt 2'};
 
     [Data1, SubjectVec1] =  GenerateDataROI(OptGenData, 1, 1);
@@ -182,7 +185,7 @@ function test_OneRoiTwoConditions
     %%
     iColumn = 2;
 
-    Opt.Specific{1, iColumn}.Titles = 'Difference';
+    Opt.Specific{1, iColumn}.Titles = '';
     Opt.Specific{1, iColumn}.XLabel = {'Difference'};
 
     [Data, SubjectVec] = GenerateDataROI(OptGenData, 1, 1);
@@ -200,5 +203,6 @@ function test_OneRoiTwoConditions
 
     Opt = SetProfilePlottingOptions(Opt);
     PlotProfileAndBetas(Opt);
+    PrintFigure(pwd)
 
 end
