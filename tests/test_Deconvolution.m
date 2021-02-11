@@ -1,9 +1,6 @@
-OptGenData.NbSubject = 1;
-OptGenData.NbRuns = 200;
-OptGenData.NbLayers = 6;
-% (C) Copyright 2020 Remi Gau
+% (C) Copyright 2021 Remi Gau
 
-function test_suite = test_PerfomDeconvolution %#ok<*STOUT>
+function test_suite = test_Deconvolution %#ok<*STOUT>
     try % assignment of 'localfunctions' is necessary in Matlab >= 2016
         test_functions = localfunctions(); %#ok<*NASGU>
     catch % no problem; early Matlab versions can use initTestSuite fine
@@ -13,6 +10,10 @@ end
 
 function test_MeanDeconvolution
 
+    OptGenData.NbSubject = 1;
+    OptGenData.NbRuns = 200;
+    OptGenData.NbLayers = 6;
+    
     ROI = 1;
     Cdt = 1;
 
