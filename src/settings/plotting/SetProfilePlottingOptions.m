@@ -13,7 +13,8 @@ function Opt = SetProfilePlottingOptions(Opt)
     Opt.PermutationTest.Do = true;
     Opt.PermutationTest.Plot = false;
 
-    Opt.PlotSubjects = true;
+    Opt.PerformDeconvolution = true;
+
     Opt.ShadedErrorBar = false;
 
     Opt.NbLayers = NbLayers;
@@ -25,6 +26,21 @@ function Opt = SetProfilePlottingOptions(Opt)
         end
         Opt.Specific{1, i}.IsMvpa = false;
         Opt.Specific{1, i}.Ttest.SideOfTtest = 'both';
+        Opt.Specific{1, i}.PlotSubjects = false;
+    end
+
+    if isfield(Opt, 'IsDifferencePlot') && Opt.IsDifferencePlot
+        Opt.m = 2;
+        Opt.n = 10;
+
+        Opt.Specific{1, 1}.ProfileSubplot = 1:6;
+        Opt.Specific{1, 1}.BetaSubplot = {[15 17]; [19 21]; [23 25]};
+
+        Opt.Specific{1, 2}.ProfileSubplot = 7:12;
+        Opt.Specific{1, 2}.BetaSubplot = {[16 18]; [20 22]; [24 26]};
+        Opt.Specific{1, 2}.LineColors = [127 127 127] / 256;
+
+        Opt.Specific{1, 2}.PlotMinMaxType = 'group';
     end
 
 end

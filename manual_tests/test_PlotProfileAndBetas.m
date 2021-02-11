@@ -8,41 +8,6 @@ function test_suite = test_PlotProfileAndBetas %#ok<*STOUT>
     initTestSuite;
 end
 
-function [Data, SubjectVec] = GenerateDataROI(OptGenData, ROI, Cdt)
-
-    if ROI == 1 && Cdt == 1
-        Cst = 5;
-        Lin = 0.8;
-        Quad = 0.1;
-    end
-
-    if ROI == 2 && Cdt == 1
-        Cst = -5;
-        Lin = 0.8;
-        Quad = 0.1;
-    end
-
-    if ROI == 1 && Cdt == 2
-        Cst = -2;
-        Lin = -0.8;
-        Quad = 0.1;
-    end
-
-    if ROI == 2 && Cdt == 2
-        Cst = 2;
-        Lin = -0.4;
-        Quad = 0.1;
-    end
-
-    OptGenData.StdDevBetweenSubject = 5;
-    OptGenData.StdDevWithinSubject = 5;
-
-    OptGenData.Betas = [Cst; Lin; Quad];
-
-    [Data, SubjectVec] = GenerateGroupDataLaminarProfiles(OptGenData);
-
-end
-
 function test_OneRoi
 
     close all;
@@ -151,14 +116,13 @@ function test_TwoRoisSeveralConditions
 
 end
 
-function test_OneRoiTwoConditions
+function test_OneRoiTwoConditionsDifference
 
     OptGenData.NbSubject = 10;
     OptGenData.NbRuns = 20;
     OptGenData.NbLayers = 6;
 
-    Opt.m = 2;
-    Opt.n = 5;
+    Opt.IsDifferencePlot = true();
 
     %%
     iColumn = 1;
@@ -177,8 +141,6 @@ function test_OneRoiTwoConditions
     Opt.Specific{1, iColumn}.ConditionVec = [ones(size(Data1, 1), 1); 2 * ones(size(Data2, 1), 1)];
     Opt.Specific{1, iColumn}.RoiVec = [ones(size(Data1, 1), 1); ones(size(Data2, 1), 1)];
 
-    Opt.Specific{1, iColumn}.ProfileSubplot = 1:4;
-    Opt.Specific{1, iColumn}.BetaSubplot = {9; 11; 13};
     Opt.Specific{1, iColumn}.LineColors = [256 127 127
                                            127 256 127] / 256;
 
@@ -193,10 +155,6 @@ function test_OneRoiTwoConditions
     Opt.Specific{1, iColumn}.SubjectVec = SubjectVec;
     Opt.Specific{1, iColumn}.ConditionVec = ones(size(Data, 1), 1);
     Opt.Specific{1, iColumn}.RoiVec = ones(size(Data, 1), 1);
-
-    Opt.Specific{1, iColumn}.ProfileSubplot = 5:8;
-    Opt.Specific{1, iColumn}.BetaSubplot = {10; 12; 14};
-    Opt.Specific{1, iColumn}.LineColors = [127 127 127] / 256;
 
     %%
     Opt.Title = 'Condition 1 and 2 in ROi 1';

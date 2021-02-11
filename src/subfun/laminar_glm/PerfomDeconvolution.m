@@ -1,39 +1,41 @@
-function beta = PerfomDeconvolution(data, nb_layers, peak_to_tail_model, nb_layer_model, normalize)
+function DeconvolvedData = PerfomDeconvolution(Data, NbLayers, PeakToTailModel, NbLayerModel, Normalize)
     %
     %
     % adapted from simulation code from Uta Noppeney
 
-    if nargin < 3 || isempty(peak_to_tail_model)
+    if nargin < 3 || isempty(PeakToTailModel)
         % default from Makuerkiaga
-        peak_to_tail_model = 6.5;
+        PeakToTailModel = 6.5;
     end
-    if nargin < 4 || isempty(nb_layer_model)
+    if nargin < 4 || isempty(NbLayerModel)
         % default from Makuerkiaga
-        nb_layer_model = 10;
+        NbLayerModel = 10;
     end
     if nargin < 5 || isempty(nb_layernormalize_model)
-        normalize = false();
+        Normalize = false();
     end
 
-    peak = 1;
-    if normalize
-        peak = data;
+    Peak = 1;
+    if Normalize
+        Peak = Data;
     end
 
-    peak_to_tail = ComputePeakToTailRatio(nb_layers, peak_to_tail_model, nb_layer_model);
+    PeakToTail = ComputePeakToTailRatio(NbLayers, PeakToTailModel, NbLayerModel);
 
-    tail = 1 / peak_to_tail;
+    Tail = 1 / PeakToTail;
 
-    X = ReturnDeconvolutionMatrix(nb_layers, peak, tail);
+    X = ReturnDeconvolutionMatrix(NbLayers, Peak, Tail);
 
-    beta = pinv(X) * data';
+    Beta = pinv(X) * Data';
+
+    DeconvolvedData = Beta';
 
 end
 
-function peak_to_tail = ComputePeakToTailRatio(nb_layers, peak_to_tail_model, nb_layer_model)
+function PeakToTail = ComputePeakToTailRatio(NbLayers, PeakToTailModel, NbLayerModel)
 
     % peak to tail adjusted for the number of layers
-    peak_to_tail = peak_to_tail_model * nb_layers / nb_layer_model + ...
-                   (nb_layer_model - nb_layers) / (2 * nb_layer_model);
+    PeakToTail = PeakToTailModel * NbLayers / NbLayerModel + ...
+                   (NbLayerModel - NbLayers) / (2 * NbLayerModel);
 
 end

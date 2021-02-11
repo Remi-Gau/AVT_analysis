@@ -43,6 +43,10 @@ function Opt = CheckProfilePlottingOptions(Opt)
         Opt.PlotPValue = true;
     end
 
+    if ~isfield(Opt, 'PerformDeconvolution')
+        Opt.PerformDeconvolution = false;
+    end
+
     if Opt.PermutationTest.Do
         Opt.PermutationTest = CreatePermutationList(Opt.PermutationTest);
     end
@@ -59,13 +63,17 @@ function Opt = CheckProfilePlottingOptions(Opt)
 
         if Opt.Specific{i}.NbLines > 1
             Opt.ShadedErrorBar = false;
-            Opt.PlotSubjects = false;
+            Opt.Specific{i}.PlotSubjects = false;
         end
 
         if ~isfield(Opt.Specific{i}, 'LineColors')
             Opt.Specific{i}.LineColors = RoiColours();
         end
 
+    end
+
+    if Opt.PerformDeconvolution
+        Opt.Title = [Opt.Title ' - deconvolved'];
     end
 
 end

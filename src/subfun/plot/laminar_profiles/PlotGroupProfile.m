@@ -46,7 +46,7 @@ function  PlotGroupProfile(Opt, iColumn)
             GroupMean = mean(Data);
             [LowerError, UpperError] = ComputeDispersionIndex(Data, Opt);
 
-            PlotProfileSubjects(Data, Opt);
+            PlotProfileSubjects(Data, Opt.NbLayers, Opt.Specific{1, iColumn}.PlotSubjects);
 
             xOffset = (iLine - 1) * 0.1;
             PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iColumn, iLine);
@@ -153,9 +153,9 @@ function PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iColum
     end
 end
 
-function PlotProfileSubjects(GroupMean, Opt)
+function PlotProfileSubjects(GroupMean, NbLayers, PlotSubjects)
 
-    if Opt.PlotSubjects
+    if PlotSubjects
 
         % TODO
         % plot each subject with its own color
@@ -163,7 +163,7 @@ function PlotProfileSubjects(GroupMean, Opt)
 
         for SubjInd = 1:size(GroupMean, 1)
             plot( ...
-                 1:Opt.NbLayers, ...
+                 1:NbLayers, ...
                  GroupMean(SubjInd, :), '-', ...
                  'LineWidth', 1, ...
                  'Color', [0.7, 0.7, 0.7]);

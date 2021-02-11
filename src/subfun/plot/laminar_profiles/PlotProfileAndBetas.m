@@ -88,6 +88,10 @@ function Opt = ComputeSubjectProfileAndBetaAverage(Opt, iColumn)
             Data = Opt.Specific{1, iColumn}.Data(RowsToSelect, :);
             SubjectVec = Opt.Specific{1, iColumn}.SubjectVec(RowsToSelect, :);
 
+            if Opt.PerformDeconvolution
+                Data = PerfomDeconvolution(Data, Opt.NbLayers);
+            end
+
             % compute S parameter betas
             BetaHat = RunLaminarGlm(Data, DesignMatrix);
             DataTmp = ComputeSubjectAverage(BetaHat, SubjectVec);

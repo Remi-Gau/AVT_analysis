@@ -15,12 +15,12 @@ function test_PerfomDeconvolutionBasic()
     data(1, :) = [-0.6 -0.3  0    0.4  0.5  0.7]; % Target
     data(2, :) = [-0.3 -0.4 -0.5 -0.6 -0.8 -1]; % Stim
 
-    beta = PerfomDeconvolution(data, nb_layers);
+    deconvolved_data = PerfomDeconvolution(data, nb_layers);
 
     expected = [ ...
                 -0.6000   -0.1537    0.1838    0.5390    0.5075    0.5837
                 -0.3000   -0.3268   -0.3471   -0.3625   -0.4740   -0.5584];
 
-    assertElementsAlmostEqual(beta, expected', 'absolute', 0.0001);
+    assertElementsAlmostEqual(deconvolved_data, expected, 'absolute', 0.0001);
 
 end
