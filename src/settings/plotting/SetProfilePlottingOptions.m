@@ -13,7 +13,7 @@ function Opt = SetProfilePlottingOptions(Opt)
     Opt.PermutationTest.Do = true;
     Opt.PermutationTest.Plot = false;
 
-    Opt.PlotSubjects = false;
+    Opt.PlotSubjects = true;
     Opt.ShadedErrorBar = false;
 
     Opt.NbLayers = NbLayers;

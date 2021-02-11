@@ -79,9 +79,8 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
         'ygrid', 'off', ...
         'ticklength', [0.01 0.01], ...
         'fontsize', Opt.Fontsize + 4);
-    
 
-    if iColumn==1
+    if iColumn == 1
         YLabel = '\nS Param. est. [a u]';
         YLabel = [ParameterNames{iParameter}, YLabel];
         t = ylabel(sprintf(YLabel));

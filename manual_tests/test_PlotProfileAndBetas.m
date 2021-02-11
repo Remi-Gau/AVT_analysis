@@ -68,7 +68,7 @@ function test_OneRoi
 
     Opt = SetProfilePlottingOptions(Opt);
     PlotProfileAndBetas(Opt);
-    PrintFigure(pwd)
+    PrintFigure(pwd);
 
 end
 
@@ -98,7 +98,7 @@ function test_TwoRois
 
     Opt = SetProfilePlottingOptions(Opt);
     PlotProfileAndBetas(Opt);
-    PrintFigure(pwd)
+    PrintFigure(pwd);
 
 end
 
@@ -147,7 +147,7 @@ function test_TwoRoisSeveralConditions
 
     Opt.Title = 'Condition 1 and 2 in ROi 1 and 2';
     PlotProfileAndBetas(Opt);
-    PrintFigure(pwd)
+    PrintFigure(pwd);
 
 end
 
@@ -203,6 +203,6 @@ function test_OneRoiTwoConditions
 
     Opt = SetProfilePlottingOptions(Opt);
     PlotProfileAndBetas(Opt);
-    PrintFigure(pwd)
+    PrintFigure(pwd);
 
 end
