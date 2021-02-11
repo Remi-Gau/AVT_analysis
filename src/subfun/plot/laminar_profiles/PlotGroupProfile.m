@@ -6,7 +6,7 @@ function  PlotGroupProfile(Opt, iColumn)
         iColumn = 1;
     end
 
-    ThisSubplot = GetSubplotIndices(iColumn, Opt);
+    ThisSubplot = GetSubplotIndices(Opt, iColumn);
 
     subplot(Opt.n, Opt.m, ThisSubplot);
     PlotRectangle(Opt, true);
@@ -14,7 +14,15 @@ function  PlotGroupProfile(Opt, iColumn)
     subplot(Opt.n, Opt.m, ThisSubplot);
 
     hold on;
-    grid on;
+    grid off;
+
+    %% Baseline
+    IsMvpa = Opt.Specific{1, iColumn}.IsMvpa;
+    Baseline = [0, 0];
+    if IsMvpa
+        Baseline = [0.5, 0.5];
+    end
+    plot([0, Opt.NbLayers + 0.5], Baseline, '-k', 'LineWidth', 1);
 
     RoiVec = Opt.Specific{1, iColumn}.Group.RoiVec;
     ConditionVec = Opt.Specific{1, iColumn}.Group.ConditionVec;
@@ -38,23 +46,15 @@ function  PlotGroupProfile(Opt, iColumn)
             GroupMean = mean(Data);
             [LowerError, UpperError] = ComputeDispersionIndex(Data, Opt);
 
-            PlotProfileSubjects(Data, Opt);
+            PlotProfileSubjects(Data, Opt.NbLayers, Opt.Specific{1, iColumn}.PlotSubjects);
 
             xOffset = (iLine - 1) * 0.1;
-            PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iLine);
+            PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iColumn, iLine);
 
             iLine = iLine + 1;
 
         end
     end
-
-    %% Baseline
-    IsMvpa = Opt.Specific{1, iColumn}.IsMvpa;
-    Baseline = [0, 0];
-    if IsMvpa
-        Baseline = [0.5, 0.5];
-    end
-    plot([0, Opt.NbLayers + 0.5], Baseline, '-k', 'LineWidth', 1);
 
     %% Set tighet axes with margin
     [Min, Max] = ComputeMargin(Opt.Specific{1, iColumn}.Group.Min, ...
@@ -69,13 +69,14 @@ function  PlotGroupProfile(Opt, iColumn)
         'xticklabel', ' ', ...
         'ticklength', [0.01 0.1], ...
         'xgrid', 'off', ...
+        'ygrid', 'off', ...
         'fontsize', Opt.Fontsize);
 
-    XLabel = 'Cortical depth';
-    t = xlabel(XLabel);
-    set(t, ...
-        'fontweight', 'bold', ...
-        'fontsize', Opt.Fontsize);
+    %     XLabel = 'Cortical depth';
+    %     t = xlabel(XLabel);
+    %     set(t, ...
+    %         'fontweight', 'bold', ...
+    %         'fontsize', Opt.Fontsize);
 
     YLabel = 'B Param. est. [a u]';
     if IsMvpa
@@ -92,42 +93,33 @@ function  PlotGroupProfile(Opt, iColumn)
 
 end
 
-function PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iLine)
+function PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iColumn, iLine)
     %
     % Plots the laminar profile for BOLD or MVPA
     %
 
-    if nargin < 6 || isempty(iLine)
-        LINE_COLOR = 'k';
-    else
-        LINE_COLOR = Opt.LineColors(iLine, :);
+    ProfileLine = GetProfileLinePlotParameters();
+
+    if exist('iLine', 'var') && ~isempty(iLine)
+        ProfileLine.MarkerFaceColor = Opt.Specific{1, iColumn}.LineColors(iLine, :);
+        ProfileLine.LineColor = Opt.Specific{1, iColumn}.LineColors(iLine, :);
     end
-
-    LINE_WIDTH = 2;
-    MARKER = 'o';
-    MARKER_SIZE = 4;
-
-    LINE_STYLE = '-';
-    MARKER_FACE_COLOR = LINE_COLOR;
 
     xPosition = (1:Opt.NbLayers) + xOffset;
 
     if Opt.ShadedErrorBar
-
-        TRANSPARENT = true;
-
         shadedErrorBar( ...
                        xPosition, ...
                        GroupMean, ...
                        [LowerError; UpperError], ...
                        'lineProps', { ...
-                                     'Marker', MARKER, ...
-                                     'MarkerSize', MARKER_SIZE, ...
-                                     'MarkerFaceColor', MARKER_FACE_COLOR, ...
-                                     'LineStyle', LINE_STYLE, ...
-                                     'LineWidth', LINE_WIDTH, ...
-                                     'Color', LINE_COLOR}, ...
-                       'transparent', TRANSPARENT);
+                                     'Marker', ProfileLine.Marker, ...
+                                     'MarkerSize', ProfileLine.MarkerSize, ...
+                                     'MarkerFaceColor', ProfileLine.MarkerFaceColor, ...
+                                     'LineStyle', ProfileLine.LineStyle, ...
+                                     'LineWidth', ProfileLine.LineWidth, ...
+                                     'Color', ProfileLine.LineColor}, ...
+                       'transparent', ProfileLine.Transparent);
 
     else
 
@@ -139,27 +131,31 @@ function PlotMainProfile(GroupMean, LowerError, UpperError, Opt, xOffset, iLine)
                      UpperError);
 
         set(l, ...
-            'LineStyle', LINE_STYLE, ...
-            'Color', LINE_COLOR);
+            'Marker', ProfileLine.Marker, ...
+            'MarkerSize', ProfileLine.MarkerSize, ...
+            'MarkerFaceColor', ProfileLine.MarkerFaceColor, ...
+            'LineStyle', ProfileLine.LineStyle, ...
+            'Color', ProfileLine.LineColor, ...
+            'LineWidth', ProfileLine.ErrorLineWidth);
 
         l = plot( ...
                  xPosition, ...
                  GroupMean);
 
         set(l, ...
-            'Marker', MARKER, ...
-            'MarkerSize', MARKER_SIZE, ...
-            'MarkerFaceColor', MARKER_FACE_COLOR, ...
-            'LineStyle', LINE_STYLE, ...
-            'LineWidth', LINE_WIDTH, ...
-            'Color', LINE_COLOR);
+            'Marker', ProfileLine.Marker, ...
+            'MarkerSize', ProfileLine.MarkerSize, ...
+            'MarkerFaceColor', ProfileLine.MarkerFaceColor, ...
+            'LineStyle', ProfileLine.LineStyle, ...
+            'LineWidth', ProfileLine.LineWidth, ...
+            'Color', ProfileLine.LineColor);
 
     end
 end
 
-function PlotProfileSubjects(GroupMean, Opt)
+function PlotProfileSubjects(GroupMean, NbLayers, PlotSubjects)
 
-    if Opt.PlotSubjects
+    if PlotSubjects
 
         % TODO
         % plot each subject with its own color
@@ -167,7 +163,7 @@ function PlotProfileSubjects(GroupMean, Opt)
 
         for SubjInd = 1:size(GroupMean, 1)
             plot( ...
-                 1:Opt.NbLayers, ...
+                 1:NbLayers, ...
                  GroupMean(SubjInd, :), '-', ...
                  'LineWidth', 1, ...
                  'Color', [0.7, 0.7, 0.7]);
@@ -177,11 +173,16 @@ function PlotProfileSubjects(GroupMean, Opt)
 
 end
 
-function ThisSubplot = GetSubplotIndices(iCondtion, Opt)
+function ThisSubplot = GetSubplotIndices(Opt, iColumn)
     %
     % returns subplot on which to draw the lainar profile depending on the
     % number of columns in the figure
     %
+
+    if isfield(Opt.Specific{1, iColumn}, 'ProfileSubplot')
+        ThisSubplot = Opt.Specific{1, iColumn}.ProfileSubplot;
+        return
+    end
 
     switch Opt.m
 
@@ -190,7 +191,7 @@ function ThisSubplot = GetSubplotIndices(iCondtion, Opt)
 
         case 2
 
-            switch iCondtion
+            switch iColumn
                 case 1
                     ThisSubplot = [1 3];
 
@@ -200,7 +201,7 @@ function ThisSubplot = GetSubplotIndices(iCondtion, Opt)
 
         case 3
 
-            switch iCondtion
+            switch iColumn
                 case 1
                     ThisSubplot = [1 4];
 

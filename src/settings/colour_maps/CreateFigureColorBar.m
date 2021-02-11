@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 function CreateFigureColorBar(Name, MIN, MAX, ColorMap)
 
     if nargin < 1

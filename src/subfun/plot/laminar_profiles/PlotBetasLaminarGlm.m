@@ -8,12 +8,21 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
 
     ParameterNames = {'Constant', 'Linear', 'Quadratic'};
 
-    ThisSubplot = GetSubplotIndex(iColumn, iParameter, Opt);
+    ThisSubplot = GetSubplotIndex(Opt, iColumn, iParameter);
 
     subplot(Opt.n, Opt.m, ThisSubplot);
 
     hold on;
     grid on;
+
+    %% plot zero line
+    Baseline = [0, 0];
+    IsMvpa = Opt.Specific{1, iColumn}.IsMvpa;
+    if IsMvpa
+        Baseline = [0.5, 0.5];
+    end
+    Xpos = ReturnXpositionViolinPlot();
+    plot([0, max(Xpos) + 0.5], Baseline, '-k', 'LineWidth', 1);
 
     RoiVec = Opt.Specific{1, iColumn}.Group.RoiVec;
     ConditionVec = Opt.Specific{1, iColumn}.Group.ConditionVec;
@@ -39,47 +48,46 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
             AllGroupBetas(:, iLine) = DataToPlot; %#ok<*AGROW>
 
             %% Main plot
-            ViolinPlot(DataToPlot, Opt, iLine);
+            ViolinPlot(DataToPlot, Opt, iColumn, iLine);
 
             %% Plot mean + dispersion
-            PlotMeanAndDispersion(DataToPlot, Opt, iLine);
+            PlotMeanAndDispersion(DataToPlot, Opt, iColumn, iLine);
 
             iLine = iLine + 1;
 
         end
     end
 
-    %% plot zero line
-    Baseline = [0, 0];
-    IsMvpa = Opt.Specific{1, iColumn}.IsMvpa;
-    if IsMvpa
-        Baseline = [0.5, 0.5];
-    end
-    Xpos = ReturnXpositionViolinPlot();
-    plot([0, max(Xpos) + 0.5], Baseline, '-k', 'LineWidth', 1);
-
-    %% Tight fight with some vertical margin
+    %% Tight fit with some vertical margin
+    ViolinPlotParameters = GetViolinPlotParameters();
     [Min, Max, Margin] = ComputeMargin(Opt.Specific{1, iColumn}.Group.Beta.Min, ...
                                        Opt.Specific{1, iColumn}.Group.Beta.Max, ...
-                                       6);
+                                       ViolinPlotParameters.Margin);
 
-    axis([0, Xpos(numel(Opt.Specific{1, iColumn}.RoiNames)) + .5, Min, Max]);
+    axis([0, Xpos(numel(Opt.Specific{1, iColumn}.XLabel)) + .5, Min, Max]);
 
     %% Labels
+    XLabel = '';
+    if iParameter > 1
+        XLabel = Opt.Specific{1, iColumn}.XLabel;
+    end
     set(gca, ...
         'tickdir', 'out', ...
         'xtick', Xpos - 0.25, ...
-        'xticklabel', Opt.Specific{1, iColumn}.RoiNames, ...
+        'xticklabel', XLabel, ...
         'xgrid', 'off', ...
+        'ygrid', 'off', ...
         'ticklength', [0.01 0.01], ...
-        'fontsize', Opt.Fontsize);
+        'fontsize', Opt.Fontsize + 4);
 
-    YLabel = '\nS Param. est. [a u]';
-    YLabel = [ParameterNames{iParameter}, YLabel];
-    t = ylabel(sprintf(YLabel));
-    set(t, ...
-        'fontweight', 'bold', ...
-        'fontsize', Opt.Fontsize);
+    if iColumn == 1
+        YLabel = '\nS Param. est. [a u]';
+        YLabel = [ParameterNames{iParameter}, YLabel];
+        t = ylabel(sprintf(YLabel));
+        set(t, ...
+            'fontweight', 'bold', ...
+            'fontsize', Opt.Fontsize);
+    end
 
     %% Compute p values and print them
     % offset values for oncoming stats: accuracy tested against null = 0.5
@@ -89,11 +97,11 @@ function PlotBetasLaminarGlm(Opt, iParameter, iColumn)
 
     [P, ~] = ComputePValue(AllGroupBetas, Opt, Opt.Specific{1, iColumn}.Ttest);
 
-    PrintPValue(P, Xpos - 0.25, Max - Margin / 2, Opt);
+    PrintPValue(P, Xpos - 0.25, Max + Margin / 6, Opt);
 
 end
 
-function  ThisSubplot = GetSubplotIndex(iCondtion, iParameter, Opt)
+function  ThisSubplot = GetSubplotIndex(Opt, iColumn, iParameter)
     %
     % returns subplot on which to draw the laminar profile depending on the
     % number of columns in the figure
@@ -108,6 +116,11 @@ function  ThisSubplot = GetSubplotIndex(iCondtion, iParameter, Opt)
     % the second column fo subplots, we take the element SubplotTable(1, 3 , 2)
     %
 
+    if isfield(Opt.Specific{1, iColumn}, 'BetaSubplot')
+        ThisSubplot = Opt.Specific{1, iColumn}.BetaSubplot{iParameter};
+        return
+    end
+
     SubplotTable(:, :, 1) = [ ...
                              3, 5, 7
                              4, 7, 10
@@ -121,47 +134,35 @@ function  ThisSubplot = GetSubplotIndex(iCondtion, iParameter, Opt)
     SubplotTable(:, :, 3) = SubplotTable(:, :, 2) + 1;
     SubplotTable(:, 2, 3) = nan(3, 1);
 
-    ThisSubplot = SubplotTable(iParameter, Opt.m, iCondtion);
+    ThisSubplot = SubplotTable(iParameter, Opt.m, iColumn);
 
 end
 
-function ViolinPlot(GroupData, Opt, iLine)
+function ViolinPlot(GroupData, Opt, iColumn, iLine)
 
-    DIST_WIDTH = 0.5;
-    SHOW_MEAN_MEDIAN = 0;
-    GLOBAL_NORM = 2;
+    ViolinPlotParameters = GetViolinPlotParameters();
 
-    MARKER = 'o';
-    MARKER_SIZE = 5;
-    MARKER_EDGE_COLOR = 'k';
-    MARKER_FACE_COLOR = 'w';
-
-    LINE_WIDTH = 1;
-    BIN_WIDTH = 0.5;
-    SPREAD_WIDTH = 0.5;
-
-    Color = Opt.LineColors(iLine, :);
     Xpos = ReturnXpositionViolinPlot();
 
     distributionPlot( ...
                      GroupData, ...
                      'xValues', Xpos(iLine), ...
-                     'color', Color, ...
-                     'distWidth', DIST_WIDTH, ...
-                     'showMM', SHOW_MEAN_MEDIAN, ...
-                     'globalNorm', GLOBAL_NORM);
+                     'color', Opt.Specific{1, iColumn}.LineColors(iLine, :), ...
+                     'distWidth', ViolinPlotParameters.DistWidth, ...
+                     'showMM', ViolinPlotParameters.ShowMeanMedian, ...
+                     'globalNorm', ViolinPlotParameters.GlobalNorm);
 
     h = plotSpread( ...
                    GroupData, ...
                    'xValues', Xpos(iLine), ...
-                   'distributionMarkers', {MARKER}, ...
-                   'binWidth', BIN_WIDTH, ...
-                   'spreadWidth', SPREAD_WIDTH);
+                   'distributionMarkers', {ViolinPlotParameters.Marker}, ...
+                   'binWidth', ViolinPlotParameters.BinWidth, ...
+                   'spreadWidth', ViolinPlotParameters.SpreadWidth);
     set(h{1}, ...
-        'MarkerSize', MARKER_SIZE, ...
-        'MarkerEdgeColor', MARKER_EDGE_COLOR, ...
-        'MarkerFaceColor', MARKER_FACE_COLOR, ...
-        'LineWidth', LINE_WIDTH);
+        'MarkerSize', ViolinPlotParameters.MarkerSize, ...
+        'MarkerEdgeColor', ViolinPlotParameters.MarkerEdgeColor, ...
+        'MarkerFaceColor', ViolinPlotParameters.MarkerFaceColor, ...
+        'LineWidth', ViolinPlotParameters.LineWidth);
 
     %  TODO
     %  Plot each subject with its color
@@ -180,16 +181,14 @@ function ViolinPlot(GroupData, Opt, iLine)
 
 end
 
-function PlotMeanAndDispersion(GroupData, Opt, iLine)
+function PlotMeanAndDispersion(GroupData, Opt, iColumn, iLine)
     %
     % Plots a thin error bar and a thick line across data points
     %
 
-    LINE_WIDTH = 1;
-    MARKER = 'o';
-    MARKER_SIZE = 5;
+    [~, MeanDispersion] = GetViolinPlotParameters();
 
-    Color = Opt.LineColors(iLine, :);
+    Color = Opt.Specific{1, iColumn}.LineColors(iLine, :);
     Xpos = ReturnXpositionViolinPlot();
 
     GroupMean =  mean(GroupData);
@@ -202,7 +201,7 @@ function PlotMeanAndDispersion(GroupData, Opt, iLine)
                  UpperError);
 
     set(l, ...
-        'LineWidth', LINE_WIDTH, ...
+        'LineWidth', MeanDispersion.LineWidth, ...
         'Color', Color);
 
     l = plot( ...
@@ -210,8 +209,8 @@ function PlotMeanAndDispersion(GroupData, Opt, iLine)
              GroupMean);
 
     set(l, ...
-        'Marker', MARKER, ...
-        'MarkerSize', MARKER_SIZE, ...
+        'Marker', MeanDispersion.Marker, ...
+        'MarkerSize', MeanDispersion.MarkerSize, ...
         'MarkerFaceColor', Color, ...
         'Color', Color);
 
@@ -234,13 +233,13 @@ function PrintPValue(P, Xpos, Ypos, Opt)
                      Xpos(iP) - .2, ...
                      Ypos, ...
                      sprintf(Sig));
-            set(t, 'fontsize', Opt.Fontsize);
+            set(t, 'fontsize', Opt.Fontsize - 2);
 
             if P(iP) < Opt.Alpha
                 set(t, ...
                     'color', 'k', ...
                     'fontweight', 'bold', ...
-                    'fontsize', Opt.Fontsize + 0.5);
+                    'fontsize', Opt.Fontsize - 2);
             end
 
         end

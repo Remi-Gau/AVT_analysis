@@ -2,80 +2,25 @@
 
 function PlotProfileAndBetas(Opt)
 
-    Opt = CheckPlottingOptions(Opt);
+    Opt = CheckProfilePlottingOptions(Opt);
 
-    figure('Name', 'test', ...
+    figure('Name', Opt.Title, ...
            'Position', Opt.FigDim);
 
     SetFigureDefaults(Opt);
 
-    DesignMatrix = SetDesignMatLamGlm(Opt.NbLayers, true);
+    for iColumn = 1:size(Opt.Specific, 2)
 
-    %% Compute subject average for profile and beta
-    for iColumn = 1:Opt.m
-
-        RoiVec = Opt.Specific{1, iColumn}.RoiVec;
-        ConditionVec = Opt.Specific{1, iColumn}.ConditionVec;
-
-        RoiList = unique(RoiVec);
-        CdtList = unique(ConditionVec);
-
-        Group.Data = [];
-        Group.Mean = [];
-        Group.UpperError = [];
-        Group.LowerError = [];
-
-        GroupBeta.Data = [];
-        GroupBeta.Mean = [];
-        GroupBeta.UpperError = [];
-        GroupBeta.LowerError = [];
-
-        GroupRoiVec = [];
-        GroupConditionVec = [];
-        GroupSubjectVec = [];
-
-        for iRoi = 1:numel(RoiList)
-
-            for iCdt = 1:numel(CdtList)
-
-                Criteria = {
-                            RoiVec, RoiList(iRoi); ...
-                            ConditionVec, CdtList(iCdt)};
-                RowsToSelect = ReturnRowsToSelect(Criteria);
-
-                Data = Opt.Specific{1, iColumn}.Data(RowsToSelect, :);
-                SubjectVec = Opt.Specific{1, iColumn}.SubjectVec(RowsToSelect, :);
-
-                % compute S parameter betas
-                BetaHat = RunLaminarGlm(Data, DesignMatrix);
-                DataTmp = ComputeSubjectAverage(BetaHat, SubjectVec);
-                GroupBeta = AppendMeanAndError(DataTmp, GroupBeta, Opt);
-
-                % compute profile for each subject
-                [DataTmp, SubjTmp] = ComputeSubjectAverage(Data, SubjectVec);
-                Group = AppendMeanAndError(DataTmp, Group, Opt);
-
-                GroupSubjectVec = [GroupSubjectVec; SubjTmp]; %#ok<*AGROW>
-                GroupRoiVec = [GroupRoiVec; ones(size(SubjTmp)) * iRoi];
-                GroupConditionVec = [GroupConditionVec; ones(size(SubjTmp)) * iCdt];
-
-            end
-
-        end
-
-        Opt.Specific{1, iColumn}.Group = Group;
-        Opt.Specific{1, iColumn}.Group.Beta = GroupBeta;
-        Opt.Specific{1, iColumn}.Group.SubjectVec = GroupSubjectVec;
-        Opt.Specific{1, iColumn}.Group.RoiVec = GroupRoiVec;
-        Opt.Specific{1, iColumn}.Group.ConditionVec = GroupConditionVec;
+        Opt = ComputeSubjectProfileAndBetaAverage(Opt, iColumn);
 
         AllData(1, iColumn) = Opt.Specific{1, iColumn}.Group;
         BetaData(1, iColumn) = Opt.Specific{1, iColumn}.Group.Beta;
 
     end
 
-    for iColumn = 1:Opt.m
+    for iColumn = 1:size(Opt.Specific, 2)
 
+        %% Plot profiles
         [Min, Max] = ComputeMinMax(Opt.Specific{1, iColumn}.PlotMinMaxType, ...
                                    AllData, ...
                                    Opt, ...
@@ -85,6 +30,7 @@ function PlotProfileAndBetas(Opt)
 
         PlotGroupProfile(Opt, iColumn);
 
+        %% Plot s parameters
         SparamToPlot = 2;
         if Opt.PlotQuadratic
             SparamToPlot = 3;
@@ -106,67 +52,68 @@ function PlotProfileAndBetas(Opt)
 
     end
 
+    mtit(upper(Opt.Title), ...
+         'fontsize', Opt.Fontsize + 4, ...
+         'xoff', 0, ...
+         'yoff', .05);
+
 end
 
-function Opt = CheckPlottingOptions(Opt)
+function Opt = ComputeSubjectProfileAndBetaAverage(Opt, iColumn)
 
-    Opt.Fontsize = 8;
-    Opt.Visible = 'on';
+    DesignMatrix = SetDesignMatLamGlm(Opt.NbLayers, true);
 
-    % define subplot grid
-    Opt.m = size(Opt.Specific, 2);
+    RoiVec = Opt.Specific{1, iColumn}.RoiVec;
+    ConditionVec = Opt.Specific{1, iColumn}.ConditionVec;
 
-    Opt.n = 3;
-    if Opt.PlotQuadratic
-        Opt.n = 4;
-    end
-    Opt.n = Opt.n + 1;
+    RoiList = unique(RoiVec);
+    CdtList = unique(ConditionVec);
 
-    switch Opt.m
-        case 1
-            Opt.FigDim = [50, 50, 600, 800];
-        case 2
-            Opt.FigDim = [50, 50, 1200, 800];
-        case 3
-            Opt.FigDim = [50, 50, 1800, 800];
-    end
+    Group = struct('Data', [], 'Mean', [], 'UpperError', [], 'LowerError', []);
+    GroupBeta = Group;
 
-    if Opt.PlotQuadratic
-        Opt.FigDim(4) = 1000;
-    end
+    GroupRoiVec = [];
+    GroupConditionVec = [];
+    GroupSubjectVec = [];
 
-    if ~isfield(Opt, 'PermutationTest')
-        Opt.PermutationTest.Do = false;
-    end
+    for iRoi = 1:numel(RoiList)
 
-    if ~isfield(Opt, 'PlotPValue')
-        Opt.PlotPValue = true;
-    end
+        for iCdt = 1:numel(CdtList)
 
-    if ~isfield(Opt, 'LineColors')
-        Opt.LineColors = RoiColours();
-    end
+            Criteria = {
+                        RoiVec, RoiList(iRoi); ...
+                        ConditionVec, CdtList(iCdt)};
+            RowsToSelect = ReturnRowsToSelect(Criteria);
 
-    if Opt.PermutationTest.Do
-        Opt.PermutationTest = CreatePermutationList(Opt.PermutationTest);
-    end
+            Data = Opt.Specific{1, iColumn}.Data(RowsToSelect, :);
+            SubjectVec = Opt.Specific{1, iColumn}.SubjectVec(RowsToSelect, :);
 
-    if contains(Opt.ErrorBarType, 'CI')
-        Opt.ShadedErrorBar = false;
-    end
+            if Opt.PerformDeconvolution
+                Data = PerfomDeconvolution(Data, Opt.NbLayers);
+            end
 
-    for i = 1:Opt.m
+            % compute S parameter betas
+            BetaHat = RunLaminarGlm(Data, DesignMatrix);
+            DataTmp = ComputeSubjectAverage(BetaHat, SubjectVec);
+            GroupBeta = AppendMeanAndError(DataTmp, GroupBeta, Opt);
 
-        Opt.Specific{i}.NbLines = prod([ ...
-                                        numel(unique(Opt.Specific{i}.ConditionVec)); ...
-                                        numel(unique(Opt.Specific{i}.RoiVec))]);
+            % compute profile for each subject
+            [DataTmp, SubjTmp] = ComputeSubjectAverage(Data, SubjectVec);
+            Group = AppendMeanAndError(DataTmp, Group, Opt);
 
-        if Opt.Specific{i}.NbLines > 1
-            Opt.ShadedErrorBar = false;
-            Opt.PlotSubjects = false;
+            GroupSubjectVec = [GroupSubjectVec; SubjTmp]; %#ok<*AGROW>
+            GroupRoiVec = [GroupRoiVec; ones(size(SubjTmp)) * iRoi];
+            GroupConditionVec = [GroupConditionVec; ones(size(SubjTmp)) * iCdt];
+
         end
 
     end
+
+    Opt.Specific{1, iColumn}.Group = Group;
+    Opt.Specific{1, iColumn}.Group.Beta = GroupBeta;
+    Opt.Specific{1, iColumn}.Group.SubjectVec = GroupSubjectVec;
+    Opt.Specific{1, iColumn}.Group.RoiVec = GroupRoiVec;
+    Opt.Specific{1, iColumn}.Group.ConditionVec = GroupConditionVec;
 
 end
 

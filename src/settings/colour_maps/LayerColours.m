@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 function COLOR_LAYERS = LayerColours()
 
     COLOR_LAYERS = flipud([

@@ -1,13 +1,23 @@
 % (C) Copyright 2020 Remi Gau
-
-% Compiles data for a ROI from the different subjects and creates a single array for
+%
+% Compiles BOLD profile data for a ROI from the different subjects and creates a single array for
 % all subjects, runs, conditions, layers
+%
+% For each subject tha data is:
 %
 % - rearrange the data as ipsi and contra
 % - averages across vertices
+%
+% ``GrpData``
+%
 % - m X n array:
 %   - n = number of layers
 %   - m = nb_subject * nb_runs * nb_conditions
+%
+% Note that the data from run 17 of subject
+% 6 is omitted in the output: this run is missing auditory stimulation and
+% creates some imbalances in downstream analysis that are easier resvolved by
+% removing all the data from that run.
 
 clc;
 clear;
@@ -26,10 +36,7 @@ ROIs = {
 %%
 MVNN = false;
 
-% average across vertices / voxels
-AverageType = 'median';
-
-NbLayers = 6;
+[NbLayers, AverageType] = GetPlottingDefaults();
 
 DoFeaturePooling = true;
 
@@ -78,13 +85,11 @@ for iROI = 1:numel(ROIs)
             load(Filename, ...
                  'RoiData', 'ConditionVec', 'RunVec', 'LayerVec');
 
-            DataHs{1, ihs} = ReassignIpsiAndContra(RoiData, ConditionVec, HsSufix, DoFeaturePooling);
+            Data{1, ihs} = ReassignIpsiAndContra(RoiData, ConditionVec, HsSufix, DoFeaturePooling);
 
         end
 
-        % Pool data between hemispheres
-        Data = [DataHs{1, 1} DataHs{1, 2}];
-        clear DataHs;
+        Data = CombineDataBothHemisphere(Data);
 
         % Temp variable to store the surface parameter beta values
         % - nb of surface parameters to estimate
@@ -96,16 +101,22 @@ for iROI = 1:numel(ROIs)
 
         iBeta = 1;
 
+        % average across vertices / voxels for each run and condition
         for iRun = 1:max(RunVec)
 
             for iCdt = 1:max(ConditionVec)
 
                 beta2select = all([ConditionVec == iCdt, RunVec == iRun], 2);
 
+                % omit data from run 17 of subject 06
+                if strcmp(SubLs(iSub).name, 'sub-06') && iRun == 17
+                    beta2select = false;
+                end
+
                 % to skip subjects with missing conditions
                 if any(beta2select)
 
-                    tmp = Data(beta2select, :);
+                    tmp = Data{1}(beta2select, :);
                     switch AverageType
                         case 'mean'
                             tmp = mean(tmp, 2);
