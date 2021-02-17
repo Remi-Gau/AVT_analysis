@@ -1,6 +1,6 @@
 % (C) Copyright 2021 Remi Gau
 
-function Data = LoadProfileData(ROIs, InputDir)
+function [Data, CondNamesIpsiContra] = LoadProfileData(ROIs, InputDir)
 
     [NbLayers, AverageType] = GetPlottingDefaults();
 
@@ -17,6 +17,7 @@ function Data = LoadProfileData(ROIs, InputDir)
         Data(iROI, 1).Data = GrpData;
         Data(iROI, 1).ConditionVec = GrpConditionVec;
         Data(iROI, 1).SubjVec = SubjVec;
+        Data(iROI, 1).RunVec = GrpRunVec;
 
     end
 end
