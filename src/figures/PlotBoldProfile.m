@@ -29,7 +29,7 @@ function PlotBoldProfile()
     AgainstBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
     CrossSide(Data, ROIs, OutputDir, CondNamesIpsiContra);
     CrossSensory(Data, ROIs, OutputDir);
-    Target_get_Stim(Data, ROIs, OutputDir);
+    Target_gt_Stim(Data, ROIs, OutputDir);
     CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
     A_gt_T_WithBaseline(Data, OutputDir);
     V_gt_T_WithBaseline(Data, OutputDir);
@@ -135,7 +135,7 @@ function CrossSensory(Data, ROIs, OutputDir)
 
 end
 
-function Target_get_Stim(Data, ROIs, OutputDir)
+function Target_gt_Stim(Data, ROIs, OutputDir)
 
     Comparisons = {
                    [7, -1], [8, -2]
