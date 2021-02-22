@@ -2,7 +2,7 @@
 
 function [GroupData, SubjectVec] = ComputeSubjectAverage(Data, SubjectVec)
     %
-    % Given tidy data and a vector specifying which rows belongs to which
+    % Given almost tidy data and a vector specifying which rows belongs to which
     % subject, it returns an array with one row per subject.
     %
     % USAGE::
