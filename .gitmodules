@@ -19,3 +19,6 @@
 [submodule "lib/CPP_BIDS_SPM_pipeline"]
 	path = lib/CPP_BIDS_SPM_pipeline
 	url = https://github.com/cpp-lln-lab/CPP_BIDS_SPM_pipeline.git
+[submodule "lib/laminar_tools"]
+	path = lib/laminar_tools
+	url = https://github.com/Remi-Gau/laminar_tools.git
