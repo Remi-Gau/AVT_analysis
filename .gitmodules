@@ -1,9 +1,6 @@
 [submodule "lib/spmup"]
 	path = lib/spmup
 	url = https://github.com/CPernet/spmup.git
-[submodule "lib/shadedErrorBar"]
-	path = lib/shadedErrorBar
-	url = https://github.com/raacampbell/shadedErrorBar.git
 [submodule "lib/matlab_for_cbs_tools"]
 	path = lib/matlab_for_cbs_tools
 	url = https://github.com/Remi-Gau/matlab_for_cbs_tools.git
