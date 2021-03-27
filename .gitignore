@@ -6,6 +6,6 @@
 *.wav
 *.m~
 
-avt/**
+envs/**
 docs/build/*
 .vscode/*.json
