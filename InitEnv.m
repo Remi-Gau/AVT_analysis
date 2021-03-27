@@ -55,7 +55,6 @@ function InitEnv()
     % and ask user to update submodules.
     AddDependencies();
 
-
     disp('Correct matlab/octave verions and added to the path!');
 
 end
@@ -92,12 +91,11 @@ function tryInstallFromForge(packageName)
 end
 
 function AddDependencies()
-    
+
     pth = fileparts(mfilename('fullpath'));
 
     % TODO make a cleaner import of the lib folder
     addpath(genpath(fullfile(pth, 'lib')));
     addpath(genpath(fullfile(pth, 'src')));
-
 
 end
