@@ -97,5 +97,8 @@ function AddDependencies()
     % TODO make a cleaner import of the lib folder
     addpath(genpath(fullfile(pth, 'lib')));
     addpath(genpath(fullfile(pth, 'src')));
+    
+    spm('defaults', 'fmri');
+    spm_jobman('initcfg');
 
 end
