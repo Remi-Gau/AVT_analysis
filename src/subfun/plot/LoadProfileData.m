@@ -2,7 +2,7 @@
 
 function [Data, CondNamesIpsiContra] = LoadProfileData(ROIs, InputDir)
 
-    [NbLayers, AverageType] = GetPlottingDefaults();
+    [NbLayers, AverageType] = SetPlottingParameters();
 
     for iROI =  1:numel(ROIs)
 

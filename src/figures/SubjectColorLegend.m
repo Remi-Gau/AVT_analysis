@@ -1,5 +1,5 @@
 [SubLs, NbSub] = GetSubjectList();
-COLOR_SUBJECTS = SubjectColours();
+COLOR_SUBJECTS = SubjectColors();
 
 figure(1);
 hold on;
