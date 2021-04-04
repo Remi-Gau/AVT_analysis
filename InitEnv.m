@@ -20,7 +20,7 @@ function InitEnv()
     
     % required package list
     octaveVersion = '4.0.3';
-    installlist = {'statistics', 'image'};
+    installlist = {}; %{'statistics', 'image'};
     
     if IsOctave()
         
