@@ -59,8 +59,8 @@ function InitEnv()
 
     run(fullfile(pth, 'lib', 'laminar_tools', 'InitLaminarTools'));
     if IsOctave
-        addpath(genpath(fullfile((pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'src')))
-        addpath(genpath(fullfile((pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'lib')))
+        addpath(genpath(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'src')));
+        addpath(genpath(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'lib')));
     else
         run(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'initCppSpm'));
     end
