@@ -1,11 +1,15 @@
 % (C) Copyright 2020 Remi Gau
 
-% Runs the laminar GLM on each beta image mapped onto a set of surfaces and extracted
-% for a given ROI.
+% Runs the laminar GLM on each beta image mapped onto a set of surfaces 
+% and extracted for a given ROI.
+%
 % Does so by looping through runs and conditions.
-% Stores the results in a separate matrix that will be reshape into a tidy 2D
-% before saving.
+%
+% Stores the results in a separate matrix 
+% that will be reshape into a tidy 2D before saving.
+%
 % Also creates new condition and run vector to pass on to the next analysis stage.
+%
 % After that we check that we have processed all the betas we had: no more, no less.
 
 clc;

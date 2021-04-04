@@ -24,16 +24,16 @@ ROIs = { ...
         'V2'
        };
 
-[NbLayers, AverageType] = GetPlottingDefaults();
+Opt = SetDefaults();
 
-[Data, CondNamesIpsiContra] = LoadProfileData(ROIs, InputDir);
+[Data, CondNamesIpsiContra] = LoadProfileData(Opt, ROIs, InputDir);
 
 Quad = false();
-DesignMatrix = SetDesignMatLamGlm(NbLayers, Quad);
+DesignMatrix = SetDesignMatLamGlm(Opt.NbLayers, Quad);
 
 for iROI = 1:numel(Data)
 
-    GrpData = PerfomDeconvolution(Data(iROI).Data, NbLayers);
+    GrpData = PerfomDeconvolution(Data(iROI).Data, Opt.NbLayers);
 
     BetaHat = RunLaminarGlm(GrpData, DesignMatrix);
 
@@ -42,8 +42,8 @@ for iROI = 1:numel(Data)
     GrpConditionVec = Data(iROI, 1).ConditionVec;
 
     Filename = ['Group-roi-', Data(iROI).RoiName, ...
-                '_average-', AverageType, ...
-                '_nbLayers-', num2str(NbLayers), '_deconvolved.mat' ...
+                '_average-', Opt.AverageType, ...
+                '_Opt.NbLayers-', num2str(Opt.NbLayers), '_deconvolved.mat' ...
                ];
 
     save(fullfile(InputDir, Filename), ...
