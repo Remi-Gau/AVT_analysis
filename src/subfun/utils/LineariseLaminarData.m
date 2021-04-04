@@ -8,13 +8,13 @@ function [Data, CvMat] = LineariseLaminarData(Data, CvMat)
     %
     %   [Data, CvMat] = LineariseLaminarData(Data, CvMat)
     %
-    % :param Data: 
+    % :param Data:
     % :type Data: array
     % :param CvMat: [ConditionVec RunVec LayerVec]
     % :type CvMat: array
     %
     % :output:
-    %           :Data: 
+    %           :Data:
     %           :CvMat: [ConditionVec RunVec]
     %
     % Input::
@@ -34,8 +34,6 @@ function [Data, CvMat] = LineariseLaminarData(Data, CvMat)
     %   cdt 1 run 1    1 2 1 2 1 2 1 2
     %   cdt 1 run 2    3 4 3 4 3 4 3 4
     %
-
-
 
     Layers = unique(CvMat(:, 3));
 

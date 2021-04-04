@@ -18,7 +18,7 @@ function [Dirs] = SetDir(space, MVNN)
     end
 
     StartDir = fullfile(fileparts(mfilename('fullpath')), '..', '..');
-    
+
     if isunix
         ExternalHD = '/media/remi/AVT_4TB/derivatives';
     end
@@ -56,7 +56,7 @@ function [Dirs] = SetDir(space, MVNN)
                                                  '_MVNN-', MVNN]);
 
     Dirs.CodeDir = spm_file(fullfile(fileparts(mfilename('fullpath')),  '..', '..'), ...
-        'cpath');
+                            'cpath');
 
     Dirs = GetDependencies(Dirs);
 

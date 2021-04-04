@@ -10,6 +10,6 @@ function Dirs = GetDependencies(Dirs)
     %
 
     addpath(genpath(spm_file(fullfile(Dirs.CodeDir, '..', 'lib'), ...
-        'cpath')));
+                             'cpath')));
 
 end

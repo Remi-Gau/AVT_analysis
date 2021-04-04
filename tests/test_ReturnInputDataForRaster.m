@@ -9,21 +9,21 @@ function test_suite = test_ReturnInputDataForRaster %#ok<*STOUT>
 end
 
 function test_ReturnInputDataForRasterBasic()
-    
+
     NbConditions = 2;
     NbRuns = 3;
     NbLayers = 4;
     NbVertices = 5;
-    
+
     [Data, ConditionVec, RunVec] = GenerateDummySurfaceRoiData(NbConditions, ...
-        NbRuns, ...
-        NbLayers, ...
-        NbVertices);
-    
+                                                               NbRuns, ...
+                                                               NbLayers, ...
+                                                               NbVertices);
+
     ConditionToReturn = 2;
-    
+
     RasterData = ReturnInputDataForRaster(Data, ConditionVec, RunVec, ConditionToReturn);
-    
-    assertEqual(size(RasterData), [NbVertices, NbLayers, NbRuns])
-     
+
+    assertEqual(size(RasterData), [NbVertices, NbLayers, NbRuns]);
+
 end
