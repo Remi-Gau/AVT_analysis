@@ -1,29 +1,20 @@
-% (C) Copyright 2020 Remi Gau
+% (C) Copyright 2021 Remi Gau
 
 % Raster business
 %
 
 clc;
 clear;
+close all;
 
-ROIs = { ...
-    'A1'
-    };
+ROIs = {'A1', 'PT', 'V1', 'V2'};
 
 SortBy = 'Cst';
 
 MVNN = false;
 
-%%
-Opt = SetDefaults();
-
-CondNames = GetConditionList();
-
-Dirs = SetDir('surf', MVNN);
-
-[SubLs, NbSub] = GetSubjectList(Dirs.ExtractedBetas);
-
 SortingCondition = 1;
+
 SortedCondition = [ ...
     1, 2; ...
     3, 4; ...
@@ -31,17 +22,24 @@ SortedCondition = [ ...
 
 hemi = {'lh', 'rh'};
 
+%%
+Opt = SetRasterPlotParameters();
+
+[~, CondNamesIpsiContra] = GetConditionList();
+
+Dirs = SetDir('surf', MVNN);
+
+[SubLs, NbSub] = GetSubjectList(Dirs.ExtractedBetas);
+
 for iROI = 1:numel(ROIs)
     
-    fprintf('%s\n', ROIs{iROI});
+    fprintf('\n\n%s\n', ROIs{iROI});
     
     RoiData = LoadDataForRaster(Opt, Dirs, ROIs{iROI});
-    
-    Opt = SetRasterPlotParameters(Opt);
-    
-    for hs = 1
-        
-        fprintf('%s\n', hemi{hs});
+
+    for hs = 1:numel(hemi)
+
+        fprintf('\n hemisphere: %s\n', hemi{hs});
 
         for iSub = 1:NbSub
             
@@ -53,7 +51,7 @@ for iROI = 1:numel(ROIs)
                         RoiData(iSub, hs).RunVec, ...
                         SortedCondition(iRow, iCol)); %#ok<*SAGROW>
                     
-                    Titles{iRow, iCol} = CondNames{SortedCondition(iRow, iCol)};
+                    Titles{iRow, iCol} = CondNamesIpsiContra{SortedCondition(iRow, iCol)};
                     
                 end
             end
@@ -66,7 +64,7 @@ for iROI = 1:numel(ROIs)
             
         end
         
-        % Sort and bin
+        fprintf('  Sorting and binning\n');
         
         for i = 1:numel(Data)
             
@@ -78,70 +76,19 @@ for iROI = 1:numel(ROIs)
         [SortingData] = SortRaster(SortingData, SortingData, Opt, SortBy);
         SortingData = BinRaster(SortingData);
         
-        % plot
+        fprintf('  Plotting\n');
         
         Opt.Title = sprintf('ROI: %s %s ; %s=f(%s_{%s})', ...
             hemi{hs}, ...
             ROIs{iROI}, ...
             'Conditions', ...
             SortBy, ...
-            CondNames{SortingCondition});
+            CondNamesIpsiContra{SortingCondition});
         
         PlotSeveralRasters(Opt, Data, SortingData, Titles);
         
-    end
-
-end
-
-function Data = LoadDataForRaster(Opt, Dirs, RoiName)
-    
-    fprintf('\n');
-    
-    [SubLs, NbSub] = GetSubjectList(Dirs.ExtractedBetas);
-    
-    for iSub = 1:NbSub
-        
-        fprintf(' Loading %s\n', SubLs(iSub).name);
-        
-        SubDir = fullfile(Dirs.ExtractedBetas, SubLs(iSub).name);
-        
-        for hs = 1:2
-            
-            if hs == 1
-                HsSufix = 'l';
-            else
-                HsSufix = 'r';
-            end
-            
-            Filename = ReturnFilename('hs_roi_run_cdt_layer', ...
-                SubLs(iSub).name, ...
-                HsSufix, ...
-                Opt.NbLayers, ...
-                RoiName);
-            
-            RoiSaveFile = fullfile(SubDir, Filename);
-            load(RoiSaveFile);
-            
-            % remove all data from run 17 to avoid imbalalance
-            if strcmp(SubLs(iSub).name, 'sub-06')
-                
-                RowsToSelect = ReturnRowsToSelect({RunVec, 17});
-                
-                RoiData(RowsToSelect, :) = [];
-                ConditionVec(RowsToSelect, :) = [];
-                LayerVec(RowsToSelect, :) = [];
-                RunVec(RowsToSelect, :) = [];
-                
-            end
-            
-            Data(iSub, hs).RoiName = RoiName; %#ok<*AGROW>
-            Data(iSub, hs).Data = RoiData;
-            Data(iSub, hs).ConditionVec = ConditionVec;
-            Data(iSub, hs).RunVec = RunVec;
-            Data(iSub, hs).LayerVec = LayerVec;
-            
-        end
+        clear Data SortingData Titles
         
     end
-    
+
 end

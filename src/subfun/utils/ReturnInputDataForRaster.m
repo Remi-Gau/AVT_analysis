@@ -1,3 +1,5 @@
+% (C) Copyright 2021 Remi Gau
+
 function RasterData = ReturnInputDataForRaster(Data, ConditionVec, RunVec, ConditionToReturn)
 
     RowsToSelect = ReturnRowsToSelect({ConditionVec, ConditionToReturn});

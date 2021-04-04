@@ -1,41 +1,41 @@
-function PlotBoldProfile()
+% see SetProfilePlottingOptions and CheckProfilePlottingOptions
+% in ``src/settings`` to change plotting options
 
-    % see SetProfilePlottingOptions and CheckProfilePlottingOptions
-    % in ``src/settings`` to change plotting options
+clc;
+clear;
+close all;
 
-    clc;
-    clear;
-    close all;
+space = 'surf';
+MVNN =  false;
 
-    space = 'surf';
-    MVNN =  false;
+[Dirs] = SetDir(space, MVNN);
+InputDir = fullfile(Dirs.ExtractedBetas, 'group');
+OutputDir = fullfile(Dirs.Figures, 'BoldProfiles');
+[~, ~, ~] = mkdir(OutputDir);
 
-    [Dirs] = SetDir(space, MVNN);
-    InputDir = fullfile(Dirs.ExtractedBetas, 'group');
-    OutputDir = fullfile(Dirs.Figures, 'BoldProfiles');
-    [~, ~, ~] = mkdir(OutputDir);
+ROIs = { ...
+        'A1'
+        'PT'
+        'V1'
+        'V2'
+       };
+   
+Opt = SetDefaults();
 
-    ROIs = { ...
-            'A1'
-            'PT'
-            'V1'
-            'V2'
-           };
+Data = LoadProfileData(Opt, ROIs, InputDir);
 
-    Data = LoadProfileData(ROIs, InputDir);
+[~, CondNamesIpsiContra] = GetConditionList();
 
-    [~, CondNamesIpsiContra] = GetConditionList();
+%%
 
-    AgainstBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
-    CrossSide(Data, ROIs, OutputDir, CondNamesIpsiContra);
-    CrossSensory(Data, ROIs, OutputDir);
-    Target_gt_Stim(Data, ROIs, OutputDir);
-    CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
-    A_gt_T_WithBaseline(Data, OutputDir);
-    V_gt_T_WithBaseline(Data, OutputDir);
-    Target_gt_Stim_WithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
-
-end
+AgainstBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
+CrossSide(Data, ROIs, OutputDir, CondNamesIpsiContra);
+CrossSensory(Data, ROIs, OutputDir);
+Target_gt_Stim(Data, ROIs, OutputDir);
+CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
+A_gt_T_WithBaseline(Data, OutputDir);
+V_gt_T_WithBaseline(Data, OutputDir);
+Target_gt_Stim_WithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
 
 function AgainstBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
 
@@ -123,7 +123,7 @@ function CrossSensory(Data, ROIs, OutputDir)
         end
 
         Opt.Title = ComparisonsNames{iComp};
-        
+
         PlotProfileAndBetas(Opt);
         PrintFigure(fullfile(OutputDir, 'crosssensory'));
 
