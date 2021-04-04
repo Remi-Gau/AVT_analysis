@@ -97,13 +97,12 @@ function AddDependencies()
     run(fullfile(pth, 'lib', 'laminar_tools', 'InitLaminarTools'))
     
     % TODO make a cleaner import of the lib folder
-    run(fullfile(thisDirectory, 'lib', 'CPP_BIDS_SPM_pipeline', 'initCppSpm'));
+    run(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'initCppSpm'));
     
     addpath(genpath(fullfile(pth, 'lib', 'libsvm-3.21', 'matlab')));
     
     librairies = {...
         'matlab_for_cbs_tools'; ...
-        'spmup'; ...
         'herrorbar'};
     
     for iLib = 1:size(librairies,1)
