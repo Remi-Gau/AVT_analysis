@@ -8,30 +8,26 @@ function test_suite = test_LineariseLaminarData %#ok<*STOUT>
     initTestSuite;
 end
 
-function test_templateTestBasic()
-
+function test_LineariseLaminarDataBasic()
+    
     NbConditions = 2;
-    NbRuns = 2;
-    NbLayers = 3;
-    NbVertices = 4;
+    NbRuns = 3;
+    NbLayers = 4;
+    NbVertices = 5;
 
-    LayerVec = repmat([1:NbLayers]', NbConditions * NbRuns, 1);
-
-    Data = repmat([1:NbLayers]', NbConditions * NbRuns, NbVertices);
-
-    RunVec = [ ...
-              ones(NbLayers * NbConditions, 1); ...
-              2 * ones(NbLayers * NbConditions, 1)];
-
-    ConditionVec = repmat([ones(NbLayers, 1); 2 * ones(NbLayers, 1)], NbRuns, 1);
+    [Data, ConditionVec, RunVec, LayerVec] = GenerateDummySurfaceRoiData(NbConditions, ...
+        NbRuns, ...
+        NbLayers, ...
+        NbVertices);
 
     CvMat = [ConditionVec RunVec LayerVec];
 
     [Data, CvMat] = LineariseLaminarData(Data, CvMat);
 
-    ExpectedRunVec = [ ...
-                      ones(NbConditions, 1); ...
-                      2 * ones(NbConditions, 1)];
+    ExpectedRunVec = [];
+    for i=1:NbRuns
+        ExpectedRunVec = [ExpectedRunVec; i * ones(NbConditions, 1)];
+    end
 
     ExpectedConditionVec = repmat([1; 2], NbRuns, 1);
 
