@@ -109,7 +109,7 @@ function AddDependencies()
     
     librairies = {...
         'pcm_toolbox'; ...
-        'rsa_toolbox'};
+        'rsatoolbox'};
     
     for iLib = 1:size(librairies,1)
         addpath(fullfile(pth, 'lib', librairies{iLib}));
