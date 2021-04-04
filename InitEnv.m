@@ -58,7 +58,12 @@ function InitEnv()
     pth = fileparts(mfilename('fullpath'));
 
     run(fullfile(pth, 'lib', 'laminar_tools', 'InitLaminarTools'));
-    run(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'initCppSpm'));
+    if IsOctave
+        addpath(genpath(fullfile((pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'src')))
+        addpath(genpath(fullfile((pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'lib')))
+    else
+        run(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'initCppSpm'));
+    end
 
     disp('Correct matlab/octave verions and added to the path!');
 
