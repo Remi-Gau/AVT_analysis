@@ -95,8 +95,6 @@ function AddDependencies()
     pth = fileparts(mfilename('fullpath'));
     
     run(fullfile(pth, 'lib', 'laminar_tools', 'InitLaminarTools'))
-    
-    % TODO make a cleaner import of the lib folder
     run(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'initCppSpm'));
     
     addpath(genpath(fullfile(pth, 'lib', 'libsvm-3.21', 'matlab')));
