@@ -54,6 +54,11 @@ function InitEnv()
     % If external dir is empty throw an exception
     % and ask user to update submodules.
     AddDependencies();
+
+    pth = fileparts(mfilename('fullpath'));
+    
+    run(fullfile(pth, 'lib', 'laminar_tools', 'InitLaminarTools'))
+    run(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'initCppSpm'));
     
     disp('Correct matlab/octave verions and added to the path!');
     
@@ -93,9 +98,6 @@ end
 function AddDependencies()
     
     pth = fileparts(mfilename('fullpath'));
-    
-    run(fullfile(pth, 'lib', 'laminar_tools', 'InitLaminarTools'))
-    run(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'initCppSpm'));
     
     addpath(genpath(fullfile(pth, 'lib', 'libsvm-3.21', 'matlab')));
     
