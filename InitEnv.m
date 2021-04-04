@@ -55,10 +55,10 @@ function InitEnv()
     % and ask user to update submodules.
     AddDependencies();
 
-    pth = fileparts(mfilename('fullpath'));
+    % pth = fileparts(mfilename('fullpath'));
     
-    run(fullfile(pth, 'lib', 'laminar_tools', 'InitLaminarTools'))
-    run(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'initCppSpm'));
+    % run(fullfile(pth, 'lib', 'laminar_tools', 'InitLaminarTools'))
+    % run(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'initCppSpm'));
     
     disp('Correct matlab/octave verions and added to the path!');
     
