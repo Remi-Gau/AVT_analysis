@@ -1,41 +1,41 @@
-function PlotBoldProfile()
+% see SetProfilePlottingOptions and CheckProfilePlottingOptions
+% in ``src/settings`` to change plotting options
 
-    % see SetProfilePlottingOptions and CheckProfilePlottingOptions
-    % in ``src/settings`` to change plotting options
+clc;
+clear;
+close all;
 
-    clc;
-    clear;
-    close all;
+space = 'surf';
+MVNN =  false;
 
-    space = 'surf';
-    MVNN =  false;
+[Dirs] = SetDir(space, MVNN);
+InputDir = fullfile(Dirs.ExtractedBetas, 'group');
+OutputDir = fullfile(Dirs.Figures, 'BoldProfiles');
+[~, ~, ~] = mkdir(OutputDir);
 
-    [Dirs] = SetDir(space, MVNN);
-    InputDir = fullfile(Dirs.ExtractedBetas, 'group');
-    OutputDir = fullfile(Dirs.Figures, 'BoldProfiles');
-    [~, ~, ~] = mkdir(OutputDir);
+ROIs = { ...
+        'A1'
+        'PT'
+        'V1'
+        'V2'
+       };
+   
+Opt = SetDefaults();
 
-    ROIs = { ...
-            'A1'
-            'PT'
-            'V1'
-            'V2'
-           };
+Data = LoadProfileData(Opt, ROIs, InputDir);
 
-    Data = LoadProfileData(ROIs, InputDir);
+[~, CondNamesIpsiContra] = GetConditionList();
 
-    [~, CondNamesIpsiContra] = GetConditionList();
+%%
 
-    AgainstBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
-    CrossSide(Data, ROIs, OutputDir, CondNamesIpsiContra);
-    CrossSensory(Data, ROIs, OutputDir);
-    Target_gt_Stim(Data, ROIs, OutputDir);
-    CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
-    A_gt_T_WithBaseline(Data, OutputDir);
-    V_gt_T_WithBaseline(Data, OutputDir);
-    Target_gt_Stim_WithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
-
-end
+AgainstBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
+CrossSide(Data, ROIs, OutputDir, CondNamesIpsiContra);
+CrossSensory(Data, ROIs, OutputDir);
+Target_gt_Stim(Data, ROIs, OutputDir);
+CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
+A_gt_T_WithBaseline(Data, OutputDir);
+V_gt_T_WithBaseline(Data, OutputDir);
+Target_gt_Stim_WithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
 
 function AgainstBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
 
@@ -62,7 +62,7 @@ function AgainstBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
 
         Opt.Title = [CondNamesIpsiContra{ThisCdt}(1) ' ' CondNamesIpsiContra{ThisCdt}(2:5)];
 
-        Opt = SetProfilePlottingOptions(Opt);
+        Opt = SetProfilePlotParameters(Opt);
 
         PlotProfileAndBetas(Opt);
         PrintFigure(fullfile(OutputDir, 'baseline'));
@@ -86,8 +86,6 @@ function CrossSide(Data, ROIs, OutputDir, CondNamesIpsiContra)
         Opt.Title = ['[Contra-Ipsi]_{', ...
                      CondNamesIpsiContra{Cdt}(1) ' ' CondNamesIpsiContra{Cdt}(2:5), ...
                      '}'];
-
-        Opt = SetProfilePlottingOptions(Opt);
 
         PlotProfileAndBetas(Opt);
         PrintFigure(fullfile(OutputDir, 'crossside'));
@@ -126,8 +124,6 @@ function CrossSensory(Data, ROIs, OutputDir)
 
         Opt.Title = ComparisonsNames{iComp};
 
-        Opt = SetProfilePlottingOptions(Opt);
-
         PlotProfileAndBetas(Opt);
         PrintFigure(fullfile(OutputDir, 'crosssensory'));
 
@@ -164,8 +160,6 @@ function Target_gt_Stim(Data, ROIs, OutputDir)
 
         Opt.Title = ['Target-Stim_{' ComparisonsNames{iComp} '}'];
 
-        Opt = SetProfilePlottingOptions(Opt);
-
         PlotProfileAndBetas(Opt);
         PrintFigure(fullfile(OutputDir, 'target-stim'));
 
@@ -175,7 +169,7 @@ end
 
 function CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
 
-    COLOR_MODALITIES = repmat(ModalityColours(), 2, 1);
+    COLOR_MODALITIES = repmat(ModalityColors(), 2, 1);
 
     for Cdt = 2:2:12
 
@@ -214,8 +208,6 @@ function CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiCon
                          CondNamesIpsiContra{Cdt}(1) ' ' CondNamesIpsiContra{Cdt}(2:5), ...
                          '}'];
 
-            Opt = SetProfilePlottingOptions(Opt);
-
             PlotProfileAndBetas(Opt);
             PrintFigure(fullfile(OutputDir, 'crossside', ROIs{iROI}));
 
@@ -231,7 +223,7 @@ function A_gt_T_WithBaseline(Data, OutputDir) % in V1 and V2
             'V1'
             'V2'};
 
-    COLOR_MODALITIES = ModalityColours();
+    COLOR_MODALITIES = ModalityColors();
     COLOR_MODALITIES(2, :) = []; % remove visual color
 
     Laterality = {'ipsi', 'contra'};
@@ -290,8 +282,6 @@ function A_gt_T_WithBaseline(Data, OutputDir) % in V1 and V2
                 end
                 Opt.Title = [ROIs{iROI} ' - [A-T]_{' StimType '}_{ ; ' Laterality{iLat} '}'];
 
-                Opt = SetProfilePlottingOptions(Opt);
-
                 PlotProfileAndBetas(Opt);
                 PrintFigure(fullfile(OutputDir, 'crosssensory', ROIs{iROI}));
 
@@ -308,7 +298,7 @@ function V_gt_T_WithBaseline(Data, OutputDir) % in A1 and PT
             'A1'
             'PT'};
 
-    COLOR_MODALITIES = ModalityColours();
+    COLOR_MODALITIES = ModalityColors();
     COLOR_MODALITIES(1, :) = []; % remove audio color
 
     Laterality = {'ipsi', 'contra'};
@@ -367,8 +357,6 @@ function V_gt_T_WithBaseline(Data, OutputDir) % in A1 and PT
                 end
                 Opt.Title = [ROIs{iROI} ' - [V-T]_{' StimType '}_{ ; ' Laterality{iLat} '}'];
 
-                Opt = SetProfilePlottingOptions(Opt);
-
                 PlotProfileAndBetas(Opt);
                 PrintFigure(fullfile(OutputDir, 'crosssensory', ROIs{iROI}));
 
@@ -385,7 +373,7 @@ function Target_gt_Stim_WithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
 
     Laterality = {'ipsi', 'contra'};
 
-    tmp = repmat(ModalityColours(), 2, 1);
+    tmp = repmat(ModalityColors(), 2, 1);
     COLOR_MODALITIES = tmp([1 4 2 5 3 6], :);
 
     for Cdt = 1:2:6
@@ -426,8 +414,6 @@ function Target_gt_Stim_WithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
                 Opt.Title = [ROIs{iROI} ' - [Target - Stim]_{', ...
                              CondNamesIpsiContra{Cdt}(1) ' ' CondNamesIpsiContra{Cdt}(2:5), ...
                              '}_{ ; ' Laterality{iLat + 1} '}'];
-
-                Opt = SetProfilePlottingOptions(Opt);
 
                 PlotProfileAndBetas(Opt);
                 PrintFigure(fullfile(OutputDir, 'target-stim', ROIs{iROI}));

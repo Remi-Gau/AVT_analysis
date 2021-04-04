@@ -1,14 +1,12 @@
 % (C) Copyright 2021 Remi Gau
 
-function [Data, CondNamesIpsiContra] = LoadProfileData(ROIs, InputDir)
-
-    [NbLayers, AverageType] = GetPlottingDefaults();
+function [Data, CondNamesIpsiContra] = LoadProfileData(Opt, ROIs, InputDir) %#ok<STOUT>
 
     for iROI =  1:numel(ROIs)
 
         Filename = ['Group-roi-', ROIs{iROI}, ...
-                    '_average-', AverageType, ...
-                    '_nbLayers-', num2str(NbLayers), '.mat' ...
+                    '_average-', Opt.AverageType, ...
+                    '_nbLayers-', num2str(Opt.NbLayers), '.mat' ...
                    ];
 
         load(fullfile(InputDir, Filename));

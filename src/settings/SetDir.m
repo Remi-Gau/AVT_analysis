@@ -17,16 +17,13 @@ function [Dirs] = SetDir(space, MVNN)
         MVNN = '0';
     end
 
+    StartDir = fullfile(fileparts(mfilename('fullpath')), '..', '..');
+
     if isunix
-        StartDir = '/home/remi';
         ExternalHD = '/media/remi/AVT_4TB/derivatives';
-    elseif ispc
-        StartDir = 'D:\';
-    else
-        disp('Platform not supported');
     end
 
-    Dirs.DerDir = fullfile(StartDir, 'gin', 'AVT', 'derivatives');
+    Dirs.DerDir = fullfile(StartDir, '..', '..', 'derivatives');
     if ~exist(Dirs.DerDir, 'dir')
         error('The data directory does not exist: %s', Dirs.DerDir);
     end
@@ -58,7 +55,8 @@ function [Dirs] = SetDir(space, MVNN)
                                                  '_space-', space, ...
                                                  '_MVNN-', MVNN]);
 
-    Dirs.CodeDir = abspath(fullfile(fileparts(mfilename('fullpath')),  '..', '..'));
+    Dirs.CodeDir = spm_file(fullfile(fileparts(mfilename('fullpath')),  '..', '..'), ...
+                            'cpath');
 
     Dirs = GetDependencies(Dirs);
 

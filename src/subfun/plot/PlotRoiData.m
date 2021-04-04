@@ -7,7 +7,7 @@ function PlotRoiData(Data, ConditionVec, RunVec)
                    'Position', [50 50 1200 600], ...
                    'Color', [1 1 1]);
 
-    colormap(SeismicColourMap());
+    colormap(SeismicColorMap());
     %     colormap(gray);
 
     subplot(1, 12, 1:2);

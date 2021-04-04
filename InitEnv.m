@@ -20,7 +20,7 @@ function InitEnv()
 
     % required package list
     octaveVersion = '4.0.3';
-    installlist = {'statistics', 'image'};
+    installlist = {'io', 'statistics', 'image'};
 
     if IsOctave()
 
@@ -55,6 +55,15 @@ function InitEnv()
     % and ask user to update submodules.
     AddDependencies();
 
+    pth = fileparts(mfilename('fullpath'));
+
+    run(fullfile(pth, 'lib', 'laminar_tools', 'InitLaminarTools'));
+    if IsOctave
+        addpath(genpath(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'src')));
+        addpath(genpath(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'lib')));
+    else
+        run(fullfile(pth, 'lib', 'CPP_BIDS_SPM_pipeline', 'initCppSpm'));
+    end
 
     disp('Correct matlab/octave verions and added to the path!');
 
@@ -92,12 +101,30 @@ function tryInstallFromForge(packageName)
 end
 
 function AddDependencies()
-    
+
     pth = fileparts(mfilename('fullpath'));
 
-    % TODO make a cleaner import of the lib folder
-    addpath(genpath(fullfile(pth, 'lib')));
+    addpath(genpath(fullfile(pth, 'lib', 'libsvm-3.21', 'matlab')));
+
+    librairies = { ...
+                  'matlab_for_cbs_tools'; ...
+                  'herrorbar'};
+
+    for iLib = 1:size(librairies, 1)
+        addpath(genpath(fullfile(pth, 'lib', librairies{iLib})));
+    end
+
+    librairies = { ...
+                  'pcm_toolbox'; ...
+                  'rsatoolbox'};
+
+    for iLib = 1:size(librairies, 1)
+        addpath(fullfile(pth, 'lib', librairies{iLib}));
+    end
+
     addpath(genpath(fullfile(pth, 'src')));
 
+    spm('defaults', 'fmri');
+    spm_jobman('initcfg');
 
 end
