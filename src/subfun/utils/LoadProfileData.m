@@ -10,6 +10,35 @@ function [Data, CondNamesIpsiContra] = LoadProfileData(Opt, ROIs, InputDir) %#ok
                    ];
 
         load(fullfile(InputDir, Filename));
+        
+        if Opt.PoolIpsiContra
+
+            % We remove nans and then average ipsi and contra 
+            % and adapt all label vectors accordingly
+            % We oinly keep the label of the ispi conditions (odd numbers)
+
+            IsNaN = isnan(GrpConditionVec);
+            GrpData(IsNaN, :) = [];
+            GrpConditionVec(IsNaN, :) = [];
+            SubjVec(IsNaN, :) = [];
+            GrpRunVec(IsNaN, :) = [];
+
+            OddConditions = logical(mod(GrpConditionVec, 2));
+            
+            % We check that the ipsi and contra condition we are about to
+            % average come from the same subjects and run
+            assert(all(SubjVec(OddConditions)==SubjVec(~OddConditions)))
+            assert(all(GrpRunVec(OddConditions)==GrpRunVec(~OddConditions)))
+            
+            tmp = GrpData(OddConditions,:);
+            tmp(:,:,2) = GrpData(~OddConditions,:);
+            GrpData = mean(tmp, 3);
+            
+            GrpConditionVec(~OddConditions,:) = [];
+            SubjVec(~OddConditions,:) = [];
+            GrpRunVec(~OddConditions,:) = [];
+
+        end
 
         Data(iROI, 1).RoiName = ROIs{iROI}; %#ok<*AGROW>
         Data(iROI, 1).Data = GrpData;
