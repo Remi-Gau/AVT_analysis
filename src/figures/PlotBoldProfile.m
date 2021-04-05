@@ -12,7 +12,6 @@ MVNN =  false;
 [Dirs] = SetDir(space, MVNN);
 InputDir = fullfile(Dirs.ExtractedBetas, 'group');
 OutputDir = fullfile(Dirs.Figures, 'BoldProfiles');
-[~, ~, ~] = mkdir(OutputDir);
 
 ROIs = { ...
         'A1'

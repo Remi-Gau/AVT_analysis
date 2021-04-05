@@ -1,8 +1,10 @@
 % (C) Copyright 2021 Remi Gau
 %
-% Plot raster conditions (no contrasts)
+% Plot rasters for each condition or preferred conditions (no contrasts)
 %
-% Plot each hemisphere independently
+% see ``src/settings``
+% and ``lib/laminar_tools/src/settings``
+% to change plotting options
 %
 
 clc;
@@ -54,7 +56,7 @@ function AllRoisAllCondtions(SortBy, SortingCondition, Hemi)
 
     Opt = SetDefaults();
 
-    ROIs = {'PT'}; % {'A1', 'PT' 'V1', 'V2'};
+    ROIs = {'A1', 'PT' 'V1', 'V2'};
 
     SortedCondition = [ ...
                        1, 2; ...
@@ -121,6 +123,9 @@ function PlotHemisphere(Hemi, ROIs, Sorted, SortBy, Sorting, Title)
 
             fprintf('  Plotting\n');
             PlotSeveralRasters(Opt, Data, SortingData, Titles, R);
+            
+            OutputDir = fullfile(Dirs.Figures, 'Rasters');
+            PrintFigure(fullfile(OutputDir, 'baseline'));
 
             clear Data SortingData;
 
@@ -188,6 +193,9 @@ function PlotHemispheresIpsiContraPooled(Hemi, ROIs, Sorted, SortBy, Sorting, Ti
         fprintf(' Plotting\n');
         PlotSeveralRasters(Opt, Data, SortingData, Titles, R);
 
+        OutputDir = fullfile(Dirs.Figures, 'Rasters');
+        PrintFigure(fullfile(OutputDir, 'baseline'));
+        
         clear Data SortingData;
 
     end
