@@ -4,21 +4,27 @@ function [Analysis, Models] = BuildModels(ModelType, IsAuditoryRoi)
 
     fprintf('Building models\n');
 
+    [~, CondNamesIpsiContra] = GetConditionList;
+
     switch lower(ModelType)
 
         case '3x3'
             Analysis(1).name = 'Ipsi';
             Analysis(1).CdtToSelect = 1:2:5;
+            Analysis(1).CondNames = CondNamesIpsiContra(1:2:5);
 
             Analysis(2).name = 'Contra';
             Analysis(2).CdtToSelect = 2:2:6;
+            Analysis(1).CondNames = CondNamesIpsiContra(2:2:6);
 
             Analysis(3).name = 'ContraIpsi';
             Analysis(3).CdtToSelect = 1:6;
+            Analysis(1).CondNames = CondNamesIpsiContra(1:6);
 
         case {'6x6', 'subset6x6'}
             Analysis(1).name = 'AllConditions';
             Analysis(1).CdtToSelect = 1:6;
+            Analysis(1).CondNames = CondNamesIpsiContra(1:6);
 
     end
 
