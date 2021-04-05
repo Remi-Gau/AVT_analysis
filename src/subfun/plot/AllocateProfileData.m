@@ -2,7 +2,12 @@
 
 function ToPlot = AllocateProfileData(Data, ROIs, Cdt)
 
-    ToPlot = struct('Data', [], 'SubjectVec', [], 'ConditionVec', [], 'RoiVec', []);
+    ToPlot = struct(...
+        'Data', [], ...
+        'SubjectVec', [], ...
+        'ConditionVec', [], ...
+        'RoiVec', [], ...
+        'Titles', '');
 
     for iROI = 1:size(ROIs, 1)
 
@@ -61,4 +66,5 @@ function ToPlot = AllocateProfileData(Data, ROIs, Cdt)
 
     end
 
+    ToPlot.XLabel = ROIs;
 end
