@@ -20,9 +20,9 @@ function fig_handles = PlotPcmModels(M)
     %                 dA = M.Ac(:,:,i)*A';
     %                 dGdtheta(:,:,i) =  dA + dA';
     %             end;
-    
+
     Opt = SetDefaults();
-    Opt = SetPlottingParameters(Opt);    
+    Opt = SetPlottingParameters(Opt);
 
     color_map_folder = fullfile(fileparts(which('map_luminance')), '..', 'mat_maps');
     load(fullfile(color_map_folder, '1hot_iso.mat'));
@@ -35,7 +35,7 @@ function fig_handles = PlotPcmModels(M)
     for iM = 1:numel(M)
 
         if strcmp(M{iM}.type, 'feature')
-            
+
             Opt.Title = M{iM}.name;
 
             Opt = OpenFigure(Opt);
@@ -57,7 +57,7 @@ function fig_handles = PlotPcmModels(M)
 end
 
 function PlotType1(Model)
-    
+
     FONTSIZE = 8;
 
     SubPlot = 1;

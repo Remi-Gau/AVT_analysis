@@ -6,7 +6,7 @@ function [Data, CondNamesIpsiContra] = LoadProfileData(Opt, ROIs, InputDir) %#ok
     % reassigns lef tand right to ipsi and contra is necessary
     % reoranize output in a structure
     %
-    
+
     for iROI =  1:numel(ROIs)
 
         Filename = ['Group-roi-', ROIs{iROI}, ...

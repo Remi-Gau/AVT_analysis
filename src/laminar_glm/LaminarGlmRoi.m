@@ -88,13 +88,13 @@ for iSub = 1:NbSub
                     if any(beta2select)
 
                         Y = RoiData(beta2select, :);
-                        
+
                         if Opt.PerformDeconvolution
-                            assert(size(Y,1)==Opt.NbLayers)
+                            assert(size(Y, 1) == Opt.NbLayers);
                             Y = PerfomDeconvolution(Y', Opt.NbLayers);
-                            Y=Y';
+                            Y = Y';
                         end
-                        
+
                         X = DesMat;
                         B = pinv(X) * Y;
                         SurfParam(:, :, iBeta) = B;
@@ -138,9 +138,9 @@ for iSub = 1:NbSub
                                           Opt.NbLayers, ...
                                           ROI(iROI).name, ...
                                           SurfParameters{iSurfParameters});
-               if Opt.PerformDeconvolution                 
-                  Filename = strrep(Filename, '.mat', '_deconvolved-1.mat');
-               end
+                if Opt.PerformDeconvolution
+                    Filename = strrep(Filename, '.mat', '_deconvolved-1.mat');
+                end
 
                 RoiSurfParamFile = fullfile(Dirs.LaminarGlm, SubLs(iSub).name, Filename);
 

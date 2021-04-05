@@ -128,7 +128,7 @@ function PlotHemisphere(Hemi, ROIs, Sorted, SortBy, Sorting, Title)
 
             fprintf('  Plotting\n');
             PlotSeveralRasters(Opt, Data, SortingData, Titles, R);
-            
+
             OutputDir = fullfile(Dirs.Figures, 'Rasters');
             PrintFigure(fullfile(OutputDir, 'baseline'));
 
@@ -200,7 +200,7 @@ function PlotHemispheresIpsiContraPooled(Hemi, ROIs, Sorted, SortBy, Sorting, Ti
 
         OutputDir = fullfile(Dirs.Figures, 'Rasters');
         PrintFigure(fullfile(OutputDir, 'baseline'));
-        
+
         clear Data SortingData;
 
     end

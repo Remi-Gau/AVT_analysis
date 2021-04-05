@@ -26,9 +26,9 @@ fig_h = PlotPcmModels(Models);
 for iFig = 1:numel(fig_h)
 
     FigureName = ['Model-' num2str(iFig), '-' fig_h(iFig).Name '.tif'];
-    FigureName = strrep(FigureName, ',', '');    
-    
-    figure(fig_h(iFig))
-    PrintFigure(FigureDir);      
+    FigureName = strrep(FigureName, ',', '');
+
+    figure(fig_h(iFig));
+    PrintFigure(FigureDir);
 
 end
