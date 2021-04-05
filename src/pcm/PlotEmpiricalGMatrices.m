@@ -53,7 +53,6 @@ Dirs = SetDir(Space, MVNN);
 InputDir = fullfile(Dirs.PCM, ModelType);
 
 FigureDir = fullfile(InputDir, 'figures', 'empirical_G_matrices');
-mkdir(FigureDir);
 
 for iROI = 1:numel(ROIs)
 

@@ -1,6 +1,7 @@
 % (C) Copyright 2020 Remi Gau
-
-%  bar plot of the likelihoods of the different models
+%
+%  bar plot of the likelihoods of the different PCM models
+%
 
 clc;
 clear;

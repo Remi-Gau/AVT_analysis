@@ -11,7 +11,8 @@ close all;
 
 %% Main parameters
 
-ModelType = '3X3';
+% '3X3', '6X6', 'subset6X6'
+ModelType = 'subset6X6';
 
 % Choose on what type of data the analysis will be run
 %
@@ -36,58 +37,27 @@ ROIs = { ...
         'PT'
        };
 
-% This needs to be adapted or even saved with the PCM results
-[~, CondNames] = GetConditionList();
-switch lower(ModelType)
-    case '3x3'
+Analysis = BuildModels(ModelType);
 
-        %% Analysis name condition to use for it
+Opt = SetRasterPlotParameters();
+ColorMap = Opt.Raster.ColorMap;
 
-        Analysis(1).name = 'Ipsi';
-        Analysis(1).CdtToSelect = 1:2:5;
-        Analysis(1).CondNames = CondNames(1:2:5);
-
-        Analysis(2).name = 'Contra';
-        Analysis(2).CdtToSelect = 2:2:6;
-        Analysis(2).CondNames = CondNames(2:2:6);
-
-        Analysis(3).name = 'ContraIpsi';
-        Analysis(3).CondNames = {'A', 'V', 'T'};
-
-    case '6x6'
-
-        Analysis(1).name = 'AllConditions';
-        Analysis(1).CdtToSelect = 1:6;
-        Analysis(1).CondNames = CondNames(1:6);
-
-end
-
-FigDim = [50, 50, 1400, 750];
-FONTSIZE = 8;
-
-ColorMap = SeismicColourMap(1000);
-% ColorMap = BrainColourMaps('hot_increasing');
+Opt.FigDim = [50 50 2400 2000];
 
 %% Other parameters
-% Unlikely to change
-
-IsTarget = false;
-
-Space = 'surf';
-
-%% Will not change
-
-MVNN = true;
 
 ConditionType = 'stim';
-if IsTarget
-    ConditionType = 'target';
+if Opt.Targets
+    ConditionType = 'target'; %#ok<*UNRCH>
 end
 
+Space = 'surf';
+MVNN = true;
 Dirs = SetDir(Space, MVNN);
+
 InputDir = fullfile(Dirs.PCM, ModelType);
-FigureDir = fullfile(InputDir, 'figures');
-mkdir(FigureDir);
+
+FigureDir = fullfile(InputDir, 'figures', 'model_G_matrices');
 
 for iROI = 1:numel(ROIs)
 
@@ -99,9 +69,18 @@ for iROI = 1:numel(ROIs)
                     '_param-', lower(InputType), ...
                     '_analysis-', Analysis(iAnalysis).name, ...
                     '.mat'];
+                
+        if Opt.PerformDeconvolution
+            filename = strrep(filename, '.mat', '_deconvolved-1.mat');
+        end
+
+        if strcmp(ModelType, 'subset6X6')
+            filename = ['group_' filename];
+        end
+
         filename = fullfile(InputDir, filename);
 
-        disp(filename);
+        fprintf(1, 'loading:\n %s\n', filename);
         load(filename, 'Models', 'G_hat', 'G_pred_grp', 'G_pred_cr');
 
         %% Plot G matrices
@@ -111,29 +90,32 @@ for iROI = 1:numel(ROIs)
                           '_param-', lower(InputType), ...
                           '_analysis-', Analysis(iAnalysis).name];
 
-        figure( ...
-               'name', strrep(FigureFilename, '_', ' '), ...
-               'Position', FigDim);
+        Opt.Title = strrep(FigureFilename, '_', ' ');
 
-        SetFigureDefaults();
+        Opt = OpenFigure(Opt);
 
         colormap(ColorMap);
 
-        [m, n] = OptimizeSubplotNumber(numel(Models) - 1);
+        [m, n] = OptimizeSubplotNumber(numel(Models));
 
         Subplot = 1;
 
         % CVed G_{emp}
         subplot(m, n, Subplot);
 
-        PlotGMatrixAndSetAxis(mean(G_hat, 3), Analysis(iAnalysis).CondNames, 'G_{emp} CV', FONTSIZE);
+        PlotGMatrixAndSetAxis(mean(G_hat, 3), ...
+            Analysis(iAnalysis).CondNames, ...
+            'G_{emp} CV', Opt.Fontsize);
 
         Subplot = Subplot + 1;
 
         % CVed G_{pred} free model
         subplot(m, n, Subplot);
 
-        PlotGMatrixAndSetAxis(mean(G_pred_cr{end}, 3), Analysis(iAnalysis).CondNames, 'G_{pred} free CV', FONTSIZE);
+        PlotGMatrixAndSetAxis(mean(G_pred_cr{end}, 3), ...
+            Analysis(iAnalysis).CondNames, ...
+            'G_{pred} free CV', ...
+        Opt.Fontsize);
 
         Subplot = Subplot + 1;
 
@@ -143,20 +125,21 @@ for iROI = 1:numel(ROIs)
             subplot(m, n, Subplot);
 
             Title = [num2str(iModel - 1) ' - ' strrep(Models{iModel}.name, '_', ' ')];
-            PlotGMatrixAndSetAxis(mean(G_pred_cr{iModel}, 3), Analysis(iAnalysis).CondNames, Title, FONTSIZE);
+            PlotGMatrixAndSetAxis(mean(G_pred_cr{iModel}, 3), ...
+                Analysis(iAnalysis).CondNames, ...
+                Title, ...
+                Opt.Fontsize);
 
             Subplot = Subplot + 1;
 
         end
 
         mtit(get(gcf, 'name'), ...
-             'fontsize', FONTSIZE, ...
+             'fontsize', Opt.Fontsize, ...
              'xoff', 0, ...
              'yoff', .035);
 
-        FigureFilename = fullfile(FigureDir, [FigureFilename '.tif']);
-        disp(FigureFilename);
-        print(gcf, FigureFilename, '-dtiff');
+        PrintFigure(FigureDir);
 
     end
 
