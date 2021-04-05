@@ -11,12 +11,17 @@ clc;
 clear;
 close all;
 
-SortingCondition = 5;
 SortBy = 'Cst';
 Hemi = {'lh', 'rh'};
 
-AllRoisAllCondtions(SortBy, SortingCondition, Hemi);
-AllRoisNonPreferred(SortBy, SortingCondition, Hemi);
+SortingCondition = [1:2:6];
+
+for iCdt = 1:numel(SortingCondition)
+
+    AllRoisAllCondtions(SortBy, SortingCondition(iCdt), Hemi);
+    AllRoisNonPreferred(SortBy, SortingCondition(iCdt), Hemi);
+
+end
 
 function AllRoisNonPreferred(SortBy, SortingCondition, Hemi)
 
