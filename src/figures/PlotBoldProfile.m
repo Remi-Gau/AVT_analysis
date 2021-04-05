@@ -1,5 +1,5 @@
-% see ``src/settings`` 
-% and ``lib/laminar_tools/src/settings`` 
+% see ``src/settings``
+% and ``lib/laminar_tools/src/settings``
 % to change plotting options
 
 clc;
@@ -47,16 +47,16 @@ CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
 function AgainstBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
 
     Opt = SetDefaults();
-    
+
     NbColumns = 2;
     if Opt.PoolIpsiContra
         NbColumns = 1;
     end
-    
+
     for Cdt = 1:2:numel(CondNamesIpsiContra)
 
         ThisCdt = Cdt;
-        
+
         for iColumn = 1:NbColumns
 
             if iColumn == 2
@@ -69,7 +69,7 @@ function AgainstBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
             if ~Opt.PoolIpsiContra
                 ToPlot.Titles = CondNamesIpsiContra{ThisCdt}(6:end);
             end
-            
+
             Opt.Specific{1, iColumn} = ToPlot;
 
         end
@@ -84,10 +84,10 @@ function AgainstBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
 end
 
 function CrossSide(Data, ROIs, OutputDir, CondNamesIpsiContra)
-    
+
     Opt = SetDefaults();
     if Opt.PoolIpsiContra
-        warning('Opt.PoolIpsiContra set to true: no contra-ipsi figure will be generated.')
+        warning('Opt.PoolIpsiContra set to true: no contra-ipsi figure will be generated.');
         return
     end
 
@@ -115,17 +115,17 @@ function CrossSensory(Data, ROIs, OutputDir)
                    [9, -5], [10, -12]
                   };
 
-    ComparisonsNames = {...
-        '[A-T]_{stim}'; ...
-        '[V-T]_{stim}'; ...
-        '[A-T]_{target}'; ...
-        '[V-T]_{target}'};
-    
+    ComparisonsNames = { ...
+                        '[A-T]_{stim}'; ...
+                        '[V-T]_{stim}'; ...
+                        '[A-T]_{target}'; ...
+                        '[V-T]_{target}'};
+
     Opt = SetDefaults();
     if ~Opt.PlotTargets
         ComparisonsNames(3:4) = [];
     end
-   
+
     for iComp = 1:size(ComparisonsNames, 1)
 
         Opt = SetUpComparisonPlot(Data, ROIs, Comparisons, iComp);
@@ -139,10 +139,10 @@ function CrossSensory(Data, ROIs, OutputDir)
 end
 
 function Target_gt_Stim(Data, ROIs, OutputDir)
-    
+
     Opt = SetDefaults();
     if ~Opt.PlotTargets
-        warning('Opt.PlotTargets set to false: no target-stim figure will be generated.')
+        warning('Opt.PlotTargets set to false: no target-stim figure will be generated.');
         return
     end
 
@@ -153,7 +153,7 @@ function Target_gt_Stim(Data, ROIs, OutputDir)
                   };
 
     ComparisonsNames = {'Audio', 'Visual' 'Tactile'};
-    
+
     for iComp = 1:size(Comparisons, 1)
 
         Opt = SetUpComparisonPlot(Data, ROIs, Comparisons, iComp);
@@ -170,10 +170,10 @@ function CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiCon
 
     Opt = SetDefaults();
     if Opt.PoolIpsiContra
-        warning('Opt.PoolIpsiContra set to true: no contra-ipsi figure will be generated.')
+        warning('Opt.PoolIpsiContra set to true: no contra-ipsi figure will be generated.');
         return
     end
-    
+
     COLOR_MODALITIES = repmat(ModalityColors(), 2, 1);
 
     for Cdt = 2:2:numel(CondNamesIpsiContra)
@@ -189,7 +189,7 @@ function CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiCon
                     ToPlot = AllocateProfileData(Data, ROIs(iROI), {(Cdt - 1); Cdt});
                     ToPlot.XLabel = { 'Ipsi', 'Contra'};
                     ToPlot.LineColors = [COLOR_MODALITIES(Cdt / 2, :) * 0.6
-                                                           COLOR_MODALITIES(Cdt / 2, :)];
+                                         COLOR_MODALITIES(Cdt / 2, :)];
 
                 elseif iColumn == 2
 
@@ -197,9 +197,8 @@ function CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiCon
                     ToPlot.XLabel = {'Contra - Ipsi'};
 
                 end
-                
+
                 Opt.Specific{1, iColumn} = ToPlot;
-                
 
             end
 
@@ -227,7 +226,7 @@ function A_gt_T_WithBaseline(Data, OutputDir) % in V1 and V2
 
     Opt = SetDefaults();
     Opt.IsDifferencePlot = true();
-    
+
     Laterality = {'ipsi', 'contra'};
     if Opt.PoolIpsiContra
         Laterality = {''};
@@ -237,10 +236,10 @@ function A_gt_T_WithBaseline(Data, OutputDir) % in V1 and V2
                   [1 5], [2 6]
                   [7 11], [8 12]
                  };
-                     
+
     if ~Opt.PlotTargets
-        Conditions(2,:) = [];
-    end             
+        Conditions(2, :) = [];
+    end
 
     for isTarget = 0:(size(Conditions, 1) - 1)
 
@@ -253,7 +252,7 @@ function A_gt_T_WithBaseline(Data, OutputDir) % in V1 and V2
                 if ~Opt.PoolIpsiContra
                     Opt.Title = [Opt.Title '_{ ; ' Laterality{iLat} '}'];
                 end
-                
+
                 PlotProfileAndBetas(Opt);
                 PrintFigure(fullfile(OutputDir, 'crosssensory', ROIs{iROI}));
 
@@ -275,7 +274,7 @@ function V_gt_T_WithBaseline(Data, OutputDir) % in A1 and PT
 
     Opt = SetDefaults();
     Opt.IsDifferencePlot = true();
-    
+
     Laterality = {'ipsi', 'contra'};
     if Opt.PoolIpsiContra
         Laterality = {''};
@@ -285,10 +284,10 @@ function V_gt_T_WithBaseline(Data, OutputDir) % in A1 and PT
                   [3 5], [4 6]; ...
                   [9 11], [10 12] ...
                  };
-             
+
     if ~Opt.PlotTargets
-        Conditions(2,:) = [];
-    end                
+        Conditions(2, :) = [];
+    end
 
     for isTarget = 0:(size(Conditions, 1) - 1)
 
@@ -301,7 +300,7 @@ function V_gt_T_WithBaseline(Data, OutputDir) % in A1 and PT
                 if ~Opt.PoolIpsiContra
                     Opt.Title = [Opt.Title '_{ ; ' Laterality{iLat} '}'];
                 end
-                
+
                 PlotProfileAndBetas(Opt);
                 PrintFigure(fullfile(OutputDir, 'crosssensory', ROIs{iROI}));
 
@@ -317,16 +316,16 @@ function Target_gt_Stim_WithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
 
     Opt = SetDefaults();
     if ~Opt.PlotTargets
-        warning('Opt.PlotTargets set to false: no target-stim figure will be generated.')
+        warning('Opt.PlotTargets set to false: no target-stim figure will be generated.');
         return
     end
-    
+
     tmp = repmat(ModalityColors(), 2, 1);
     COLOR_MODALITIES = tmp([1 4 2 5 3 6], :);
-    
+
     Opt = SetDefaults();
     Opt.IsDifferencePlot = true();
-    
+
     Laterality = {'ipsi', 'contra'};
     if Opt.PoolIpsiContra
         Laterality = {''};
@@ -364,7 +363,7 @@ function Target_gt_Stim_WithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
                              CondNamesIpsiContra{Cdt}(1) ' ' CondNamesIpsiContra{Cdt}(2:5) '}'];
                 if ~Opt.PoolIpsiContra
                     Opt.Title = [Opt.Title '_{ ; ' Laterality{iLat} '}'];
-                end                         
+                end
 
                 PlotProfileAndBetas(Opt);
                 PrintFigure(fullfile(OutputDir, 'target-stim', ROIs{iROI}));
@@ -380,69 +379,68 @@ end
 %% helper functions
 
 function Opt = SetUpComparisonPlot(Data, ROIs, Comparisons, iComp)
-    
+
     Opt = SetDefaults();
-    
+
     ColumnNames = {'ipsi', 'contra'};
     if Opt.PoolIpsiContra
         ColumnNames = {''};
     end
 
     for iColumn = 1:size(ColumnNames, 2)
-        
+
         tmp = {Comparisons{iComp, iColumn}(1), Comparisons{iComp, iColumn}(2)};
-        
+
         ToPlot = AllocateProfileData(Data, ROIs, tmp);
         ToPlot.Titles = ColumnNames{iColumn};
-        
+
         Opt.Specific{1, iColumn} = ToPlot;
-        
+
     end
-    
+
 end
 
 function Opt = SetUpDifferencePlot(Data, ROI, Conditions, Opt, Color, iLat, isTarget)
-    
-    if Conditions{1,1}(1) == 1
+
+    if Conditions{1, 1}(1) == 1
         Label = 'Audio';
     else
-        Label = 'Visual';  
+        Label = 'Visual';
     end
-    
+
     if iLat == 2
         Color = Color * 0.6;
     end
-    
+
     for iColumn = 1:2
-        
+
         if iColumn == 1
-            
+
             ToPlot = AllocateProfileData(Data, ROI, ...
-                {Conditions{isTarget + 1, iLat}(1); ...
-                Conditions{isTarget + 1, iLat}(2)});
+                                         {Conditions{isTarget + 1, iLat}(1); ...
+                                          Conditions{isTarget + 1, iLat}(2)});
             ToPlot.LineColors = Color;
-            
+
         elseif iColumn == 2
-            
+
             ToPlot = AllocateProfileData(Data, ROI, ...
-                {Conditions{isTarget + 1, iLat}(1), ...
-                -1 * Conditions{isTarget + 1, iLat}(2)});
-            
+                                         {Conditions{isTarget + 1, iLat}(1), ...
+                                          -1 * Conditions{isTarget + 1, iLat}(2)});
+
         end
-        
+
         Opt.Specific{1, iColumn} = ToPlot;
-        
+
     end
-    
+
     Opt.Specific{1, 1}.XLabel = {Label, 'Tactile'};
     Opt.Specific{1, 2}.XLabel = {['[' Label ' - Tactile]']};
-    
-    
+
     StimType = 'stim';
     if isTarget
         StimType = 'target';
     end
-    
+
     Opt.Title = [ROI{1} ' - [' Label(1) '-T]_{' StimType '}'];
 
 end

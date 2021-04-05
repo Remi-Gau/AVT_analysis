@@ -13,10 +13,12 @@ SortingCondition = 5;
 SortBy = 'Cst';
 Hemi = {'lh', 'rh'};
 
-% AllRoisAllCondtions(SortBy, SortingCondition, Hemi)
+AllRoisAllCondtions(SortBy, SortingCondition, Hemi);
 AllRoisNonPreferred(SortBy, SortingCondition, Hemi);
 
 function AllRoisNonPreferred(SortBy, SortingCondition, Hemi)
+
+    Opt = SetDefaults();
 
     Title = 'Non preferred';
 
@@ -26,7 +28,12 @@ function AllRoisNonPreferred(SortBy, SortingCondition, Hemi)
                        3, 4; ...
                        5, 6];
 
-    PlotHemisphere(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, Title);
+    if Opt.PoolIpsiContra
+        SortedCondition(:, 2) = [];
+        PlotHemispheresIpsiContraPooled(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, Title);
+    else
+        PlotHemisphere(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, Title);
+    end
 
     ROIs = {'V1', 'V2'};
 
@@ -34,11 +41,18 @@ function AllRoisNonPreferred(SortBy, SortingCondition, Hemi)
                        1, 2; ...
                        5, 6];
 
-    %     PlotHemisphere(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, Title);
+    if Opt.PoolIpsiContra
+        SortedCondition(:, 2) = [];
+        PlotHemispheresIpsiContraPooled(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, Title);
+    else
+        PlotHemisphere(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, Title);
+    end
 
 end
 
 function AllRoisAllCondtions(SortBy, SortingCondition, Hemi)
+
+    Opt = SetDefaults();
 
     ROIs = {'PT'}; % {'A1', 'PT' 'V1', 'V2'};
 
@@ -49,20 +63,18 @@ function AllRoisAllCondtions(SortBy, SortingCondition, Hemi)
 
     Title = 'All conditions';
 
-    PlotHemisphere(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, Title);
+    if Opt.PoolIpsiContra
+        SortedCondition(:, 2) = [];
+        PlotHemispheresIpsiContraPooled(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, Title);
+    else
+        PlotHemisphere(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, Title);
+    end
 
 end
 
-function PlotHemisphere(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, Title)
+function PlotHemisphere(Hemi, ROIs, Sorted, SortBy, Sorting, Title)
 
-    MVNN = false;
-    Dirs = SetDir('surf', MVNN);
-
-    [~, NbSub] = GetSubjectList(Dirs.ExtractedBetas);
-
-    Opt = SetRasterPlotParameters();
-
-    [~, CondNamesIpsiContra] = GetConditionList();
+    [Opt, NbSub, Dirs, CondNamesIpsiContra] = SetUpRasterPlotting();
 
     for iROI = 1:numel(ROIs)
 
@@ -70,34 +82,22 @@ function PlotHemisphere(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, T
 
         RoiData = LoadDataForRaster(Opt, Dirs, ROIs{iROI});
 
+        Titles = GetTitlesRasters(Sorted);
+
         for hs = 1:numel(Hemi)
 
             fprintf('\n hemisphere: %s\n', Hemi{hs});
 
-            for iRow = 1:size(SortedCondition, 1)
-                for iCol = 1:size(SortedCondition, 2)
-                    Titles{iRow, iCol} = CondNamesIpsiContra{SortedCondition(iRow, iCol)};
-                    Titles{iRow, iCol} = strrep(Titles{iRow, iCol}, 'Stim', ' Stim ');
-                end
-            end
-
-            Opt.Title = sprintf('ROI: %s %s ; %s = f(%s_{%s})', ...
-                                Hemi{hs}, ...
-                                ROIs{iROI}, ...
-                                Title, ...
-                                SortBy, ...
-                                strrep(CondNamesIpsiContra{SortingCondition}, 'Stim', ' Stim '));
-
             for iSub = 1:NbSub
 
-                for iRow = 1:size(SortedCondition, 1)
-                    for iCol = 1:size(SortedCondition, 2)
+                for iRow = 1:size(Sorted, 1)
+                    for iCol = 1:size(Sorted, 2)
 
                         Data{iRow, iCol}{iSub, 1} = ReturnInputDataForRaster( ...
                                                                              RoiData(iSub, hs).Data, ...
                                                                              RoiData(iSub, hs).ConditionVec, ...
                                                                              RoiData(iSub, hs).RunVec, ...
-                                                                             SortedCondition(iRow, iCol)); %#ok<*SAGROW>
+                                                                             Sorted(iRow, iCol)); %#ok<*SAGROW>
 
                     end
                 end
@@ -106,9 +106,16 @@ function PlotHemisphere(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, T
                                                                 RoiData(iSub, hs).Data, ...
                                                                 RoiData(iSub, hs).ConditionVec, ...
                                                                 RoiData(iSub, hs).RunVec, ...
-                                                                SortingCondition);
+                                                                Sorting);
 
             end
+
+            Opt.Title = sprintf('ROI: %s %s ; %s = f(%s_{%s})', ...
+                                Hemi{hs}, ...
+                                ROIs{iROI}, ...
+                                Title, ...
+                                SortBy, ...
+                                strrep(CondNamesIpsiContra{Sorting}, 'Stim', ' Stim '));
 
             [Data, SortingData, R] = PrepareRasterData(Data, SortingData, Opt, SortBy);
 
@@ -121,4 +128,113 @@ function PlotHemisphere(Hemi, ROIs, SortedCondition, SortBy, SortingCondition, T
 
     end
 
+end
+
+function PlotHemispheresIpsiContraPooled(Hemi, ROIs, Sorted, SortBy, Sorting, Title)
+
+    [Opt, NbSub, Dirs, CondNamesIpsiContra] = SetUpRasterPlotting();
+
+    for iROI = 1:numel(ROIs)
+
+        fprintf('\n\n%s\n', ROIs{iROI});
+
+        RoiData = LoadDataForRaster(Opt, Dirs, ROIs{iROI});
+
+        Titles = GetTitlesRasters(Sorted);
+
+        for iRow = 1:size(Titles, 1)
+
+            for hs = 1:numel(Hemi)
+
+                for iSub = 1:NbSub
+
+                    for IspiContra = 0:1
+
+                        tmpSorted(:, :, :, IspiContra + 1) = ReturnInputDataForRaster( ...
+                                                                                      RoiData(iSub, hs).Data, ...
+                                                                                      RoiData(iSub, hs).ConditionVec, ...
+                                                                                      RoiData(iSub, hs).RunVec, ...
+                                                                                      Sorted(iRow) + IspiContra); %#ok<*SAGROW>
+
+                        tmpSorting(:, :, :, IspiContra + 1) = ReturnInputDataForRaster( ...
+                                                                                       RoiData(iSub, hs).Data, ...
+                                                                                       RoiData(iSub, hs).ConditionVec, ...
+                                                                                       RoiData(iSub, hs).RunVec, ...
+                                                                                       Sorting + IspiContra);
+
+                    end
+
+                    Data{iRow, hs}{iSub, 1} = mean(tmpSorted, 4);
+                    SortingData{iRow, hs}{iSub, 1} = mean(tmpSorting, 4);
+
+                    clear tmpSorted tmpSorting;
+
+                end
+
+            end
+
+        end
+
+        Opt.Title = sprintf('ROI: %s ; %s = f(%s_{%s})', ...
+                            ROIs{iROI}, ...
+                            Title, ...
+                            SortBy, ...
+                            CondNamesIpsiContra{Sorting}(1));
+
+        fprintf('\n');
+
+        [Data, SortingData, R] = PrepareRasterData(Data, SortingData, Opt, SortBy);
+
+        fprintf(' Plotting\n');
+        PlotSeveralRasters(Opt, Data, SortingData, Titles, R);
+
+        clear Data SortingData;
+
+    end
+
+end
+
+function Titles = GetTitlesRasters(Sorted)
+
+    Opt = SetDefaults();
+
+    [~, CondNamesIpsiContra] = GetConditionList();
+
+    Hemi = {'lh', 'rh'};
+
+    NbCol = size(Sorted, 2);
+    if Opt.PoolIpsiContra
+        NbCol = size(Hemi, 2);
+    end
+
+    for iRow = 1:size(Sorted, 1)
+        for iCol = 1:NbCol
+
+            if Opt.PoolIpsiContra
+                CdtName = CondNamesIpsiContra{Sorted(iRow, 1)}(1:5);
+            else
+                CdtName = CondNamesIpsiContra{Sorted(iRow, iCol)};
+            end
+            CdtName = strrep(CdtName, 'Stim', ' Stim ');
+
+            Titles{iRow, iCol} = sprintf('%s', CdtName);
+
+            if Opt.PoolIpsiContra
+                Titles{iRow, iCol} = [Titles{iRow, iCol}, ' - hemisphere ', Hemi{iCol}];
+            end
+
+        end
+    end
+
+end
+
+function [Opt, NbSub, Dirs, CondNamesIpsiContra] = SetUpRasterPlotting()
+    MVNN = false;
+    Dirs = SetDir('surf', MVNN);
+
+    [~, NbSub] = GetSubjectList(Dirs.ExtractedBetas);
+
+    Opt = SetRasterPlotParameters();
+
+    [~, CondNamesIpsiContra] = GetConditionList();
 end
