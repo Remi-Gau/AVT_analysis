@@ -15,20 +15,18 @@
 clc;
 clear;
 
-MVNN = false;
+MVNN = true;
 
-Quad = true;
+Opt = SetDefaults;
 
 %%
-NbLayers = 6;
-
 CondNames = GetConditionList();
 
 Dirs = SetDir('surf', MVNN);
 
 [SubLs, NbSub] = GetSubjectList(Dirs.ExtractedBetas);
 
-DesMat = SetDesignMatLamGlm(NbLayers, Quad);
+DesMat = SetDesignMatLamGlm(Opt.NbLayers, Opt.PlotQuadratic);
 
 SurfParameters = {'Cst', 'Lin', 'Quad'};
 
@@ -53,10 +51,10 @@ for iSub = 1:NbSub
     for hs = 1:2
 
         if hs == 1
-            fprintf('\n\n Left hemipshere\n');
+            fprintf(' Left hemipshere\n');
             HsSufix = 'l';
         else
-            fprintf('\n\n Right hemipshere\n');
+            fprintf(' Right hemipshere\n');
             HsSufix = 'r';
         end
 
@@ -65,7 +63,7 @@ for iSub = 1:NbSub
             Filename = ReturnFilename('hs_roi_run_cdt_layer', ...
                                       SubLs(iSub).name, ...
                                       HsSufix, ...
-                                      NbLayers, ...
+                                      Opt.NbLayers, ...
                                       ROI(iROI).name);
 
             RoiSaveFile = fullfile(SubDir, Filename);
@@ -90,6 +88,13 @@ for iSub = 1:NbSub
                     if any(beta2select)
 
                         Y = RoiData(beta2select, :);
+                        
+                        if Opt.PerformDeconvolution
+                            assert(size(Y,1)==Opt.NbLayers)
+                            Y = PerfomDeconvolution(Y', Opt.NbLayers);
+                            Y=Y';
+                        end
+                        
                         X = DesMat;
                         B = pinv(X) * Y;
                         SurfParam(:, :, iBeta) = B;
@@ -130,9 +135,12 @@ for iSub = 1:NbSub
                 Filename = ReturnFilename('hs_roi_run_cdt_s-param', ...
                                           SubLs(iSub).name, ...
                                           HsSufix, ...
-                                          NbLayers, ...
+                                          Opt.NbLayers, ...
                                           ROI(iROI).name, ...
                                           SurfParameters{iSurfParameters});
+               if Opt.PerformDeconvolution                 
+                  Filename = strrep(Filename, '.mat', '_deconvolved-1.mat');
+               end
 
                 RoiSurfParamFile = fullfile(Dirs.LaminarGlm, SubLs(iSub).name, Filename);
 

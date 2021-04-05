@@ -1,21 +1,15 @@
-% Deconvolve laminar porofile data
+% Deconvolve laminar profile data
 %
-% Loads the laminar profile data
+% Loads the laminar profile group data (1 profile per cdt / run / subject)
+% Reassign left and right to ipsi and contra if necessary
 % Performs deconvolution a la Makuerkiaga
 % Runs laminar GLM
-% Saves a new copy of the data
+% Saves the data (X s-parameters per cdt / run / subject)
+%
 
 clc;
 clear;
 close all;
-
-space = 'surf';
-MVNN =  false;
-
-[Dirs] = SetDir(space, MVNN);
-InputDir = fullfile(Dirs.ExtractedBetas, 'group');
-OutputDir = fullfile(Dirs.Figures, 'BoldProfiles');
-[~, ~, ~] = mkdir(OutputDir);
 
 ROIs = { ...
         'A1'
@@ -24,12 +18,19 @@ ROIs = { ...
         'V2'
        };
 
-Opt = SetDefaults();
+space = 'surf';
+MVNN =  false;
+
+[Dirs] = SetDir(space, MVNN);
+InputDir = fullfile(Dirs.ExtractedBetas, 'group');
+OutputDir = fullfile(Dirs.LaminarGlm, 'group');
+spm_mkdir(OutputDir);
+
+Opt = SetDefaults;
 
 [Data, CondNamesIpsiContra] = LoadProfileData(Opt, ROIs, InputDir);
 
-Quad = false();
-DesignMatrix = SetDesignMatLamGlm(Opt.NbLayers, Quad);
+DesignMatrix = SetDesignMatLamGlm(Opt.NbLayers, Opt.PlotQuadratic);
 
 for iROI = 1:numel(Data)
 
@@ -43,10 +44,12 @@ for iROI = 1:numel(Data)
 
     Filename = ['Group-roi-', Data(iROI).RoiName, ...
                 '_average-', Opt.AverageType, ...
-                '_Opt.NbLayers-', num2str(Opt.NbLayers), '_deconvolved.mat' ...
+                '_NbLayers-', num2str(Opt.NbLayers), '_deconvolved-1.mat' ...
                ];
+           
+    fprintf('Saving: %s\n', fullfile(OutputDir, Filename));           
 
-    save(fullfile(InputDir, Filename), ...
+    save(fullfile(OutputDir, Filename), ...
          'GrpData', ...
          'BetaHat', ...
          'SubjVec', ...
