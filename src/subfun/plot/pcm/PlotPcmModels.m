@@ -20,28 +20,33 @@ function fig_handles = PlotPcmModels(M)
     %                 dA = M.Ac(:,:,i)*A';
     %                 dGdtheta(:,:,i) =  dA + dA';
     %             end;
+    
+    Opt = SetDefaults();
+    Opt = SetPlottingParameters(Opt);    
 
-    ColorMap = BrainColourMaps('hot_increasing');
+    color_map_folder = fullfile(fileparts(which('map_luminance')), '..', 'mat_maps');
+    load(fullfile(color_map_folder, '1hot_iso.mat'));
+    ColorMap = hot;
 
-    Opt.Visible = 'on';
-
-    FigDim = [100, 50, 1300, 700];
+    Opt.FigDim = [100, 50, 1300, 700];
+    Opt.PerformDeconvolution = false;
+    Opt.PoolIpsiContra = false;
 
     for iM = 1:numel(M)
 
         if strcmp(M{iM}.type, 'feature')
+            
+            Opt.Title = M{iM}.name;
 
-            fig_handles(iM) = figure('name', M{iM}.name, 'Position', FigDim); %#ok<*AGROW>
-
-            SetFigureDefaults(Opt);
+            Opt = OpenFigure(Opt);
+            fig_handles(iM) = gcf;
 
             PlotType1(M{iM});
-            % PlotType2(M{iM});
 
             colormap(ColorMap);
 
             mtit(M{iM}.name, ...
-                 'fontsize', 12, ...
+                 'fontsize', Opt.Fontsize, ...
                  'xoff', 0, ...
                  'yoff', .035);
 
@@ -52,7 +57,7 @@ function fig_handles = PlotPcmModels(M)
 end
 
 function PlotType1(Model)
-
+    
     FONTSIZE = 8;
 
     SubPlot = 1;
