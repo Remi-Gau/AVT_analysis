@@ -10,7 +10,7 @@ close all;
 %% Main parameters
 
 % '3X3', '6X6', 'subset6X6'
-ModelType = 'subset6X6';
+ModelType = '3X3';
 
 % Choose on what type of data the analysis will be run
 %
@@ -63,6 +63,9 @@ end
 
 FigureDir = fullfile(InputDir, 'figures', 'likelihoods');
 spm_mkdir(FigureDir);
+
+OutputDir = fullfile(InputDir, 'likelihoods');
+spm_mkdir(OutputDir);
 
 Analysis = BuildModels(ModelType);
 
@@ -139,6 +142,11 @@ for iROI = 1:numel(ROIs)
                                         'colors', colors, ...
                                         'normalize', Normalize);
 
+            if Normalize == 0
+                Likelihood(:, :, iAnalysis) = T.likelihood;
+            end
+
+            % change color of bars that exceed threshold
             if Normalize == 1
 
                 loglike = mean(T.likelihood_norm(:, 2:end - 1));
@@ -186,16 +194,15 @@ for iROI = 1:numel(ROIs)
 
             if PlotSubject
                 MIN = min(Data(:));
-
                 MAX = max(Data(:));
                 MAX = MAX * 1.1;
 
             else
                 MIN = min(mean(Data)) - ...
-                  max(nansem(Data)) / 4; %#ok<*UNRCH>
+                      max(nansem(Data)) / 4; %#ok<*UNRCH>
 
                 MAX = max(mean(Data)) + ...
-                  max(nansem(Data));
+                      max(nansem(Data));
                 MAX = MAX * 1.005;
                 if MAX < 1.005
                     MAX = 1.005;
@@ -232,6 +239,8 @@ for iROI = 1:numel(ROIs)
          'Fontsize', Opt.Fontsize, ...
          'xoff', 0, ...
          'yoff', .035);
+
+    save(fullfile(OutputDir, [filename '.mat']), 'Likelihood', 'Models_all');
 
     PrintFigure(FigureDir);
 

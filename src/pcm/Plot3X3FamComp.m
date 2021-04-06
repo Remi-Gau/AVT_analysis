@@ -22,6 +22,9 @@ close all;
 
 %% Main parameters
 
+% '3X3', '6X6', 'subset6X6'
+ModelType = '3X3';
+
 % Choose on what type of data the analysis will be run
 %
 % b-parameters
@@ -33,7 +36,7 @@ close all;
 % 'Cst', 'Lin', 'Quad'
 %
 
-InputType = 'ROI';
+InputType = 'Cst';
 
 % Region of interest:
 %  possible choices: A1, PT, V1-5
@@ -45,118 +48,69 @@ ROIs = { ...
         'V2'
        };
 
-% This needs to be adapted or even saved with the PCM results
-Analysis(1).name = 'Ipsi';
-Analysis(2).name = 'Contra';
-Analysis(3).name = 'ContraIpsi';
-
-%% Figure parameters
-set(0, 'defaultAxesFontName', 'Arial');
-set(0, 'defaultTextFontName', 'Arial');
-
-FigDim = [50, 50, 480, 600];
-Visible = 'on';
-
 %% Other parameters
-% Unlikely to change
-
-IsTarget = false;
-
-Space = 'surf';
-
-%% Will not change
 
 MVNN = true;
+Space = 'surf';
+
+Opt = SetDefaults();
+Opt = SetPlottingParameters(Opt);
 
 ConditionType = 'stim';
-if IsTarget
-    ConditionType = 'target';
+if Opt.Targets
+    ConditionType = 'target'; %#ok<*UNRCH>
 end
 
+PlotSubject = 1;
+
 Dirs = SetDir(Space, MVNN);
-InputDir = fullfile(Dirs.PCM, '3X3');
+InputDir = fullfile(Dirs.PCM, ModelType, 'likelihoods');
 
-[Families, Families2] = SetPcm3X3modelsFamily();
+FigureDir = fullfile(Dirs.PCM, ModelType, 'figures', 'model_comparison');
 
-FigureDir = fullfile(InputDir, 'figures');
-mkdir(FigureDir);
+[Families, Families2] = Set3X3modelsFamily();
 
 NbROIs = numel(ROIs);
 
 for iROI = 1:NbROIs
 
-    for iAnalysis = 1:numel(Analysis)
-
-        filename = ['pcm_results', ...
-                    '_roi-', ROIs{iROI}, ...
-                    '_cdt-', ConditionType, ...
-                    '_param-', lower(InputType), ...
-                    '_analysis-', Analysis(iAnalysis).name, ...
-                    '.mat'];
-        filename = fullfile(InputDir, filename);
-
-        disp(filename);
-        load(filename, 'Models', 'T_grp', 'T_cr');
-
-        Models_all{iAnalysis, 1} = Models; %#ok<*SAGROW>
-        T_group_all{iAnalysis, 1} = T_grp;
-        T_cross_all{iAnalysis, 1} = T_cr;
-
-        clear Models T_grp T_cr filename;
-
-    end
-
-    Normalize = 0;
-    colors = {'b'; 'b'; 'b'; 'b'; 'b'; 'b'; 'b'; 'b'; 'b'; 'b'; 'b'; 'b'};
-
-    for iAnalysis = 1:numel(Models_all)
-
-        Upperceil = T_group_all{iAnalysis, 1}.likelihood(:, end);
-        Data2Plot = T_cross_all{iAnalysis, 1};
-        M = Models_all{iAnalysis, 1};
-
-        T = pcm_plotModelLikelihood( ...
-                                    Data2Plot, M, ...
-                                    'upperceil', Upperceil, ...
-                                    'colors', colors, ...
-                                    'normalize', Normalize);
-
-        Likelihood{iROI}(:, :, iAnalysis) = T.likelihood;
-        Likelihood_norm{iROI}(:, :, iAnalysis) = T.likelihood_norm;
-
-    end
-
-end
-
-%% Do family comparison and plot
-XP = [];
-XP2 = [];
-
-for iROI = 1:NbROIs
-
-    close all;
-
     disp(ROIs{iROI});
 
-    %% For ipsi and contra
+    filename = ['likelihoods', ...
+                '_roi-', ROIs{iROI}, ...
+                '_cdt-', ConditionType, ...
+                '_param-', lower(InputType)];
+
+    if PlotSubject
+        filename = [filename '_withSubj-1'];
+    end
+
+    load(fullfile(InputDir, [filename '.mat']), 'Likelihood', 'Models_all');
+
+    % Likelihood(:, :, iAnalysis) = T.likelihood;
+
+    XP = [];
+    XP2 = [];
     for iAnalysis = 1:numel(Models_all)
 
         %% RFX: perform bayesian model family comparison
         % Compute exceedance probabilities
         for iCdt = 1:3
             family = Families{iCdt};
-            loglike = Likelihood{iROI}(:, family.modelorder + 1, iAnalysis);
+            loglike = Likelihood(:, family.modelorder + 1, iAnalysis);
             family = spm_compare_families(loglike, family);
-            XP(iCdt, :, iROI, iAnalysis) = family.xp;
+            XP(iCdt, :, iAnalysis) = family.xp;
 
             family = Families2{iCdt};
-            loglike = Likelihood{iROI}(:, family.modelorder + 1, iAnalysis);
+            loglike = Likelihood(:, family.modelorder + 1, iAnalysis);
             family = spm_compare_families(loglike, family);
-            XP2(iCdt, :, iROI, iAnalysis) = family.xp;
+            XP2(iCdt, :, iAnalysis) = family.xp;
         end
 
     end
 end
+
+return
 
 %% Matrices plot for exceedance probability of I + (S & I)
 close all;
