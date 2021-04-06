@@ -65,10 +65,10 @@ PlotSubject = 1;
 
 Dirs = SetDir(Space, MVNN);
 InputDir = fullfile(Dirs.PCM, ModelType, 'likelihoods');
-
+OutputDir = fullfile(Dirs.PCM, ModelType, 'model_comparison');
 FigureDir = fullfile(Dirs.PCM, ModelType, 'figures', 'model_comparison');
 
-[Families, Families2] = Set3X3modelsFamily();
+Families = Set3X3modelsFamily();
 
 NbROIs = numel(ROIs);
 
@@ -89,25 +89,31 @@ for iROI = 1:NbROIs
 
     % Likelihood(:, :, iAnalysis) = T.likelihood;
 
-    XP = [];
-    XP2 = [];
-    for iAnalysis = 1:numel(Models_all)
+    XP = {};
 
-        %% RFX: perform bayesian model family comparison
-        % Compute exceedance probabilities
-        for iCdt = 1:3
-            family = Families{iCdt};
-            loglike = Likelihood(:, family.modelorder + 1, iAnalysis);
-            family = spm_compare_families(loglike, family);
-            XP(iCdt, :, iAnalysis) = family.xp;
+    for  iFam = 1:numel(Families)
 
-            family = Families2{iCdt};
-            loglike = Likelihood(:, family.modelorder + 1, iAnalysis);
-            family = spm_compare_families(loglike, family);
-            XP2(iCdt, :, iAnalysis) = family.xp;
+        for iAnalysis = 1:numel(Models_all)
+
+            %% RFX: perform bayesian model family comparison
+            % Compute exceedance probabilities
+            for iCdt = 1:numel(Families)
+
+                family = Families{iFam}{iCdt};
+
+                loglike = Likelihood(:, family.modelorder + 1, iAnalysis);
+
+                family = spm_compare_families(loglike, family);
+
+                XP{iFam}(iCdt, :, iAnalysis) = family.xp;
+
+            end
+
         end
-
     end
+
+    filename = strrep(filename, 'likelihoods', 'model_comparison');
+    save(fullfile(OutputDir, [filename '.mat']), 'XP', 'Models_all', 'Families');
 end
 
 return
