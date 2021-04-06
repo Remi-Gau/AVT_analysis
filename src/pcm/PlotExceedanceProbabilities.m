@@ -55,11 +55,15 @@ Dirs = SetDir(Space, MVNN);
 InputDir = fullfile(Dirs.PCM, ModelType, 'model_comparison');
 FigureDir = fullfile(Dirs.PCM, ModelType, 'figures', 'model_comparison');
 
+ColorMapDir = fullfile(fileparts(which('map_luminance')), '..', 'mat_maps');
+load(fullfile(ColorMapDir, '1hot_iso.mat'));
+ColorMap = hot;
+
 NbROIs = numel(ROIs);
 
 for iROI = 1:NbROIs
 
-    disp(ROIs{iROI});
+    fprintf(1, '%s\n', ROIs{iROI});
 
     filename = ['model_comparison', ...
                 '_roi-', ROIs{iROI}, ...
@@ -70,49 +74,59 @@ for iROI = 1:NbROIs
         filename = [filename '_withSubj-1'];
     end
 
-    load(fullfile(InputDir, [filename '.mat']), 'XP', 'Models_all', 'Families');
+    fprintf(1, 'loading:\n %s\n', fullfile(InputDir, [filename '.mat']));
+
+    load(fullfile(InputDir, [filename '.mat']), ...
+         'XP', 'Models_all', 'Families', 'Analysis');
+
+    for i = 1:numel(XP)
+        ExceedProba{i}(:, :, :, iROI) = XP{i}; %#ok<SAGROW>
+    end
+
+    clear XP;
 end
-    
+
 %% Matrices plot for exceedance probability of I + (S & I)
 
-for iFam = 1:2
+for iFam = 1:numel(ExceedProba)
 
-    Struct2Save = struct( ...
-                         'comp', { ...
-                                  { ...
-                                   'Ai VS Vi', 'Ai VS Ti', 'Vi VS Ti', ...
-                                   'Ac VS Vc', 'Ac VS Tc', 'Vc VS Tc' ...
-                                  } ...
-                                 }, ...
-                         'p_s', [], ...
-                         'p_si', [], ...
-                         'p_i', []);
+    %     Struct2Save = struct( ...
+    %                          'comp', { ...
+    %                                   { ...
+    %                                    'Ai VS Vi', 'Ai VS Ti', 'Vi VS Ti', ...
+    %                                    'Ac VS Vc', 'Ac VS Tc', 'Vc VS Tc' ...
+    %                                   } ...
+    %                                  }, ...
+    %                          'p_s', [], ...
+    %                          'p_si', [], ...
+    %                          'p_i', []);
 
-    for iAnalysis = 1:size(XP, 4)
+    XP = ExceedProba{iFam};
+
+    NbFam = numel(Families{iFam}{1}.names);
+
+    for iAnalysis = 1:size(XP, 3)
 
         if iFam == 1
-            NbFam = '3';
-            Mat2Plot = squeeze(XP(:, 3, :, iAnalysis) + XP(:, 1, :, iAnalysis));
+            Mat2Plot = squeeze(XP(:, 3, iAnalysis, :) + XP(:, 1, iAnalysis, :));
             Struct2Save = cat(1, ...
-                              XP([2 1 3], :, :, iAnalysis), ...
-                              XP([2 1 3], :, :, iAnalysis));
+                              XP([2 1 3], :, iAnalysis, :), ...
+                              XP([2 1 3], :, iAnalysis, :));
 
-        else
-            NbFam = '2';
-            Mat2Plot = squeeze(XP2(:, 1, :, iAnalysis));
+        elseif iFam == 2
+            Mat2Plot = squeeze(XP(:, 1, iAnalysis, :));
             Struct2Save = zeros(6, 3, NbROIs);
 
         end
 
-        filename = ['ModelFamilyComparison', ...
+        filename = ['model_comparison', ...
                     '_cdt-', ConditionType, ...
                     '_param-', lower(InputType), ...
                     '_analysis-', Analysis(iAnalysis).name, ...
-                    '_NbFamilies-', NbFam];
+                    '_nbFamilies-', num2str(NbFam)];
 
-        figure( ...
-               'name', strrep(filename, '_', ' '), ...
-               'Position', FigDim);
+        Opt.Title = strrep(filename, '_', ' ');
+        Opt = OpenFigure(Opt);
 
         colormap('gray');
 
@@ -153,18 +167,16 @@ for iFam = 1:2
 
         colorbar;
 
-        p = mtit(['Exc probability Idpt + Scaled & Idpdt - ' InputType], ...
-                 'fontsize', 14, ...
-                 'xoff', 0, 'yoff', .025);
-
         axis([.5 NbROIs + .5 .5 3.5]);
         axis square;
 
-        ColorMap = BrainColourMaps('hot_increasing');
         colormap(ColorMap);
 
-        
-        print(gcf, fullfile(FigureDir, [filename '_hot.tif']), '-dtiff');
+        mtit([Opt.Title ' - ' InputType], ...
+             'fontsize', Opt.Fontsize, ...
+             'xoff', 0, 'yoff', .025);
+
+        PrintFigure(FigureDir);
 
     end
 

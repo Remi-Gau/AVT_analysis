@@ -20,5 +20,5 @@ function test_Set6X6modelsBasic
 end
 
 function test_Set6X6modelsSubset
-        M = SetSubset6X6Models();
+    M = SetSubset6X6Models();
 end

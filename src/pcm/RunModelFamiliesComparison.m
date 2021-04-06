@@ -1,6 +1,6 @@
 % (C) Copyright 2020 Remi Gau
 %
-% computes exceedance probabilities by performing family comparison 
+% computes exceedance probabilities by performing family comparison
 % with spm_compare_families
 
 clc;
@@ -10,7 +10,7 @@ close all;
 %% Main parameters
 
 % '3X3', '6X6', 'subset6X6'
-ModelType = '3X3';
+ModelType = 'subset6X6';
 
 % Choose on what type of data the analysis will be run
 %
@@ -64,7 +64,7 @@ NbROIs = numel(ROIs);
 
 for iROI = 1:NbROIs
 
-    fprintf(1, '%s\n', ROIs{iROI});
+    fprintf(1, '\n\n%s\n', ROIs{iROI});
 
     filename = ['likelihoods', ...
                 '_roi-', ROIs{iROI}, ...
@@ -75,18 +75,19 @@ for iROI = 1:NbROIs
         filename = [filename '_withSubj-1'];
     end
 
+    fprintf(1, 'loading:\n %s\n', fullfile(InputDir, [filename '.mat']));
+
     load(fullfile(InputDir, [filename '.mat']), ...
-        'Likelihood', 'Models_all', 'Analysis');
+         'Likelihood', 'Models_all', 'Analysis');
 
-    % Likelihood(:, :, iAnalysis) = T.likelihood;
-
-    XP = {};
+    % remove null and free models
+    Likelihood(:, [1 end], :) = [];
 
     % in case we have different types of family comparisons
     for  iFam = 1:numel(Families)
 
         for iAnalysis = 1:numel(Models_all)
-            
+
             fprintf(1, '\n %s\n', Analysis(iAnalysis).name);
 
             %% RFX: perform bayesian model family comparison
@@ -94,9 +95,9 @@ for iROI = 1:NbROIs
             for iCdt = 1:numel(Families{iFam})
 
                 family = Families{iFam}{iCdt};
-                fprintf(1, '  %s\n', strjoin(family.names, '   ')); 
+                fprintf(1, '  %s\n', strjoin(family.names, '   '));
 
-                loglike = Likelihood(:, family.modelorder + 1, iAnalysis);
+                loglike = Likelihood(:, family.modelorder, iAnalysis);
 
                 family = spm_compare_families(loglike, family);
 
@@ -109,6 +110,5 @@ for iROI = 1:NbROIs
 
     filename = strrep(filename, 'likelihoods', 'model_comparison');
     save(fullfile(OutputDir, [filename '.mat']), ...
-        'XP', 'Models_all', 'Families', 'Analysis');
+         'XP', 'Models_all', 'Families', 'Analysis');
 end
-

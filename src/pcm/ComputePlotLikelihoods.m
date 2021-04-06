@@ -10,7 +10,7 @@ close all;
 %% Main parameters
 
 % '3X3', '6X6', 'subset6X6'
-ModelType = '3X3';
+ModelType = 'subset6X6';
 
 % Choose on what type of data the analysis will be run
 %
