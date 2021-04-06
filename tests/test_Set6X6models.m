@@ -18,3 +18,7 @@ function test_Set6X6modelsBasic
     M = Set6X6models(false, FeaturesToAdd);
 
 end
+
+function test_Set6X6modelsSubset
+        M = SetSubset6X6Models();
+end

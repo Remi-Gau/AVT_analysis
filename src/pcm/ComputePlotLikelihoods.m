@@ -240,7 +240,7 @@ for iROI = 1:numel(ROIs)
          'xoff', 0, ...
          'yoff', .035);
 
-    save(fullfile(OutputDir, [filename '.mat']), 'Likelihood', 'Models_all');
+    save(fullfile(OutputDir, [filename '.mat']), 'Likelihood', 'Models_all', 'Analysis');
 
     PrintFigure(FigureDir);
 

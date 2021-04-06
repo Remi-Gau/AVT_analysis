@@ -1,19 +1,7 @@
 % (C) Copyright 2020 Remi Gau
+
 %
-% For 3X3 models
-%
-% - computes likelihood of each model
-% - computes exceedance probabilities by performing 2 family comparison with spm_compare_families
-%
-%           a) Families.names{1}='Scaled';
-%           b) Families.names{2}='Scaled+Idpdt and Idpdt';
-%
-% or
-%           a) Families.names{1}='Scaled';
-%           b) Families.names{2}='Scaled+Idpdt'
-%           c) Families.names{3}='Idpdt'
-%
-% - plot the exceedance probabilities for both cases as a matrix
+% plot the exceedance probabilities for all ROIs as a matrix
 %
 
 clc;
@@ -64,11 +52,8 @@ end
 PlotSubject = 1;
 
 Dirs = SetDir(Space, MVNN);
-InputDir = fullfile(Dirs.PCM, ModelType, 'likelihoods');
-OutputDir = fullfile(Dirs.PCM, ModelType, 'model_comparison');
+InputDir = fullfile(Dirs.PCM, ModelType, 'model_comparison');
 FigureDir = fullfile(Dirs.PCM, ModelType, 'figures', 'model_comparison');
-
-Families = Set3X3modelsFamily();
 
 NbROIs = numel(ROIs);
 
@@ -76,7 +61,7 @@ for iROI = 1:NbROIs
 
     disp(ROIs{iROI});
 
-    filename = ['likelihoods', ...
+    filename = ['model_comparison', ...
                 '_roi-', ROIs{iROI}, ...
                 '_cdt-', ConditionType, ...
                 '_param-', lower(InputType)];
@@ -85,41 +70,10 @@ for iROI = 1:NbROIs
         filename = [filename '_withSubj-1'];
     end
 
-    load(fullfile(InputDir, [filename '.mat']), 'Likelihood', 'Models_all');
-
-    % Likelihood(:, :, iAnalysis) = T.likelihood;
-
-    XP = {};
-
-    for  iFam = 1:numel(Families)
-
-        for iAnalysis = 1:numel(Models_all)
-
-            %% RFX: perform bayesian model family comparison
-            % Compute exceedance probabilities
-            for iCdt = 1:numel(Families)
-
-                family = Families{iFam}{iCdt};
-
-                loglike = Likelihood(:, family.modelorder + 1, iAnalysis);
-
-                family = spm_compare_families(loglike, family);
-
-                XP{iFam}(iCdt, :, iAnalysis) = family.xp;
-
-            end
-
-        end
-    end
-
-    filename = strrep(filename, 'likelihoods', 'model_comparison');
-    save(fullfile(OutputDir, [filename '.mat']), 'XP', 'Models_all', 'Families');
+    load(fullfile(InputDir, [filename '.mat']), 'XP', 'Models_all', 'Families');
 end
-
-return
-
+    
 %% Matrices plot for exceedance probability of I + (S & I)
-close all;
 
 for iFam = 1:2
 
@@ -159,8 +113,6 @@ for iFam = 1:2
         figure( ...
                'name', strrep(filename, '_', ' '), ...
                'Position', FigDim);
-
-        SetFigureDefaults(Opt);
 
         colormap('gray');
 
@@ -210,7 +162,8 @@ for iFam = 1:2
 
         ColorMap = BrainColourMaps('hot_increasing');
         colormap(ColorMap);
-        disp(filename);
+
+        
         print(gcf, fullfile(FigureDir, [filename '_hot.tif']), '-dtiff');
 
     end
