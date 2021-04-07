@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 % see ``src/settings``
 % and ``lib/laminar_tools/src/settings``
 % to change plotting options
