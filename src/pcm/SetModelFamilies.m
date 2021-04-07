@@ -27,9 +27,9 @@ function Families = SetModelFamilies(ModelType)
             %   Scaled_VT-Independent_A-IpsiContraScaled_000
 
             Comparisons(1).family_names = { ...
-                                           'scaled', ...
-                                           'idpdt', ...
-                                           'pref_cdt_idpdt'};
+                                           'A, V, T scaled', ...
+                                           'A, V, T idpdt', ...
+                                           'pref cdt idpdt'};
             Comparisons(1).partition = [1 1 2 2 2 2 2 2 2 2 3 3 3 3];
 
             Cdt{1} = [1:2 3:10 11:14];
@@ -108,17 +108,23 @@ function Families = SetModelFamilies(ModelType)
                        'modelorder', [], ...
                        'infer', 'RFX', ...
                        'Nsamp', 1e4, ...
-                       'prior', 'F-unity'); %#ok<*SAGROW>
+                       'prior', 'M-unity'); %#ok<*SAGROW>
 
             % The field modelOrder will be used
             % to only extract the likelihood of the models of interest
             Families{iComp}{iCdt}.modelorder = Cdt{iCdt};
 
             for iFam = 1:numel(Comparisons(iComp).family_names)
-                Families{iComp}{iCdt}.names{iFam} = ...
-                    [CdtComb(iCdt, 1) '_' ...
-                     Comparisons(iComp).family_names{iFam} '_' ...
-                     CdtComb(iCdt, 2)];
+                
+                name = Comparisons(iComp).family_names{iFam};
+                if strcmp(ModelType, 'subset6X6')
+                    name = Comparisons(iComp).family_names{iFam};
+                else
+                    name = [CdtComb(iCdt, 1) '_' name '_' CdtComb(iCdt, 2)];
+                end
+                
+                Families{iComp}{iCdt}.names{iFam} = name;
+                
             end
 
         end

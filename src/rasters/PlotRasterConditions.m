@@ -14,11 +14,11 @@ close all;
 SortBy = 'Cst';
 Hemi = {'lh', 'rh'};
 
-SortingCondition = [1:2:6];
+SortingCondition = 5; % [1:2:6];
 
 for iCdt = 1:numel(SortingCondition)
 
-    AllRoisAllCondtions(SortBy, SortingCondition(iCdt), Hemi);
+%     AllRoisAllCondtions(SortBy, SortingCondition(iCdt), Hemi);
     AllRoisNonPreferred(SortBy, SortingCondition(iCdt), Hemi);
 
 end
