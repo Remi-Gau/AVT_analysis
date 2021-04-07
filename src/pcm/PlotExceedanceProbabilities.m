@@ -74,12 +74,11 @@ for iROI = 1:NbROIs
          'XP', 'Models_all', 'Families', 'Analysis');
 
     for i = 1:numel(XP)
-            ExProba{i}(:, :, :, iROI) = XP{i}; 
+        ExProba{i}(:, :, :, iROI) = XP{i};
     end
 
     clear XP;
 end
 
-CreateFigureExceedanceProba(ExProba, Families, Analysis, InputType, ModelType, FigureDir, ROIs)
+CreateFigureExceedanceProba(ExProba, Families, Analysis, InputType, ModelType, FigureDir, ROIs);
 %
-
