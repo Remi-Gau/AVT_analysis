@@ -122,7 +122,7 @@ function AddDependencies()
         addpath(fullfile(pth, 'lib', librairies{iLib}));
     end
 
-    addpath(genpath(fullfile(pth, 'src')));
+    addpath(genpath(fullfile(pth, 'src', 'subfun')));
 
     spm('defaults', 'fmri');
     spm_jobman('initcfg');
