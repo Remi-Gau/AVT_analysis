@@ -14,11 +14,11 @@ close all;
 SortBy = 'Cst';
 Hemi = {'lh', 'rh'};
 
-SortingCondition = [1:2:6];
+SortingCondition = 5; % [1:2:6];
 
 for iCdt = 1:numel(SortingCondition)
 
-    AllRoisAllCondtions(SortBy, SortingCondition(iCdt), Hemi);
+%     AllRoisAllCondtions(SortBy, SortingCondition(iCdt), Hemi);
     AllRoisNonPreferred(SortBy, SortingCondition(iCdt), Hemi);
 
 end
@@ -128,7 +128,7 @@ function PlotHemisphere(Hemi, ROIs, Sorted, SortBy, Sorting, Title)
 
             fprintf('  Plotting\n');
             PlotSeveralRasters(Opt, Data, SortingData, Titles, R);
-            
+
             OutputDir = fullfile(Dirs.Figures, 'Rasters');
             PrintFigure(fullfile(OutputDir, 'baseline'));
 
@@ -200,7 +200,7 @@ function PlotHemispheresIpsiContraPooled(Hemi, ROIs, Sorted, SortBy, Sorting, Ti
 
         OutputDir = fullfile(Dirs.Figures, 'Rasters');
         PrintFigure(fullfile(OutputDir, 'baseline'));
-        
+
         clear Data SortingData;
 
     end

@@ -21,6 +21,11 @@ function Filename = GetNameFileToLoad(SubDir, SubjName, HsSufix, NbLayers, RoiNa
 
     end
 
+    Opt = SetDefaults();
+    if Opt.PerformDeconvolution
+        Filename = strrep(Filename, '.mat', '_deconvolved-1.mat');
+    end
+
     Filename = fullfile(SubDir, Filename);
 
     fprintf('   Loading: %s\n', Filename);

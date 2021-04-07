@@ -10,6 +10,6 @@ end
 
 function test_test_Set3X3modelsFamilyBasic
 
-    [Families, Families2] = Set3X3modelsFamily();
+    Families = SetModelFamilies('3X3');
 
 end

@@ -13,7 +13,8 @@ close all;
 
 %% Main parameters
 
-ModelType = 'subset6X6'; % '3X3', '6X6', 'subset6X6'
+% '3X3', '6X6', 'subset6X6'
+ModelType = 'subset6X6';
 
 % Choose on what type of data the analysis will be run
 %
@@ -41,22 +42,17 @@ ROIs = { ...
 %% Other parameters
 % Unlikely to change
 
-IsTarget = false;
-
-DoFeaturePooling = true;
+Opt = SetDefaults();
 
 Space = 'surf';
-
 MVNN = true;
 
 IndividualPcmDo = false;
 
 %%
 
-NbLayers = 6;
-
 ConditionType = 'stim';
-if IsTarget
+if Opt.Targets
     ConditionType = 'target'; %#ok<*UNRCH>
 end
 
@@ -72,28 +68,7 @@ end
 [SubLs, NbSub] = GetSubjectList(InputDir);
 
 OutputDir = fullfile(Dirs.PCM, ModelType);
-mkdir(OutputDir);
-
-%% Build the models
-fprintf('Building models\n');
-
-switch lower(ModelType)
-
-    case '3x3'
-        Analysis(1).name = 'Ipsi';
-        Analysis(1).CdtToSelect = 1:2:5;
-
-        Analysis(2).name = 'Contra';
-        Analysis(2).CdtToSelect = 2:2:6;
-
-        Analysis(3).name = 'ContraIpsi';
-        Analysis(3).CdtToSelect = 1:6;
-
-    case {'6x6', 'subset6x6'}
-        Analysis(1).name = 'AllConditions';
-        Analysis(1).CdtToSelect = 1:6;
-
-end
+spm_mkdir(OutputDir);
 
 %% Start
 fprintf('Get started\n');
@@ -126,7 +101,7 @@ for iROI =  1:numel(ROIs)
             Filename = GetNameFileToLoad( ...
                                          SubDir, SubLs(iSub).name, ...
                                          HsSufix, ...
-                                         NbLayers, ...
+                                         Opt.NbLayers, ...
                                          ROIs{iROI}, ...
                                          InputType);
 
@@ -139,10 +114,10 @@ for iROI =  1:numel(ROIs)
             [RoiData, RunVec, ConditionVec, LayerVec] = CheckInput(RoiData, ...
                                                                    RunVec, ...
                                                                    ConditionVec, ...
-                                                                   IsTarget, ...
+                                                                   Opt.Targets, ...
                                                                    LayerVec);
 
-            RoiData = ReassignIpsiAndContra(RoiData, ConditionVec, HsSufix, DoFeaturePooling);
+            RoiData = ReassignIpsiAndContra(RoiData, ConditionVec, HsSufix, Opt.ReassignIpsiContra);
 
             % If we have the layers data on several rows of the data
             % matrix we put them back on a single row
@@ -168,14 +143,7 @@ for iROI =  1:numel(ROIs)
         IsAuditoryRoi = false;
     end
 
-    switch lower(ModelType)
-        case '3x3'
-            Models = Set3X3models();
-        case '6x6'
-            Models = Set6X6models(IsAuditoryRoi);
-        case 'subset6x6'
-            Models = SetSubset6X6Models(IsAuditoryRoi);
-    end
+    [Analysis, Models] = BuildModels(ModelType, IsAuditoryRoi);
 
     %% Run the PCM
 
@@ -193,6 +161,10 @@ for iROI =  1:numel(ROIs)
                     '_param-', lower(InputType), ...
                     '_analysis-', Analysis(iAnalysis).name, ...
                     '.mat'];
+
+        if Opt.PerformDeconvolution
+            Filename = strrep(Filename, '.mat', '_deconvolved-1.mat');
+        end
 
         [GrpData, GrpRunVec, GrpConditionVec] = PreparePcmInput( ...
                                                                 GrpDataSource, ...

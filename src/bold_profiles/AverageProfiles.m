@@ -36,9 +36,7 @@ ROIs = {
 %%
 MVNN = false;
 
-[NbLayers, AverageType] = GetPlottingDefaults();
-
-DoFeaturePooling = true;
+Opt = SetDefaults();
 
 [CondNames, CondNamesIpsiContra] = GetConditionList();
 
@@ -78,14 +76,17 @@ for iROI = 1:numel(ROIs)
             Filename = ReturnFilename('hs_roi_run_cdt_layer', ...
                                       SubLs(iSub).name, ...
                                       HsSufix, ...
-                                      NbLayers, ...
+                                      Opt.Opt.NbLayers, ...
                                       ROIs{iROI});
 
             Filename = fullfile(SubDir, Filename);
             load(Filename, ...
                  'RoiData', 'ConditionVec', 'RunVec', 'LayerVec');
 
-            Data{1, ihs} = ReassignIpsiAndContra(RoiData, ConditionVec, HsSufix, DoFeaturePooling);
+            Data{1, ihs} = ReassignIpsiAndContra(RoiData, ...
+                                                 ConditionVec, ...
+                                                 HsSufix, ...
+                                                 Opt.ReassignIpsiContra);
 
         end
 
@@ -95,7 +96,7 @@ for iROI = 1:numel(ROIs)
         % - nb of surface parameters to estimate
         % - nb vertices,
         % - nb beta from subject level GLM
-        SubjData = nan(NbBetas, NbLayers);
+        SubjData = nan(NbBetas, Opt.Opt.NbLayers);
         ConditionVec_tmp = nan(NbBetas, 1);
         RunVec_tmp = nan(NbBetas, 1);
 
@@ -117,14 +118,14 @@ for iROI = 1:numel(ROIs)
                 if any(beta2select)
 
                     tmp = Data{1}(beta2select, :);
-                    switch AverageType
+                    switch Opt.AverageType
                         case 'mean'
                             tmp = mean(tmp, 2);
                         case 'median'
                             tmp = median(tmp, 2);
                     end
 
-                    SubjData(iBeta, 1:NbLayers) = tmp';
+                    SubjData(iBeta, 1:Opt.Opt.NbLayers) = tmp';
                     clear tmp;
 
                     ConditionVec_tmp(iBeta, 1) = iCdt;
@@ -155,8 +156,8 @@ for iROI = 1:numel(ROIs)
     [~, ~, ~] = mkdir(fullfile(Dirs.ExtractedBetas, 'group'));
 
     Filename = ['Group-roi-', ROIs{iROI}, ...
-                '_average-', AverageType, ...
-                '_nbLayers-', num2str(NbLayers), '.mat' ...
+                '_average-', Opt.AverageType, ...
+                '_nbLayers-', num2str(Opt.Opt.NbLayers), '.mat' ...
                ];
 
     Filename = fullfile(Dirs.ExtractedBetas, 'group', Filename);

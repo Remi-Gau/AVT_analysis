@@ -22,11 +22,9 @@ ROIs = { ...
 
 Opt = SetDefaults();
 
-Data = LoadProfileData(Opt, ROIs, InputDir);
+[Data, CondNamesIpsiContra] = LoadProfileData(Opt, ROIs, InputDir);
 
-[~, CondNamesIpsiContra] = GetConditionList();
-
-if ~Opt.PlotTargets
+if ~Opt.Targets
     CondNamesIpsiContra(7:end) = [];
 end
 
@@ -121,7 +119,7 @@ function CrossSensory(Data, ROIs, OutputDir)
                         '[V-T]_{target}'};
 
     Opt = SetDefaults();
-    if ~Opt.PlotTargets
+    if ~Opt.Targets
         ComparisonsNames(3:4) = [];
     end
 
@@ -140,8 +138,8 @@ end
 function Target_gt_Stim(Data, ROIs, OutputDir)
 
     Opt = SetDefaults();
-    if ~Opt.PlotTargets
-        warning('Opt.PlotTargets set to false: no target-stim figure will be generated.');
+    if ~Opt.Targets
+        warning('Opt.Targets set to false: no target-stim figure will be generated.');
         return
     end
 
@@ -284,7 +282,7 @@ function V_gt_T_WithBaseline(Data, OutputDir) % in A1 and PT
                   [9 11], [10 12] ...
                  };
 
-    if ~Opt.PlotTargets
+    if ~Opt.Targets
         Conditions(2, :) = [];
     end
 
@@ -314,8 +312,8 @@ end
 function Target_gt_Stim_WithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
 
     Opt = SetDefaults();
-    if ~Opt.PlotTargets
-        warning('Opt.PlotTargets set to false: no target-stim figure will be generated.');
+    if ~Opt.Targets
+        warning('Opt.Targets set to false: no target-stim figure will be generated.');
         return
     end
 

@@ -1,6 +1,7 @@
 % (C) Copyright 2020 Remi Gau
-
-%  bar plot of the likelihoods of the different models
+%
+%  bar plot of the likelihoods of the different PCM models
+%
 
 clc;
 clear;
@@ -8,7 +9,8 @@ close all;
 
 %% Main parameters
 
-ModelType = '6X6';
+% '3X3', '6X6', 'subset6X6'
+ModelType = 'subset6X6';
 
 % Choose on what type of data the analysis will be run
 %
@@ -33,47 +35,21 @@ ROIs = { ...
         'PT'
        };
 
-PlotSubject = false;
+PlotSubject = true;
 
-% This needs to be adapted or even saved with the PCM results
-switch lower(ModelType)
-    case '3x3'
+Opt = SetDefaults();
+Opt = SetPlottingParameters(Opt);
 
-        %% Analysis name condition to use for it
-
-        Analysis(1).name = 'Ipsi';
-        Analysis(1).CdtToSelect = 1:2:5;
-
-        Analysis(2).name = 'Contra';
-        Analysis(2).CdtToSelect = 2:2:6;
-
-        Analysis(3).name = 'ContraIpsi';
-        Analysis(3).CdtToSelect = 1:6;
-
-    case '6x6'
-
-        Analysis(1).name = 'AllConditions';
-        Analysis(1).CdtToSelect = 1:6;
-end
-
-FigDim = [50, 50, 1400, 750];
-
-FONTSIZE = 12;
-
-%% Other parameters
-% Unlikely to change
-
-IsTarget = false;
-
-Space = 'surf';
+Opt.FigDim = [50 50 1250 650];
 
 %% Will not change
 
 MVNN = true;
+Space = 'surf';
 
 ConditionType = 'stim';
-if IsTarget
-    ConditionType = 'target';
+if Opt.Targets
+    ConditionType = 'target'; %#ok<*UNRCH>
 end
 
 Dirs = SetDir(Space, MVNN);
@@ -82,11 +58,16 @@ InputDir = fullfile(Dirs.PCM, ModelType);
 
 if PlotSubject
     [SubLs, NbSub] = GetSubjectList();
-    COLOR_SUBJECTS = SubjectColours();
+    COLOR_SUBJECTS = SubjectColors();
 end
 
-FigureDir = fullfile(InputDir, 'figures');
-mkdir(FigureDir);
+FigureDir = fullfile(InputDir, 'figures', 'likelihoods');
+spm_mkdir(FigureDir);
+
+OutputDir = fullfile(InputDir, 'likelihoods');
+spm_mkdir(OutputDir);
+
+Analysis = BuildModels(ModelType);
 
 for iROI = 1:numel(ROIs)
 
@@ -98,9 +79,18 @@ for iROI = 1:numel(ROIs)
                     '_param-', lower(InputType), ...
                     '_analysis-', Analysis(iAnalysis).name, ...
                     '.mat'];
+
+        if Opt.PerformDeconvolution
+            filename = strrep(filename, '.mat', '_deconvolved-1.mat');
+        end
+
+        if strcmp(ModelType, 'subset6X6')
+            filename = ['group_' filename];
+        end
+
         filename = fullfile(InputDir, filename);
 
-        disp(filename);
+        fprintf(1, 'loading:\n %s\n', filename);
         load(filename, 'Models', 'T_grp', 'T_cr');
 
         Models_all{iAnalysis, 1} = Models; %#ok<*SAGROW>
@@ -127,11 +117,8 @@ for iROI = 1:numel(ROIs)
         filename = [filename '_withSubj-1'];
     end
 
-    figure( ...
-           'name', strrep(filename, '_', ' '), ...
-           'Position', FigDim);
-
-    SetFigureDefaults(Opt);
+    Opt.Title = strrep(filename, '_', ' ');
+    Opt = OpenFigure(Opt);
 
     Subplot = 1;
 
@@ -155,6 +142,11 @@ for iROI = 1:numel(ROIs)
                                         'colors', colors, ...
                                         'normalize', Normalize);
 
+            if Normalize == 0
+                Likelihood(:, :, iAnalysis) = T.likelihood;
+            end
+
+            % change color of bars that exceed threshold
             if Normalize == 1
 
                 loglike = mean(T.likelihood_norm(:, 2:end - 1));
@@ -194,7 +186,7 @@ for iROI = 1:numel(ROIs)
 
             ylabel('');
 
-            set(gca, 'fontsize', FONTSIZE, ...
+            set(gca, 'Fontsize', Opt.Fontsize, ...
                 'xtick', 1:(NbModels - 2), ...
                 'xticklabel', 2:(NbModels - 1));
 
@@ -202,16 +194,15 @@ for iROI = 1:numel(ROIs)
 
             if PlotSubject
                 MIN = min(Data(:));
-
                 MAX = max(Data(:));
                 MAX = MAX * 1.1;
 
             else
                 MIN = min(mean(Data)) - ...
-                  max(nansem(Data)) / 4; %#ok<*UNRCH>
+                      max(nansem(Data)) / 4; %#ok<*UNRCH>
 
                 MAX = max(mean(Data)) + ...
-                  max(nansem(Data));
+                      max(nansem(Data));
                 MAX = MAX * 1.005;
                 if MAX < 1.005
                     MAX = 1.005;
@@ -227,13 +218,13 @@ for iROI = 1:numel(ROIs)
                 end
 
                 t = title(temp);
-                set(t, 'fontsize', FONTSIZE);
+                set(t, 'Fontsize', Opt.Fontsize);
 
             end
 
             if Normalize == 0
                 t = ylabel(Analysis(iAnalysis).name);
-                set(t, 'fontsize', FONTSIZE + 2);
+                set(t, 'Fontsize', Opt.Fontsize + 2);
             end
 
             axis([0.5 (NbModels - 2) + 0.5 0 MAX]);
@@ -245,12 +236,12 @@ for iROI = 1:numel(ROIs)
     end
 
     mtit(strrep(filename, '_', ' '), ...
-         'fontsize', FONTSIZE, ...
+         'Fontsize', Opt.Fontsize, ...
          'xoff', 0, ...
          'yoff', .035);
 
-    filename = fullfile(FigureDir, [filename '.tif']);
-    disp(filename);
-    print(gcf, filename, '-dtiff');
+    save(fullfile(OutputDir, [filename '.mat']), 'Likelihood', 'Models_all', 'Analysis');
+
+    PrintFigure(FigureDir);
 
 end

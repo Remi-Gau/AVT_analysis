@@ -8,7 +8,8 @@ close all;
 
 %% Main parameters
 
-ModelType = '6X6';
+% '3X3', '6X6', 'subset6X6'
+ModelType = 'subset6X6';
 
 % Choose on what type of data the analysis will be run
 %
@@ -33,62 +34,25 @@ ROIs = { ...
         'PT'
        };
 
-PlotSubject = false;
+Analysis = BuildModels(ModelType);
 
-% This needs to be adapted or even saved with the PCM results
-[~, CondNames] = GetConditionList();
-switch lower(ModelType)
-    case '3x3'
-
-        %% Analysis name condition to use for it
-
-        Analysis(1).name = 'Ipsi';
-        Analysis(1).CdtToSelect = 1:2:5;
-        Analysis(1).CondNames = CondNames(1:2:5);
-
-        Analysis(2).name = 'Contra';
-        Analysis(2).CdtToSelect = 2:2:6;
-        Analysis(2).CondNames = CondNames(2:2:6);
-
-        Analysis(3).name = 'ContraIpsi';
-        Analysis(3).CondNames = {'A', 'V', 'T'};
-
-    case '6x6'
-
-        Analysis(1).name = 'AllConditions';
-        Analysis(1).CdtToSelect = 1:6;
-        Analysis(1).CondNames = CondNames(1:6);
-
-end
-
-FigDim = [50, 50, 750, 750];
-FONTSIZE = 12;
-
-ColorMap = SeismicColourMap(1000);
-% ColorMap = BrainColourMaps('hot_increasing');
+Opt = SetRasterPlotParameters();
+ColorMap = Opt.Raster.ColorMap;
 
 %% Other parameters
-% Unlikely to change
-
-IsTarget = false;
-
-Space = 'surf';
-
-%% Will not change
-
-MVNN = true;
 
 ConditionType = 'stim';
-if IsTarget
-    ConditionType = 'target';
+if Opt.Targets
+    ConditionType = 'target'; %#ok<*UNRCH>
 end
 
+Space = 'surf';
+MVNN = true;
 Dirs = SetDir(Space, MVNN);
 
 InputDir = fullfile(Dirs.PCM, ModelType);
 
-FigureDir = fullfile(InputDir, 'figures');
-mkdir(FigureDir);
+FigureDir = fullfile(InputDir, 'figures', 'empirical_G_matrices');
 
 for iROI = 1:numel(ROIs)
 
@@ -100,9 +64,18 @@ for iROI = 1:numel(ROIs)
                     '_param-', lower(InputType), ...
                     '_analysis-', Analysis(iAnalysis).name, ...
                     '.mat'];
+
+        if Opt.PerformDeconvolution
+            filename = strrep(filename, '.mat', '_deconvolved-1.mat');
+        end
+
+        if strcmp(ModelType, 'subset6X6')
+            filename = ['group_' filename];
+        end
+
         filename = fullfile(InputDir, filename);
 
-        disp(filename);
+        fprintf(1, 'loading:\n %s\n', filename);
         load(filename, 'Models', 'G_hat', 'G_pred_grp', 'G_pred_cr');
 
         %% Plot G matrices
@@ -112,17 +85,17 @@ for iROI = 1:numel(ROIs)
                           '_param-', lower(InputType), ...
                           '_analysis-', Analysis(iAnalysis).name];
 
-        figure( ...
-               'name', strrep(FigureFilename, '_', ' '), ...
-               'Position', FigDim);
+        Opt.Title = strrep(FigureFilename, '_', ' ');
 
-        SetFigureDefaults();
+        Opt = OpenFigure(Opt);
 
-        Title = strrep(FigureFilename, '_', ' ');
+        PlotGMatrixAndSetAxis(mean(G_hat, 3), ...
+                              Analysis(iAnalysis).CondNames, ...
+                              Opt.Title, ...
+                              Opt.Fontsize, ...
+                              false);
 
-        PlotGMatrixAndSetAxis(mean(G_hat, 3), Analysis(iAnalysis).CondNames, Title, FONTSIZE, false);
-
-        NewColorMap = NonCenteredDivergingColourmap(mean(G_hat, 3), ColorMap);
+        NewColorMap = NonCenteredDivergingColorMap(mean(G_hat, 3), ColorMap);
         colormap(NewColorMap);
 
         axis square;
@@ -134,9 +107,7 @@ for iROI = 1:numel(ROIs)
 
         AddBlackBorder(size(G_hat, 1));
 
-        FigureFilename = fullfile(FigureDir, [FigureFilename '.tif']);
-        disp(FigureFilename);
-        print(gcf, FigureFilename, '-dtiff');
+        PrintFigure(FigureDir);
 
         Clim = ComputeClimMatrix(mean(G_hat, 3), false);
         CreateFigureColorBar('Scale-G-matrix-', Clim(1), Clim(2), NewColorMap);
@@ -171,8 +142,10 @@ function AddWhiteLines(Width)
 
     for  i = 1:numel(Pos)
         ThisPos = Pos(i);
-        plot([ThisPos, ThisPos] + 0.51, [0.51 Width + 0.51], 'color', COLOR, 'linewidth', LINE_WIDTH);
-        plot([0.51 Width + 0.51], [ThisPos ThisPos] + 0.51,  'color', COLOR, 'linewidth', LINE_WIDTH);
+        plot([ThisPos, ThisPos] + 0.51, [0.51 Width + 0.51], ...
+             'color', COLOR, 'linewidth', LINE_WIDTH);
+        plot([0.51 Width + 0.51], [ThisPos ThisPos] + 0.51,  ...
+             'color', COLOR, 'linewidth', LINE_WIDTH);
     end
 
 end

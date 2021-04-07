@@ -17,13 +17,13 @@ function [Dirs] = SetDir(space, MVNN)
         MVNN = '0';
     end
 
-    StartDir = fullfile(fileparts(mfilename('fullpath')), '..', '..');
+    StartDir = spm_file(fullfile(fileparts(mfilename('fullpath')), '..', '..'), 'cpath');
 
     if isunix
         ExternalHD = '/media/remi/AVT_4TB/derivatives';
     end
 
-    Dirs.DerDir = fullfile(StartDir, '..', '..', 'derivatives');
+    Dirs.DerDir = spm_file(fullfile(StartDir, '..', '..', 'derivatives'), 'cpath');
     if ~exist(Dirs.DerDir, 'dir')
         error('The data directory does not exist: %s', Dirs.DerDir);
     end

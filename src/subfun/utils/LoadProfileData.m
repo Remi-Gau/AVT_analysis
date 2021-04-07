@@ -1,6 +1,11 @@
 % (C) Copyright 2021 Remi Gau
 
 function [Data, CondNamesIpsiContra] = LoadProfileData(Opt, ROIs, InputDir) %#ok<STOUT>
+    %
+    % loops through the ROIs to load the data
+    % reassigns lef tand right to ipsi and contra is necessary
+    % reoranize output in a structure
+    %
 
     for iROI =  1:numel(ROIs)
 
