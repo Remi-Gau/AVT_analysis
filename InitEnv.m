@@ -123,6 +123,7 @@ function AddDependencies()
     end
 
     addpath(genpath(fullfile(pth, 'src', 'subfun')));
+    addpath(genpath(fullfile(pth, 'src', 'settings')));
 
     spm('defaults', 'fmri');
     spm_jobman('initcfg');
