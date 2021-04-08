@@ -32,14 +32,14 @@ end
 
 %%
 % AgainstBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
-CrossSide(Data, ROIs, OutputDir, CondNamesIpsiContra);
-% CrossSensory(Data, ROIs, OutputDir);
+% CrossSide(Data, ROIs, OutputDir, CondNamesIpsiContra);
+CrossSensory(Data, ROIs, OutputDir);
 % Target_gt_Stim(Data, ROIs, OutputDir);
 
 %% the following won't work if you try to plot the quadratic component
-CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
+% CrosssideDifferenceWithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
 % A_gt_T_WithBaseline(Data, OutputDir); % in V1 and V2
-% V_gt_T_WithBaseline(Data, OutputDir); % in A1 and PT
+V_gt_T_WithBaseline(Data, OutputDir); % in A1 and PT
 % Target_gt_Stim_WithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra);
 
 %%
@@ -114,21 +114,17 @@ function CrossSensory(Data, ROIs, OutputDir)
                    [9, -5], [10, -12]
                   };
 
-    ComparisonsNames = { ...
-                        '[A-T]_{stim}'; ...
-                        '[V-T]_{stim}'; ...
-                        '[A-T]_{target}'; ...
-                        '[V-T]_{target}'};
+    [~, ~, ~, CrossSens] = GetConditionList();
 
     Opt = SetDefaults();
     if ~Opt.Targets
-        ComparisonsNames(3:4) = [];
+        CrossSens(3:4) = [];
     end
 
-    for iComp = 1:size(ComparisonsNames, 1)
+    for iComp = 1:size(CrossSens, 1)
 
         Opt = SetUpComparisonPlot(Data, ROIs, Comparisons, iComp);
-        Opt.Title = ComparisonsNames{iComp};
+        Opt.Title = CrossSens{iComp};
 
         PlotProfileAndBetas(Opt);
         PrintFigure(fullfile(OutputDir, 'crosssensory'));
@@ -376,28 +372,6 @@ function Target_gt_Stim_WithBaseline(Data, ROIs, OutputDir, CondNamesIpsiContra)
 end
 
 %% helper functions
-
-function Opt = SetUpComparisonPlot(Data, ROIs, Comparisons, iComp)
-
-    Opt = SetDefaults();
-
-    ColumnNames = {'ipsi', 'contra'};
-    if Opt.PoolIpsiContra
-        ColumnNames = {''};
-    end
-
-    for iColumn = 1:size(ColumnNames, 2)
-
-        tmp = {Comparisons{iComp, iColumn}(1), Comparisons{iComp, iColumn}(2)};
-
-        ToPlot = AllocateProfileData(Data, ROIs, tmp);
-        ToPlot.Titles = ColumnNames{iColumn};
-
-        Opt.Specific{1, iColumn} = ToPlot;
-
-    end
-
-end
 
 function Opt = SetUpDifferencePlot(Data, ROI, Conditions, Opt, Color, iLat, isTarget)
 
