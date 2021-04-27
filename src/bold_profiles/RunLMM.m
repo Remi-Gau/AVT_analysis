@@ -31,86 +31,46 @@ MVNN =  false;
 [Dirs] = SetDir(space, MVNN);
 InputDir = fullfile(Dirs.ExtractedBetas, 'group');
 
-Opt = SetDefaults();
-
-Filename = ['Group-Sparameters', ...
-            '_average-', Opt.AverageType, ...
-            '_nbLayers-', num2str(Opt.NbLayers), ...
-            '_deconvolved-0'];
-if Opt.PerformDeconvolution
-    Filename(end) = '1';
-end
-
+Filename = ReturnSparametersFileName('BaseCondition');
 fprintf(1, 'loading:\n %s\n', fullfile(InputDir, [Filename '_data.tsv']));
 Beta = spm_load(fullfile(InputDir, [Filename '_data.tsv']));
 
+Filename = ReturnSparametersFileName('CrossSide');
+fprintf(1, 'loading:\n %s\n', fullfile(InputDir, [Filename '_data.tsv']));
+BetaCrossSide = spm_load(fullfile(InputDir, [Filename '_data.tsv']));
+
+Filename = ReturnSparametersFileName('CrossSens');
+fprintf(1, 'loading:\n %s\n', fullfile(InputDir, [Filename '_data.tsv']));
+BetaCrossSens = spm_load(fullfile(InputDir, [Filename '_data.tsv']));
+
+[~, IpsiContra, CrossSide, CrossSens] = GetConditionList();
+
+CrossSens = CrossSens';
+CrossSens = CrossSens(:);
+
 % SavedTxt = fullfile(FigureFolder, 'LMM_BOLD_results.tsv');
 % fid = fopen (SavedTxt, 'w');
-fid = 1;
 
-%% V and T / Ipsi and Contra in A1 and PT
-Conditions = 3:6;
+%% (V - T) / Ipsi and Contra in A1 and PT
+Conditions = 3:4;
 RoisToSelect = {'A1', 'PT'};
+Parameters = {'Cst', 'Lin'};
 
-%
-Parameters = {'Cst'};
-model = ReturnLmmSpecAndData(Beta, Conditions, RoisToSelect, Parameters, false());
-model = FitLmm(model);
+[model, fid] = ReturnLmmSpecAndData(BetaCrossSens, RoisToSelect, Parameters, CrossSens, Conditions, false);
+model = EstimateLmm(model);
+[c, message] = returnContrast('F_CdtXSide', model, Conditions, CrossSens);
+[PVAL, F, DF1, DF2] = TestAndPrint(model, c, message, fid);
 
-PrintModelDesciption(fid, RoisToSelect, Conditions, Parameters)
 
-[c, message] = returnContrast('F_CdtXSide', model, Conditions);
-[PVAL, F, DF1, DF2] = test_and_print(model, c, message, fid);
-
-if PVAL < 0.05 / 4
-
-    % Ipsi
-model = ReturnLmmSpecAndData(Beta, Conditions([1 3]), RoisToSelect, Parameters, false());
-model = FitLmm(model);
-
-PrintModelDesciption(fid, RoisToSelect, Conditions, Parameters)
-
-[c, message] = returnContrast('F_CdtXSide', model, Conditions);
-[PVAL, F, DF1, DF2] = test_and_print(model, c, message, fid);
-
-end
-
-%
-Parameters = {'Lin'};
-model = ReturnLmmSpecAndData(Beta, Conditions, RoisToSelect, Parameters, false());
-model = FitLmm(model);
-
-PrintModelDesciption(fid, RoisToSelect, Conditions, Parameters)
-
-[c, message] = returnContrast('F_CdtXSide', model, Conditions);
-[PVAL, F, DF1, DF2] = test_and_print(model, c, message, fid);
-
-%% A and T / Ipsi and Contra in V1 and V2
-Conditions = [1:2 5:6];
+%% (V - T) / Ipsi and Contra in A1 and PT
+Conditions = 1:2;
 RoisToSelect = {'V1', 'V2'};
+Parameters = {'Cst', 'Lin'};
 
-%
-Parameters = {'Cst'};
-
-model = ReturnLmmSpecAndData(Beta, Conditions, RoisToSelect, Parameters, false());
-model = FitLmm(model);
-
-PrintModelDesciption(fid, RoisToSelect, Conditions, Parameters)
-
-[c, message] = returnContrast('F_CdtXSide', model, Conditions);
-[PVAL, F, DF1, DF2] = test_and_print(model, c, message, fid);
-
-%
-Parameters = {'Lin'};
-
-model = ReturnLmmSpecAndData(Beta, Conditions, RoisToSelect, Parameters, false());
-model = FitLmm(model);
-
-PrintModelDesciption(fid, RoisToSelect, Conditions, Parameters)
-
-[c, message] = returnContrast('F_CdtXSide', model, Conditions);
-[PVAL, F, DF1, DF2] = test_and_print(model, c, message, fid);
-
+[model, fid] = ReturnLmmSpecAndData(BetaCrossSens, RoisToSelect, Parameters, CrossSens, Conditions, false);
+model = EstimateLmm(model);
+[c, message] = returnContrast('F_CdtXSide', model, Conditions, CrossSens);
+[PVAL, F, DF1, DF2] = TestAndPrint(model, c, message, fid);
 
 return
 
@@ -120,26 +80,13 @@ return
 
 %% HELPER FUNCTIONS
 
-function PrintModelDesciption(fid, RoisToSelect, Conditions, Parameters)
-    
-    [~, ConditionList] = GetConditionList;
-
-    fprintf(fid, '\nROI: %s', strjoin(RoisToSelect));
-    fprintf(fid, ' - Conditions: %s ', strjoin(ConditionList(Conditions)));
-    fprintf(fid, ' - Parameters: %s \n', strjoin(Parameters));
-end
-
-function [c, message] = returnContrast(ContrastType, model, Conditions)
+function [c, message] = returnContrast(ContrastType, model, Conditions, CdtNames)
 
     PARAM = {'Cst', 'Lin'};
     SIDE = {'Ipsi', 'Contra'};
 
-    if nargin > 2 && ~isempty(Conditions) && isnumeric(Conditions)
-        if all(Conditions == 3:6)
-            Conditions = {'VStim', 'TStim'};
-        elseif all(Conditions == [1:2 5:6])
-            Conditions = {'AStim', 'TStim'};
-        end
+    if nargin > 3
+        Conditions = CdtNames(Conditions);
     end
 
     tmp = [];
@@ -154,15 +101,8 @@ function [c, message] = returnContrast(ContrastType, model, Conditions)
         case 'F_CdtXSide'
             message = 'Interaction between condition and stimulated side';
 
-            idx1 = ReturnRegLogicIdx(model, {Conditions{1}; SIDE{1}});
-            idx2 = ReturnRegLogicIdx(model, {Conditions{2}; SIDE{2}});
-
-            tmp(1, :) = any([idx1; idx2]);
-
-            idx1 = ReturnRegLogicIdx(model, {Conditions{2}; SIDE{1}});
-            idx2 = ReturnRegLogicIdx(model, {Conditions{1}; SIDE{2}});
-
-            tmp(2, :) = any([idx1; idx2]);
+            tmp(1, :) = ReturnRegLogicIdx(model, {Conditions{1}; SIDE{1}});
+            tmp(2, :) = ReturnRegLogicIdx(model, {Conditions{2}; SIDE{2}});
 
             tmp = logical(tmp);
 
@@ -182,21 +122,27 @@ function idx = ReturnRegLogicIdx(model, string)
         string = {string};
     end
     for i = 1:size(string, 1)
-        idx(i, :) = cellfun(@(x) ~isempty(x), strfind(model.RegNames, string{i}));
+        idx(i, :) = cellfun(@(x) ~isempty(x), strfind(lower(model.RegNames), lower(string{i})));
     end
     idx = all(idx, 1);
 end
 
-function model = FitLmm(model)
+function model = EstimateLmm(model)
+    
+    temp = model.RegNames;
+    idx = cellfun(@(x) regexp(x, '[\[\]{} -]'), temp, 'UniformOutput', false);
+    for i = 1:numel(temp)
+        temp{i}(idx{i}) = '';
+    end
 
     model.lme = fitlmematrix(model.X, model.Y, model.Z, model.G, ...
                              'FitMethod', 'REML', ...
-                             'FixedEffectPredictors', model.RegNames, ...
+                             'FixedEffectPredictors', temp, ...
                              'RandomEffectPredictors', {{'Intercept'}}, ...
                              'RandomEffectGroups', {'Subject'});
 end
 
-function [PVAL, F, DF1, DF2] = test_and_print(model, c, message, fid)
+function [PVAL, F, DF1, DF2] = TestAndPrint(model, c, message, fid)
 
     pattern.screen = '\n%s\t F(%i,%i)= %f\t p = %f\n';
     pattern.file = '\n%s\n\tF(%i,%i)=%.3f\t%s\n';
@@ -219,8 +165,6 @@ function p_str = convert_pvalue(p)
 end
 
 function p_ttest = compare_results(i, model)
-
-    NbSubj = 11;
 
     if size(model.X, 2) == 4
         ROIs = { ...
