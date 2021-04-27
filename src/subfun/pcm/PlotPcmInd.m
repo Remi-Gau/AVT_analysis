@@ -120,12 +120,14 @@ function  fig_handles = PlotPcmInd(M, G, G_hat, T_ind, D, theta_ind, G_pred_ind,
 
             elseif i == 2
                 Data2Plot = D;
-                SubPlotRange = [1 * floor(tmp + 1):2 * floor(tmp) numel(M) + (1 * floor(tmp + 1):2 * floor(tmp))];
+                SubPlotRange = [1 * floor(tmp + 1):2 * floor(tmp) numel(M) + ...
+                                (1 * floor(tmp + 1):2 * floor(tmp))];
                 Title = 'CV';
 
             elseif i == 3 %
                 Data2Plot = T_ind;
-                SubPlotRange = [2 * floor(tmp + 1):3 * floor(tmp) numel(M) + (2 * floor(tmp + 1):3 * floor(tmp))];
+                SubPlotRange = [2 * floor(tmp + 1):3 * floor(tmp) numel(M) + ...
+                                (2 * floor(tmp + 1):3 * floor(tmp))];
                 Title = 'AIC: ln(L_{NoCV})-k';
                 for iM = 1:size(Data2Plot.likelihood, 2)
                     Data2Plot.likelihood(iSub, iM) = ...

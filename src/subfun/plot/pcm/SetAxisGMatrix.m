@@ -1,6 +1,7 @@
-% (C) Copyright 2020 Remi Gau
-
 function SetAxisGMatrix(ConditionNames, FONTSIZE)
+    %
+    % (C) Copyright 2020 Remi Gau
+
     set(gca, ...
         'tickdir', 'out', ...
         'xtick', 1:numel(ConditionNames), ...

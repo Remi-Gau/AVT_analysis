@@ -5,6 +5,8 @@ function [args, grid] = grid_search_reg(trdata, trlabel, nfold, opt)
     % [args, grid] = grid_search_reg(trdata, trlabel, nfold, opt)
     %
     %
+    %
+    % (C) Copyright 2020 Remi Gau
 
     % 1st grid search with initial range of estimates
     if strcmp(opt.svm.machine, 'epsilon-SVR')

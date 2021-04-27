@@ -1,6 +1,6 @@
-% (C) Copyright 2021 Remi Gau
-
 function ToPlot = AllocateProfileData(Data, ROIs, Cdt)
+    %
+    % (C) Copyright 2020 Remi Gau
 
     ToPlot = struct( ...
                     'Data', [], ...

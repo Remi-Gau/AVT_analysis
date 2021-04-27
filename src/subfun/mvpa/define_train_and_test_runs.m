@@ -1,4 +1,6 @@
 function [TestRuns, TrainRuns] = define_train_and_test_runs(NbRuns, TestRunsList, RunSubSamp, cv, iCV)
+    %
+    % (C) Copyright 2020 Remi Gau
 
     TestRuns = [];  %#ok<*NASGU>
     TrainRuns = [];

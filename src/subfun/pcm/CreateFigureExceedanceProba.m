@@ -2,6 +2,7 @@ function CreateFigureExceedanceProba(ExProba, Fam, Analysis, InputType, ModelTyp
     %
     % Matrices plot for exceedance probability
     %
+    % (C) Copyright 2020 Remi Gau
 
     Opt = SetDefaults();
     Opt = SetPlottingParameters(Opt);

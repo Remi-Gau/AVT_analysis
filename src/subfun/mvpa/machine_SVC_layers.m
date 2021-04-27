@@ -1,4 +1,6 @@
 function [acc, weight, results] = machine_SVC_layers(svm, feat, featlay, cvmat, trsession, tesession, opt)
+    %
+    % (C) Copyright 2020 Remi Gau
 
     % Separate training and test sets
     tr = ismember(cvmat(:, 1), svm.class) & ismember(cvmat(:, 2), find(trsession));

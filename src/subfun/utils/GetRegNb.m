@@ -1,5 +1,3 @@
-% (C) Copyright 2020 Remi Gau
-
 function RegNumbers = GetRegNb(SPM)
     %
     % Gets the number each regressor of the SPM design matrix.
@@ -14,6 +12,7 @@ function RegNumbers = GetRegNb(SPM)
     %                        This matrix is NaN padded.
     %
     %
+    % (C) Copyright 2020 Remi Gau
 
     MAX = 0;
     for i = 1:size(SPM.Sess, 2)

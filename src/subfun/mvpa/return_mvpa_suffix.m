@@ -1,4 +1,3 @@
-% (C) Copyright 2020 Remi Gau
 function SaveSufix = return_mvpa_suffix(opt, NbLayers)
     %
     % Creates save suffixes from MVPA save files
@@ -7,6 +6,8 @@ function SaveSufix = return_mvpa_suffix(opt, NbLayers)
     %
     %   SaveSufix = CreateMvpaSaveSuffix(opt, NbLayers)
     %
+    %
+    % (C) Copyright 2020 Remi Gau
 
     if nargin < 3 || isempty(NbLayers)
         NbLayers = 6;

@@ -1,5 +1,3 @@
-% (C) Copyright 2020 Remi Gau
-
 function Dirs = GetDependencies(Dirs)
     %
     % Adds folders to the path
@@ -8,6 +6,7 @@ function Dirs = GetDependencies(Dirs)
     %
     %   Dirs = GetDependencies(Dirs)
     %
+    % (C) Copyright 2020 Remi Gau
 
     addpath(genpath(spm_file(fullfile(Dirs.CodeDir, '..', 'lib'), ...
                              'cpath')));

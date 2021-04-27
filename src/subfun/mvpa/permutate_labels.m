@@ -4,6 +4,8 @@ function cv_mat = permutate_labels(opt, cv_mat, svm)
     %
     % Requires ``opt.permutation.test`` to be set to ``true``.
     %
+    %
+    % (C) Copyright 2020 Remi Gau
 
     if opt.permutation.test && iPerm > 1
 

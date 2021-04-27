@@ -1,8 +1,8 @@
-% (C) Copyright 2020 Remi Gau
-
 function CloseParWorkersPool(KillGcpOnExit)
     % CLOSEPARWORKERSPOOL Check matlab version and closes pool of workers for
     % parallel work
+    %
+    % (C) Copyright 2020 Remi Gau
 
     MatlabVer = version('-release');
     if str2double(MatlabVer(1:4)) > 2013

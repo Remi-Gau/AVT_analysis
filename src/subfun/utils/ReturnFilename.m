@@ -1,11 +1,10 @@
-% (C) Copyright 2020 Remi Gau
-
 function filename = ReturnFilename(FileType, SubjectName, HemiSphere, NbLayers, ROI, SurfParam)
     %
     % USAGE::
     %
     %   filename = ReturnFilename(FileType, SubjectName, HemiSphere, NbLayers, ROI, SurfParam)
     %
+    % (C) Copyright 2020 Remi Gau
 
     if isempty(NbLayers)
         NbLayers = 6;

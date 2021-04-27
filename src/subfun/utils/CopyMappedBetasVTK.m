@@ -1,5 +1,3 @@
-% (C) Copyright 2020 Remi Gau
-
 function CopyMappedBetasVTK(Subj, SrcDir, DestDir, opt, Debug)
     %
     % Extract vtk files from a folder tree created by MIPAV/JIST
@@ -14,6 +12,7 @@ function CopyMappedBetasVTK(Subj, SrcDir, DestDir, opt, Debug)
     % :type Debug: boolean
     %
     %
+    % (C) Copyright 2020 Remi Gau
 
     if nargin < 2
         error('Need to know where to look for...');

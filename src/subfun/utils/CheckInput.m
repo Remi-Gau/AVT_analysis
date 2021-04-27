@@ -1,5 +1,3 @@
-% (C) Copyright 2020 Remi Gau
-
 function [Data, Runs, Conditions, Layers] = CheckInput(Data, Runs, Conditions, IsTarget, Layers)
     %
     % - Removes target data if necessary.
@@ -10,6 +8,7 @@ function [Data, Runs, Conditions, Layers] = CheckInput(Data, Runs, Conditions, I
     %
     %   [Data, Runs, Conditions, Layers] = CheckInput(Data, Runs, Conditions, IsTarget, Layers)
     %
+    % (C) Copyright 2020 Remi Gau
 
     % HACK to give layers some plausible dimension
     if nargin < 5 || isempty(Layers)

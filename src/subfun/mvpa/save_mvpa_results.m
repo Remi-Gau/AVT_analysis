@@ -1,4 +1,6 @@
 function save_mvpa_results(OutputDir, opt, ClassAcc, SVM, NbLayers)
+    %
+    % (C) Copyright 2020 Remi Gau
 
     SaveSufix = return_mvpa_suffix(opt, NbLayers);
 

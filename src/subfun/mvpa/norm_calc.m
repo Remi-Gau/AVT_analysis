@@ -1,4 +1,6 @@
 function [trdata, tedata] =  norm_calc(trdata, tedata, cvmat, tr, te, opt)
+    %
+    % (C) Copyright 2020 Remi Gau
 
     % Eucledian image normalization
     if opt.scaling.img.eucledian

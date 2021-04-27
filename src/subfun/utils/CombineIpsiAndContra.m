@@ -1,5 +1,3 @@
-% (C) Copyright 2020 Remi Gau
-
 function [Data, ConditionVec, RunVec] = CombineIpsiAndContra(Data, ConditionVec, RunVec, Type)
     %
     % Collapse across ipsi and contra stimuli by either pooling or averaging (mean)
@@ -12,6 +10,7 @@ function [Data, ConditionVec, RunVec] = CombineIpsiAndContra(Data, ConditionVec,
     % We loop over partitions and then for each condition (A, V, T)
     % we combine the ipsi and contra data of that partition.
     %
+    % (C) Copyright 2020 Remi Gau
 
     if nargin < 4
         Type = 'pool';

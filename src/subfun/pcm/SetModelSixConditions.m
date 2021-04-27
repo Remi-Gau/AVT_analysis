@@ -1,5 +1,3 @@
-% (C) Copyright 2021 Remi Gau
-
 function M = SetModelSixConditions(M, ConditionScaled, IpsiContraScaled)
     %
     % Set up PCM models with A, V and T conditions, with ipsi and contra
@@ -18,6 +16,8 @@ function M = SetModelSixConditions(M, ConditionScaled, IpsiContraScaled)
     %                          certain condition are scaled to each other. In
     %                          the order AVT. For example: ``[true(), false(), false()]``
     % :type IpsiContraScaled: logical vector
+    %
+    % (C) Copyright 2021 Remi Gau
 
     M{end + 1}.Ac = [];
 
