@@ -80,5 +80,5 @@ for iROI = 1:NbROIs
     clear XP;
 end
 
-CreateFigureExceedanceProba(ExProba, Families, Analysis, InputType, ModelType, FigureDir, ROIs);
-%
+CreateFigureExceedanceProba(ExProba, Families, Analysis, InputType, ModelType, FigureDir, ROIs, Dirs);
+

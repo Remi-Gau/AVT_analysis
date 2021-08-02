@@ -1,4 +1,4 @@
-function CreateFigureExceedanceProba(ExProba, Fam, Analysis, InputType, ModelType, FigDir, ROIs)
+function CreateFigureExceedanceProba(ExProba, Fam, Analysis, InputType, ModelType, FigDir, ROIs, Dirs)
     %
     % Matrices plot for exceedance probability
     %
@@ -12,7 +12,8 @@ function CreateFigureExceedanceProba(ExProba, Fam, Analysis, InputType, ModelTyp
         ConditionType = 'target'; %#ok<*UNRCH>
     end
 
-    ColorMapDir = fullfile(fileparts(which('map_luminance')), '..', 'mat_maps');
+    ColorMapDir = fullfile(Dirs.CodeDir, 'lib', 'CPP_BIDS_SPM_pipeline', ...
+                                         'lib', 'brain_colours', 'mat_maps');
     load(fullfile(ColorMapDir, '1hot_iso.mat'));
     ColorMap = hot;
 
