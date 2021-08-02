@@ -1,10 +1,12 @@
 function [model, fid] = ReturnLmmSpecAndData(Beta, Rois, Param, CdtNames, Cdts,  MakeFig, fid)
-    
+    %
+    % (C) Copyright 2021 Remi Gau
+
     if nargin < 7
         fid = 1;
     end
 
-    PrintModelDesciption(fid, Rois, Param, Cdts, CdtNames)
+    PrintModelDesciption(fid, Rois, Param, Cdts, CdtNames);
 
     Criteria = {Beta.Conditions, CdtNames(Cdts); ...
                 Beta.Rois, Rois};
@@ -72,6 +74,9 @@ function [model, fid] = ReturnLmmSpecAndData(Beta, Rois, Param, CdtNames, Cdts, 
 end
 
 function PlotLmmSpecification(model)
+
+    fontsize = 8;
+
     %% plot
     figure('name', 'LMM', 'position', [50 50 1500 1500]);
     colormap gray;
@@ -81,7 +86,7 @@ function PlotLmmSpecification(model)
     set(gca, ...
         'ytick', 1:size(model.RowLabels, 1), ...
         'yticklabel', model.RowLabels, ...
-        'fontsize', 8);
+        'fontsize', fontsize);
     title('data');
 
     subplot(1, 4, 2);
@@ -89,7 +94,8 @@ function PlotLmmSpecification(model)
     set(gca, ...
         'xtick', 1:numel(model.RegNames), ...
         'xticklabel', strrep(model.RegNames, '_', ' '), ...
-        'XTickLabelRotation', 45);
+        'XTickLabelRotation', 45, ...
+        'fontsize', fontsize);
     title('X');
 
     subplot(1, 4, 3);
@@ -104,7 +110,8 @@ end
 
 function PrintModelDesciption(fid, RoisToSelect, Parameters, Conditions, CdtNames)
 
+    fprintf(fid, '\nMODEL');
     fprintf(fid, '\nROI: %s', strjoin(RoisToSelect));
-    fprintf(fid, ' - Conditions: %s ', strjoin(CdtNames(Conditions)));
-    fprintf(fid, ' - Parameters: %s \n', strjoin(Parameters));
+    fprintf(fid, '\nConditions: %s ', strjoin(CdtNames(Conditions)));
+    fprintf(fid, '\nParameters: %s \n', strjoin(Parameters));
 end
