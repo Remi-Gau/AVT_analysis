@@ -60,7 +60,7 @@ if any(ismember(InputType, {'Cst', 'Lin', 'Quad'}))
     InputDir = Dirs.LaminarGlm;
 end
 
-OutputDir = fullfile(Dirs.Figures, 'RSA');
+OutputDir = Dirs.RSA;
 spm_mkdir(OutputDir);
 
 %% Start
