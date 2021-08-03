@@ -14,17 +14,17 @@ NbSub = numel(SubLs);
 DateFormat = 'yyyy_mm_dd_HH_MM';
 
 
-for iSub = %8%:NbSub
-    
+for iSub = 1:NbSub
+
     fprintf('\n\nProcessing %s\n', SubLs(iSub).name)
-    
+
     % Subject directory
     SubDir = fullfile(StartDir, SubLs(iSub).name);
 
     cd(fullfile(SubDir, 'pmap'))
-    
+
     Files2Reorient = {};
-    
+
     % Get files
     ROIFiles = dir('w*.nii');
     for i=1:numel(ROIFiles)
@@ -34,11 +34,11 @@ for iSub = %8%:NbSub
     cd(fullfile(SubDir, 'pmap'))
 %     M = dir('ReorientMatrix_*.mat');
 %     load(fullfile(SubDir, 'pmap', M.name))
-%     
+%
 %     matlabbatch{1}.spm.util.reorient.srcfiles = Files2Reorient;
 %     matlabbatch{1}.spm.util.reorient.transform.transM = M;
 %     matlabbatch{1}.spm.util.reorient.prefix = '';
-    
+
     M = dir('CoregMatrix_*.mat');
     load(fullfile(SubDir, 'pmap', M.name))
 
@@ -47,7 +47,7 @@ for iSub = %8%:NbSub
     matlabbatch{1}.spm.util.reorient.prefix = '';
 
     spm_jobman('run', matlabbatch)
-    
+
     cd(fullfile(SubDir, 'pmap'))
     save (strcat('ReorientPMaps_', SubLs(iSub).name, '_jobs_', datestr(now, DateFormat), '.mat'));
 

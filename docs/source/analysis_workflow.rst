@@ -1,12 +1,12 @@
 Data analysis workflow
 **********************
-  
-.. automodule:: src 
+
+.. automodule:: src
 
 .. autofunction:: convertSourceToRaw
 
 
-I indicate here the different folders where the code is kept. 
+I indicate here the different folders where the code is kept.
 
 I try to indicate
 and in which order the scripts (or other manual interventions) have to be run.

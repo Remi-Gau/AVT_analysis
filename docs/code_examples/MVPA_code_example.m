@@ -80,8 +80,8 @@ SubLs = dir('sub*');
 NbSub = numel(SubLs);
 
 
-for iSub = 1:NbSub    
-    
+for iSub = 1:NbSub
+
     % --------------------------------------------------------- %
     %                        Subject data                       %
     % --------------------------------------------------------- %
@@ -95,61 +95,61 @@ for iSub = 1:NbSub
     else
         opt.session.nsamples = NbRuns;
     end
-    
-    
+
+
     %% Creates a table that lists for each beta of interest:
     %   - its corresponding class
     %   - the session in which it occurs
     CV_Mat_Orig = [zeros(NbRuns*sum([Class.nbetas]), 1) ...
         zeros(NbRuns*sum([Class.nbetas]), 1)] ;
-    
-    
-    
-    
+
+
+
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
     % Here you will have to code how the data is organized in the feature
     % matrix you will feed to the libSVM function
     % It is organized as an exemplar X features matrix but CV_Mat_Orig
     % defines for each exemplar:
     % - to which class it belongs to (first column)
     % - from which session it comes from (first column)
-    
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    
-    
-    
-    
+
+
+
+
+
     %% Get data
     for iROI=1:numel(ROIs_ori)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
+
         % Here you will have to code the extraction of the DATA from the
         % ROIs. Each matrix has to be organized as an exemplar X features matrix
         % and match the information contained in the CV_Mat_Orig defined
         % above.
-        
+
         % It is best to do both those at the same time but it does not have
         % to.
-        
+
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
-        FeaturesAll{iROI,1} = ???
+
+        FeaturesAll{iROI,1} = Something
     end
-    
-    
+
+
     %% Run for different type of normalization
     % Here we can loop through the classification with different types of image and
     % feature scaling
     for Norm = 6
-        
+
         opt = ChooseNorm(Norm, opt);
-        
+
         SaveSufix = CreateSaveSuffix(opt, [], NbLayers, space);
-        
-        
-        
+
+
+
         %% Run cross-validation for each model and ROI
         SVM = SVM_Ori;
         for i=1:numel(SVM)
@@ -166,13 +166,13 @@ for iSub = 1:NbSub
             end
         end
         clear i j
-        
+
         for iSVM=1:numel(SVM)
-            
+
             for iROI=SVM(iSVM).ROI_2_analyse
-                
+
                 ROI_idx = find(SVM(iSVM).ROI_2_analyse==iROI);
-                
+
                 fprintf('Analysing subject %s\n', SubLs(iSub).name)
                 fprintf(' Running SVM:  %s\n', SVM(iSVM).name)
                 fprintf('  Running ROI:  %s\n', SVM(iSVM).ROI(ROI_idx).name)
@@ -182,35 +182,35 @@ for iSub = 1:NbSub
                 % RNG init
                 rng('default');
                 opt.seed = rng;
-                
+
                 Class_Acc = struct('TotAcc', []);
-                
+
                 %% Subsample sessions for the learning curve (otherwise take all of them)
                 for NbSess2Incl = opt.session.nsamples
 
                     % All possible ways of only choosing X sessions of the total
                     CV_id = nchoosek(1:NbRuns, NbSess2Incl);
                     CV_id = CV_id(randperm(size(CV_id, 1)),:);
-                    
+
                     % Limits the number of permutation if too many
                     if size(CV_id, 1) > opt.session.subsample.nreps
                         CV_id = CV_id(1:opt.session.subsample.nreps,:);
                     end
-                    
+
                     %% Define the cross-validation scheme
-                    
+
                     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                    
+
                     % Here you might have to change the the way the
                     % TestSessList is defined depending on what cross
                     % validation scheme you want to run.
-                    
-                    % If you are not running any learning curves then 
+
+                    % If you are not running any learning curves then
                     % only fill TestSessList{1,1} with the session to leave
                     % out as test set for each cross validation.
-                    
+
                     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                    
+
                     % Defines the test sessions for the CV: take one
                     % session from each day as test: all the others as
                     % training
@@ -224,7 +224,7 @@ for iSub = 1:NbSub
                     [x, y, z] = ndgrid(sets{:});
                     cartProd = [x(:) y(:) z(:)];
                     clear x y z RunPerSes Idx
-                    
+
                     % Test sets for the different CVs
                     if opt.session.curve
                         for i=1:size(CV_id,1)
@@ -247,11 +247,11 @@ for iSub = 1:NbSub
                         end
                     end
                     clear cartProd
-                    
-                    
+
+
                     %% Subsampled sessions loop
                     for iSubSampSess=1:size(CV_id, 1)
-                        
+
                         % Permutation test
                         if NbSess2Incl < NbRuns
                             NbPerm = 1;
@@ -261,56 +261,56 @@ for iSub = 1:NbSub
                             fprintf('    Running analysis with all sessions\n\n')
                             NbPerm = opt.permutation.nreps;
                         end
-                        
+
                         %%
                         T = [];
                         for iPerm=1:NbPerm
-                            
+
                             fprintf(1,'    Permutation %i out of %i\n',iPerm, NbPerm);
                             tic
                             CV_Mat = CV_Mat_Orig;
-                            
+
                             %% Permute class within sessions when all sessions are included
                             if iPerm > 1
                                 for iRun=1:max(CV_Mat(:,2))
                                     Cdt_2_perm = all([ismember(CV_Mat(:,1), SVM(iSVM).class), ...
                                         ismember(CV_Mat(:,2), iRun)], 2);
-                                    
+
                                     temp = CV_Mat(Cdt_2_perm,1);
-                                    
+
                                     CV_Mat(Cdt_2_perm,1) = temp(randperm(length(temp)));
                                 end
                             end
                             clear temp
-                            
+
                             %% Run the cross-validations
                             NbCV = size(TestSessList{iSubSampSess,1}, 1);
-                            
+
                             fprintf(1,'    [%s]\n    [ ',repmat('.',1,NbCV));
-                           
+
                             % The use of the parfor can be useful in some
                             % cases.
                             parfor iCV=1:NbCV
-                                
+
                                 fprintf(1,'\b.\n');
-                                
+
                                 TestSess = []; %#ok<NASGU>
                                 TrainSess = []; %#ok<NASGU>
-                                
+
                                 % Separate training and test sessions
                                 [TestSess, TrainSess] = deal(false(size(1:NbRuns)));
-                                
+
                                 TestSess(TestSessList{iSubSampSess,1}(iCV,:)) = 1; %#ok<*PFBNS>
                                 TrainSess(setdiff(CV_id(iSubSampSess,:), TestSessList{iSubSampSess,1}(iCV,:)) )= 1;
-                                
+
                                 [results, ~] = RunSVM(SVM, FeaturesBoth, CV_Mat, TrainSess, TestSess, opt, iSVM);
-                                
+
                                 TEMP(iCV,1).results = {results};
                                 TEMP(iCV,1).acc = mean(results.pred==results.label);
-                                
+
                             end
                             fprintf(1,'\b]\n');
-                            
+
                             % Store the results
                             for iCV=1:NbCV
                                 SVM(iSVM).ROI(ROI_idx).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,1).results = ...
@@ -318,22 +318,22 @@ for iSub = 1:NbSub
                                 SVM(iSVM).ROI(ROI_idx).session(NbSess2Incl).rand(iSubSampSess).perm(iPerm).CV(iCV,1).acc = ...
                                     TEMP(iCV,1).acc;
                             end
-                            
+
                             T(end+1)=toc;
                             fprintf(1,'    Avg time elapsed / permutation = %i secs ; ETA = %s\n',...
                                 round(mean(T)), Seconds_to_hours(round((NbPerm-iPerm)*mean(T))) );
                             fprintf(1,'    Time elapsed on last permutation = %i secs ; ETA = %s\n',...
                                 round(T(end)), Seconds_to_hours(round((NbPerm-iPerm)*T(end))) );
-                            
+
                         end % iPerm=1:NbPerm
                         %clear iPerm
-                        
+
                     end % iSubSampSess=1:size(CV_id, 1)
                     %clear iSubSampSess
-                    
+
                 end % NbSess2Incl = opt.session.nsamples
                 %clear NbSess2Incl
-                
+
                 %% Calculate prediction accuracies
                 Class_Acc.TotAcc(1) = ...
                     nanmean([SVM(iSVM).ROI(ROI_idx).session(end).rand.perm(1).CV(:,1).acc]);
@@ -343,26 +343,26 @@ for iSub = 1:NbSub
                     fprintf('\n   Accuracy\n');
                     disp(Class_Acc.TotAcc(:))
                 end
-                
-                
+
+
                 % Save data
                 Results = SVM(iSVM).ROI(ROI_idx);
                 SaveResults(SaveDir, Results, opt, Class_Acc, SVM, iSVM, ROI_idx, SaveSufix)
-                
+
                 clear Results
-                
+
                 % clears the saved data from the structure to clear memory
                 SVM(iSVM).ROI(ROI_idx).session = [];
-                
+
             end % iROI=1:numel(SVM(iSVM).ROI)
             clear Mask Features
-            
+
         end % iSVM=1:numel(SVM)
         clear iSVM SVM
-        
+
     end % for Norm = 6:7
     clear Features RegNumbers
-    
+
 end % for iSub = 1:NbSub
 
 CloseParWorkersPool(KillGcpOnExit)
@@ -373,16 +373,16 @@ end
 function [results, weight] = RunSVM(SVM, Features, CV_Mat, TrainSess, TestSess, opt, iSVM)
 
 if isempty(Features) || all(Features(:)==Inf)
-    
+
     warning('Empty ROI')
-    
+
     results = struct();
     weight = [];
-    
+
 else
 
     results = machine_SVC(SVM(iSVM), Features(:,LogFeat), CV_Mat, TrainSess, TestSess, opt);
-    
+
 end
 
 end

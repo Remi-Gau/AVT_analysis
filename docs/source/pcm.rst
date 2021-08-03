@@ -1,14 +1,12 @@
 Pattern component modelling
 ***************************
-  
+
 Scripts and functions related to pattern component modelling.
 
 ----
 
 
-
-
-3 X 3 models 
+3 X 3 models
 ============
 
 
@@ -84,7 +82,7 @@ Scripts and functions related to pattern component modelling.
 .. autofunction:: SetPcm3X3models
 
 
-6 X 6 models 
+6 X 6 models
 ============
 
 Let's go through example of visual areas
@@ -126,7 +124,7 @@ First possibility:
 
 We do it factorially.
 
-But this means that when Ipsi and Contra are independent, there can be almost as many possibilities 
+But this means that when Ipsi and Contra are independent, there can be almost as many possibilities
 for ipsi and contra. So the models that are impossible (because of the "transitivity" issue described above)
 or the models that are "redundant".
 
@@ -140,6 +138,11 @@ So we end up with a subset of models for 6X6.
 
 See the tree of models (tree.html)
 
+
+Linear mixed models
+===================
+
+.. autofunction:: src.bold_profiles.RunLMM
 
 
 Underlying functions
