@@ -1,4 +1,6 @@
 function [PVAL, F, DF1, DF2] = FTestAndPrint(model, c, message, fid)
+    %
+    % (C) Copyright 2021 Remi Gau
 
     fprintf(1, '\n');
 

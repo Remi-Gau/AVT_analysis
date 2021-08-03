@@ -13,7 +13,7 @@ function CreateFigureExceedanceProba(ExProba, Fam, Analysis, InputType, ModelTyp
     end
 
     ColorMapDir = fullfile(Dirs.CodeDir, 'lib', 'CPP_BIDS_SPM_pipeline', ...
-                                         'lib', 'brain_colours', 'mat_maps');
+                           'lib', 'brain_colours', 'mat_maps');
     load(fullfile(ColorMapDir, '1hot_iso.mat'));
     ColorMap = hot;
 

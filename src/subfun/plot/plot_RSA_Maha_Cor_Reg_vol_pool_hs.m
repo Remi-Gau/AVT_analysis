@@ -294,7 +294,8 @@ function plot_RSA_Maha_Cor_Reg_vol_pool_hs(StartDir, SubLs, beta_type, ranktrans
 
                     rename_subplot([3 3], CondNames, ROIs);
 
-                    Name = sprintf('%s - %s - %s - %s - %s8%s - %s', hs_sufix, DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
+                    Name = sprintf('%s - %s - %s - %s - %s8%s - %s', hs_sufix, ...
+                                   DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
 
                     title_print(Name, Dest_dir);
 
@@ -322,7 +323,9 @@ function plot_RSA_Maha_Cor_Reg_vol_pool_hs(StartDir, SubLs, beta_type, ranktrans
 
                         rename_subplot([4 3], CondNames, {SubLs.name}');
 
-                        Name = sprintf('Subjects - %s - %s - %s - %s - %s - %s8%s - %s', hs_sufix, ROIs{iROI}, DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
+                        Name = sprintf('Subjects - %s - %s - %s - %s - %s - %s8%s - %s', ...
+                                       hs_sufix, ROIs{iROI}, DataName, FigName, Save_suffix, ToPlot{iToPlot}, ...
+                                       ranktrans_suffix, plotranktrans_suffix);
 
                         title_print(Name, fullfile(Dest_dir, 'Subjects'));
                     end
@@ -403,7 +406,8 @@ function plot_RSA_Maha_Cor_Reg_vol_pool_hs(StartDir, SubLs, beta_type, ranktrans
                     %                     'ticklength', [0.01 0.01], 'fontsize', 8, 'YAxisLocation','right')
                     %                 box off
 
-                    Name = sprintf('%s - %s - %s - %s - %s8%s - %s', hs_sufix, DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
+                    Name = sprintf('%s - %s - %s - %s - %s8%s - %s', ...
+                                   hs_sufix, DataName, FigName, Save_suffix, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
 
                     title_print(Name, Dest_dir);
 
