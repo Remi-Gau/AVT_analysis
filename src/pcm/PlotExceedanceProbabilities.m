@@ -8,50 +8,16 @@ clc;
 clear;
 close all;
 
-%% Main parameters
-
-% '3X3', 'subset6X6'
-ModelType = 'subset6X6';
-
-% Choose on what type of data the analysis will be run
-%
-% b-parameters
-%
-% 'ROI'
-%
-% s-parameters
-%
-% 'Cst', 'Lin', 'Quad'
-%
-
-InputType = 'Cst';
-
-% Region of interest:
-%  possible choices: A1, PT, V1-5
-
-ROIs = { ...
-        'A1'
-        'PT'
-        'V1'
-        'V2'
-       };
-
 %% Other parameters
 
-MVNN = true;
-Space = 'surf';
+[ModelType, InputType, ROIs, ConditionType, Dirs] = SetPcm();
 
 PlotSubject = 1;
 
-Dirs = SetDir(Space, MVNN);
 InputDir = fullfile(Dirs.PCM, ModelType, 'model_comparison');
 FigureDir = fullfile(Dirs.PCM, ModelType, 'figures', 'model_comparison');
 
 Opt = SetDefaults();
-ConditionType = 'stim';
-if Opt.Targets
-    ConditionType = 'target'; %#ok<*UNRCH>
-end
 
 NbROIs = numel(ROIs);
 
