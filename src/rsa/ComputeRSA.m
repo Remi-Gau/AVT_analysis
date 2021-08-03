@@ -1,31 +1,73 @@
-% compute RSA distances (A --> B) in a cross validated fashion
-A =  rsa.distanceLDC(Y{iSub}(:, Vert2Take), partVec{iSub}, condVec{iSub});
+% (C) Copyright 2020 Remi Gau
+%
+% Runs RSA
 
-% because when doing cross validation distance A --> B can be different
-% from B-->A we recompute the RSA in the other direction and take the
-% mean of both directions
+% TODO
+% - Make it run on the b parameters
+% - Make it run on volume
+%
 
-% compute RSA distances (B --> A) in a cross validated fashion
-% flipup the data and the partition vector means that condition label
-% used to be 1:6 is now 6:-1:1
-B =  rsa.distanceLDC(flipud(Y{iSub}(:, Vert2Take)), flipud(partVec{iSub}), condVec{iSub});
-% flip the distance back
-B = fliplr(B);
-B = [B(1:2) B(4) B(7) B(11) B(3) B(5) B(8) B(12) B(6) B(9) B(13) B(10) B(14:15)];
-% take the mean
-RDMs_CV(:, :, iSub, iSplit) = squareform(mean([A; B]));
+clc;
+clear;
+close all;
 
-%% Compute CVed G-matrix, do multidimensional scaling
-G_hat(:, :, iSub, iSplit) = pcm_estGCrossval(Y{iSub}(:, Vert2Take), partVec{iSub}, condVec{iSub});
+%% Main parameters
+
+% Choose on what type of data the analysis will be run
+%
+% b-parameters
+%
+% 'ROI'
+%
+% s-parameters
+%
+% 'Cst', 'Lin', 'Quad'
+%
+
+InputType = 'Cst';
+
+% Region of interest:
+%  possible choices: A1, PT, V1-5
+
+ROIs = { ...
+        'V1'
+        'V2'
+        'A1'
+        'PT'
+       };
+
+%% Other parameters
+% Unlikely to change
+
+Opt = SetDefaults();
+
+Space = 'surf';
+MVNN = true;
 
 %%
-% Eucledian normalization
-for i = 1:size(X, 1)
-    X(i, :) = X(i, :) / norm(X(i, :));
-end
-clear i;
 
-A =  rsa.distanceLDC(X, partitionVec, conditionVec);
-B =  rsa.distanceLDC(flipud(X), flipud(partitionVec), conditionVec);
-B = fliplr(B);
-RDMs{iROI, iHS, iTarget + 1} = squareform(mean([A; B]));
+ConditionType = 'stim';
+if Opt.Targets
+    ConditionType = 'target'; %#ok<*UNRCH>
+end
+
+Dirs = SetDir(Space, MVNN);
+
+% TODO
+% This input dir might have to change if we are dealing with volume data
+InputDir = Dirs.ExtractedBetas;
+if any(ismember(InputType, {'Cst', 'Lin', 'Quad'}))
+    InputDir = Dirs.LaminarGlm;
+end
+
+OutputDir = fullfile(Dirs.Figures, 'RSA');
+spm_mkdir(OutputDir);
+
+%% Start
+fprintf('Get started\n');
+
+for iROI =  1:numel(ROIs)
+
+    [GrpData, GrpConditionVec, GrpRunVec] = LoadAndPreparePcmData(ROIs{iROI}, InputDir, Opt, InputType);
+
+end
