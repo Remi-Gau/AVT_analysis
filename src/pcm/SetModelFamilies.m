@@ -115,16 +115,16 @@ function Families = SetModelFamilies(ModelType)
             Families{iComp}{iCdt}.modelorder = Cdt{iCdt};
 
             for iFam = 1:numel(Comparisons(iComp).family_names)
-                
+
                 name = Comparisons(iComp).family_names{iFam};
                 if strcmp(ModelType, 'subset6X6')
                     name = Comparisons(iComp).family_names{iFam};
                 else
                     name = [CdtComb(iCdt, 1) '_' name '_' CdtComb(iCdt, 2)];
                 end
-                
+
                 Families{iComp}{iCdt}.names{iFam} = name;
-                
+
             end
 
         end

@@ -1,8 +1,9 @@
-% (C) Copyright 2020 Remi Gau
-
 function fig_handles = PlotPcmModels(M)
     %
     % works for feature based model at the moment
+    %
+    %
+    % (C) Copyright 2020 Remi Gau
 
     % TODO
     % add name of conditions

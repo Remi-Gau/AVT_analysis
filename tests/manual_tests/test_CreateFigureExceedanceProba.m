@@ -1,4 +1,4 @@
-clear
+clear;
 
 ROIs = { ...
         'A1'
@@ -6,7 +6,7 @@ ROIs = { ...
         'V1'
         'V2'
        };
-   
+
 tmp  = linspace(0, 1, 12);
 ExProba = {reshape(tmp, 4, 3)'};
 
@@ -14,4 +14,4 @@ Fam{1}{1}.names = 'family names';
 
 Analysis.name = 'test';
 
-CreateFigureExceedanceProba(ExProba, Fam, Analysis, 'Cst', 'test', pwd, ROIs)
+CreateFigureExceedanceProba(ExProba, Fam, Analysis, 'Cst', 'test', pwd, ROIs);

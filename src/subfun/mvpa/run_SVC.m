@@ -3,6 +3,8 @@ function results = run_SVC(svm, feat, cvmat, trsession, tesession, opt)
     % Trains model for support vector machine - classification
     % Generalizes to test data
     %
+    %
+    % (C) Copyright 2020 Remi Gau
 
     % Separate training and test sets
     tr = ismember(cvmat(:, 1), svm.class) & ismember(cvmat(:, 2), find(trsession));

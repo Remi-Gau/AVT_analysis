@@ -1,6 +1,12 @@
 function [idfeat, acc] = rfe_calc(data, idfeat, label, session, nsplits, args, opt)
-    % [idfeat, acc] = rfe_calc(data, label, session, nsplit, args)
+    %
+    %
     % Recursive feature elimination to reduce features to the most discriminative voxels
+    %
+    % [idfeat, acc] = rfe_calc(data, label, session, nsplit, args)
+    %
+    %
+    % (C) Copyright 2020 Remi Gau
 
     % RFE parameters
     nRFE = opt.rfe.nreps;

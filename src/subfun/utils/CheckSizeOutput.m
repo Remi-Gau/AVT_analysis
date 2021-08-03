@@ -1,10 +1,9 @@
-% (C) Copyright 2020 Remi Gau
-
 function CheckSizeOutput(Data, Conditions, Runs, Layers)
     %
     % Makes sure that the 2D data matrix and its "data dictionary" vector are
     % matched in terms of row numbers.
     %
+    % (C) Copyright 2020 Remi Gau
 
     % HACK
     % if this input is missing we assume we create a dummy that has the same

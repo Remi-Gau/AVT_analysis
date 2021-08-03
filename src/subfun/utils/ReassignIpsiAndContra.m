@@ -1,5 +1,3 @@
-% (C) Copyright 2020 Remi Gau
-
 function RoiData = ReassignIpsiAndContra(RoiData, ConditionVec, Hemisphere, DoFeaturePooling)
     %
     % Swap left and right for the right hemisphere, so that we have everything
@@ -30,6 +28,8 @@ function RoiData = ReassignIpsiAndContra(RoiData, ConditionVec, Hemisphere, DoFe
     %       'VTargIpsi', 'VTargContra', ...
     %       'TTargIpsi', 'TTargContra' ...
     %       };
+    %
+    % (C) Copyright 2020 Remi Gau
 
     if nargin < 3
         error('minimum 3 arguments necessary: RoiData, ConditionVec, Hemisphere');

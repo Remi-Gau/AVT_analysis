@@ -1,5 +1,3 @@
-% (C) Copyright 2020 Remi Gau
-
 function [Data, CvMat] = LineariseLaminarData(Data, CvMat)
     %
     % Puts all vertices data of the same condition and run on the same row
@@ -34,6 +32,7 @@ function [Data, CvMat] = LineariseLaminarData(Data, CvMat)
     %   cdt 1 run 1    1 2 1 2 1 2 1 2
     %   cdt 1 run 2    3 4 3 4 3 4 3 4
     %
+    % (C) Copyright 2020 Remi Gau
 
     Layers = unique(CvMat(:, 3));
 

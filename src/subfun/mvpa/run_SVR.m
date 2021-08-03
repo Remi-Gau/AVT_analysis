@@ -3,6 +3,8 @@ function results = run_SVR(svm, feat, cvmat, trsession, tesession, opt)
     % Trains model for support vector machine - regression and
     % Generalizes to test data
     %
+    %
+    % (C) Copyright 2020 Remi Gau
 
     % Separate training and test sets
     tr = ismember(cvmat(:, 1), svm.train_class) & ismember(cvmat(:, 2), find(trsession));

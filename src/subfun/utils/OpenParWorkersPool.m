@@ -1,5 +1,3 @@
-% (C) Copyright 2020 Remi Gau
-
 function [KillGcpOnExit] = OpenParWorkersPool(NbWorkers)
     %
     % Check matlab version and opens pool of workers for parallel work
@@ -8,6 +6,7 @@ function [KillGcpOnExit] = OpenParWorkersPool(NbWorkers)
     %
     %   [KillGcpOnExit] = OpenParWorkersPool(NbWorkers)
     %
+    % (C) Copyright 2020 Remi Gau
 
     MatlabVer = version('-release');
     if str2double(MatlabVer(1:4)) > 2013

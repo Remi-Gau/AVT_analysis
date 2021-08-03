@@ -7,6 +7,8 @@ function varargout = define_test_runs_list(opt, iSub, listValidRuns)
     % - a more complicated cross-validation scheme leaves out one run from
     %   each session.
     %
+    %
+    % (C) Copyright 2020 Remi Gau
 
     RunPerSes = ReturnNbRunsPerSession();
     RunPerSes = RunPerSes.RunsPerSes(iSub, :);

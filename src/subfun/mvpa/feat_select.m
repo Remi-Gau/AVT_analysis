@@ -1,4 +1,6 @@
 function idfeat = feat_select(trdata, trlabel, opt)
+    %
+    % (C) Copyright 2020 Remi Gau
 
     % Treshold for selection (0-1)
     threshold = opt.fs.threshold;

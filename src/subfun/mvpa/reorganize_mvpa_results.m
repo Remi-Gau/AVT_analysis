@@ -1,4 +1,6 @@
 function SVM = reorganize_mvpa_results(SVM, TEMP, NbRuns2Incl, RunSubSamp, iPerm)
+    %
+    % (C) Copyright 2020 Remi Gau
 
     for iCV = 1:size(TEMP, 1)
 

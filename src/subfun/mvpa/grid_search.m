@@ -7,6 +7,7 @@ function [args, grid] = grid_search(trdata, trlabel, nfold, opt)
     %   [args, grid] = grid_search(trdata, trlabel, nfold, opt)
     %
     %
+    % (C) Copyright 2020 Remi Gau
 
     sessions_list = unique(nfold);
 

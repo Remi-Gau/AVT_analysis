@@ -58,6 +58,4 @@ function [Dirs] = SetDir(space, MVNN)
     Dirs.CodeDir = spm_file(fullfile(fileparts(mfilename('fullpath')),  '..', '..'), ...
                             'cpath');
 
-    Dirs = GetDependencies(Dirs);
-
 end
