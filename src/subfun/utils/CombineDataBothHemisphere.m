@@ -3,7 +3,7 @@
 function Data = CombineDataBothHemisphere(Data, Opt)
 
     if Opt.CombineHemisphere
-    
+
         NbSub = size(Data, 1);
 
         tmp = {};
@@ -11,7 +11,7 @@ function Data = CombineDataBothHemisphere(Data, Opt)
             tmp{iSub, 1} = [Data{iSub, 1} Data{iSub, 2}]; %#ok<*AGROW>
         end
         Data = tmp;
-    
+
     end
 
 end

@@ -105,12 +105,11 @@ for iROI =  1:numel(ROIs)
                                                                 GrpConditionVecSource, ...
                                                                 GrpRunVecSource, ...
                                                                 Analysis(iAnalysis));
-        
-                                                            
+
         if ~Opt.CombineHemisphere
-            error('Running PCM on each hemisphere separately: not supported')
+            error('Running PCM on each hemisphere separately: not supported');
         end
-                                                            
+
         G_hat = ComputeGmatrix(GrpData, GrpRunVec, GrpConditionVec);
 
         if IndividualPcmDo
