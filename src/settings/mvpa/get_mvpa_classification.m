@@ -1,4 +1,6 @@
 function SVM = get_mvpa_classification(opt)
+    %
+    % (C) Copyright 2020 Remi Gau
 
     %% Ipsi VS contra
     SVM(1)     = struct('name', 'Audio-IpsiVSContra', ...

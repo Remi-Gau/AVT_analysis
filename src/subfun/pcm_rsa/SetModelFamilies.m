@@ -1,4 +1,6 @@
 function Families = SetModelFamilies(ModelType)
+    %
+    % (C) Copyright 2021 Remi Gau
 
     switch ModelType
 
