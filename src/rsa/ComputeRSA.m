@@ -3,6 +3,7 @@
 % Runs RSA
 
 % TODO
+% - Allow for possibility to run on each hs independently 
 % - Make it run on the b parameters
 % - Make it run on volume
 %
@@ -30,14 +31,13 @@ InputType = 'Cst';
 %  possible choices: A1, PT, V1-5
 
 ROIs = { ...
-        'V1'
-        'V2'
-        'A1'
-        'PT'
-       };
+    'V1'
+    'V2'
+    'A1'
+    'PT'
+    };
 
 %% Other parameters
-% Unlikely to change
 
 Opt = SetDefaults();
 
@@ -45,16 +45,22 @@ Space = 'surf';
 MVNN = true;
 
 %%
-
 ConditionType = 'stim';
+Analysis.name = 'all_stim';
+Analysis.CdtToSelect = 1:6;
+
 if Opt.Targets
     ConditionType = 'target'; %#ok<*UNRCH>
+    Analysis.CdtToSelect = 7:12;
+    Analysis.name = 'all_target';
 end
 
-Dirs = SetDir(Space, MVNN);
+CondNames = GetConditionList();
+CondNames = CondNames(Analysis.CdtToSelect);
 
 % TODO
 % This input dir might have to change if we are dealing with volume data
+Dirs = SetDir(Space, MVNN);
 InputDir = Dirs.ExtractedBetas;
 if any(ismember(InputType, {'Cst', 'Lin', 'Quad'}))
     InputDir = Dirs.LaminarGlm;
@@ -67,7 +73,57 @@ spm_mkdir(OutputDir);
 fprintf('Get started\n');
 
 for iROI =  1:numel(ROIs)
+    
+    [GrpDataSource, GrpConditionVecSource, GrpRunVecSource] = LoadAndPreparePcmData(ROIs{iROI}, ...
+        InputDir, ...
+        Opt, ...
+        InputType);
+    
+    [GrpData, GrpRunVec, GrpConditionVec] = PreparePcmInput(GrpDataSource, ...
+        GrpConditionVecSource, ...
+        GrpRunVecSource, ...
+        Analysis);
+    
+    [SubLs, NbSub] = GetSubjectList(InputDir);
 
-    [GrpData, GrpConditionVec, GrpRunVec] = LoadAndPreparePcmData(ROIs{iROI}, InputDir, Opt, InputType);
+    for hs = 1:size(GrpData, 2)
+        
+        hs_entity = '';
+        
+        if size(GrpData, 2) > 1
+            hs_entity = '_hemi-';
+            if hs == 1
+                label = 'L';
+            else
+                label = 'R';
+            end
+             hs_entity = [hs_entity label];
+        end
+    
+        Filename = ['rsa_results', ...
+            '_roi-', ROIs{iROI}, ...
+            hs_entity, ...
+            '_cdt-', ConditionType, ...
+            '_param-', lower(InputType), ...
+            '.mat'];
+
+        if Opt.PerformDeconvolution
+            Filename = strrep(Filename, '.mat', '_deconvolved-1.mat');
+        end
+
+        for iSub = 1:NbSub
+            A =  rsa.distanceLDC(GrpData{iSub}, GrpRunVec{iSub}, GrpConditionVec{iSub});
+            B =  rsa.distanceLDC(flipud(GrpData{iSub}), flipud(GrpRunVec{iSub}), GrpConditionVec{iSub});
+            B = fliplr(B);
+            RDMs(:,:,iSub) = squareform(mean([A; B])); %#ok<SAGROW>
+        end
+        
+        save(fullfile(OutputDir, ['group_' Filename]), ...
+            'Analysis', ...
+            'CondNames', ...
+            'GrpRunVec', 'GrpConditionVec', ...
+            'RDMs');
+    
+    end
 
 end
