@@ -64,6 +64,6 @@ function [GrpData, GrpConditionVec, GrpRunVec] = LoadAndPreparePcmData(ROI, Inpu
 
     end
 
-    GrpData = CombineDataBothHemisphere(GrpData);
+    GrpData = CombineDataBothHemisphere(GrpData, Opt);
 
 end

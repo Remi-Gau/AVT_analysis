@@ -73,7 +73,7 @@ fprintf('Get started\n');
 
 for iROI =  1:numel(ROIs)
 
-    [GrpData, GrpConditionVec, GrpRunVec] = LoadAndPreparePcmData(ROIs{iROI}, InputDir, Opt, InputType);
+    [GrpDataSource, GrpConditionVecSource, GrpRunVecSource] = LoadAndPreparePcmData(ROIs{iROI}, InputDir, Opt, InputType);
 
     IsAuditoryRoi = true;
     if any(strcmp(ROIs{iROI}, {'V1', 'V2', 'V3', 'V4', 'V5'}))
@@ -83,10 +83,6 @@ for iROI =  1:numel(ROIs)
     [Analysis, Models] = BuildModels(ModelType, IsAuditoryRoi);
 
     %% Run the PCM
-
-    GrpDataSource = GrpData;
-    GrpConditionVecSource = GrpConditionVec;
-    GrpRunVecSource = GrpRunVec;
 
     for iAnalysis = 1:numel(Analysis)
 
