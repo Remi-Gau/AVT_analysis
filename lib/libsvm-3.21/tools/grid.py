@@ -45,49 +45,43 @@ class GridOption:
 
 		while i < len(options):
 			if options[i] == '-log2c':
-				i = i + 1
+				i += 1
 				if options[i] == 'null':
 					self.grid_with_c = False
 				else:
 					self.c_begin, self.c_end, self.c_step = map(float,options[i].split(','))
 			elif options[i] == '-log2g':
-				i = i + 1
+				i += 1
 				if options[i] == 'null':
 					self.grid_with_g = False
 				else:
 					self.g_begin, self.g_end, self.g_step = map(float,options[i].split(','))
 			elif options[i] == '-v':
-				i = i + 1
+				i += 1
 				self.fold = options[i]
 			elif options[i] in ('-c','-g'):
 				raise ValueError('Use -log2c and -log2g.')
 			elif options[i] == '-svmtrain':
-				i = i + 1
+				i += 1
 				self.svmtrain_pathname = options[i]
 			elif options[i] == '-gnuplot':
-				i = i + 1
-				if options[i] == 'null':
-					self.gnuplot_pathname = None
-				else:
-					self.gnuplot_pathname = options[i]
+				i += 1
+				self.gnuplot_pathname = None if options[i] == 'null' else options[i]
 			elif options[i] == '-out':
-				i = i + 1
-				if options[i] == 'null':
-					self.out_pathname = None
-				else:
-					self.out_pathname = options[i]
+				i += 1
+				self.out_pathname = None if options[i] == 'null' else options[i]
 			elif options[i] == '-png':
-				i = i + 1
+				i += 1
 				self.png_pathname = options[i]
 			elif options[i] == '-resume':
 				if i == (len(options)-1) or options[i+1].startswith('-'):
 					self.resume_pathname = self.dataset_title + '.out'
 				else:
-					i = i + 1
+					i += 1
 					self.resume_pathname = options[i]
 			else:
 				pass_through_options.append(options[i])
-			i = i + 1
+			i += 1
 
 		self.pass_through_string = ' '.join(pass_through_options)
 		if not os.path.exists(self.svmtrain_pathname):

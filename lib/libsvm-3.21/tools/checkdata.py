@@ -36,9 +36,8 @@ def main():
 		print("dataset {0} not found".format(dataset))
 		exit(1)
 
-	line_no = 1
 	error_line_count = 0
-	for line in open(dataset, 'r'):
+	for line_no, line in enumerate(open(dataset, 'r'), start=1):
 		line_error = False
 
 		# each line must end with a newline character
@@ -91,8 +90,6 @@ def main():
 			except:
 				err(line_no, "feature '{0}' not an <index>:<value> pair, <index> integer, <value> real number ".format(nodes[i]))
 				line_error = True
-
-		line_no += 1
 
 		if line_error:
 			error_line_count += 1
