@@ -3,7 +3,7 @@
 	url = https://github.com/Remi-Gau/matlab_for_cbs_tools.git
 [submodule "lib/rsatoolbox"]
 	path = lib/rsatoolbox
-	url = https://github.com/rsagroup/rsatoolbox.git
+	url = https://github.com/Remi-Gau/rsatoolbox.git
 [submodule "lib/pcm_toolbox"]
 	path = lib/pcm_toolbox
 	url = https://github.com/jdiedrichsen/pcm_toolbox.git
