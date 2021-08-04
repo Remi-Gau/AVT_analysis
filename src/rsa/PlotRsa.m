@@ -31,12 +31,10 @@ ROIs = { ...
         'PT'
        };
 
-
 Opt = SetRasterPlotParameters();
 ColorMap = Opt.Raster.ColorMap;
 
 Opt.CombineHemisphere = true;
-
 
 %% Other parameters
 

@@ -9,7 +9,7 @@
 	url = https://github.com/jdiedrichsen/pcm_toolbox.git
 [submodule "lib/CPP_BIDS_SPM_pipeline"]
 	path = lib/CPP_BIDS_SPM_pipeline
-	url = https://github.com/cpp-lln-lab/CPP_BIDS_SPM_pipeline.git
+	url = https://github.com/cpp-lln-lab/CPP_SPM.git
 [submodule "lib/laminar_tools"]
 	path = lib/laminar_tools
 	url = https://github.com/Remi-Gau/laminar_tools.git
