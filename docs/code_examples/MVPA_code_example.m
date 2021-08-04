@@ -146,8 +146,8 @@ function MVPA_code_example
                                             'opt', opt);
                     else
                         SVM(i).ROI(end + 1) = struct('name', ROI(j).name, ...
-                                                   'size', sum(cellfun('length', ROI(j).VertOfInt)), ...
-                                                   'opt', opt);
+                                                     'size', sum(cellfun('length', ROI(j).VertOfInt)), ...
+                                                     'opt', opt);
                     end
                 end
             end
