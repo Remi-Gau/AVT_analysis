@@ -11,7 +11,8 @@ function plot_RSA_Mahalanobis_surf_pool_hs(StartDir, SubLs, ToPlot, ranktrans, i
 
     NbSub = numel(SubLs);
 
-    load(fullfile(StartDir, 'sub-02', 'roi', 'surf', 'sub-02_ROI_VertOfInt.mat'), 'ROI', 'NbVertex'); % to know how many ROIs we have
+    load(fullfile(StartDir, 'sub-02', 'roi', 'surf', 'sub-02_ROI_VertOfInt.mat'), 'ROI', 'NbVertex');
+    % to know how many ROIs we have
 
     ColorMap = brain_colour_maps('hot_increasing');
 
@@ -39,7 +40,8 @@ function plot_RSA_Mahalanobis_surf_pool_hs(StartDir, SubLs, ToPlot, ranktrans, i
 
         Sub_dir = fullfile(StartDir, SubLs(iSubj).name);
 
-        load(fullfile(Sub_dir, 'results', 'profiles', 'surf', 'RSA', 'RSA_mahalanobis_results_2.mat'),  ...
+        load(fullfile(Sub_dir, 'results', 'profiles', 'surf', ...
+                      'RSA', 'RSA_mahalanobis_results_2.mat'),  ...
              'RDMs_CV', 'RDMs_CV_sens', 'RDMs_CV_side');
 
         for i = 1:3
@@ -97,10 +99,14 @@ function plot_RSA_Mahalanobis_surf_pool_hs(StartDir, SubLs, ToPlot, ranktrans, i
 
                 case 2
                     if target
-                        CondNames = {'(Contra-Ipsi)_{Targ_A} ', '(Contra-Ipsi)_{Targ_V}', '(Contra-Ipsi)_{Targ_T}'};
+                        CondNames = {'(Contra-Ipsi)_{Targ_A} ', ...
+                                     '(Contra-Ipsi)_{Targ_V}', ...
+                                     '(Contra-Ipsi)_{Targ_T}'};
                         FigName = 'Targets - Side VS Side';
                     else
-                        CondNames = {'(Contra-Ipsi)_A ', '(Contra-Ipsi)_V', '(Contra-Ipsi)_T'};
+                        CondNames = {'(Contra-Ipsi)_A ', ...
+                                     '(Contra-Ipsi)_V', ...
+                                     '(Contra-Ipsi)_T'};
                         FigName = 'Side VS Side';
                     end
                     Dest_dir = fullfile(RSA_dir, 'Side');
@@ -108,13 +114,21 @@ function plot_RSA_Mahalanobis_surf_pool_hs(StartDir, SubLs, ToPlot, ranktrans, i
                 case 3
                     if target
                         CondNames = { ...
-                                     'Targets - (A-V)_{Contra}', 'Targets - (A-T)_{Contra}', 'Targets - (V-T)_{Contra}', ...
-                                     'Targets - (A-V)_{Ipsi}', 'Targets - (A-T)_{Ipsi}', 'Targets - (V-T)_{Ipsi}'};
+                                     'Targets - (A-V)_{Contra}', ...
+                                     'Targets - (A-T)_{Contra}', ...
+                                     'Targets - (V-T)_{Contra}', ...
+                                     'Targets - (A-V)_{Ipsi}', ...
+                                     'Targets - (A-T)_{Ipsi}', ...
+                                     'Targets - (V-T)_{Ipsi}'};
                         FigName = 'Targets - Sens VS Sens';
                     else
                         CondNames = { ...
-                                     '(A-V)_{Contra}', '(A-T)_{Contra}', '(V-T)_{Contra}', ...
-                                     '(A-V)_{Ipsi}', '(A-T)_{Ipsi}', '(V-T)_{Ipsi}'};
+                                     '(A-V)_{Contra}', ...
+                                     '(A-T)_{Contra}', ...
+                                     '(V-T)_{Contra}', ...
+                                     '(A-V)_{Ipsi}', ...
+                                     '(A-T)_{Ipsi}', ...
+                                     '(V-T)_{Ipsi}'};
                         FigName = 'Sens VS Sens';
                     end
 
@@ -152,13 +166,15 @@ function plot_RSA_Mahalanobis_surf_pool_hs(StartDir, SubLs, ToPlot, ranktrans, i
                     clear Data;
 
                     % Plot
-                    figure('name', [FigName ' - ' DataName ' - ' ToPlot{iToPlot}], 'Position', FigDim, 'Color', [1 1 1]);
+                    figure('name', [FigName ' - ' DataName ' - ' ToPlot{iToPlot}], ...
+                           'Position', FigDim, 'Color', [1 1 1]);
 
                     rsa.fig.showRDMs(RDM, gcf, isplotranktrans, [], 1, [], [], ColorMap);
 
                     rename_subplot([3 3], CondNames, {ROI.name}');
 
-                    Name = sprintf('%s - %s - %s8%s - %s', DataName, FigName, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
+                    Name = sprintf('%s - %s - %s8%s - %s', DataName, FigName, ...
+                                   ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
 
                     title_print(Name, fullfile(Dest_dir));
 
@@ -184,13 +200,15 @@ function plot_RSA_Mahalanobis_surf_pool_hs(StartDir, SubLs, ToPlot, ranktrans, i
                         %                 CLIM = [min(RDM(:)) max(RDM(:))];
 
                         % Plot
-                        figure('name', ['Sujbects - ' FigName ' - ' DataName ' - ' ToPlot{iToPlot}], 'Position', FigDim, 'Color', [1 1 1]);
+                        figure('name', ['Sujbects - ' FigName ' - ' DataName ' - ' ...
+                                        ToPlot{iToPlot}], 'Position', FigDim, 'Color', [1 1 1]);
 
                         rsa.fig.showRDMs(RDM, gcf, isplotranktrans, [], 1, [], [], ColorMap);
 
                         rename_subplot([4 3], CondNames, {SubLs.name}');
 
-                        Name = sprintf('Subjects - %s - %s - %s - %s8%s - %s', ROI(iROI).name, DataName, FigName, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
+                        Name = sprintf('Subjects - %s - %s - %s - %s8%s - %s', ROI(iROI).name, ...
+                                       DataName, FigName, ToPlot{iToPlot}, ranktrans_suffix, plotranktrans_suffix);
 
                         title_print(Name, fullfile(Dest_dir, 'Subjects'));
                     end

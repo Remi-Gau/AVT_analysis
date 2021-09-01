@@ -9,3 +9,8 @@
 envs/**
 docs/build/*
 .vscode/*.json
+
+
+coverage_html
+coverage.xml
+test_report.log

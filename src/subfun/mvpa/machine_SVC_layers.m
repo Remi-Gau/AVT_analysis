@@ -76,7 +76,8 @@ function [acc, weight, results] = machine_SVC_layers(svm, feat, featlay, cvmat, 
         weight(1, ver(idfeat)) = w / sum(w);
 
         % Compute dual objective value (see LIBSVM FAQ)
-        dualobj = 0.5 * (w' * w) -  model.sv_coef' * [repmat(model.Label(1), 1, model.nSV(1)) repmat(model.Label(2), 1, model.nSV(2))]';
+        dualobj = 0.5 * (w' * w) -  model.sv_coef' * [repmat(model.Label(1), 1, model.nSV(1)) ...
+                                                      repmat(model.Label(2), 1, model.nSV(2))]';
 
         % Number of support vectors
         % nsv = model.totalSV;

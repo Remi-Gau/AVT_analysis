@@ -59,3 +59,14 @@ mex traceABtrans.c
 
 The script `src/figures/PlotBoldProfile.m` will plot the main figures for BOLD
 profile results.
+
+
+## Development
+
+```
+virtualenv -p /usr/bin/python3.8 env
+source env/bin/activate
+
+pip install -r requirements.txt
+pre-commit install
+```

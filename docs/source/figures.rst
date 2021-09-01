@@ -1,6 +1,6 @@
 Plotting figures
 ****************
-  
+
 Scripts and functions for plotting laminar profiles
 
 Functions

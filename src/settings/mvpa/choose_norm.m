@@ -1,4 +1,6 @@
 function opt = choose_norm(opt, Norm)
+    %
+    % (C) Copyright 2020 Remi Gau
 
     opt.scaling.img.eucledian = false;
     opt.scaling.img.zscore = false;

@@ -1,4 +1,6 @@
 function model = EstimateLmm(model)
+    %
+    % (C) Copyright 2021 Remi Gau
 
     temp = model.RegNames;
     idx = cellfun(@(x) regexp(x, '[\[\]{} -]'), temp, 'UniformOutput', false);

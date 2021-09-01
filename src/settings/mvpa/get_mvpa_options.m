@@ -1,4 +1,6 @@
 function opt = get_mvpa_options(MVNN, Norm)
+    %
+    % (C) Copyright 2020 Remi Gau
 
     % Options for the SVM
 

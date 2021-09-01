@@ -1,6 +1,6 @@
 Processing beta images
 **********************
-  
+
 `code/preprocess_betas/`
 
 1. `CpBetas.m` : isolate the betas of interest from the subject level GLM and

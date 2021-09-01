@@ -6,14 +6,7 @@ clc;
 clear;
 close all;
 
-% '3X3', '6X6', 'subset6X6'
-ModelType = 'subset6X6';
-
-Space = 'surf';
-
-MVNN = true;
-
-Dirs = SetDir(Space, MVNN);
+[ModelType, InputType, ROIs, ConditionType, Dirs] = SetPcm();
 
 IsAuditoryRoi = true;
 [~, Models] = BuildModels(ModelType, IsAuditoryRoi);

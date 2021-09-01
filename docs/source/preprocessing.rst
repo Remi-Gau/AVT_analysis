@@ -1,7 +1,7 @@
 Preprocessing
 *************
-  
-List of functions in the ``src`` folder.  
+
+List of functions in the ``src`` folder.
 
 ----
 

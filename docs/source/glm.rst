@@ -1,6 +1,6 @@
 GLM
 ***
-  
+
 Scripts and functions related to subject level models.
 
 ----

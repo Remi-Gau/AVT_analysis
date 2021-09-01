@@ -1,6 +1,6 @@
 MVPA
 ****
-  
+
 Scripts and functions related to MVPA.
 
 ----

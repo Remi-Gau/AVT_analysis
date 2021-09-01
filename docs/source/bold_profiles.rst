@@ -1,6 +1,6 @@
 BOLD profiles
 *************
-  
+
 ## BOLD profiles
 
 `code/bold_profiles/FeatPool/surf`
