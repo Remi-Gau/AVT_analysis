@@ -38,30 +38,11 @@ for iROI =  1:numel(ROIs)
 
     [SubLs, NbSub] = GetSubjectList(InputDir);
 
-    for hs = 1:size(GrpData, 2)
+    NbHs = size(GrpData, 2);
 
-        hs_entity = '';
+    for hs = 1:NbHs
 
-        if size(GrpData, 2) > 1
-            hs_entity = '_hemi-';
-            if hs == 1
-                label = 'L';
-            else
-                label = 'R';
-            end
-            hs_entity = [hs_entity label];
-        end
-
-        Filename = ['rsa_results', ...
-                    '_roi-', ROIs{iROI}, ...
-                    hs_entity, ...
-                    '_cdt-', ConditionType, ...
-                    '_param-', lower(InputType), ...
-                    '.mat'];
-
-        if Opt.PerformDeconvolution
-            Filename = strrep(Filename, '.mat', '_deconvolved-1.mat');
-        end
+        Filename = GetRsaFilename(NbHs, hs, ROIs{iROI}, ConditionType, InputType, Opt);
 
         for iSub = 1:NbSub
             RDMs(:, :, iSub) = ComputeCvedSquaredEuclidianDist(GrpData{iSub}, ...
@@ -69,7 +50,7 @@ for iROI =  1:numel(ROIs)
                                                                GrpConditionVec{iSub}); %#ok<SAGROW>
         end
 
-        save(fullfile(OutputDir, ['group_' Filename]), ...
+        save(fullfile(OutputDir, Filename), ...
              'Analysis', ...
              'CondNames', ...
              'GrpRunVec', 'GrpConditionVec', ...

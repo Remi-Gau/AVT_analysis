@@ -1,90 +1,65 @@
 % (C) Copyright 2021 Remi Gau
 %
-%  Plots the empirical G matrix
+%  Plots RSAs
 
 clc;
 clear;
 close all;
 
-%% Main parameters
+IsPlotRankTrans = false;
 
-% Choose on what type of data the analysis will be run
-%
-% b-parameters
-%
-% 'ROI'
-%
-% s-parameters
-%
-% 'Cst', 'Lin', 'Quad'
-%
+[InputType, ROIs, Opt, ConditionType, Analysis, CondNames, Dirs] = SetRsa;
 
-InputType = 'Cst';
+Opt = SetPlottingParameters(Opt);
 
-% Region of interest:
-%  possible choices: A1, PT, V1-5
+ColorMapFolder = fullfile(fileparts(which('loadLutSub')), '..', 'mat_maps');
+load(fullfile(ColorMapFolder, '1hot_iso.mat'), 'hot');
+ColorMap = [];
 
-ROIs = { ...
-        'V1'
-        'V2'
-        'A1'
-        'PT'
-       };
+[SubLs, NbSub] = GetSubjectList(Dirs.LaminarGlm);
 
-Opt = SetRasterPlotParameters();
-ColorMap = Opt.Raster.ColorMap;
+InputDir = Dirs.RSA;
+FigureDir = fullfile(Dirs.Figures, 'rsa');
 
-Opt.CombineHemisphere = true;
+%%
 
-%% Other parameters
-
-ConditionType = 'stim';
-if Opt.Targets
-    ConditionType = 'target'; %#ok<*UNRCH>
+NbHs = 1;
+if Opt.CombineHemisphere
+    HsLabels = 'LR';
+    NbHs = length(HsLabels);
 end
-
-Space = 'surf';
-MVNN = true;
-Dirs = SetDir(Space, MVNN);
-
-InputDir = fullfile(Dirs.PCM, ModelType);
-
-FigureDir = fullfile(InputDir, 'figures', 'empirical_G_matrices');
 
 for iROI = 1:numel(ROIs)
 
-    for iAnalysis = 1:numel(Analysis)
+    for hs = 1:NbHs
 
-        filename = ['pcm_results', ...
-                    '_roi-', ROIs{iROI}, ...
-                    '_cdt-', ConditionType, ...
-                    '_param-', lower(InputType), ...
-                    '_analysis-', Analysis(iAnalysis).name, ...
-                    '.mat'];
+        Filename = GetRsaFilename(NbHs, hs, ROIs{iROI}, ConditionType, InputType, Opt);
 
-        if Opt.PerformDeconvolution
-            filename = strrep(filename, '.mat', '_deconvolved-1.mat');
-        end
-
-        if strcmp(ModelType, 'subset6X6')
-            filename = ['group_' filename];
-        end
-
-        filename = fullfile(InputDir, filename);
-
-        fprintf(1, 'loading:\n %s\n', filename);
-        load(filename, 'Models', 'G_hat', 'G_pred_grp', 'G_pred_cr');
+        load(fullfile(InputDir, Filename));
 
         %% Plot G matrices
-        FigureFilename = ['empirical_G_matrix', ...
-                          '_roi-', ROIs{iROI}, ...
-                          '_cdt-', ConditionType, ...
-                          '_param-', lower(InputType), ...
-                          '_analysis-', Analysis(iAnalysis).name];
+        FigureFilename = strrep(Filename, '.mat', '');
 
         Opt.Title = strrep(FigureFilename, '_', ' ');
 
         Opt = OpenFigure(Opt);
+
+        CLIM = [min(RDMs(:)) max(RDMs(:))];
+        if IsPlotRankTrans
+            CLIM = [0 1];
+        end
+        Aspect = 1;
+        Imagelabels = [];
+        ShowColorbar = false;
+
+        %         RDMs = mean(RDMs, 3)
+
+        rsa.fig.showRDMs(RDMs, gcf, IsPlotRankTrans, ...
+                         CLIM, ShowColorbar, Aspect, Imagelabels, ColorMap);
+
+        PrintFigure(FigureDir);
+
+        colormap(ColorMap);
 
     end
 end

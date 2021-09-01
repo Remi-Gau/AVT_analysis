@@ -1,1 +1,3 @@
-miss_hit
+miss_hit==0.9.23
+pre-commit
+-r docs/requirements.txt
