@@ -109,7 +109,8 @@ for iSub = 1:NbSub
             Beta2Sel = [];
             for iSess = 1:Nb_sess
                 Beta2Sel = [Beta2Sel; find(strcmp(cellstr(BetaNames), ...
-                                                  ['Sn(' num2str(iSess) ') ' CondNames{iCdt}  '*bf(1)']))];   %#ok<*AGROW>
+                                                  ['Sn(' num2str(iSess) ') ' ...
+                                                   CondNames{iCdt}  '*bf(1)']))];   %#ok<*AGROW>
             end
 
             % Identify the corresponding "layers" (as in 3rd dimension) in the feature matrix
@@ -221,7 +222,8 @@ for iSub = 1:NbSub
             %             if strcmp(distfun, 'Mahalanobis') && ismultinorm == 0
             %                 [Sw_reg, res, beta_hat] = get_res_covmatrix(xY, SPM);
             %             else
-            %                 [u_hat,resMS,Sw_hat,beta_hat] = rsa.spm.noiseNormalizeBeta(xY, SPM, 'normmode', normmode);
+            %                 [u_hat,resMS,Sw_hat,beta_hat] = ...
+            %                   rsa.spm.noiseNormalizeBeta(xY, SPM, 'normmode', normmode);
             %             end
 
             %%
@@ -252,7 +254,9 @@ for iSub = 1:NbSub
             %             subjectRDMs{rr}(:,:,ss) =
             %             squareform(pdist(rsa_data, lower(distfun), Sw_reg)); spearman
 
-            subjectRDMs_CV{iROI, iToPlot, 1}(:, :, iSub) = squareform(rsa.distanceLDC(X_CV, partition, conditionVec));
+            subjectRDMs_CV{iROI, iToPlot, 1}(:, :, iSub) = squareform(rsa.distanceLDC(X_CV, ...
+                                                                                      partition, ...
+                                                                                      conditionVec));
 
             %%
             RDM_final_euc = zeros(size(CondNames, 2));
@@ -322,7 +326,8 @@ for iSub = 1:NbSub
             %             if strcmp(distfun, 'Mahalanobis') && ismultinorm == 0
             %                 [Sw_reg, res, beta_hat] = get_res_covmatrix(xY, SPM);
             %             else
-            %                 [u_hat,resMS,Sw_hat,beta_hat] = rsa.spm.noiseNormalizeBeta(xY, SPM, 'normmode', normmode);
+            %                 [u_hat,resMS,Sw_hat,beta_hat] = ...
+            %                   rsa.spm.noiseNormalizeBeta(xY, SPM, 'normmode', normmode);
             %             end
 
             % Eucledian normalization
@@ -343,7 +348,9 @@ for iSub = 1:NbSub
             %             subjectRDMs{rr}(:,:,ss) =
             %             squareform(pdist(rsa_data, lower(distfun), Sw_reg)); spearman
 
-            subjectRDMs_CV_cross_side{iROI, iToPlot, 1}(:, :, iSub) = squareform(rsa.distanceLDC(X_CV, partition, conditionVec));
+            subjectRDMs_CV_cross_side{iROI, iToPlot, 1}(:, :, iSub) = squareform(rsa.distanceLDC(X_CV, ...
+                                                                                                 partition, ...
+                                                                                                 conditionVec));
 
             RDM_final_euc = zeros(size(Cond_con_name, 2));
             RDM_final_pear = zeros(size(Cond_con_name, 2));
@@ -414,7 +421,8 @@ for iSub = 1:NbSub
             %             if strcmp(distfun, 'Mahalanobis') && ismultinorm == 0
             %                 [Sw_reg, res, beta_hat] = get_res_covmatrix(xY, SPM);
             %             else
-            %                 [u_hat,resMS,Sw_hat,beta_hat] = rsa.spm.noiseNormalizeBeta(xY, SPM, 'normmode', normmode);
+            %                 [u_hat,resMS,Sw_hat,beta_hat] = ...
+            % rsa.spm.noiseNormalizeBeta(xY, SPM, 'normmode', normmode);
             %             end
 
             % Eucledian normalization
@@ -435,7 +443,9 @@ for iSub = 1:NbSub
             %             subjectRDMs{rr}(:,:,ss) =
             %             squareform(pdist(rsa_data, lower(distfun), Sw_reg)); spearman
 
-            subjectRDMs_CV_cross_sens{iROI, iToPlot, 1}(:, :, iSub) = squareform(rsa.distanceLDC(X_CV, partition, conditionVec));
+            subjectRDMs_CV_cross_sens{iROI, iToPlot, 1}(:, :, iSub) = squareform(rsa.distanceLDC(X_CV, ...
+                                                                                                 partition, ...
+                                                                                                 conditionVec));
 
             RDM_final_euc = zeros(size(Cond_con_name, 2));
             RDM_final_pear = zeros(size(Cond_con_name, 2));

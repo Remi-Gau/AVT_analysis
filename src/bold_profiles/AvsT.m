@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 %% A & T / Ipsi & Contra in V1 and V2
 Conditions = [1 2 5 6];
 RoisToSelect = {'V1', 'V2'};

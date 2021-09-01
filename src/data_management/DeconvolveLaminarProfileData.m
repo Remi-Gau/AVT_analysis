@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+%
 % Deconvolve laminar profile data
 %
 % Loads the laminar profile group data (1 profile per cdt / run / subject)

@@ -27,17 +27,19 @@ for iSub = 1:NbSub
             suffix = 'r';
         end
 
+        basename = ['MP2RAGE_T1map_thresh_clone_transform_strip_clone_transform_bound_mems_' suffix 'cr_gm_avg'];
+
         % identify the level set for that subject
         LevelSetFile = spm_select('FPList', SubDir, ...
-                                  ['^*MP2RAGE_T1map_thresh_clone_transform_strip_clone_transform_bound_mems_' suffix 'cr_gm_avg.nii$']);
+                                  ['^*' basename '.nii$']);
 
         % unzip it if necessary
         if isempty(LevelSetFile)
             gunzip(spm_select('FPList', SubDir, ...
-                              ['^*MP2RAGE_T1map_thresh_clone_transform_strip_clone_transform_bound_mems_' suffix 'cr_gm_avg.nii.gz$']));
+                              ['^*' basename '.nii.gz$']));
 
             LevelSetFile = spm_select('FPList', SubDir, ...
-                                      ['^*MP2RAGE_T1map_thresh_clone_transform_strip_clone_transform_bound_mems_' suffix 'cr_gm_avg.nii$']);
+                                      ['^*' basename '.nii$']);
         end
 
         % store it in vector form for each hemipshere

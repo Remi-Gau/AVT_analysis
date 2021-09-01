@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 %% HELPER FUNCTIONS
 
 function p_str = convert_pvalue(p)

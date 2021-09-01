@@ -104,7 +104,9 @@ for iSub = NbSub % for each subject
                 matlabbatch{1, 1}.spm.spatial.realignunwarp.data(1, RunInd).pmscan = {''};
             end
 
-            disp(madiary(['diary_realign_' datestr(now, DateFormat) '.out']);tlabbatch{1, 1}.spm.spatial.realignunwarp.data(1, RunInd).pmscan);
+            matlabbatch{1, 1}.spm.spatial.realignunwarp.data(1, RunInd).pmscan;
+
+            diary(['diary_realign_' datestr(now, DateFormat) '.out']);
 
             RunInd = RunInd + 1;
 
@@ -125,7 +127,8 @@ for iSub = NbSub % for each subject
 
     % Saving
     if UseVDM
-        SaveMatLabBatch(strcat('RealignAndUnwarpVDM_', SubLs(iSub).name, '_', datestr(now, DateFormat), '_matlabbatch'), matlabbatch);
+        SaveMatLabBatch(strcat('RealignAndUnwarpVDM_', SubLs(iSub).name, '_', ...
+                               datestr(now, DateFormat), '_matlabbatch'), matlabbatch);
         try
             % in case SPM created a .ps file output we rename it so it is
             % not overwritten later
@@ -134,7 +137,8 @@ for iSub = NbSub % for each subject
         catch
         end
     else
-        SaveMatLabBatch(strcat('RealignAndUnwarp_', SubLs(iSub).name, '_', datestr(now, DateFormat), '_matlabbatch'), matlabbatch); %#ok<*UNRCH>
+        SaveMatLabBatch(strcat('RealignAndUnwarp_', SubLs(iSub).name, '_', ...
+                               datestr(now, DateFormat), '_matlabbatch'), matlabbatch); %#ok<*UNRCH>
         try
             PsFile = dir('spm_*.ps');
             move(PsFile.name, ['RealignAndUnwarp_' PsFile.name]);
@@ -155,4 +159,3 @@ end
 cd (StartDir);
 
 % CloseParWorkersPool(KillGcpOnExit)
-

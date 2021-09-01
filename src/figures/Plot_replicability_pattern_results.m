@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 clc;
 clear;
 
@@ -438,7 +439,8 @@ for  iSub = [1:4 6:NbSub] % [1:4 6:NbSub]
                     subplot(3, numel(CondNames), iSubplot + numel(CondNames) * (iDay - 1));
 
                     Mat2PlotAllDays = RHO_session(Col(iCdt, :), Col(iCdt, :), hs, iROI);
-                    Mat2Plot = Mat2PlotAllDays((Subcol(iDay) + 1):Subcol(iDay + 1), (Subcol(iDay) + 1):Subcol(iDay + 1));
+                    Mat2Plot = Mat2PlotAllDays((Subcol(iDay) + 1):Subcol(iDay + 1), ...
+                                               (Subcol(iDay) + 1):Subcol(iDay + 1));
 
                     % collected maximum and minimum values to adjust CLIM post
                     % hoc
