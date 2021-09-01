@@ -99,7 +99,8 @@ for iSub = 5 % 1:10
             Beta2Sel = [];
             for iSess = 1:Nb_sess
                 Beta2Sel = [Beta2Sel; find(strcmp(cellstr(BetaNames), ...
-                                                  ['Sn(' num2str(iSess) ') ' CondNames{iCdt}  '*bf(1)']))];  %#ok<*AGROW>
+                                                  ['Sn(' num2str(iSess) ') ' ...
+                                                   CondNames{iCdt}  '*bf(1)']))];  %#ok<*AGROW>
             end
             % Identify the corresponding "layers" (as in 3rd dimension) in the feature matrix
             Beta2Sel = find(ismember(BetaOfInterest, Beta2Sel));
@@ -153,7 +154,9 @@ for iSub = 5 % 1:10
             for iDay = 1:3
                 Data = S_Param_day(:, Col);
                 Filename = fullfile(StartDir, SubLs(iSub).name, 'ffx_nat', 'betas', '6_surf', ...
-                                    [SubLs(iSub).name '_' CondNames{iCdt} '_day-' num2str(iDay) '_' HS(hs) 'h_cst_inf.vtk']);
+                                    [SubLs(iSub).name '_' CondNames{iCdt} ...
+                                     '_day-' num2str(iDay) '_' ...
+                                     HS(hs) 'h_cst_inf.vtk']);
                 write_vtk(Filename, inf_vertex, inf_face, Data');
                 Col = Col + 1;
                 clear Data;

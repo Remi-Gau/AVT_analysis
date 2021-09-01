@@ -42,7 +42,8 @@ parfor iSub = 1:NbSub % for each subject
     matlabbatch{1}.spm.spatial.coreg.write.roptions.mask = 0;
     matlabbatch{1}.spm.spatial.coreg.write.roptions.prefix = 'r';
 
-    SaveMatLabBatch(fullfile(SubDir, 'pmap', ['Reslice_', SubLs(iSub).name, '_jobs_', datestr(now, DateFormat), '.mat']), matlabbatch);
+    SaveMatLabBatch(fullfile(SubDir, 'pmap', ['Reslice_', SubLs(iSub).name, '_jobs_', ...
+                                              datestr(now, DateFormat), '.mat']), matlabbatch);
 
     spm_jobman('run', matlabbatch);
 

@@ -150,7 +150,8 @@ for iSub = NbSub % for each subject
 
     %% Saves and run the batch
     cd(fullfile(SubDir));
-    save (strcat('Create_VDM_Subj_', SubLs(iSub).name, '_', datestr(now, DateFormat), '_matlabbatch.mat'), 'matlabbatch');
+    save (strcat('Create_VDM_Subj_', SubLs(iSub).name, '_', datestr(now, DateFormat), '_matlabbatch.mat'), ...
+          'matlabbatch');
 
     spm_jobman('run', matlabbatch);
 

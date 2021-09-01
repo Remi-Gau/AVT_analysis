@@ -1,5 +1,6 @@
 function [Components, h] = Set_PCM_components_RDM(print, FigDim)
-
+    %
+    % (C) Copyright 2020 Remi Gau
     %% Set the different pattern components using RDMs
 
     fprintf('Preparing pattern components\n');

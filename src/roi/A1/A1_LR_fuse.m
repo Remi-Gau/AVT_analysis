@@ -18,7 +18,8 @@ for iSub = 1:NbSub
     % Subject directory
     SubDir = fullfile(StartDir, SubLs(iSub).name);
 
-    copyfile(fullfile(StartDir, 'A1_ROI_Def', [SubLs(iSub).name '_A1_*cr_RG_UN_data.nii']), fullfile(SubDir, 'roi', 'vol', 'mni', 'upsamp'));
+    copyfile(fullfile(StartDir, 'A1_ROI_Def', [SubLs(iSub).name '_A1_*cr_RG_UN_data.nii']), ...
+             fullfile(SubDir, 'roi', 'vol', 'mni', 'upsamp'));
 
     Files = spm_select('FPList', fullfile(SubDir, 'roi', 'vol', 'mni', 'upsamp'), ...
                        ['^' SubLs(iSub).name '_A1_.*cr_RG_UN_data.nii$']);

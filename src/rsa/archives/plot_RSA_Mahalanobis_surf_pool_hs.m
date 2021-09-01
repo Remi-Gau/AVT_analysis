@@ -191,7 +191,8 @@ function plot_RSA_Mahalanobis_surf_pool_hs(StartDir, SubLs, ToPlot, ranktrans, i
 
                         if ranktrans
                             for iSubj = 1:NbSub
-                                RDM(:, :, iSubj) = rsa.util.scale01(rsa.util.rankTransform_equalsStayEqual(RDM(:, :, iSubj), 1));
+                                tmp = rsa.util.rankTransform_equalsStayEqual(RDM(:, :, iSubj), 1);
+                                RDM(:, :, iSubj) = rsa.util.scale01(tmp);
                             end
                         end
 

@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 clc;
 clear;
 close all;
@@ -58,7 +59,8 @@ for iSubj = 1:NbSub
 
         for iROI = 1:numel(SVM(iSVM).ROI)
 
-            File2Load = fullfile(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]));
+            File2Load = fullfile(fullfile(SaveDir, ...
+                                          ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]));
 
             if exist(File2Load, 'file')
 
@@ -154,7 +156,9 @@ for iSVM = 1:numel(SVM)
         end
 
         % plot
-        fig = figure('Name', [SVM(iSVM).name ' - ' SVM(iSVM).ROI(iROI).name], 'Position', [100, 50, 1200, 700], 'Color', [1 1 1], 'Visible', 'on');
+        fig = figure('Name', [SVM(iSVM).name ' - ' SVM(iSVM).ROI(iROI).name], ...
+                     'Position', [100, 50, 1200, 700], ...
+                     'Color', [1 1 1], 'Visible', 'on');
 
         % plot the null distribution with Monte Carlo
         % gives the p values of the global and majority prevalence test
@@ -240,7 +244,9 @@ for iSVM = 1:numel(SVM)
         t = title(sprintf('Null distribution (200 CVs):\nsign permutation'));
         set(t, 'fontsize', fontsize);
 
-        P = sum(mean(SignPerms_grp_no_perm, 2) > mean(SVM(iSVM).ROI(iROI).grp_no_perm - .5)) / size(SignPerms_grp_no_perm, 1);
+        P = sum(mean(SignPerms_grp_no_perm, 2) > ...
+                mean(SVM(iSVM).ROI(iROI).grp_no_perm - .5)) / ...
+          size(SignPerms_grp_no_perm, 1);
         t = text(-0.09, MAX, sprintf('p_{sign-perm}=%.3f ', P));
         set(t, 'fontsize', fontsize);
 
@@ -278,7 +284,9 @@ for iSVM = 1:numel(SVM)
             t = title(SubLs(iSubj).name);
             set(t, 'fontsize', fontsize);
 
-            P = sum(SVM(iSVM).ROI(iROI).perms(:, iSubj) > SVM(iSVM).ROI(iROI).grp(iSubj)) / numel(SVM(iSVM).ROI(iROI).perms(:, iSubj));
+            P = sum(SVM(iSVM).ROI(iROI).perms(:, iSubj) > ...
+                    SVM(iSVM).ROI(iROI).grp(iSubj)) / ...
+              numel(SVM(iSVM).ROI(iROI).perms(:, iSubj));
             t = text(0.25, MAX - MAX * .1, sprintf('p_{label-perm}=%.3f ', P));
             set(t, 'fontsize', fontsize);
 
@@ -304,7 +312,10 @@ for iSVM = 1:numel(SVM)
             SubDir = fullfile(StartDir, SubLs(iSubj).name);
             SaveDir = fullfile(SubDir, 'results', 'SVM');
 
-            File2Load = fullfile(fullfile(SaveDir, ['SVM-' SVM(iSVM).name '_ROI-' SVM(iSVM).ROI(iROI).name SaveSufix]));
+            File2Load = fullfile(fullfile(SaveDir, ['SVM-', ...
+                                                    SVM(iSVM).name '_ROI-', ...
+                                                    SVM(iSVM).ROI(iROI).name, ...
+                                                    SaveSufix]));
             File2Load = strrep(File2Load, '_perm-1', '');
 
             load(File2Load, 'Results');
@@ -336,7 +347,10 @@ for iSVM = 1:numel(SVM)
             end
         end
 
-        fig = figure('Name', ['CoS--' SVM(iSVM).name ' - ' SVM(iSVM).ROI(iROI).name], 'Position', [100, 50, 1200, 700], 'Color', [1 1 1], 'Visible', 'on');
+        fig = figure('Name', ['CoS--' SVM(iSVM).name ' - ' SVM(iSVM).ROI(iROI).name], ...
+                     'Position', [100, 50, 1200, 700], ...
+                     'Color', [1 1 1], ...
+                     'Visible', 'on');
 
         hold on;
 
