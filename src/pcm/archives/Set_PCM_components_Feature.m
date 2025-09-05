@@ -1,5 +1,6 @@
 function [Components, h] = Set_PCM_components_Feature(print, FigDim)
-
+    %
+    % (C) Copyright 2020 Remi Gau
     if nargin < 2 || isempty(FigDim)
         FigDim = [100, 100, 1000, 1500];
     end

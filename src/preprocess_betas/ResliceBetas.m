@@ -86,7 +86,8 @@ parfor iSub = 1:NbSub % for each subject
                  fullfile(SubDir, dest_dir, 'betas'));
     end
 
-    SaveMatLabBatch(fullfile(SubDir, dest_dir, 'betas', ['Reslice_', SubLs(iSub).name, '_', datestr(now, DateFormat), '_matlabbatch.mat']), matlabbatch);
+    SaveMatLabBatch(fullfile(SubDir, dest_dir, 'betas', ['Reslice_', SubLs(iSub).name, '_', ...
+                                                         datestr(now, DateFormat), '_matlabbatch.mat']), matlabbatch);
 
     spm_jobman('run', matlabbatch);
 

@@ -1,4 +1,6 @@
 function [GrpData, GrpConditionVec, GrpRunVec] = LoadAndPreparePcmData(ROI, InputDir, Opt, InputType)
+    %
+    % (C) Copyright 2020 Remi Gau
 
     [SubLs, NbSub] = GetSubjectList(InputDir);
 

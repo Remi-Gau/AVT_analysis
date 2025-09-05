@@ -368,7 +368,9 @@ function  fig_handles = PlotPcmInd(M, G, G_hat, T_ind, D, theta_ind, G_pred_ind,
         end
         mtit(fig_handles(end).Name, 'fontsize', 12, 'xoff', 0, 'yoff', .035);
 
-        %% Plot theta estimates and each subject's empirical G matrix, as well as the predicted one and the free model one
+        %% Plot theta estimates
+        % for each subject's empirical G matrix,
+        % as well as the predicted one and the free model one
         H = 1;
         % H = eye(size(M{1}.Ac,1))-ones(size(M{1}.Ac,1))/size(M{1}.Ac,1);
 

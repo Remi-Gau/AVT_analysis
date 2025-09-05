@@ -69,7 +69,9 @@ for iSub = 1:NbSub
             A1(A1 == 1) = 0;
             A1(A1 == 2) = 1;
         end
-        write_vtk(fullfile(SubDir, 'roi', 'surf', [SubLs(iSub).name '_A1_' suffix 'cr.vtk']), inf_vertex, inf_face, A1);
+        write_vtk(fullfile(SubDir, 'roi', 'surf', [SubLs(iSub).name '_A1_' suffix 'cr.vtk']), ...
+                  inf_vertex, ...
+                  inf_face, A1);
 
         for iThres = 1:numel(Thresh)
             Mapping = zeros(1, size(PT, 2));
@@ -78,7 +80,10 @@ for iSub = 1:NbSub
             Mapping(1, SumOther > PT) = 0;
             Mapping(1, A1 > 0) = 0;
 
-            write_vtk(fullfile(SubDir, 'roi', 'surf', [SubLs(iSub).name '_PT_' suffix 'cr.vtk']), inf_vertex, inf_face, Mapping);
+            write_vtk(fullfile(SubDir, 'roi', 'surf', [SubLs(iSub).name '_PT_' suffix 'cr.vtk']), ...
+                      inf_vertex, ...
+                      inf_face, ...
+                      Mapping);
         end
 
         clear Mapping A1 PT OtherROI inf_vertex inf_face PT_vtk vtk Inf_file;

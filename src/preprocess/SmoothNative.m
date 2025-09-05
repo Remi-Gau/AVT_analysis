@@ -73,7 +73,10 @@ for iSub = NbSub % for each subject
 
     end
 
-    SaveMatLabBatch(fullfile(SubDir, ['SmoothNat_', SubLs(iSub).name, '_', datestr(now, DateFormat), '_matlabbatch.mat']), matlabbatch);
+    SaveMatLabBatch(fullfile(SubDir, ['SmoothNat_', SubLs(iSub).name, '_', ...
+                                      datestr(now, DateFormat), ...
+                                      '_matlabbatch.mat']), ...
+                    matlabbatch);
 
     fprintf('\n');
     disp('%%%%%%%%%%%%');

@@ -1,5 +1,6 @@
 function [Models_A, Models_V, h] = Set_PCM_models(Components, print, FigDim)
-
+    %
+    % (C) Copyright 2020 Remi Gau
     h = [];
 
     CondNames = { ...

@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function All_ROIs_All_Scalings_MVPA_surf_tables
     clc;
     clear;
@@ -158,10 +159,16 @@ end
 function Print2TableROI(fid, ROIs, ToPrint)
 
     if ~isempty(ToPrint.ToPermute)
-        Legends1 = {'', '', 'Constant', '', '', '', '', '', '', '', '', '', '', 'Linear', '', '', '', '', '', '', '', '', '', '', 'Whole ROI'};
+        Legends1 = {'', '', ...
+                    'Constant', '', '', '', '', '', '', '', '', '', '', ...
+                    'Linear', '', '', '', '', '', '', '', '', '', '', ...
+                    'Whole ROI'};
         Legends2 = {'', 'mean', '', '', 'STD', '', '', 'p value', '', 'effect size'};
     else
-        Legends1 = {'', '', 'Constant', '', '', '', '', '', '', '', '', '', '', '', '', 'Linear', '', '', '', '', '', '', '', '', '', '', '', '', 'Whole ROI'};
+        Legends1 = {'', '', ...
+                    'Constant', '', '', '', '', '', '', '', '', '', '', '', '', ...
+                    'Linear', '', '', '', '', '', '', '', '', '', '', '', '', ...
+                    'Whole ROI'};
         Legends2 = {'', 'mean', '', '', 'STD', '', '', 't value', '', 'p value', '', 'effect size'};
     end
 
@@ -262,8 +269,7 @@ function Print2TableROI(fid, ROIs, ToPrint)
                         elseif strcmp(ToPrint.OneSideTTest, 'both')
                             P = sum( ...
                                     abs(Perms) > ...
-                                    repmat(abs(mean(tmp)), size(Perms, 1), 1)) ...
-                                / size(Perms, 1);
+                                    repmat(abs(mean(tmp)), size(Perms, 1), 1)) / size(Perms, 1);
                         end
 
                     else
@@ -277,8 +283,7 @@ function Print2TableROI(fid, ROIs, ToPrint)
                     if ~isempty(ToPrint.ToPermute)
                         P = sum( ...
                                 abs(Perms) > ...
-                                repmat(abs(mean(tmp)), size(Perms, 1), 1)) ...
-                            / size(Perms, 1);
+                                repmat(abs(mean(tmp)), size(Perms, 1), 1)) / size(Perms, 1);
                     else
                         [~, P, ~, STATS] = ttest(tmp, 0, 'alpha', Alpha);
                     end

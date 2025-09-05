@@ -109,7 +109,8 @@ for iSub = 1:NbSub % for each subject
                         ['^rp_' SubLs(iSub).name '_ses-' num2str(iSes) '.*_task-audiovisualtactile_run-.*.txt$']);
 
         IMG = spm_select('FPList', fullfile(pwd), ...
-                         ['^' suffix 'auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-.*_bold.nii.gz$']);
+                         ['^' suffix 'auv' SubLs(iSub).name '_ses-' num2str(iSes) ...
+                          '_task-audiovisualtactile_run-.*_bold.nii.gz$']);
 
         if ~isempty(IMG)
             fprintf(' Unzipping files\n');
@@ -117,7 +118,8 @@ for iSub = 1:NbSub % for each subject
         end
 
         IMG = spm_select('FPList', fullfile(pwd), ...
-                         ['^' suffix 'auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-.*_bold.nii$']);
+                         ['^' suffix 'auv' SubLs(iSub).name '_ses-' num2str(iSes) ...
+                          '_task-audiovisualtactile_run-.*_bold.nii$']);
 
         for iRuns = 1:size(IMG, 1)
 
@@ -182,11 +184,12 @@ for iSub = 1:NbSub % for each subject
                             SOTs = SOTs(P(1:Num_targets));
                         end
 
-                        matlabbatch{1, 1}.spm.stats.fmri_spec.sess(1, RunInd).cond(1, ConditionNumber).name = [TrialType Side];
-                        matlabbatch{1, 1}.spm.stats.fmri_spec.sess(1, RunInd).cond(1, ConditionNumber).duration = 0;
-                        matlabbatch{1, 1}.spm.stats.fmri_spec.sess(1, RunInd).cond(1, ConditionNumber).tmod = 0;
-                        matlabbatch{1, 1}.spm.stats.fmri_spec.sess(1, RunInd).cond(1, ConditionNumber).pmod = struct('name', {}, 'param', {}, 'poly', {});
-                        matlabbatch{1, 1}.spm.stats.fmri_spec.sess(1, RunInd).cond(1, ConditionNumber).onset = SOTs;
+                        sess(1, RunInd).cond(1, ConditionNumber).name = [TrialType Side];
+                        sess(1, RunInd).cond(1, ConditionNumber).duration = 0;
+                        sess(1, RunInd).cond(1, ConditionNumber).tmod = 0;
+                        sess(1, RunInd).cond(1, ConditionNumber).pmod = struct('name', {}, 'param', {}, 'poly', {});
+                        sess(1, RunInd).cond(1, ConditionNumber).onset = SOTs;
+                        matlabbatch{1, 1}.spm.stats.fmri_spec.sess = sess;
 
                         ConditionNumber = ConditionNumber + 1;
                     end
@@ -237,11 +240,12 @@ for iSub = 1:NbSub % for each subject
             end
 
             if ~isempty(SOTs)
-                matlabbatch{1, 1}.spm.stats.fmri_spec.sess(1, RunInd).cond(1, ConditionNumber).name = 'ExtraResp';
-                matlabbatch{1, 1}.spm.stats.fmri_spec.sess(1, RunInd).cond(1, ConditionNumber).duration = 0;
-                matlabbatch{1, 1}.spm.stats.fmri_spec.sess(1, RunInd).cond(1, ConditionNumber).tmod = 0;
-                matlabbatch{1, 1}.spm.stats.fmri_spec.sess(1, RunInd).cond(1, ConditionNumber).pmod = struct('name', {}, 'param', {}, 'poly', {});
-                matlabbatch{1, 1}.spm.stats.fmri_spec.sess(1, RunInd).cond(1, ConditionNumber).onset = SOTs;
+                sess(1, RunInd).cond(1, ConditionNumber).name = 'ExtraResp';
+                sess(1, RunInd).cond(1, ConditionNumber).duration = 0;
+                sess(1, RunInd).cond(1, ConditionNumber).tmod = 0;
+                sess(1, RunInd).cond(1, ConditionNumber).pmod = struct('name', {}, 'param', {}, 'poly', {});
+                sess(1, RunInd).cond(1, ConditionNumber).onset = SOTs;
+                matlabbatch{1, 1}.spm.stats.fmri_spec.sess;
 
                 if Plot
                     subplot(2, 1, 2);
@@ -295,11 +299,13 @@ for iSub = 1:NbSub % for each subject
     for iSes = 1:NbSes
         cd(fullfile(SubDir, SesLs(iSes).name, 'func'));
         IMG = spm_select('FPList', fullfile(pwd), ...
-                         ['^' suffix 'auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-.*_bold.nii$']);
+                         ['^' suffix 'auv' SubLs(iSub).name '_ses-' num2str(iSes) ...
+                          '_task-audiovisualtactile_run-.*_bold.nii$']);
         for iRuns = 1:size(IMG, 1)
             gzip(IMG(iRuns, :));
         end
-        %         delete([suffix 'auv' SubLs(iSub).name '_ses-' num2str(iSes) '_task-audiovisualtactile_run-*_bold.nii'])
+        %         delete([suffix 'auv' SubLs(iSub).name '_ses-' num2str(iSes) ...
+        % '_task-audiovisualtactile_run-*_bold.nii'])
     end
 
     cd (StartDir);

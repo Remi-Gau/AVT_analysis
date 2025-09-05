@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 % run LMM on just the CST or LIN from both ROIs if signiicant
 if PVAL < .05
 

@@ -51,7 +51,7 @@ for iCon = 1:numel(SPM.xCon)
 
         % Estimation
         matlabbatch{1, end + 1} = {};
-        matlabbatch{1, end}.spm.stats.fmri_est.spmmat{1, 1} = fullfile(StartDir, 'rfx', Name, 'SPM.mat');     % set the spm file to be estimated
+        matlabbatch{1, end}.spm.stats.fmri_est.spmmat{1, 1} = fullfile(StartDir, 'rfx', Name, 'SPM.mat');
         matlabbatch{1, end}.spm.stats.fmri_est.method.Classical = 1;
 
         % Contrast

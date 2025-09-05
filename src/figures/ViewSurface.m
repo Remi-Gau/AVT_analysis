@@ -1,4 +1,7 @@
-M = gifti(fullfile(pwd, 'sub-02_ses-1_MP2RAGE_T1map_thresh_clone_transform_strip_clone_transform_bound_mems_lcr_gm_avg_inf.vtk'));
+% (C) Copyright 2020 Remi Gau
+
+file = 'sub-02_ses-1_MP2RAGE_T1map_thresh_clone_transform_strip_clone_transform_bound_mems_lcr_gm_avg_inf.vtk';
+M = gifti(fullfile(pwd, file));
 M = export(M, 'patch');
 T = randn(size(M.vertices, 1), 1);
 T = spm_mesh_smooth(M, T, 100);

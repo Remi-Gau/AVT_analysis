@@ -88,7 +88,8 @@ for iSub = 9:NbSub
             Beta2Sel = [];
             for iSess = 1:Nb_sess
                 Beta2Sel = [Beta2Sel; find(strcmp(cellstr(BetaNames), ...
-                                                  ['Sn(' num2str(iSess) ') ' CondNames{iCdt}  '*bf(1)']))];  %#ok<*AGROW>
+                                                  ['Sn(' num2str(iSess) ') ' ...
+                                                   CondNames{iCdt}  '*bf(1)']))];  %#ok<*AGROW>
             end
             %             fprintf('\n')
             %             disp(BetaNames(Beta2Sel,:))
@@ -147,10 +148,12 @@ for iSub = 9:NbSub
 
             for iSess = 1:Nb_sess
                 Beta2Sel = [Beta2Sel; find(strcmp(cellstr(BetaNames), ...
-                                                  ['Sn(' num2str(iSess) ') ' CondNames{Cond2Contrast{iCdt, 1}}  '*bf(1)']))];
+                                                  ['Sn(' num2str(iSess) ') ' ...
+                                                   CondNames{Cond2Contrast{iCdt, 1}}  '*bf(1)']))];
 
                 Beta2Sel2 = [Beta2Sel2; find(strcmp(cellstr(BetaNames), ...
-                                                    ['Sn(' num2str(iSess) ') ' CondNames{Cond2Contrast{iCdt, 2}}  '*bf(1)']))];
+                                                    ['Sn(' num2str(iSess) ') ' ...
+                                                     CondNames{Cond2Contrast{iCdt, 2}}  '*bf(1)']))];
             end
 
             %             fprintf('\n')
@@ -178,7 +181,10 @@ for iSub = 9:NbSub
                 Mapping(VertexWithData) = B(iBeta, :);
                 write_vtk(fullfile(Results_dir, 'side', [SubLs(iSub).name '_' HsSufix 'cr_' ...
                                                          Cond_con_name{iCdt} '_contra-ipsi'...
-                                                         '_' VTK_sufix{iBeta} '.vtk']), inf_vertex, inf_faces, Mapping);
+                                                         '_' VTK_sufix{iBeta} '.vtk']), ...
+                          inf_vertex, ...
+                          inf_faces, ...
+                          Mapping);
             end
 
             clear Features Beta2Sel B X Y Mapping iBeta iSess;
@@ -222,10 +228,12 @@ for iSub = 9:NbSub
                 if strcmp(SubLs(iSub).name, 'sub-06') && iSess == 17 && iCdt ~= 3
                 else
                     Beta2Sel = [Beta2Sel; find(strcmp(cellstr(BetaNames), ...
-                                                      ['Sn(' num2str(iSess) ') ' CondNames{Cond2Contrast{iCdt, 1}}  '*bf(1)']))];
+                                                      ['Sn(' num2str(iSess) ') ' ...
+                                                       CondNames{Cond2Contrast{iCdt, 1}}  '*bf(1)']))];
 
                     Beta2Sel2 = [Beta2Sel2; find(strcmp(cellstr(BetaNames), ...
-                                                        ['Sn(' num2str(iSess) ') ' CondNames{Cond2Contrast{iCdt, 2}}  '*bf(1)']))];
+                                                        ['Sn(' num2str(iSess) ') ' ...
+                                                         CondNames{Cond2Contrast{iCdt, 2}}  '*bf(1)']))];
                 end
             end
 
@@ -253,7 +261,10 @@ for iSub = 9:NbSub
                 Mapping = zeros(1, size(inf_vertex, 2));
                 Mapping(VertexWithData) = B(iBeta, :);
                 write_vtk(fullfile(Results_dir, 'cross_sens', [SubLs(iSub).name '_' HsSufix 'cr_' ...
-                                                               Cond_con_name{iCdt} '_' VTK_sufix{iBeta} '.vtk']), inf_vertex, inf_faces, Mapping);
+                                                               Cond_con_name{iCdt} '_' VTK_sufix{iBeta} '.vtk']), ...
+                          inf_vertex, ...
+                          inf_faces, ...
+                          Mapping);
             end
 
             clear Features Beta2Sel B X Y Mapping iBeta iSess;
