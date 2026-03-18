@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function Interactions_profile_surf_pool_hs_plot
     clc;
     clear;
@@ -29,10 +30,12 @@ function Interactions_profile_surf_pool_hs_plot
             ToPermute = [];
         end
 
-        load(fullfile(ResultsDir, strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data'); %#ok<*UNRCH>
+        load(fullfile(ResultsDir, strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), ...
+             'AllSubjects_Data'); %#ok<*UNRCH>
         Stimuli_data = AllSubjects_Data;
 
-        load(fullfile(ResultsDir, strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data'); %#ok<*UNRCH>
+        load(fullfile(ResultsDir, strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), ...
+             'AllSubjects_Data'); %#ok<*UNRCH>
         Target_data = AllSubjects_Data;
 
         NbROI = length(Stimuli_data);
@@ -49,7 +52,10 @@ function Interactions_profile_surf_pool_hs_plot
         ToPlot.Visible = 'on';
         ToPlot.FigureFolder = FigureFolder;
 
-        f = figure('Name', 'StimVsTargets', 'Position', [50, 50, 1400, 700], 'Color', [1 1 1], 'Visible', ToPlot.Visible);
+        f = figure('Name', 'StimVsTargets', ...
+                   'Position', [50, 50, 1400, 700], ...
+                   'Color', [1 1 1], ...
+                   'Visible', ToPlot.Visible);
 
         set(gca, 'units', 'centimeters');
         pos = get(gca, 'Position');
@@ -94,7 +100,10 @@ function Interactions_profile_surf_pool_hs_plot
         ToPlot.FigureFolder = FigureFolder;
         ToPlot.ToPermute = ToPermute;
 
-        f = figure('Name', 'Interactions', 'Position', [50, 50, 1400, 700], 'Color', [1 1 1], 'Visible', ToPlot.Visible);
+        f = figure('Name', 'Interactions', ...
+                   'Position', [50, 50, 1400, 700], ...
+                   'Color', [1 1 1], ...
+                   'Visible', ToPlot.Visible);
 
         set(gca, 'units', 'centimeters');
         pos = get(gca, 'Position');
@@ -206,8 +215,7 @@ function Plot_interaction(ToPlot)
 
         P = sum( ...
                 abs(Perms) > ...
-                repmat(abs(mean(tmp)), size(Perms, 1), 1)) ...
-            / size(Perms, 1);
+                repmat(abs(mean(tmp)), size(Perms, 1), 1)) / size(Perms, 1);
 
         for iP = 1:numel(P)
             Sig = [];

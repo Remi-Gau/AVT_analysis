@@ -40,7 +40,8 @@ for ihs = numel(hs)
 
         parfor iLayer = 1:NbLayers
 
-            VTK_file = dir(['GrpSurf_' CondNames{iCond} '_layer_' num2str(iLayer) '_' hs(ihs) 'h.vtk']); %#ok<*PFBNS>
+            VTK_file = dir(['GrpSurf_' CondNames{iCond} ...
+                            '_layer_' num2str(iLayer) '_' hs(ihs) 'h.vtk']); %#ok<*PFBNS>
             disp(VTK_file.name);
 
             [~, ~, Mapping] = read_vtk(VTK_file.name, 9, 1);
@@ -53,18 +54,26 @@ for ihs = numel(hs)
 
         end
 
-        write_vtk(['mean_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], Vertex, Face, AllLayers', 6);
-        write_vtk(['mean_inf_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], InfVertex, InfFace, AllLayers', 6);
+        write_vtk(['mean_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], ...
+                  Vertex, Face, AllLayers', 6);
+        write_vtk(['mean_inf_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], ...
+                  InfVertex, InfFace, AllLayers', 6);
 
-        write_vtk(['mask_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], Vertex, Face, AllLayersMask', 6);
-        write_vtk(['mask_inf_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], InfVertex, InfFace, AllLayersMask', 6);
+        write_vtk(['mask_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], ...
+                  Vertex, Face, AllLayersMask', 6);
+        write_vtk(['mask_inf_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], ...
+                  InfVertex, InfFace, AllLayersMask', 6);
 
-        write_vtk(['mask_bin_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], Vertex, Face, (AllLayersMask == 10)', 6);
-        write_vtk(['mask_bin_inf_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], InfVertex, InfFace, (AllLayersMask == 10)', 6);
+        write_vtk(['mask_bin_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], ...
+                  Vertex, Face, (AllLayersMask == 10)', 6);
+        write_vtk(['mask_bin_inf_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], ...
+                  InfVertex, InfFace, (AllLayersMask == 10)', 6);
 
         AllLayers(AllLayersMask < 10) = 0;
-        write_vtk(['mean_mask_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], Vertex, Face, AllLayers, 6);
-        write_vtk(['mean_mask_inf_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], InfVertex, InfFace, AllLayers, 6);
+        write_vtk(['mean_mask_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], ...
+                  Vertex, Face, AllLayers, 6);
+        write_vtk(['mean_mask_inf_' CondNames{iCond} '_' hs(ihs) 'h.vtk'], ...
+                  InfVertex, InfFace, AllLayers, 6);
 
     end
 

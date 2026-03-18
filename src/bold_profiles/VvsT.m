@@ -1,3 +1,5 @@
+% (C) Copyright 2020 Remi Gau
+
 %% V & T / Ipsi & Contra in A1 and PT
 Conditions = 3:6;
 RoisToSelect = {'A1', 'PT'};

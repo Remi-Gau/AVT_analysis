@@ -142,7 +142,9 @@ for iSub = [1:NbSub] % for each subject
             FileContent = [];
 
             Miss(RunInd, :) = [NbATargL + NbATargR, NbVTargL + NbVTargR, NbTTargL + NbTTargR] - Hits(RunInd, :);
-            CorrectRejection(RunInd, :) =  [NbAStimL + NbAStimR, NbVStimL + NbVStimR, NbTStimL + NbTStimR] - FalseAlarms(RunInd, :);
+            CorrectRejection(RunInd, :) =  [NbAStimL + NbAStimR, ...
+                                            NbVStimL + NbVStimR, ...
+                                            NbTStimL + NbTStimR] - FalseAlarms(RunInd, :);
 
             if NbResponses ~= [sum(Hits(RunInd, :)) + sum(FalseAlarms(RunInd, :)) + ExtraResponses(RunInd)]
                 error('We are missing some responses.');

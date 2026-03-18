@@ -84,7 +84,8 @@ for iSub = NbSub
             Beta2Sel = [];
             for iSess = 1:Nb_sess
                 Beta2Sel = [Beta2Sel; find(strcmp(cellstr(BetaNames), ...
-                                                  ['Sn(' num2str(iSess) ') ' CondNames{iCdt}  '*bf(1)']))];  %#ok<*AGROW>
+                                                  ['Sn(' num2str(iSess) ') ' ...
+                                                   CondNames{iCdt}  '*bf(1)']))];  %#ok<*AGROW>
             end
             %             fprintf('\n')
             %             disp(BetaNames(Beta2Sel,:))
