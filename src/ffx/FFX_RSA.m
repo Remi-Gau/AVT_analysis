@@ -78,7 +78,10 @@ for iSub = 1:NbSub % for each subject
     matlabbatch{1}.spm.spatial.coreg.estwrite.other = {fullfile(SubDir, 'ffx_rsa', 'mask_all_rois.nii')};
     matlabbatch{1}.spm.spatial.coreg.estwrite.eoptions.cost_fun = 'nmi';
     matlabbatch{1}.spm.spatial.coreg.estwrite.eoptions.sep = [4 2 1 .8];
-    matlabbatch{1}.spm.spatial.coreg.estwrite.eoptions.tol = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.001 0.001];
+    matlabbatch{1}.spm.spatial.coreg.estwrite.eoptions.tol = [0.02 0.02 0.02 ...
+                                                              0.001 0.001 0.001 ...
+                                                              0.01 0.01 0.01 ...
+                                                              0.001 0.001 0.001];
     matlabbatch{1}.spm.spatial.coreg.estwrite.eoptions.fwhm = [5 5];
     matlabbatch{1}.spm.spatial.coreg.estwrite.roptions.interp = 0;
     matlabbatch{1}.spm.spatial.coreg.estwrite.roptions.wrap = [0 0 0];

@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 [SubLs, NbSub] = GetSubjectList();
 COLOR_SUBJECTS = SubjectColors();
 

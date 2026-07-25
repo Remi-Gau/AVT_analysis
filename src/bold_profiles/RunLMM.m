@@ -1,4 +1,7 @@
+% (C) Copyright 2020 Remi Gau
+%
 % RunLMM
+%
 
 % small script to print out the results of the LMM and run the step down
 % approach

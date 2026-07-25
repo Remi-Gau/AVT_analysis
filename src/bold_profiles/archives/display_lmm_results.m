@@ -4,6 +4,8 @@ function display_lmm_results(DO)
     % - BOLDProfiles/make_figures_BOLD.m or
     % - MVPA/make_figures_MVPA.m
     % also outputs tables (does not serve them with fries though)
+    %
+    % (C) Copyright 2020 Remi Gau
 
     % 1. F-test in 2x2 (ROI X shape parameters)
     %   if significant

@@ -54,7 +54,8 @@ for iSub = 1:NbSub
     matlabbatch{2}.spm.util.reorient.transform.transM = M;
     matlabbatch{2}.spm.util.reorient.prefix = '';
 
-    save (fullfile(SubDir, dest_dir, 'betas', strcat('Reorient_', SubLs(iSub).name, '_jobs_', datestr(now, DateFormat), '.mat')));
+    save (fullfile(SubDir, dest_dir, 'betas', strcat('Reorient_', SubLs(iSub).name, '_jobs_', ...
+                                                     datestr(now, DateFormat), '.mat')));
 
     spm_jobman('run', matlabbatch);
 

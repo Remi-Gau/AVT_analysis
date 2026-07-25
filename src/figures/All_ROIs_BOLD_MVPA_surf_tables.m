@@ -1,3 +1,4 @@
+% (C) Copyright 2020 Remi Gau
 function All_ROIs_BOLD_MVPA_surf_tables
     % clc;
     clear;
@@ -63,12 +64,18 @@ function All_ROIs_BOLD_MVPA_surf_tables
     % load BOLD and MVPA
     if IsStim
         Stim_prefix = 'Stimuli';
-        load(fullfile(Dirs.BOLD_resultsDir, strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data'); %#ok<*UNRCH>
-        File2Load = fullfile(Dirs.MVPA_resultsDir, strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
+        load(fullfile(Dirs.BOLD_resultsDir, ...
+                      strcat('ResultsSurfPoolQuadGLM_l-', num2str(NbLayers), '.mat')), ...
+             'AllSubjects_Data'); %#ok<*UNRCH>
+        File2Load = fullfile(Dirs.MVPA_resultsDir, ...
+                             strcat('GrpPoolQuadGLM', SaveSufix, '.mat')); %#ok<*UNRCH>
     else
         Stim_prefix = 'Target';
-        load(fullfile(Dirs.BOLD_resultsDir, strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), 'AllSubjects_Data'); %#ok<*UNRCH>
-        File2Load = fullfile(Dirs.MVPA_resultsDir, strcat('GrpTargetsPoolQuadGLM', SaveSufix)); %#ok<*UNRCH>
+        load(fullfile(Dirs.BOLD_resultsDir, ...
+                      strcat('ResultsSurfTargetsPoolQuadGLM_l-', num2str(NbLayers), '.mat')), ...
+             'AllSubjects_Data'); %#ok<*UNRCH>
+        File2Load = fullfile(Dirs.MVPA_resultsDir, ...
+                             strcat('GrpTargetsPoolQuadGLM', SaveSufix)); %#ok<*UNRCH>
     end
 
     AllSubjects_Data_BOLD = AllSubjects_Data;
@@ -227,10 +234,14 @@ end
 function Print2TableROI(fid, ROIs, ToPrint)
 
     if ~isempty(ToPrint.ToPermute)
-        Legends1 = {'', '', 'Constant', '', '', '', '', '', '', '', '', '', '', '', '', '', 'Linear', '', '', '', '', '', '', '', '', '', '', '', '', '', 'Whole ROI'};
+        Legends1 = {'', '', 'Constant', '', '', '', '', '', '', '', '', '', '', '', '', '', ...
+                    'Linear', '', '', '', '', '', '', '', '', '', '', '', '', '', ...
+                    'Whole ROI'};
         Legends2 = {'', 'mean', '', '', 'STD', '', '', 'p value', '', 'Hedge G bca', '', '', ''};
     else
-        Legends1 = {'', '', 'Constant', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'Linear', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'Whole ROI'};
+        Legends1 = {'', '', 'Constant', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ...
+                    'Linear', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ...
+                    'Whole ROI'};
         Legends2 = {'', 'mean', '', '', 'STD', '', '', 't value', '', 'p value', '', 'Hedge G bca', '', '', ''};
     end
 

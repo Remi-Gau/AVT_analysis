@@ -51,7 +51,8 @@ for iSub = NbSub % for each subject
         TEMP = strcmp([CondNames{i} '*bf(1)'], cellstr(RegNames));
         All = All + TEMP;
         matlabbatch{1}.spm.stats.con.consess{i}.tcon.name = strcat(CondNames{i}, ' > Baseline');
-        matlabbatch{1}.spm.stats.con.consess{end}.tcon.weights = TEMP * 1; % the *1 is there to get rid of the logical indexing
+        % the *1 is there to get rid of the logical indexing
+        matlabbatch{1}.spm.stats.con.consess{end}.tcon.weights = TEMP * 1;
         matlabbatch{1}.spm.stats.con.consess{end}.tcon.sessrep = 'none';
         clear TEMP;
     end

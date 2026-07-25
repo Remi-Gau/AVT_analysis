@@ -63,7 +63,10 @@ for Smooth = 0:1
 
             for iLayer = 1:NbLayers
 
-                VTK_file = dir(['GrpSurf_' CondNames{iCond} '_layer_' num2str(iLayer) '_' hs(ihs) 'h' suffix '.vtk']); %#ok<*PFBNS>
+                VTK_file = dir(['GrpSurf_' CondNames{iCond} ...
+                                '_layer_' num2str(iLayer) ...
+                                '_' hs(ihs) 'h' suffix ...
+                                '.vtk']); %#ok<*PFBNS>
                 disp(VTK_file.name);
 
                 [~, ~, Mapping] = read_vtk(VTK_file.name, 9, 1);
@@ -71,7 +74,10 @@ for Smooth = 0:1
                 AllLayers(:, :, iLayer, iCond) = Mapping;
 
                 if Smooth
-                    VTK_file = dir(['GrpSurf_' CondNames{iCond} '_layer_' num2str(iLayer) '_' hs(ihs) 'h.vtk']); %#ok<*PFBNS>
+                    VTK_file = dir(['GrpSurf_' CondNames{iCond} ...
+                                    '_layer_' num2str(iLayer) ...
+                                    '_' hs(ihs) ...
+                                    'h.vtk']); %#ok<*PFBNS>
                     [~, ~, Mapping] = read_vtk(VTK_file.name, 9, 1);
                     AllLayersNoSmooth(:, :, iLayer, iCond) = Mapping;
                 end
@@ -123,7 +129,8 @@ for Smooth = 0:1
                 %
                 %                 X = [];
                 %                 for iSubj=1:(NbSub-NbSub2Excl)
-                %                     X((1:NbLayers)+NbLayers*(iSubj-1),(1:size(DesMat,2))+size(DesMat,2)*(iSubj-1)) = DesMat; %#ok<*SAGROW>
+                % X((1:NbLayers)+NbLayers*(iSubj-1),(1:size(DesMat,2))+size(DesMat,2)*(iSubj-1)) = ...
+                % DesMat; %#ok<*SAGROW>
                 %                 end
                 %
                 %                 B = pinv(X)*Y;
@@ -140,27 +147,29 @@ for Smooth = 0:1
                 %                 Mean(VertOfInt) = Mean_tmp;
                 T_map(VertOfInt) = T_map_temp;
 
-                %                 if NbSub2Excl==0
+                % if NbSub2Excl==0
                 %
-                %                     fprintf('\nRunning permutations')
+                %     fprintf('\nRunning permutations')
                 %
-                %                     for i=1:size(DesMat,2)
+                %     for i=1:size(DesMat,2)
                 %
-                %                         Perms = [];
+                %         Perms = [];
                 %
-                %                         tmp = B(i:3:size(X,2),:);
-                %                         SPM = mean(tmp);
+                %         tmp = B(i:3:size(X,2),:);
+                %         SPM = mean(tmp);
                 %
-                %                         parfor iPerm = 1:size(ToPermute,1)
-                %                             %                             Perms(iPerm,:) = max(abs(mean(tmp.*repmat(ToPermute(iPerm,:)',1,size(tmp,2))))); %#ok<*SAGROW>
-                %                             Perms(iPerm,:) = mean(tmp.*repmat(ToPermute(iPerm,:)',1,size(tmp,2))); %#ok<*SAGROW>
-                %                         end
+                %         parfor iPerm = 1:size(ToPermute,1)
+                %             % Perms(iPerm,:) = max(abs(mean(tmp.*repmat(ToPermute(iPerm,:)',1,size(tmp,2)))));
+                %             Perms(iPerm,:) = mean(tmp.*repmat(ToPermute(iPerm,:)',1,size(tmp,2))); %#ok<*SAGROW>
+                %         end
                 %
-                %                         PMaps = sum( abs( Perms-repmat(mean(Perms),size(Perms,1),1) ) > repmat( abs( SPM-mean(Perms) ) ,size(Perms,1),1) ) ...
+                %         PMaps = sum( abs( Perms-repmat(mean(Perms),size(Perms,1),1) ) > ...
+                % repmat( abs( SPM-mean(Perms) ) ,...
+                % size(Perms,1),1) ) ...
                 %                             / size(Perms,1);
                 %
-                %                         PMaps = repmat(Perms,[1 size(SPM,2)])>repmat(abs(SPM),[size(Perms,1) 1]);
-                %                         PMaps = sum(PMaps)/size(PMaps,1);
+                %  PMaps = repmat(Perms,[1 size(SPM,2)])>repmat(abs(SPM),[size(Perms,1) 1]);
+                %  PMaps = sum(PMaps)/size(PMaps,1);
                 %
                 %                         PMaps_final = zeros(1, size(Mapping,2));
                 %                         PMaps_final(VertOfInt) = PMaps;
@@ -168,20 +177,32 @@ for Smooth = 0:1
                 %                         SPM_final = zeros(1, size(Mapping,2));
                 %                         SPM_final(VertOfInt) = SPM;
                 %
-                %                         write_vtk(fullfile(DataFolder, [HS 'H'], 'Baseline', 'mask',...
-                %                             [CondName{iCond} '_' hs 'h_' Suffix{i} '_mask' suffix '.vtk']), Vertex, Face, SPM_final')
+                %  write_vtk(fullfile(DataFolder, [HS 'H'], 'Baseline', 'mask',...
+                %      [CondName{iCond} '_' hs 'h_' Suffix{i} '_mask' suffix '.vtk']), ...
+                % Vertex, ...
+                % Face, ...
+                % SPM_final')
                 %
                 %                         write_vtk(fullfile(DataFolder, [HS 'H'], 'Baseline', 'mask', ...
-                %                             [CondName{iCond} '_' hs 'h_' Suffix{i} '_inf_mask' suffix '.vtk']), InfVertex, InfFace, SPM_final')
+                %                             [CondName{iCond} '_' hs 'h_' Suffix{i} '_inf_mask' suffix '.vtk']), ...
+                % InfVertex, ...
+                % InfFace, ...
+                % SPM_final')
                 %
                 %                         SPM(PMaps>0.05) = 0;
                 %                         SPM_final = zeros(1, size(Mapping,2));
                 %                         SPM_final(VertOfInt) = SPM;
-                %                         write_vtk(fullfile(DataFolder, [HS 'H'], 'Baseline', 'mask',...
-                %                             [CondName{iCond} '_' hs 'h_' Suffix{i} '_inf_mask_thres' suffix '.vtk']), InfVertex, InfFace, SPM_final')
+                % write_vtk(fullfile(DataFolder, [HS 'H'], 'Baseline', 'mask',...
+                %     [CondName{iCond} '_' hs 'h_' Suffix{i} '_inf_mask_thres' suffix '.vtk']), ...
+                % InfVertex, ...
+                % InfFace, ...
+                % SPM_final')
                 %
-                %                         write_vtk(fullfile(DataFolder, [HS 'H'], 'Baseline', 'mask',...
-                %                             [CondName{iCond} '_' hs 'h_' Suffix{i} '_inf_mask_pmap' suffix '.vtk']), InfVertex, InfFace, PMaps_final')
+                %  write_vtk(fullfile(DataFolder, [HS 'H'], 'Baseline', 'mask',...
+                %      [CondName{iCond} '_' hs 'h_' Suffix{i} '_inf_mask_pmap' suffix '.vtk']), ...
+                % InfVertex, ...
+                % InfFace, ...
+                % PMaps_final')
                 %
                 %                     end
                 %

@@ -28,7 +28,9 @@ for SubjInd = 1:size(SubjectList, 1)
     SubjectFolder = fullfile(StartFolder, 'Subjects_Data', ['Subject_' SubjID], 'Structural', 'CBS');
 
     LevelSetFile = dir(fullfile(SubjectFolder, ...
-                                ['T1_' SubjID '_thresh_clone_transform_strip_clone_transform_bound_mems_cr_gm_avg.nii']));
+                                ['T1_' ...
+                                 SubjID ...
+                                 '_thresh_clone_transform_strip_clone_transform_bound_mems_cr_gm_avg.nii']));
 
     if ~exist(fullfile(SubjectFolder, LevelSetFile.name), 'file')
         gunzip(fullfile(SubjectFolder, [LevelSetFile.name '.gz']));

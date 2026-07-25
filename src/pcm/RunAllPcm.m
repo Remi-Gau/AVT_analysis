@@ -74,7 +74,10 @@ fprintf('Get started\n');
 
 for iROI =  1:numel(ROIs)
 
-    [GrpDataSource, GrpConditionVecSource, GrpRunVecSource] = LoadAndPreparePcmData(ROIs{iROI}, InputDir, Opt, InputType);
+    [GrpDataSource, GrpConditionVecSource, GrpRunVecSource] = LoadAndPreparePcmData(ROIs{iROI}, ...
+                                                                                    InputDir, ...
+                                                                                    Opt, ...
+                                                                                    InputType);
 
     IsAuditoryRoi = true;
     if any(strcmp(ROIs{iROI}, {'V1', 'V2', 'V3', 'V4', 'V5'}))
@@ -143,7 +146,10 @@ for iROI =  1:numel(ROIs)
 
 end
 
-function [T_ind, theta_ind, G_pred_ind, D, T_ind_cross, theta_ind_cross] = RunIndividualPcm(Data, Models, RunVec, ConditionVec)
+function [T_ind, theta_ind, G_pred_ind, D, T_ind_cross, theta_ind_cross] = RunIndividualPcm(Data, ...
+                                                                                            Models, ...
+                                                                                            RunVec, ...
+                                                                                            ConditionVec)
 
     MaxIteration = 50000;
     runEffect  = 'fixed';

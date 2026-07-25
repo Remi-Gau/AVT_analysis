@@ -1,5 +1,7 @@
 function Gout = rdm2G(rdminput, plotflag, plottext)
     % function Gout=rdm2G(rdminput,plotflag,plottext)
+    %
+    % (C) Copyright 2016 Johanna Zumer
 
     H = eye(size(rdminput)) - ones(size(rdminput)) / size(rdminput, 1);
     Gout = -0.5 * H * rdminput * H;
